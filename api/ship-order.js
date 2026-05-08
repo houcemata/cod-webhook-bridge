@@ -1,5 +1,6 @@
 // api/ship-order.js
 // Creates an order on Noest Express API and updates Supabase
+// Place this file in your /api folder on GitHub
 
 const NOEST_BASE = "https://app.noest-dz.com/api/public";
 
