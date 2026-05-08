@@ -72,7 +72,7 @@ function parseShopifyOrder(order) {
     commune: shippingAddress.address1 || "",
     product: productSummary,
     variable: firstVariant,
-    delivery_type: "home", // default — can be updated manually in CRM
+    type_livraison: "home", // default — can be updated manually in CRM
     prix_total: parseFloat(order.total_price || "0"),
     status: "pending", // always starts as pending
   };
