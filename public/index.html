@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>COD Admin CRM</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f4f4f5;
+      color: #18181b;
+      font-size: 13px;
+    }
+
+    /* ── Header ── */
+    header {
+      background: #18181b;
+      color: #fff;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    header h1 { font-size: 15px; font-weight: 600; letter-spacing: .3px; }
+    #refresh-btn {
+      background: #3f3f46;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    #refresh-btn:hover { background: #52525b; }
+
+    /* ── Stats ── */
+    .stats {
+      display: flex;
+      gap: 10px;
+      padding: 14px 18px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      flex: 1;
+      min-width: 110px;
+      background: #fff;
+      border: 1px solid #e4e4e7;
+      border-radius: 8px;
+      padding: 12px 16px;
+    }
+    .stat .label { font-size: 11px; color: #71717a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .4px; }
+    .stat .value { font-size: 26px; font-weight: 700; line-height: 1; }
+    .stat.delivered   .value { color: #16a34a; }
+    .stat.pending     .value { color: #d97706; }
+    .stat.canceled    .value { color: #dc2626; }
+    .stat.shipped     .value { color: #8b5cf6; }
+    .stat.confirmed   .value { color: #3b82f6; }
+    .stat.to_recall   .value { color: #f59e0b; }
+    .stat.not_delivered .value { color: #ef4444; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      padding: 0 18px 12px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .toolbar input,
+    .toolbar select {
+      padding: 7px 10px;
+      border: 1px solid #d4d4d8;
+      border-radius: 6px;
+      font-size: 13px;
+      background: #fff;
+      color: #18181b;
+    }
+    .toolbar input { flex: 1; min-width: 180px; }
+    #result-count { font-size: 12px; color: #71717a; margin-left: 4px; }
+
+    /* ── Error banner ── */
+    #error-banner {
+      margin: 0 18px 10px;
+      padding: 10px 14px;
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: 6px;
+      color: #b91c1c;
+      font-size: 13px;
+      display: none;
+    }
+
+    /* ── Table ── */
+    .table-wrap {
+      padding: 0 18px 32px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    table {
+      width: 100%;
+      min-width: 900px;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid #e4e4e7;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    thead { background: #f4f4f5; }
+    th {
+      padding: 9px 12px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: #52525b;
+      white-space: nowrap;
+      border-bottom: 1px solid #e4e4e7;
+      cursor: pointer;
+      user-select: none;
+    }
+    th:hover { color: #18181b; }
+    th .sort-icon { margin-left: 3px; opacity: .5; }
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #f4f4f5;
+      vertical-align: middle;
+      white-space: nowrap;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafafa; }
+
+    /* ── Status select ── */
+    .status-select {
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid #d4d4d8;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      background: #fff;
+      min-width: 120px;
+    }
+    .status-select:disabled { opacity: .6; cursor: wait; }
+
+    .status-select.pending      { border-color: #f59e0b; color: #92400e; background: #fffbeb; }
+    .status-select.confirmed    { border-color: #3b82f6; color: #1e40af; background: #eff6ff; }
+    .status-select.shipped      { border-color: #8b5cf6; color: #5b21b6; background: #f5f3ff; }
+    .status-select.delivered    { border-color: #22c55e; color: #15803d; background: #f0fdf4; }
+    .status-select.canceled     { border-color: #ef4444; color: #991b1b; background: #fef2f2; }
+    .status-select.to_recall    { border-color: #f59e0b; color: #92400e; background: #fffbeb; }
+    .status-select.attempt_1    { border-color: #fb923c; color: #9a3412; background: #fff7ed; }
+    .status-select.attempt_2    { border-color: #f97316; color: #9a3412; background: #fff7ed; }
+    .status-select.attempt_3    { border-color: #ea580c; color: #9a3412; background: #fff7ed; }
+    .status-select.rescheduled  { border-color: #06b6d4; color: #155e75; background: #ecfeff; }
+    .status-select.not_delivered{ border-color: #ef4444; color: #991b1b; background: #fef2f2; }
+    .status-select.duplicated   { border-color: #a1a1aa; color: #3f3f46; background: #f4f4f5; }
+
+    .saving-indicator { font-size: 11px; color: #a1a1aa; }
+
+    /* ── Empty / loading ── */
+    .placeholder { text-align: center; padding: 48px; color: #a1a1aa; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #18181b;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 99px;
+      font-size: 13px;
+      opacity: 0;
+      transition: opacity .2s;
+      pointer-events: none;
+      z-index: 100;
+      white-space: nowrap;
+    }
+    #toast.show { opacity: 1; }
+    #toast.error { background: #b91c1c; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>COD Admin CRM</h1>
+  <button id="refresh-btn" onclick="loadOrders()">↻ Refresh</button>
+</header>
+
+<div id="error-banner"></div>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat">
+    <div class="label">Total</div>
+    <div class="value" id="s-total">—</div>
+  </div>
+  <div class="stat pending">
+    <div class="label">Pending</div>
+    <div class="value" id="s-pending">—</div>
+  </div>
+  <div class="stat to_recall">
+    <div class="label">To Recall</div>
+    <div class="value" id="s-to_recall">—</div>
+  </div>
+  <div class="stat confirmed">
+    <div class="label">Confirmed</div>
+    <div class="value" id="s-confirmed">—</div>
+  </div>
+  <div class="stat shipped">
+    <div class="label">Shipped</div>
+    <div class="value" id="s-shipped">—</div>
+  </div>
+  <div class="stat delivered">
+    <div class="label">Delivered</div>
+    <div class="value" id="s-delivered">—</div>
+  </div>
+  <div class="stat canceled">
+    <div class="label">Canceled</div>
+    <div class="value" id="s-canceled">—</div>
+  </div>
+  <div class="stat not_delivered">
+    <div class="label">Not Delivered</div>
+    <div class="value" id="s-not_delivered">—</div>
+  </div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <input id="search" type="search" placeholder="Search name, phone, wilaya…" oninput="renderTable()" />
+  <select id="filter-status" onchange="renderTable()">
+    <option value="">All statuses</option>
+    <option value="pending">Pending</option>
+    <option value="to_recall">To Recall</option>
+    <option value="attempt_1">Attempt 1</option>
+    <option value="attempt_2">Attempt 2</option>
+    <option value="attempt_3">Attempt 3</option>
+    <option value="rescheduled">Rescheduled</option>
+    <option value="confirmed">Confirmed</option>
+    <option value="shipped">Shipped</option>
+    <option value="delivered">Delivered</option>
+    <option value="canceled">Canceled</option>
+    <option value="not_delivered">Not Delivered</option>
+    <option value="duplicated">Duplicated</option>
+  </select>
+  <span id="result-count"></span>
+</div>
+
+<!-- Table -->
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th onclick="sortBy('order_id')">ID <span class="sort-icon" id="sort-order_id"></span></th>
+        <th onclick="sortBy('created_at')">Date <span class="sort-icon" id="sort-created_at"></span></th>
+        <th onclick="sortBy('name')">Name <span class="sort-icon" id="sort-name"></span></th>
+        <th onclick="sortBy('phone')">Phone <span class="sort-icon" id="sort-phone"></span></th>
+        <th onclick="sortBy('wilaya')">Wilaya <span class="sort-icon" id="sort-wilaya"></span></th>
+        <th onclick="sortBy('commune')">Commune <span class="sort-icon" id="sort-commune"></span></th>
+        <th onclick="sortBy('product')">Product <span class="sort-icon" id="sort-product"></span></th>
+        <th onclick="sortBy('variable')">Variable <span class="sort-icon" id="sort-variable"></span></th>
+        <th onclick="sortBy('type_livraison')">Delivery <span class="sort-icon" id="sort-type_livraison"></span></th>
+        <th onclick="sortBy('prix_total')">Total <span class="sort-icon" id="sort-prix_total"></span></th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="order-body">
+      <tr><td colspan="11" class="placeholder">Loading…</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const BASE = "https://zcsdkuzmogvpvqjzhnqu.supabase.co/rest/v1";
+  const KEY  = "sb_publishable_81QJsFjBfgG9fKhNIS2usA_sNqVQhLF";
+
+  const STATUSES = [
+    "pending", "to_recall", "attempt_1", "attempt_2", "attempt_3",
+    "rescheduled", "confirmed", "shipped", "delivered",
+    "canceled", "not_delivered", "duplicated"
+  ];
+
+  const STATUS_LABELS = {
+    pending: "Pending", to_recall: "To Recall",
+    attempt_1: "Attempt 1", attempt_2: "Attempt 2", attempt_3: "Attempt 3",
+    rescheduled: "Rescheduled", confirmed: "Confirmed", shipped: "Shipped",
+    delivered: "Delivered", canceled: "Canceled",
+    not_delivered: "Not Delivered", duplicated: "Duplicated"
+  };
+
+  const H = {
+    "apikey":        KEY,
+    "Authorization": `Bearer ${KEY}`,
+    "Content-Type":  "application/json",
+  };
+
+  let allOrders = [];
+  let sortCol   = "created_at";
+  let sortAsc   = false;
+
+  /* ── Fetch ── */
+  async function loadOrders() {
+    document.getElementById("order-body").innerHTML =
+      `<tr><td colspan="11" class="placeholder">Loading…</td></tr>`;
+    try {
+      const res = await fetch(`${BASE}/orders?select=*&order=created_at.desc`, { headers: H });
+      if (!res.ok) throw new Error(`HTTP ${res.status} — ${await res.text()}`);
+      allOrders = await res.json();
+      hideError();
+      updateStats();
+      renderTable();
+    } catch (e) {
+      showError(e.message);
+      document.getElementById("order-body").innerHTML =
+        `<tr><td colspan="11" class="placeholder">Failed to load orders.</td></tr>`;
+    }
+  }
+
+  /* ── Stats ── */
+  function updateStats() {
+    const count = s => allOrders.filter(o => o.status === s).length;
+    document.getElementById("s-total").textContent        = allOrders.length;
+    document.getElementById("s-pending").textContent      = count("pending");
+    document.getElementById("s-to_recall").textContent    = count("to_recall");
+    document.getElementById("s-confirmed").textContent    = count("confirmed");
+    document.getElementById("s-shipped").textContent      = count("shipped");
+    document.getElementById("s-delivered").textContent    = count("delivered");
+    document.getElementById("s-canceled").textContent     = count("canceled");
+    document.getElementById("s-not_delivered").textContent= count("not_delivered");
+  }
+
+  /* ── Sort ── */
+  function sortBy(col) {
+    if (sortCol === col) sortAsc = !sortAsc;
+    else { sortCol = col; sortAsc = true; }
+    renderTable();
+  }
+
+  function sorted(rows) {
+    return [...rows].sort((a, b) => {
+      let av = a[sortCol] ?? "", bv = b[sortCol] ?? "";
+      if (sortCol === "prix_total") { av = +av; bv = +bv; }
+      if (av < bv) return sortAsc ? -1 : 1;
+      if (av > bv) return sortAsc ?  1 : -1;
+      return 0;
+    });
+  }
+
+  function updateSortIcons() {
+    document.querySelectorAll(".sort-icon").forEach(el => el.textContent = "");
+    const el = document.getElementById(`sort-${sortCol}`);
+    if (el) el.textContent = sortAsc ? "▲" : "▼";
+  }
+
+  /* ── Render ── */
+  function renderTable() {
+    updateSortIcons();
+    const q  = document.getElementById("search").value.trim().toLowerCase();
+    const sf = document.getElementById("filter-status").value;
+
+    let rows = allOrders.filter(o => {
+      if (sf && o.status !== sf) return false;
+      if (!q) return true;
+      return ["name","phone","wilaya","commune","product","variable","type_livraison"]
+        .some(k => o[k] && String(o[k]).toLowerCase().includes(q));
+    });
+
+    rows = sorted(rows);
+    document.getElementById("result-count").textContent =
+      rows.length < allOrders.length
+        ? `${rows.length} / ${allOrders.length} orders`
+        : `${allOrders.length} orders`;
+
+    const tbody = document.getElementById("order-body");
+    if (!rows.length) {
+      tbody.innerHTML = `<tr><td colspan="11" class="placeholder">No orders found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(o => `
+      <tr>
+        <td title="${esc(o.order_id)}">${esc(o.order_id) ?? "—"}</td>
+        <td title="${esc(o.created_at)}">${fmtDate(o.created_at)}</td>
+        <td title="${esc(o.name)}">${esc(o.name)}</td>
+        <td>${esc(o.phone)}</td>
+        <td>${esc(o.wilaya)}</td>
+        <td>${esc(o.commune)}</td>
+        <td title="${esc(o.product)}">${esc(o.product)}</td>
+        <td title="${esc(o.variable)}">${esc(o.variable)}</td>
+        <td>${esc(o.type_livraison)}</td>
+        <td>${o.prix_total != null ? Number(o.prix_total).toLocaleString("fr-DZ") + " DA" : "—"}</td>
+        <td>
+          <select
+            class="status-select ${esc(o.status)}"
+            data-id="${esc(o.order_id)}"
+            onchange="updateStatus(this)">
+            ${STATUSES.map(s =>
+              `<option value="${s}"${o.status === s ? " selected" : ""}>${STATUS_LABELS[s]}</option>`
+            ).join("")}
+          </select>
+          <span class="saving-indicator" id="sav-${esc(o.order_id)}"></span>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  /* ── Update status ── */
+  async function updateStatus(sel) {
+    const id     = sel.dataset.id;
+    const status = sel.value;
+    const indic  = document.getElementById(`sav-${id}`);
+
+    sel.disabled = true;
+    if (indic) indic.textContent = "…";
+
+    try {
+      const res = await fetch(
+        `${BASE}/orders?order_id=eq.${encodeURIComponent(id)}`,
+        {
+          method:  "PATCH",
+          headers: { ...H, "Prefer": "return=minimal" },
+          body:    JSON.stringify({ status }),
+        }
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const order = allOrders.find(o => String(o.order_id) === String(id));
+      if (order) order.status = status;
+
+      sel.className = `status-select ${status}`;
+      updateStats();
+      toast("Status updated ✓");
+    } catch (e) {
+      toast("Update failed: " + e.message, true);
+      const order = allOrders.find(o => String(o.order_id) === String(id));
+      if (order) {
+        sel.value     = order.status;
+        sel.className = `status-select ${order.status}`;
+      }
+    } finally {
+      sel.disabled = false;
+      if (indic) indic.textContent = "";
+    }
+  }
+
+  /* ── Helpers ── */
+  function esc(v) {
+    if (v == null) return "—";
+    return String(v)
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;");
+  }
+  function fmtDate(v) {
+    if (!v) return "—";
+    try {
+      return new Date(v).toLocaleDateString("fr-DZ", {
+        day: "2-digit", month: "2-digit", year: "2-digit",
+        hour: "2-digit", minute: "2-digit"
+      });
+    } catch { return String(v); }
+  }
+
+  let _toastTimer;
+  function toast(msg, isError = false) {
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.className   = "show" + (isError ? " error" : "");
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => el.className = "", 2400);
+  }
+
+  function showError(msg) {
+    const el = document.getElementById("error-banner");
+    el.textContent = "Error: " + msg;
+    el.style.display = "block";
+  }
+  function hideError() {
+    document.getElementById("error-banner").style.display = "none";
+  }
+
+  loadOrders();
+</script>
+</body>
+</html>
