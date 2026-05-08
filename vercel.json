@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/shopify-webhook.js": {
+      "maxDuration": 10
+    }
+  }
+}
