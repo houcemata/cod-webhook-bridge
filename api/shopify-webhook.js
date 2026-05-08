@@ -1,15 +1,8 @@
 // api/shopify-webhook.js
 // Shopify → Supabase bridge for COD operations system
-// Deploy this file to Vercel inside an /api folder
 
 import crypto from "crypto";
 
-// ─── helpers ───────────────────────────────────────────────────────────────
-
-/**
- * Read the raw request body as a Buffer (needed for HMAC verification).
- * Vercel does not expose rawBody by default, so we collect chunks manually.
- */
 async function getRawBody(req) {
   return new Promise((resolve, reject) => {
     const chunks = [];
@@ -19,33 +12,21 @@ async function getRawBody(req) {
   });
 }
 
-/**
- * Verify that the webhook truly came from Shopify.
- * Shopify signs every webhook with HMAC-SHA256 using your webhook secret.
- */
 function verifyShopifyHmac(rawBody, shopifyHmacHeader, secret) {
   const computed = crypto
     .createHmac("sha256", secret)
     .update(rawBody)
     .digest("base64");
-  // Use timingSafeEqual to prevent timing attacks
   return crypto.timingSafeEqual(
     Buffer.from(computed),
     Buffer.from(shopifyHmacHeader)
   );
 }
 
-/**
- * Extract the fields we care about from a raw Shopify order payload.
- * Shopify's JSON structure can be deeply nested — this function handles
- * missing fields gracefully so the handler never crashes on odd orders.
- */
 function parseShopifyOrder(order) {
   const shippingAddress = order.shipping_address || {};
   const lineItems = order.line_items || [];
 
-  // Build a readable product string from all line items
-  // e.g. "T-Shirt (Red / L) x2, Cap x1"
   const productSummary = lineItems
     .map((item) => {
       const variant = item.variant_title ? ` (${item.variant_title})` : "";
@@ -54,7 +35,6 @@ function parseShopifyOrder(order) {
     })
     .join(", ");
 
-  // First variant of first line item (for the `variable` field)
   const firstVariant =
     lineItems.length > 0 ? lineItems[0].variant_title || "" : "";
 
@@ -68,21 +48,17 @@ function parseShopifyOrder(order) {
       order.billing_address?.phone ||
       order.phone ||
       "",
-    wilaya: shippingAddress.city || shippingAddress.province || "",
-    commune: shippingAddress.address1 || "",
+    // FIX: province = wilaya, city = commune in Algerian Shopify orders
+    wilaya:  shippingAddress.province || shippingAddress.province_code || "",
+    commune: shippingAddress.city || "",
     product: productSummary,
     variable: firstVariant,
-    type_livraison: "home", // default — can be updated manually in CRM
+    type_livraison: "home",
     prix_total: parseFloat(order.total_price || "0"),
-    status: "pending", // always starts as pending
+    status: "pending",
   };
 }
 
-/**
- * Insert an order into Supabase using the REST API directly.
- * We use fetch + the Supabase REST API so we don't need to install
- * any npm packages — zero dependencies, works out of the box on Vercel.
- */
 async function insertIntoSupabase(orderData, supabaseUrl, supabaseKey) {
   const response = await fetch(`${supabaseUrl}/rest/v1/orders`, {
     method: "POST",
@@ -90,7 +66,7 @@ async function insertIntoSupabase(orderData, supabaseUrl, supabaseKey) {
       "Content-Type": "application/json",
       apikey: supabaseKey,
       Authorization: `Bearer ${supabaseKey}`,
-      Prefer: "return=minimal", // don't return the full row (saves bandwidth)
+      Prefer: "return=minimal",
     },
     body: JSON.stringify(orderData),
   });
@@ -103,10 +79,6 @@ async function insertIntoSupabase(orderData, supabaseUrl, supabaseKey) {
   return true;
 }
 
-/**
- * Check if an order with this order_id already exists in Supabase.
- * This prevents duplicate rows if Shopify sends the webhook more than once.
- */
 async function orderExists(orderId, supabaseUrl, supabaseKey) {
   const response = await fetch(
     `${supabaseUrl}/rest/v1/orders?order_id=eq.${encodeURIComponent(orderId)}&select=id&limit=1`,
@@ -118,24 +90,18 @@ async function orderExists(orderId, supabaseUrl, supabaseKey) {
     }
   );
 
-  if (!response.ok) return false; // on error, allow insert (fail open)
-
+  if (!response.ok) return false;
   const rows = await response.json();
   return rows.length > 0;
 }
 
-// ─── main handler ──────────────────────────────────────────────────────────
-
 export default async function handler(req, res) {
-  // Only accept POST requests
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  // Read raw body FIRST (before any JSON parsing)
   const rawBody = await getRawBody(req);
 
-  // ── Security: verify the request is from Shopify ──
   const shopifySecret = process.env.SHOPIFY_WEBHOOK_SECRET;
   const hmacHeader = req.headers["x-shopify-hmac-sha256"];
 
@@ -157,7 +123,6 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  // ── Parse the JSON body ──
   let order;
   try {
     order = JSON.parse(rawBody.toString("utf8"));
@@ -166,7 +131,6 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Invalid JSON" });
   }
 
-  // ── Get Supabase credentials from environment ──
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -175,7 +139,6 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Server configuration error" });
   }
 
-  // ── Deduplication: skip if order already exists ──
   const orderId = String(order.id || "");
 
   if (!orderId) {
@@ -186,11 +149,9 @@ export default async function handler(req, res) {
   const alreadyExists = await orderExists(orderId, supabaseUrl, supabaseKey);
   if (alreadyExists) {
     console.log(`Order ${orderId} already exists — skipping duplicate`);
-    // Return 200 so Shopify doesn't retry — this is intentional
     return res.status(200).json({ message: "Duplicate — skipped" });
   }
 
-  // ── Parse and insert ──
   const orderData = parseShopifyOrder(order);
 
   try {
@@ -199,7 +160,6 @@ export default async function handler(req, res) {
     return res.status(200).json({ message: "Order inserted" });
   } catch (err) {
     console.error("Insert error:", err.message);
-    // Return 500 so Shopify will retry — it retries up to 19 times
     return res.status(500).json({ error: "Insert failed" });
   }
 }
