@@ -53,7 +53,11 @@ function parseShopifyOrder(order) {
     commune: shippingAddress.city || "",
     product: productSummary,
     variable: firstVariant,
-    type_livraison: "home",
+type_livraison: (() => {
+  const shippingTitle = (order.shipping_lines?.[0]?.title || "").toLowerCase();
+  if (shippingTitle.includes("stopdesk") || shippingTitle.includes("stop desk") || shippingTitle.includes("relais")) return "pickup";
+  return "home";
+})(),
     prix_total: parseFloat(order.total_price || "0"),
     status: "pending",
   };
