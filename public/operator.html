@@ -664,8 +664,8 @@ async function openShipModal(id){
   // Set delivery type from order
   document.getElementById('ship-type').value=o.type_livraison==='pickup'?'pickup':'home';
   // Populate commune dropdown
-  populateShipCommunes(o.wilaya, o.commune);
-  onShipTypeChange();
+await onShipTypeChange();
+populateShipCommunes(o.wilaya, o.commune);
   document.getElementById('ship-modal').classList.add('open');
 }
 
