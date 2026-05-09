@@ -711,12 +711,25 @@ async function loadNoestDesks(){
 
 function populateDeskDropdown(){
   const sel=document.getElementById('ship-desk');
+  if(!noestDesks){return;}
   const o=allOrders.find(x=>x.id===shipOrderId);
-  if(!o||!noestDesks){return;}
-  // Filter desks by wilaya if possible
   const entries=Object.entries(noestDesks);
+
+  // Try to find desks matching the order's wilaya number
+  const wilayaNum=o?Object.keys({"Adrar":"01","Chlef":"02","Laghouat":"03","Oum El Bouaghi":"04","Batna":"05","Bejaia":"06","Biskra":"07","Bechar":"08","Blida":"09","Bouira":"10","Tamanrasset":"11","Tebessa":"12","Tlemcen":"13","Tiaret":"14","Tizi Ouzou":"15","Alger":"16","Djelfa":"17","Jijel":"18","Setif":"19","Saida":"20","Skikda":"21","Sidi Bel Abbes":"22","Annaba":"23","Guelma":"24","Constantine":"25","Medea":"26","Mostaganem":"27","Msila":"28","Mascara":"29","Ouargla":"30","Oran":"31","El Bayadh":"32","Illizi":"33","Bordj Bou Arreridj":"34","Boumerdes":"35","El Tarf":"36","Tindouf":"37","Tissemsilt":"38","El Oued":"39","Khenchela":"40","Souk Ahras":"41","Tipaza":"42","Mila":"43","Ain Defla":"44","Naama":"45","Ain Temouchent":"46","Ghardaia":"47","Relizane":"48","Timimoun":"49","Bordj Badji Mokhtar":"50","Ouled Djellal":"51","Beni Abbes":"52","In Salah":"53","In Guezzam":"54","Touggourt":"55","Djanet":"56","El Meghaier":"57","El Meniaa":"58"}).find(k=>k.toLowerCase()===o.wilaya?.toLowerCase()):null;
+  const wilayaCode=wilayaNum?{"Adrar":"01","Chlef":"02","Laghouat":"03","Oum El Bouaghi":"04","Batna":"05","Bejaia":"06","Biskra":"07","Bechar":"08","Blida":"09","Bouira":"10","Tamanrasset":"11","Tebessa":"12","Tlemcen":"13","Tiaret":"14","Tizi Ouzou":"15","Alger":"16","Djelfa":"17","Jijel":"18","Setif":"19","Saida":"20","Skikda":"21","Sidi Bel Abbes":"22","Annaba":"23","Guelma":"24","Constantine":"25","Medea":"26","Mostaganem":"27","Msila":"28","Mascara":"29","Ouargla":"30","Oran":"31","El Bayadh":"32","Illizi":"33","Bordj Bou Arreridj":"34","Boumerdes":"35","El Tarf":"36","Tindouf":"37","Tissemsilt":"38","El Oued":"39","Khenchela":"40","Souk Ahras":"41","Tipaza":"42","Mila":"43","Ain Defla":"44","Naama":"45","Ain Temouchent":"46","Ghardaia":"47","Relizane":"48","Timimoun":"49","Bordj Badji Mokhtar":"50","Ouled Djellal":"51","Beni Abbes":"52","In Salah":"53","In Guezzam":"54","Touggourt":"55","Djanet":"56","El Meghaier":"57","El Meniaa":"58"}[wilayaNum]:null;
+
+  // Show matching wilaya desks first, then all others
+  const matching=entries.filter(([code])=>wilayaCode&&code.startsWith(wilayaCode));
+  const others=entries.filter(([code])=>!wilayaCode||!code.startsWith(wilayaCode));
+
   sel.innerHTML='<option value="">Select Stop Desk</option>'+
-    entries.map(([code,desk])=>`<option value="${esc(code)}">${esc(desk.name)} — ${esc(desk.address||'')}</option>`).join('');
+    (matching.length?'<optgroup label="— This Wilaya —">'+
+      matching.map(([code,d])=>`<option value="${esc(code)}">${esc(d.name)}</option>`).join('')+
+    '</optgroup>':'')+
+    '<optgroup label="— All Desks —">'+
+      others.map(([code,d])=>`<option value="${esc(code)}">${esc(d.name)}</option>`).join('')+
+    '</optgroup>';
 }
 
 async function confirmShip(){
