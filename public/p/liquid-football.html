@@ -1210,13 +1210,8 @@ function populateDesks() {
   const entries = Object.entries(noestDesks);
   const matching = entries.filter(([code]) => num && new RegExp(`^${num}[A-Z]`).test(code));
   const others = entries.filter(([code]) => !matching.find(([mc]) => mc === code));
-  sel.innerHTML = '<option value="">Choisir un point — اختر نقطة</option>' +
-    (matching.length ? '<optgroup label="— Votre Wilaya —">' +
-      matching.map(([code, d]) => `<option value="${code}">${d.name || code}</option>`).join('') +
-    '</optgroup>' : '') +
-    '<optgroup label="— Tous les points —">' +
-      others.map(([code, d]) => `<option value="${code}">${d.name || code}</option>`).join('') +
-    '</optgroup>';
+  sel.innerHTML = '<option value="">اختر نقطة — Choisir un point</option>' +
+    matching.map(([code, d]) => `<option value="${code}">${d.name || code}</option>`).join('');
 }
 
 // ── STICKY BAR ──
