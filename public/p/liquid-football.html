@@ -1237,7 +1237,11 @@ async function submitOrder() {
   const desk = document.getElementById('f-desk').value;
 
   if (!name) { toast('Veuillez entrer votre nom — أدخل اسمك', true); return; }
-  if (!phone || phone.length < 9) { toast('Numéro de téléphone invalide — رقم خاطئ', true); return; }
+  const phoneClean = phone.replace(/\s/g, '');
+if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) { 
+  toast('رقم الهاتف غير صحيح', true); 
+  return; 
+}
   if (!wilayaKey) { toast('Veuillez choisir votre wilaya — اختر الولاية', true); return; }
   if (selectedDelivery === 'home' && !commune) { toast('Veuillez choisir votre commune — اختر البلدية', true); return; }
   if (selectedDelivery === 'desk' && !desk) { toast('Veuillez choisir un point Stop Desk', true); return; }
@@ -1254,7 +1258,7 @@ async function submitOrder() {
   const orderData = {
     order_id: orderId,
     name,
-    phone: phone.replace(/\s/g, ''),
+    phone: phoneClean,
     wilaya: wilayaClean,
     commune: selectedDelivery === 'home' ? commune : '',
     type_livraison: selectedDelivery === 'home' ? 'home' : 'pickup',
