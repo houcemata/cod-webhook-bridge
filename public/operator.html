@@ -820,7 +820,7 @@ async function updateStatusCard(sel,id){
   const old=o.status;
   sel.disabled=true;
   await sbFetch(`orders?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({status:newStatus})});
-  await sbFetch('order_history',{method:'POST',headers:{'Prefer':'return=minimal'},
+  await sbFetch('order_history',{method:'POST',
     body:JSON.stringify({order_id:o.order_id,old_status:old,new_status:newStatus,changed_by:'operator'})});
   o.status=newStatus;
   sel.disabled=false;
@@ -910,7 +910,7 @@ function openTracking(){
 async function updateStatusDetail(newStatus){
   const o=currentOrder,old=o.status;
   await sbFetch(`orders?id=eq.${o.id}`,{method:'PATCH',body:JSON.stringify({status:newStatus})});
-  await sbFetch('order_history',{method:'POST',headers:{'Prefer':'return=minimal'},
+  await sbFetch('order_history',{method:'POST',
     body:JSON.stringify({order_id:o.order_id,old_status:old,new_status:newStatus,changed_by:'operator'})});
   o.status=newStatus;
   await loadOrders();
@@ -1080,7 +1080,7 @@ async function saveEdit(){
     const oldVal=o[field]||'';
     const newVal=newData[field]||'';
     if(String(oldVal).trim()!==String(newVal).trim()){
-      await sbFetch('order_history',{method:'POST',headers:{'Prefer':'return=minimal'},
+      await sbFetch('order_history',{method:'POST',
         body:JSON.stringify({
           order_id:o.order_id,
           old_status:String(oldVal),
