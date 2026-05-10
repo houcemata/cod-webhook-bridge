@@ -22,8 +22,12 @@ const WILAYA_MAP = {
 
 function getWilayaId(wilayaName) {
   if (!wilayaName) return null;
-  return WILAYA_MAP[wilayaName.toLowerCase().trim()] || null;
-}
+  const cleaned = wilayaName.toLowerCase().trim()
+  .replace('algiers', 'alger')
+  .replace(/^\d+\s*-\s*/, '')
+  .replace(/\s*الجزائر\s*/, '')
+  .trim();
+return WILAYA_MAP[cleaned] || null;}
 
 async function noestPost(endpoint, body, token) {
   const res = await fetch(`${NOEST_BASE}${endpoint}`, {
