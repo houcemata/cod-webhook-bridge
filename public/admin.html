@@ -212,6 +212,18 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 .empty-icon{font-size:44px;margin-bottom:12px;opacity:0.5}
 .empty-text{font-size:14px}
 
+/* DASH PERIOD BUTTONS */
+.dash-period-btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.5px;padding:6px 13px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:var(--gray);cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.dash-period-btn:hover{background:rgba(255,255,255,0.08);color:var(--white)}
+.dash-period-btn.active{background:rgba(245,197,0,0.1);border-color:rgba(245,197,0,0.3);color:var(--yellow)}
+
+/* STATUS BARS */
+.sbar-row{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.sbar-label{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.5px;width:90px;color:var(--gray);text-align:right;flex-shrink:0}
+.sbar-track{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden}
+.sbar-fill{height:100%;border-radius:99px;transition:width 0.5s cubic-bezier(0.4,0,0.2,1)}
+.sbar-count{font-family:'Bebas Neue',sans-serif;font-size:14px;width:28px;text-align:right;flex-shrink:0}
+
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -299,21 +311,56 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         </div>
         <button class="btn btn-ghost" onclick="refreshAll()">↻ Refresh</button>
       </div>
+
+      <!-- DASHBOARD FILTERS -->
+      <div class="glass-card" style="padding:16px 20px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-right:4px;white-space:nowrap">Filter by</div>
+
+          <!-- Mode toggle -->
+          <div style="display:flex;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:3px;gap:2px;flex-shrink:0">
+            <button id="mode-btn-created" onclick="setDashMode('created')" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.5px;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;background:var(--yellow);color:var(--black);transition:all 0.2s;white-space:nowrap">Order Date</button>
+            <button id="mode-btn-activity" onclick="setDashMode('activity')" style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.5px;padding:6px 14px;border-radius:8px;border:none;cursor:pointer;background:transparent;color:var(--gray);transition:all 0.2s;white-space:nowrap">Activity Date</button>
+          </div>
+
+          <!-- Period selector -->
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="dash-period-btn active" onclick="setDashPeriod('all')" id="dp-all">All Time</button>
+            <button class="dash-period-btn" onclick="setDashPeriod('today')" id="dp-today">Today</button>
+            <button class="dash-period-btn" onclick="setDashPeriod('yesterday')" id="dp-yesterday">Yesterday</button>
+            <button class="dash-period-btn" onclick="setDashPeriod('7days')" id="dp-7days">Last 7d</button>
+            <button class="dash-period-btn" onclick="setDashPeriod('30days')" id="dp-30days">Last 30d</button>
+            <button class="dash-period-btn" onclick="setDashPeriod('month')" id="dp-month">This Month</button>
+          </div>
+
+          <!-- Custom date range -->
+          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0">
+            <input type="date" id="dash-date-from" onchange="setDashPeriod('custom')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 10px;color:var(--white);font-family:'Cairo',sans-serif;font-size:12px;outline:none;width:130px"/>
+            <span style="color:var(--gray);font-size:12px">to</span>
+            <input type="date" id="dash-date-to" onchange="setDashPeriod('custom')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:6px 10px;color:var(--white);font-family:'Cairo',sans-serif;font-size:12px;outline:none;width:130px"/>
+          </div>
+        </div>
+
+        <!-- Mode description -->
+        <div id="dash-mode-desc" style="margin-top:10px;font-size:12px;color:var(--gray);padding-top:10px;border-top:1px solid rgba(255,255,255,0.05)">
+          Showing orders <b style="color:var(--white)">created</b> in the selected period — with their current status breakdown.
+        </div>
+      </div>
+
       <div class="kpi-grid">
-        <div class="kpi-card hi"><div class="kpi-icon">📦</div><div class="kpi-label">Total Orders</div><div class="kpi-value" id="kpi-total">—</div><div class="kpi-sub">All time</div></div>
+        <div class="kpi-card hi"><div class="kpi-icon">📦</div><div class="kpi-label">Total Orders</div><div class="kpi-value" id="kpi-total">—</div><div class="kpi-sub" id="kpi-total-sub">All time</div></div>
         <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-label">Delivered</div><div class="kpi-value" id="kpi-delivered">—</div><div class="kpi-sub" id="kpi-del-rate">—% rate</div></div>
         <div class="kpi-card"><div class="kpi-icon">📞</div><div class="kpi-label">Confirmed</div><div class="kpi-value" id="kpi-confirmed">—</div><div class="kpi-sub" id="kpi-conf-rate">—% rate</div></div>
-        <div class="kpi-card"><div class="kpi-icon">⏳</div><div class="kpi-label">Pending</div><div class="kpi-value" id="kpi-pending">—</div><div class="kpi-sub">Need attention</div></div>
-        <div class="kpi-card"><div class="kpi-icon">🚚</div><div class="kpi-label">Shipped</div><div class="kpi-value" id="kpi-shipped">—</div><div class="kpi-sub">In transit</div></div>
-        <div class="kpi-card"><div class="kpi-icon">❌</div><div class="kpi-label">Canceled</div><div class="kpi-value" id="kpi-canceled">—</div><div class="kpi-sub">Lost orders</div></div>
+        <div class="kpi-card"><div class="kpi-icon">⏳</div><div class="kpi-label">Pending</div><div class="kpi-value" id="kpi-pending">—</div><div class="kpi-sub" id="kpi-pending-sub">Need attention</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🚚</div><div class="kpi-label">Shipped</div><div class="kpi-value" id="kpi-shipped">—</div><div class="kpi-sub" id="kpi-shipped-sub">In transit</div></div>
+        <div class="kpi-card"><div class="kpi-icon">❌</div><div class="kpi-label">Canceled</div><div class="kpi-value" id="kpi-canceled">—</div><div class="kpi-sub" id="kpi-canceled-sub">Lost orders</div></div>
       </div>
+
       <div class="chart-row">
-        <div class="glass-card">
-          <div style="padding:18px 20px 0;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">ORDER DISTRIBUTION</div>
-          <div class="donut-wrap">
-            <svg id="donut-svg" width="110" height="110" viewBox="0 0 120 120" style="flex-shrink:0"></svg>
-            <div class="chart-legend" id="chart-legend"></div>
-          </div>
+        <!-- STATUS BREAKDOWN — ring chart redesign -->
+        <div class="glass-card" style="padding:20px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">STATUS BREAKDOWN</div>
+          <div id="status-bars"></div>
         </div>
         <div class="glass-card" style="padding:20px">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:14px">RECENT ORDERS</div>
@@ -516,7 +563,7 @@ async function doLogout(){
   currentUser=null;
 }
 async function refreshAll(){
-  await Promise.all([loadOrders(),loadProducts(),loadOperators()]);
+  await Promise.all([loadOrders(),loadProducts(),loadOperators(),loadHistory()]);
   updateDashboard();
 }
 window.addEventListener('DOMContentLoaded',async()=>{
@@ -558,44 +605,143 @@ async function loadOperators(){
   allOperators=data||[];
 }
 
+// ── DASHBOARD FILTERS ──
+let dashMode='created'; // 'created' | 'activity'
+let dashPeriod='all';   // 'all'|'today'|'yesterday'|'7days'|'30days'|'month'|'custom'
+let allHistory=[];
+
+async function loadHistory(){
+  const{data}=await sb.from('order_history').select('order_id,new_status,changed_at').order('changed_at',{ascending:false});
+  allHistory=data||[];
+}
+
+function setDashMode(mode){
+  dashMode=mode;
+  document.getElementById('mode-btn-created').style.background=mode==='created'?'var(--yellow)':'transparent';
+  document.getElementById('mode-btn-created').style.color=mode==='created'?'var(--black)':'var(--gray)';
+  document.getElementById('mode-btn-activity').style.background=mode==='activity'?'var(--yellow)':'transparent';
+  document.getElementById('mode-btn-activity').style.color=mode==='activity'?'var(--black)':'var(--gray)';
+  const desc=document.getElementById('dash-mode-desc');
+  if(mode==='created'){
+    desc.innerHTML='Showing orders <b style="color:var(--white)">created</b> in the selected period — with their current status breakdown.';
+  } else {
+    desc.innerHTML='Showing <b style="color:var(--white)">status changes</b> that happened in the selected period — grouped by the new status.';
+  }
+  updateDashboard();
+}
+
+function setDashPeriod(p){
+  dashPeriod=p;
+  document.querySelectorAll('.dash-period-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('dp-'+p);
+  if(btn)btn.classList.add('active');
+  updateDashboard();
+}
+
+function getPeriodRange(){
+  const now=new Date();
+  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  if(dashPeriod==='all') return null;
+  if(dashPeriod==='today') return {from:today,to:new Date(today.getTime()+86400000)};
+  if(dashPeriod==='yesterday'){const y=new Date(today);y.setDate(today.getDate()-1);return{from:y,to:today};}
+  if(dashPeriod==='7days'){const f=new Date(today);f.setDate(today.getDate()-7);return{from:f,to:new Date()};}
+  if(dashPeriod==='30days'){const f=new Date(today);f.setDate(today.getDate()-30);return{from:f,to:new Date()};}
+  if(dashPeriod==='month'){const f=new Date(now.getFullYear(),now.getMonth(),1);return{from:f,to:new Date()};}
+  if(dashPeriod==='custom'){
+    const f=document.getElementById('dash-date-from').value;
+    const t=document.getElementById('dash-date-to').value;
+    if(f&&t)return{from:new Date(f),to:new Date(new Date(t).getTime()+86400000)};
+    return null;
+  }
+  return null;
+}
+
+function inRange(dateStr,range){
+  if(!range||!dateStr)return true;
+  const d=new Date(dateStr);
+  return d>=range.from&&d<range.to;
+}
+
 // ── DASHBOARD ──
 function updateDashboard(){
-  const total=allOrders.length;
-  const delivered=allOrders.filter(o=>o.status==='delivered').length;
-  const confirmed=allOrders.filter(o=>o.status==='confirmed').length;
-  const pending=allOrders.filter(o=>o.status==='pending').length;
-  const shipped=allOrders.filter(o=>o.status==='shipped').length;
-  const canceled=allOrders.filter(o=>o.status==='canceled').length;
-  const delRate=total?(delivered/total*100).toFixed(1):'0.0';
-  const confRate=total?((confirmed+delivered)/total*100).toFixed(1):'0.0';
-  document.getElementById('kpi-total').textContent=total;
-  document.getElementById('kpi-delivered').textContent=delivered;
-  document.getElementById('kpi-del-rate').textContent=`${delRate}% rate`;
-  document.getElementById('kpi-confirmed').textContent=confirmed;
-  document.getElementById('kpi-conf-rate').textContent=`${confRate}% rate`;
-  document.getElementById('kpi-pending').textContent=pending;
-  document.getElementById('kpi-shipped').textContent=shipped;
-  document.getElementById('kpi-canceled').textContent=canceled;
-  drawDonut();renderRecentOrders();
+  const range=getPeriodRange();
+
+  if(dashMode==='created'){
+    // Filter orders by created_at, show current status breakdown
+    const orders=range?allOrders.filter(o=>inRange(o.created_at,range)):allOrders;
+    const total=orders.length;
+    const delivered=orders.filter(o=>o.status==='delivered').length;
+    const confirmed=orders.filter(o=>o.status==='confirmed').length;
+    // Pending + total = always based on creation date
+    const pending=orders.filter(o=>o.status==='pending').length;
+    const shipped=orders.filter(o=>o.status==='shipped').length;
+    const canceled=orders.filter(o=>o.status==='canceled').length;
+    const delRate=total?(delivered/total*100).toFixed(1):'0.0';
+    const confRate=total?((confirmed+delivered)/total*100).toFixed(1):'0.0';
+    document.getElementById('kpi-total').textContent=total;
+    document.getElementById('kpi-delivered').textContent=delivered;
+    document.getElementById('kpi-del-rate').textContent=`${delRate}% rate`;
+    document.getElementById('kpi-confirmed').textContent=confirmed;
+    document.getElementById('kpi-conf-rate').textContent=`${confRate}% rate`;
+    document.getElementById('kpi-pending').textContent=pending;
+    document.getElementById('kpi-shipped').textContent=shipped;
+    document.getElementById('kpi-canceled').textContent=canceled;
+    document.getElementById('kpi-total-sub').textContent=range?periodLabel():'All time';
+    document.getElementById('kpi-pending-sub').textContent='Need attention';
+    document.getElementById('kpi-shipped-sub').textContent='In transit';
+    document.getElementById('kpi-canceled-sub').textContent='Lost orders';
+    drawStatusBars(orders.map(o=>o.status));
+  } else {
+    // Activity mode: filter order_history by changed_at, count new_status occurrences
+    const hist=range?allHistory.filter(h=>inRange(h.changed_at,range)):allHistory;
+    // For each order, find the most recent history entry in range
+    const countByStatus={};
+    STATUSES.forEach(s=>countByStatus[s.k]=0);
+    // count all status-change events in period grouped by new_status
+    hist.forEach(h=>{if(countByStatus.hasOwnProperty(h.new_status))countByStatus[h.new_status]++;});
+    const delivered=countByStatus['delivered']||0;
+    const confirmed=countByStatus['confirmed']||0;
+    const shipped=countByStatus['shipped']||0;
+    const canceled=countByStatus['canceled']||0;
+    const pending=countByStatus['pending']||0;
+    // Total = orders created in period (same logic)
+    const orders=range?allOrders.filter(o=>inRange(o.created_at,range)):allOrders;
+    const total=orders.length;
+    document.getElementById('kpi-total').textContent=total;
+    document.getElementById('kpi-delivered').textContent=delivered;
+    document.getElementById('kpi-del-rate').textContent='deliveries';
+    document.getElementById('kpi-confirmed').textContent=confirmed;
+    document.getElementById('kpi-conf-rate').textContent='confirmations';
+    document.getElementById('kpi-pending').textContent=pending;
+    document.getElementById('kpi-shipped').textContent=shipped;
+    document.getElementById('kpi-canceled').textContent=canceled;
+    document.getElementById('kpi-total-sub').textContent=range?periodLabel():'All time';
+    document.getElementById('kpi-pending-sub').textContent='moved to pending';
+    document.getElementById('kpi-shipped-sub').textContent='shipped today';
+    document.getElementById('kpi-canceled-sub').textContent='cancellations';
+    const allStatuses=hist.map(h=>h.new_status).filter(s=>STATUSES.some(x=>x.k===s));
+    drawStatusBars(allStatuses);
+  }
+  renderRecentOrders();
 }
-function drawDonut(){
-  const counts=STATUSES.map(s=>({...s,n:allOrders.filter(o=>o.status===s.k).length})).filter(s=>s.n>0);
-  const total=counts.reduce((a,b)=>a+b.n,0)||1;
-  const cx=60,cy=60,r=48,stroke=16;let angle=-Math.PI/2,paths='';
-  counts.forEach(s=>{
-    const slice=(s.n/total)*2*Math.PI;
-    const x1=cx+r*Math.cos(angle),y1=cy+r*Math.sin(angle);
-    angle+=slice;
-    const x2=cx+r*Math.cos(angle),y2=cy+r*Math.sin(angle);
-    paths+=`<path d="M${cx} ${cy} L${x1} ${y1} A${r} ${r} 0 ${slice>Math.PI?1:0} 1 ${x2} ${y2} Z" fill="${s.c}" opacity="0.85"/>`;
-  });
-  paths+=`<circle cx="${cx}" cy="${cy}" r="${r-stroke}" fill="#0e0e12"/>`;
-  paths+=`<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="13" font-weight="800">${total}</text>`;
-  document.getElementById('donut-svg').innerHTML=paths;
-  document.getElementById('chart-legend').innerHTML=counts.slice(0,6).map(s=>
-    `<div class="legend-row"><div class="legend-dot" style="background:${s.c}"></div><div class="legend-label">${s.l}</div><div class="legend-val">${s.n}</div></div>`
-  ).join('');
+
+function periodLabel(){
+  const labels={today:'Today',yesterday:'Yesterday','7days':'Last 7 days','30days':'Last 30 days',month:'This month',custom:'Custom range',all:'All time'};
+  return labels[dashPeriod]||dashPeriod;
 }
+
+function drawStatusBars(statusArray){
+  const counts=STATUSES.map(s=>({...s,n:statusArray.filter(x=>x===s.k).length}));
+  const max=Math.max(...counts.map(c=>c.n),1);
+  const html=counts.map(s=>`
+    <div class="sbar-row">
+      <div class="sbar-label">${s.l}</div>
+      <div class="sbar-track"><div class="sbar-fill" style="width:${(s.n/max*100).toFixed(1)}%;background:${s.c}"></div></div>
+      <div class="sbar-count" style="color:${s.n>0?s.c:'var(--gray2)'}">${s.n}</div>
+    </div>`).join('');
+  document.getElementById('status-bars').innerHTML=html;
+}
+
 function renderRecentOrders(){
   const recent=allOrders.slice(0,5);
   document.getElementById('recent-orders-list').innerHTML=recent.length
