@@ -224,6 +224,33 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 .sbar-fill{height:100%;border-radius:99px;transition:width 0.5s cubic-bezier(0.4,0,0.2,1)}
 .sbar-count{font-family:'Bebas Neue',sans-serif;font-size:14px;width:28px;text-align:right;flex-shrink:0}
 
+/* FINANCE */
+.stock-row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.stock-row:last-child{border-bottom:none}
+.stock-name{flex:1;font-size:14px;font-weight:700}
+.stock-meta{font-size:11px;color:var(--gray);margin-top:2px}
+.stock-qty{font-family:'Bebas Neue',sans-serif;font-size:22px;margin-left:auto;flex-shrink:0}
+.stock-low{color:var(--red)}
+.stock-ok{color:var(--green)}
+.stock-actions{display:flex;gap:6px;flex-shrink:0}
+.emp-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:16px;margin-bottom:12px}
+.emp-name{font-weight:700;font-size:15px;margin-bottom:2px}
+.emp-role{font-size:11px;color:var(--gray);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-bottom:10px}
+.emp-owed{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--yellow)}
+.emp-owed-label{font-size:11px;color:var(--gray);margin-bottom:10px}
+.exp-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px}
+.exp-row:last-child{border-bottom:none}
+.exp-cat{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;padding:2px 8px;border-radius:99px;font-weight:700;text-transform:uppercase}
+.exp-cat-supplies{background:rgba(59,130,246,0.15);color:#3b82f6}
+.exp-cat-shipping{background:rgba(139,92,246,0.15);color:#8b5cf6}
+.exp-cat-marketing{background:rgba(245,197,0,0.15);color:var(--yellow)}
+.exp-cat-staff{background:rgba(34,197,94,0.15);color:var(--green)}
+.exp-cat-other{background:rgba(136,136,170,0.15);color:var(--gray)}
+.prod-log-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px}
+.prod-log-row:last-child{border-bottom:none}
+.size-revenue-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.size-revenue-row:last-child{border-bottom:none}
+
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -287,6 +314,8 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     <div class="nav-item" onclick="showPage('products')" id="nav-products"><span class="nav-icon">🛍️</span>Products</div>
     <div class="nav-section">Team</div>
     <div class="nav-item" onclick="showPage('operators')" id="nav-operators"><span class="nav-icon">👥</span>Operators</div>
+    <div class="nav-section">Business</div>
+    <div class="nav-item" onclick="showPage('finance')" id="nav-finance"><span class="nav-icon">💰</span>Finance</div>
     <div class="sidebar-bottom">
       <div class="user-card">
         <div class="user-avatar" id="sidebar-avatar">H</div>
@@ -357,10 +386,15 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       </div>
 
       <div class="chart-row">
-        <!-- STATUS BREAKDOWN — ring chart redesign -->
+        <!-- STATUS BREAKDOWN — redesigned donut -->
         <div class="glass-card" style="padding:20px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">STATUS BREAKDOWN</div>
-          <div id="status-bars"></div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">ORDER DISTRIBUTION</div>
+          <div style="display:flex;align-items:center;gap:24px">
+            <div style="position:relative;flex-shrink:0">
+              <svg id="donut-svg" width="140" height="140" viewBox="0 0 140 140"></svg>
+            </div>
+            <div class="chart-legend" id="chart-legend" style="flex:1;display:flex;flex-direction:column;gap:7px"></div>
+          </div>
         </div>
         <div class="glass-card" style="padding:20px">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:14px">RECENT ORDERS</div>
@@ -443,6 +477,78 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <div class="operators-grid" id="operators-grid"></div>
     </div>
 
+    <!-- FINANCE -->
+    <div class="page" id="page-finance">
+      <div class="page-header">
+        <div><div class="page-title">FINANCE</div><div class="page-subtitle">Revenue, expenses & production</div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <select class="filter-select" id="fin-period" onchange="updateFinance()">
+            <option value="month">This Month</option>
+            <option value="lastmonth">Last Month</option>
+            <option value="7days">Last 7 Days</option>
+            <option value="30days">Last 30 Days</option>
+            <option value="all">All Time</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- FINANCE KPIs -->
+      <div class="kpi-grid" style="margin-bottom:20px">
+        <div class="kpi-card hi"><div class="kpi-icon">💵</div><div class="kpi-label">Revenue</div><div class="kpi-value" id="fin-revenue">—</div><div class="kpi-sub">Delivered orders</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📤</div><div class="kpi-label">Expenses</div><div class="kpi-value" id="fin-expenses">—</div><div class="kpi-sub">All costs</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📈</div><div class="kpi-label">Net Profit</div><div class="kpi-value" id="fin-profit">—</div><div class="kpi-sub" id="fin-margin">—% margin</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-label">Cost / Order</div><div class="kpi-value" id="fin-cpo">—</div><div class="kpi-sub">Per delivered order</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🖼️</div><div class="kpi-label">Frames Made</div><div class="kpi-value" id="fin-frames">—</div><div class="kpi-sub">In period</div></div>
+        <div class="kpi-card"><div class="kpi-icon">👩‍💼</div><div class="kpi-label">Staff Costs</div><div class="kpi-value" id="fin-staffcost">—</div><div class="kpi-sub">Employee pay</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+        <!-- PRODUCTION LOG -->
+        <div class="glass-card" style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">DAILY PRODUCTION</div>
+            <button class="btn btn-primary btn-sm" onclick="openProductionLog()">+ Log Today</button>
+          </div>
+          <div id="production-log-list" style="max-height:300px;overflow-y:auto"></div>
+        </div>
+
+        <!-- STOCK -->
+        <div class="glass-card" style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">STOCK LEVELS</div>
+            <button class="btn btn-ghost btn-sm" onclick="openAddStock()">+ Add Item</button>
+          </div>
+          <div id="stock-list"></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+        <!-- EMPLOYEE PAY -->
+        <div class="glass-card" style="padding:20px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">EMPLOYEE PAY</div>
+          <div id="employee-pay-list"></div>
+        </div>
+
+        <!-- EXPENSES -->
+        <div class="glass-card" style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">EXPENSES</div>
+            <button class="btn btn-ghost btn-sm" onclick="openAddExpense()">+ Add</button>
+          </div>
+          <div id="expenses-list" style="max-height:300px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+      <!-- REVENUE BY PRODUCT -->
+      <div class="glass-card" style="padding:20px;margin-bottom:16px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">REVENUE BY PRODUCT SIZE</div>
+        <div id="revenue-by-size"></div>
+      </div>
+
+    </div>
+
   </div>
 
   <!-- Mobile nav -->
@@ -452,11 +558,142 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <button class="mobile-nav-btn" onclick="showPage('orders')" id="mnav-orders"><span class="mobile-nav-icon">📦</span><span class="mobile-nav-label">Orders</span></button>
       <button class="mobile-nav-btn" onclick="showPage('products')" id="mnav-products"><span class="mobile-nav-icon">🛍️</span><span class="mobile-nav-label">Products</span></button>
       <button class="mobile-nav-btn" onclick="showPage('operators')" id="mnav-operators"><span class="mobile-nav-icon">👥</span><span class="mobile-nav-label">Team</span></button>
+      <button class="mobile-nav-btn" onclick="showPage('finance')" id="mnav-finance"><span class="mobile-nav-icon">💰</span><span class="mobile-nav-label">Finance</span></button>
     </div>
   </div>
 </div>
 
-<!-- ADD/EDIT PRODUCT MODAL -->
+<!-- PRODUCTION LOG MODAL -->
+<div class="modal-overlay" id="production-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="prod-modal-title">LOG PRODUCTION</div>
+      <button class="modal-close" onclick="closeModal('production-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field"><label class="form-label">Date</label><input class="form-input" id="prod-date" type="date"/></div>
+      <div style="background:rgba(245,197,0,0.05);border:1px solid rgba(245,197,0,0.15);border-radius:14px;padding:16px;margin-bottom:16px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--gray);margin-bottom:12px">FRAMES PRODUCED</div>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">M (30×40) — 60 DZD</label><input class="form-input" id="prod-m" type="number" min="0" value="0" oninput="calcProdPay()"/></div>
+          <div class="form-field"><label class="form-label">L (40×60) — 60 DZD</label><input class="form-input" id="prod-l" type="number" min="0" value="0" oninput="calcProdPay()"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">XL (60×80) — 100 DZD</label><input class="form-input" id="prod-xl" type="number" min="0" value="0" oninput="calcProdPay()"/></div>
+          <div class="form-field"><label class="form-label">XXL (120×60) — 200 DZD</label><input class="form-input" id="prod-xxl" type="number" min="0" value="0" oninput="calcProdPay()"/></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--gray)">FRAME MAKER PAY</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--yellow)" id="prod-pay-preview">0 DZD</span>
+        </div>
+      </div>
+      <div class="form-field"><label class="form-label">Notes</label><textarea class="form-textarea" id="prod-notes" placeholder="Any notes..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('production-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProductionLog()">Save Log</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD EXPENSE MODAL -->
+<div class="modal-overlay" id="expense-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">ADD EXPENSE</div>
+      <button class="modal-close" onclick="closeModal('expense-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Date</label><input class="form-input" id="exp-date" type="date"/></div>
+        <div class="form-field"><label class="form-label">Amount (DZD)</label><input class="form-input" id="exp-amount" type="number" min="0" placeholder="0"/></div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="exp-category">
+          <option value="supplies">Supplies</option>
+          <option value="shipping">Shipping</option>
+          <option value="marketing">Marketing</option>
+          <option value="staff">Staff</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-field"><label class="form-label">Description</label><input class="form-input" id="exp-desc" placeholder="What was this for?"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('expense-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveExpense()">Save Expense</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD STOCK MODAL -->
+<div class="modal-overlay" id="stock-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="stock-modal-title">ADD STOCK ITEM</div>
+      <button class="modal-close" onclick="closeModal('stock-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Item Name</label><input class="form-input" id="stk-name" placeholder="e.g. M Board (30×40)"/></div>
+        <div class="form-field"><label class="form-label">Size / Type</label><input class="form-input" id="stk-size" placeholder="e.g. 30×40cm"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Current Qty</label><input class="form-input" id="stk-qty" type="number" min="0" placeholder="0"/></div>
+        <div class="form-field"><label class="form-label">Low Stock Alert</label><input class="form-input" id="stk-threshold" type="number" min="0" placeholder="10"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Unit</label><input class="form-input" id="stk-unit" placeholder="pieces"/></div>
+        <div class="form-field"><label class="form-label">Cost per Unit (DZD)</label><input class="form-input" id="stk-cost" type="number" min="0" placeholder="0"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('stock-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveStockItem()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESTOCK MODAL -->
+<div class="modal-overlay" id="restock-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">RESTOCK</div>
+      <button class="modal-close" onclick="closeModal('restock-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="restock-item-name" style="font-weight:700;font-size:16px;margin-bottom:16px"></div>
+      <div class="form-field"><label class="form-label">Add Quantity</label><input class="form-input" id="restock-qty" type="number" min="1" placeholder="0"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('restock-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRestock()">Add Stock</button>
+    </div>
+  </div>
+</div>
+
+<!-- MARK PAID MODAL -->
+<div class="modal-overlay" id="markpaid-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">MARK AS PAID</div>
+      <button class="modal-close" onclick="closeModal('markpaid-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="markpaid-desc" style="font-size:14px;color:var(--gray);margin-bottom:16px"></div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Period Start</label><input class="form-input" id="markpaid-start" type="date"/></div>
+        <div class="form-field"><label class="form-label">Period End</label><input class="form-input" id="markpaid-end" type="date"/></div>
+      </div>
+      <div class="form-field"><label class="form-label">Amount Paid (DZD)</label><input class="form-input" id="markpaid-amount" type="number" min="0"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('markpaid-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveMarkPaid()">Confirm Payment</button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay" id="product-modal">
   <div class="modal">
     <div class="modal-header">
@@ -583,6 +820,7 @@ function showPage(name){
   if(name==='orders')renderOrdersTable();
   if(name==='products')renderProducts();
   if(name==='operators')renderOperators();
+  if(name==='finance')updateFinance();
 }
 
 // ── DATA ──
@@ -638,15 +876,31 @@ function setDashPeriod(p){
   updateDashboard();
 }
 
+function toAlgeriaDate(dateStr){
+  // Convert UTC timestamp to Algeria local date (UTC+1)
+  if(!dateStr)return null;
+  const d=new Date(dateStr);
+  // Add 1 hour offset for Algeria (UTC+1)
+  d.setTime(d.getTime()+60*60*1000);
+  return d;
+}
+function inRange(dateStr,range){
+  if(!range||!dateStr)return true;
+  const d=toAlgeriaDate(dateStr);
+  return d>=range.from&&d<range.to;
+}
 function getPeriodRange(){
   const now=new Date();
-  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  // Algeria local "today" start
+  const algeriaOffset=60*60*1000;
+  const localNow=new Date(now.getTime()+algeriaOffset);
+  const today=new Date(localNow.getFullYear(),localNow.getMonth(),localNow.getDate());
   if(dashPeriod==='all') return null;
   if(dashPeriod==='today') return {from:today,to:new Date(today.getTime()+86400000)};
   if(dashPeriod==='yesterday'){const y=new Date(today);y.setDate(today.getDate()-1);return{from:y,to:today};}
-  if(dashPeriod==='7days'){const f=new Date(today);f.setDate(today.getDate()-7);return{from:f,to:new Date()};}
-  if(dashPeriod==='30days'){const f=new Date(today);f.setDate(today.getDate()-30);return{from:f,to:new Date()};}
-  if(dashPeriod==='month'){const f=new Date(now.getFullYear(),now.getMonth(),1);return{from:f,to:new Date()};}
+  if(dashPeriod==='7days'){const f=new Date(today);f.setDate(today.getDate()-7);return{from:f,to:new Date(today.getTime()+86400000)};}
+  if(dashPeriod==='30days'){const f=new Date(today);f.setDate(today.getDate()-30);return{from:f,to:new Date(today.getTime()+86400000)};}
+  if(dashPeriod==='month'){const f=new Date(localNow.getFullYear(),localNow.getMonth(),1);return{from:f,to:new Date(today.getTime()+86400000)};}
   if(dashPeriod==='custom'){
     const f=document.getElementById('dash-date-from').value;
     const t=document.getElementById('dash-date-to').value;
@@ -654,12 +908,6 @@ function getPeriodRange(){
     return null;
   }
   return null;
-}
-
-function inRange(dateStr,range){
-  if(!range||!dateStr)return true;
-  const d=new Date(dateStr);
-  return d>=range.from&&d<range.to;
 }
 
 // ── DASHBOARD ──
@@ -690,7 +938,7 @@ function updateDashboard(){
     document.getElementById('kpi-pending-sub').textContent='Need attention';
     document.getElementById('kpi-shipped-sub').textContent='In transit';
     document.getElementById('kpi-canceled-sub').textContent='Lost orders';
-    drawStatusBars(orders.map(o=>o.status));
+    drawDonut(orders.map(o=>o.status));
   } else {
     // Activity mode: filter order_history by changed_at, count new_status occurrences
     const hist=range?allHistory.filter(h=>inRange(h.changed_at,range)):allHistory;
@@ -720,7 +968,7 @@ function updateDashboard(){
     document.getElementById('kpi-shipped-sub').textContent='shipped today';
     document.getElementById('kpi-canceled-sub').textContent='cancellations';
     const allStatuses=hist.map(h=>h.new_status).filter(s=>STATUSES.some(x=>x.k===s));
-    drawStatusBars(allStatuses);
+    drawDonut(allStatuses);
   }
   renderRecentOrders();
 }
@@ -730,16 +978,40 @@ function periodLabel(){
   return labels[dashPeriod]||dashPeriod;
 }
 
-function drawStatusBars(statusArray){
-  const counts=STATUSES.map(s=>({...s,n:statusArray.filter(x=>x===s.k).length}));
-  const max=Math.max(...counts.map(c=>c.n),1);
-  const html=counts.map(s=>`
-    <div class="sbar-row">
-      <div class="sbar-label">${s.l}</div>
-      <div class="sbar-track"><div class="sbar-fill" style="width:${(s.n/max*100).toFixed(1)}%;background:${s.c}"></div></div>
-      <div class="sbar-count" style="color:${s.n>0?s.c:'var(--gray2)'}">${s.n}</div>
+function drawDonut(statusArray){
+  const counts=STATUSES.map(s=>({...s,n:statusArray.filter(x=>x===s.k).length})).filter(s=>s.n>0);
+  const total=counts.reduce((a,b)=>a+b.n,0)||1;
+  const cx=70,cy=70,outerR=58,innerR=38;
+  let angle=-Math.PI/2;
+  let paths='';
+
+  counts.forEach((s,i)=>{
+    const slice=(s.n/total)*2*Math.PI;
+    const gap=0.03; // small gap between segments
+    const a1=angle+gap/2;
+    const a2=angle+slice-gap/2;
+    const x1=cx+outerR*Math.cos(a1),y1=cy+outerR*Math.sin(a1);
+    const x2=cx+outerR*Math.cos(a2),y2=cy+outerR*Math.sin(a2);
+    const x3=cx+innerR*Math.cos(a2),y3=cy+innerR*Math.sin(a2);
+    const x4=cx+innerR*Math.cos(a1),y4=cy+innerR*Math.sin(a1);
+    const large=slice-gap>Math.PI?1:0;
+    paths+=`<path d="M${x1.toFixed(2)} ${y1.toFixed(2)} A${outerR} ${outerR} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} L${x3.toFixed(2)} ${y3.toFixed(2)} A${innerR} ${innerR} 0 ${large} 0 ${x4.toFixed(2)} ${y4.toFixed(2)} Z" fill="${s.c}" opacity="0.9"/>`;
+    angle+=slice;
+  });
+
+  // Center text
+  paths+=`<text x="${cx}" y="${cy-7}" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="800" font-family="'Bebas Neue',sans-serif">${total}</text>`;
+  paths+=`<text x="${cx}" y="${cy+10}" text-anchor="middle" fill="#8888aa" font-size="10" font-family="'Barlow Condensed',sans-serif" letter-spacing="1">ORDERS</text>`;
+
+  document.getElementById('donut-svg').innerHTML=paths;
+
+  // Legend — show all with counts
+  document.getElementById('chart-legend').innerHTML=counts.map(s=>`
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:9px;height:9px;border-radius:2px;background:${s.c};flex-shrink:0"></div>
+      <div style="flex:1;font-size:12px;color:var(--gray);font-family:'Barlow Condensed',sans-serif;letter-spacing:0.5px">${s.l}</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:${s.c}">${s.n}</div>
     </div>`).join('');
-  document.getElementById('status-bars').innerHTML=html;
 }
 
 function renderRecentOrders(){
@@ -773,11 +1045,15 @@ function filterOrders(){
 }
 function inPeriod(o,period){
   if(!o.created_at)return true;
-  const d=new Date(o.created_at),now=new Date();
-  if(period==='today')return d.toDateString()===now.toDateString();
-  if(period==='7days'){const w=new Date(now);w.setDate(now.getDate()-7);return d>=w;}
-  if(period==='30days'){const m=new Date(now);m.setDate(now.getDate()-30);return d>=m;}
-  if(period==='month')return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+  const d=toAlgeriaDate(o.created_at);
+  const now=new Date();
+  const algeriaOffset=60*60*1000;
+  const localNow=new Date(now.getTime()+algeriaOffset);
+  const today=new Date(localNow.getFullYear(),localNow.getMonth(),localNow.getDate());
+  if(period==='today')return d>=today&&d<new Date(today.getTime()+86400000);
+  if(period==='7days'){const w=new Date(today);w.setDate(today.getDate()-7);return d>=w;}
+  if(period==='30days'){const m=new Date(today);m.setDate(today.getDate()-30);return d>=m;}
+  if(period==='month')return d.getMonth()===localNow.getMonth()&&d.getFullYear()===localNow.getFullYear();
   return true;
 }
 function renderOrdersTable(){
@@ -945,6 +1221,350 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(o=>{
   o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
 });
+
+// ── FINANCE ──
+let allProductionLogs=[], allStockItems=[], allExpenses=[], allPayLogs=[];
+let restockingItemId=null, markPaidEmployee=null;
+
+const FRAME_RATES={m:60,l:60,xl:100,xxl:200};
+const EMPLOYEES=[
+  {key:'print_guy',  name:'Print File Guy', role:'Print & Shipping Prep', payType:'fixed_weekly', weeklyAmount:2000},
+  {key:'frame_maker',name:'Frame Maker',     role:'Production & Packing',  payType:'per_frame'},
+  {key:'operator',   name:'Operator Girl',  role:'Order Confirmation',    payType:'per_delivered', ratePerDelivered:150},
+];
+
+async function loadFinanceData(){
+  const[{data:logs},{data:stock},{data:exp},{data:pay}]=await Promise.all([
+    sb.from('production_logs').select('*').order('date',{ascending:false}),
+    sb.from('stock_items').select('*').order('name'),
+    sb.from('expenses').select('*').order('date',{ascending:false}),
+    sb.from('employee_pay_log').select('*').order('created_at',{ascending:false}),
+  ]);
+  allProductionLogs=logs||[];
+  allStockItems=stock||[];
+  allExpenses=exp||[];
+  allPayLogs=pay||[];
+}
+
+function getFinPeriodRange(){
+  const now=new Date();
+  const p=document.getElementById('fin-period')?.value||'month';
+  if(p==='month'){return{from:new Date(now.getFullYear(),now.getMonth(),1),to:new Date()};}
+  if(p==='lastmonth'){
+    const f=new Date(now.getFullYear(),now.getMonth()-1,1);
+    const t=new Date(now.getFullYear(),now.getMonth(),1);
+    return{from:f,to:t};
+  }
+  if(p==='7days'){const f=new Date(now);f.setDate(now.getDate()-7);return{from:f,to:new Date()};}
+  if(p==='30days'){const f=new Date(now);f.setDate(now.getDate()-30);return{from:f,to:new Date()};}
+  return null;
+}
+
+function inFinRange(dateStr,range){
+  if(!range||!dateStr)return true;
+  const d=new Date(dateStr);
+  return d>=range.from&&d<range.to;
+}
+
+async function updateFinance(){
+  await loadFinanceData();
+  const range=getFinPeriodRange();
+
+  // Revenue from delivered orders
+  const deliveredOrders=allOrders.filter(o=>o.status==='delivered'&&inFinRange(o.created_at,range));
+  const revenue=deliveredOrders.reduce((s,o)=>s+Number(o.prix_total||0),0);
+
+  // Expenses in period
+  const periodExpenses=allExpenses.filter(e=>inFinRange(e.date,range));
+  const expTotal=periodExpenses.reduce((s,e)=>s+Number(e.amount||0),0);
+
+  // Production in period
+  const periodLogs=allProductionLogs.filter(l=>inFinRange(l.date,range));
+  const totalFrames=periodLogs.reduce((s,l)=>s+(l.m_frames||0)+(l.l_frames||0)+(l.xl_frames||0)+(l.xxl_frames||0),0);
+  const frameMakerPay=periodLogs.reduce((s,l)=>s+Number(l.total_pay_frame_maker||0),0);
+
+  // Operator pay: 150 DZD per delivered order
+  const operatorPay=deliveredOrders.length*150;
+
+  // Print guy pay: count Thursdays in period
+  const printGuyPay=countThursdays(range)*2000;
+
+  const staffCost=frameMakerPay+operatorPay+printGuyPay;
+  const totalExp=expTotal+staffCost;
+  const profit=revenue-totalExp;
+  const margin=revenue?((profit/revenue)*100).toFixed(1):'0.0';
+  const cpo=deliveredOrders.length?Math.round(totalExp/deliveredOrders.length):0;
+
+  document.getElementById('fin-revenue').textContent=fmtDZD(revenue);
+  document.getElementById('fin-expenses').textContent=fmtDZD(totalExp);
+  document.getElementById('fin-profit').textContent=fmtDZD(profit);
+  document.getElementById('fin-profit').style.color=profit>=0?'var(--green)':'var(--red)';
+  document.getElementById('fin-margin').textContent=`${margin}% margin`;
+  document.getElementById('fin-cpo').textContent=fmtDZD(cpo);
+  document.getElementById('fin-frames').textContent=totalFrames;
+  document.getElementById('fin-staffcost').textContent=fmtDZD(staffCost);
+
+  renderProductionLogs(periodLogs);
+  renderStockList();
+  renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,printGuyPay);
+  renderExpenses(periodExpenses);
+  renderRevenueBySize(deliveredOrders);
+}
+
+function countThursdays(range){
+  if(!range)return 0;
+  let count=0;
+  const d=new Date(range.from);
+  while(d<=range.to){if(d.getDay()===4)count++;d.setDate(d.getDate()+1);}
+  return count;
+}
+
+function fmtDZD(n){return Math.round(n).toLocaleString()+' DZD';}
+
+function renderProductionLogs(logs){
+  const el=document.getElementById('production-log-list');
+  if(!logs.length){el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">🖼️</div><div class="empty-text">No production logged yet</div></div>';return;}
+  el.innerHTML=logs.map(l=>{
+    const total=(l.m_frames||0)+(l.l_frames||0)+(l.xl_frames||0)+(l.xxl_frames||0);
+    return`<div class="prod-log-row">
+      <div>
+        <div style="font-weight:700;font-size:14px">${new Date(l.date).toLocaleDateString('fr-DZ')}</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:2px">
+          M:${l.m_frames||0} · L:${l.l_frames||0} · XL:${l.xl_frames||0} · XXL:${l.xxl_frames||0} = <b>${total} frames</b>
+        </div>
+        ${l.notes?`<div style="font-size:11px;color:var(--gray);margin-top:2px">📝 ${esc(l.notes)}</div>`:''}
+      </div>
+      <div style="text-align:right;flex-shrink:0;margin-left:12px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--yellow)">${fmtDZD(l.total_pay_frame_maker||0)}</div>
+        <div style="font-size:10px;color:var(--gray)">frame maker pay</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderStockList(){
+  const el=document.getElementById('stock-list');
+  if(!allStockItems.length){el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📦</div><div class="empty-text">No stock items yet</div></div>';return;}
+  el.innerHTML=allStockItems.map(s=>{
+    const low=s.quantity<=s.low_stock_threshold;
+    return`<div class="stock-row">
+      <div style="flex:1">
+        <div class="stock-name">${esc(s.name)}</div>
+        <div class="stock-meta">${esc(s.size||'')} · ${esc(s.unit||'units')} · ${fmtDZD(s.cost_per_unit||0)}/unit</div>
+        ${low?`<div style="font-size:11px;color:var(--red);margin-top:2px">⚠️ Low stock!</div>`:''}
+      </div>
+      <div class="stock-qty ${low?'stock-low':'stock-ok'}">${Number(s.quantity).toLocaleString()}</div>
+      <div class="stock-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openRestock(${s.id},'${esc(s.name)}')">+ Stock</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteStockItem(${s.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,printGuyPay){
+  const el=document.getElementById('employee-pay-list');
+  const employees=[
+    {key:'frame_maker',name:'Frame Maker',role:'Production & Packing',owed:frameMakerPay,basis:`${allProductionLogs.filter(l=>inFinRange(l.date,range)).reduce((s,l)=>s+(l.m_frames||0)+(l.l_frames||0)+(l.xl_frames||0)+(l.xxl_frames||0),0)} frames produced`},
+    {key:'operator',name:'Operator Girl',role:'Order Confirmation',owed:operatorPay,basis:`${deliveredOrders.length} delivered orders × 150 DZD`},
+    {key:'print_guy',name:'Print File Guy',role:'Print & Shipping Prep',owed:printGuyPay,basis:`${countThursdays(range)} Thursdays × 2,000 DZD`},
+  ];
+  el.innerHTML=employees.map(e=>`
+    <div class="emp-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="emp-name">${e.name}</div>
+          <div class="emp-role">${e.role}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="openMarkPaid('${e.key}','${e.name}',${e.owed})">Mark Paid</button>
+      </div>
+      <div class="emp-owed">${fmtDZD(e.owed)}</div>
+      <div class="emp-owed-label">${e.basis}</div>
+    </div>`).join('');
+}
+
+function renderExpenses(expenses){
+  const el=document.getElementById('expenses-list');
+  if(!expenses.length){el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📋</div><div class="empty-text">No expenses yet</div></div>';return;}
+  el.innerHTML=expenses.map(e=>`
+    <div class="exp-row">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+          <span class="exp-cat exp-cat-${e.category||'other'}">${e.category||'other'}</span>
+          <span style="font-size:12px;color:var(--gray)">${new Date(e.date).toLocaleDateString('fr-DZ')}</span>
+        </div>
+        <div style="font-size:13px">${esc(e.description||'')}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:12px">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--red)">${fmtDZD(e.amount||0)}</span>
+        <button class="btn btn-danger btn-sm" onclick="deleteExpense(${e.id})" style="padding:4px 8px">×</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderRevenueBySize(deliveredOrders){
+  const sizes={M:0,L:0,XL:0,XXL:0,Other:0};
+  const counts={M:0,L:0,XL:0,XXL:0,Other:0};
+  deliveredOrders.forEach(o=>{
+    const v=(o.variable||'').toUpperCase();
+    const p=Number(o.prix_total||0);
+    if(v.includes('30X40')||v.includes('30 X 40')||v.startsWith('M')){sizes.M+=p;counts.M++;}
+    else if(v.includes('40X60')||v.includes('40 X 60')||v.startsWith('L')){sizes.L+=p;counts.L++;}
+    else if(v.includes('60X80')||v.includes('60 X 80')||v.startsWith('XL')&&!v.startsWith('XXL')){sizes.XL+=p;counts.XL++;}
+    else if(v.includes('120X60')||v.includes('120 X 60')||v.startsWith('XXL')){sizes.XXL+=p;counts.XXL++;}
+    else{sizes.Other+=p;counts.Other++;}
+  });
+  const total=Object.values(sizes).reduce((a,b)=>a+b,0)||1;
+  const colors={M:'#3b82f6',L:'#8b5cf6',XL:'#F5C500',XXL:'#22c55e',Other:'#8888aa'};
+  document.getElementById('revenue-by-size').innerHTML=Object.entries(sizes).map(([size,rev])=>`
+    <div class="size-revenue-row">
+      <div style="width:40px;font-family:'Bebas Neue',sans-serif;font-size:16px;color:${colors[size]}">${size}</div>
+      <div style="flex:1;height:8px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${(rev/total*100).toFixed(1)}%;background:${colors[size]};border-radius:99px;transition:width 0.5s"></div>
+      </div>
+      <div style="width:80px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:14px;color:${colors[size]}">${fmtDZD(rev)}</div>
+      <div style="width:60px;text-align:right;font-size:12px;color:var(--gray)">${counts[size]} orders</div>
+    </div>`).join('');
+}
+
+// ── PRODUCTION LOG ACTIONS ──
+function openProductionLog(){
+  document.getElementById('prod-date').value=new Date().toISOString().split('T')[0];
+  ['prod-m','prod-l','prod-xl','prod-xxl'].forEach(id=>document.getElementById(id).value=0);
+  document.getElementById('prod-notes').value='';
+  document.getElementById('prod-pay-preview').textContent='0 DZD';
+  document.getElementById('production-modal').classList.add('open');
+}
+function calcProdPay(){
+  const m=parseInt(document.getElementById('prod-m').value)||0;
+  const l=parseInt(document.getElementById('prod-l').value)||0;
+  const xl=parseInt(document.getElementById('prod-xl').value)||0;
+  const xxl=parseInt(document.getElementById('prod-xxl').value)||0;
+  const pay=m*60+l*60+xl*100+xxl*200;
+  document.getElementById('prod-pay-preview').textContent=pay.toLocaleString()+' DZD';
+}
+async function saveProductionLog(){
+  const date=document.getElementById('prod-date').value;
+  const m=parseInt(document.getElementById('prod-m').value)||0;
+  const l=parseInt(document.getElementById('prod-l').value)||0;
+  const xl=parseInt(document.getElementById('prod-xl').value)||0;
+  const xxl=parseInt(document.getElementById('prod-xxl').value)||0;
+  const notes=document.getElementById('prod-notes').value.trim();
+  if(!date){toast('Please select a date',true);return;}
+  const pay=m*60+l*60+xl*100+xxl*200;
+  const{data,error}=await sb.from('production_logs').insert({date,m_frames:m,l_frames:l,xl_frames:xl,xxl_frames:xxl,total_pay_frame_maker:pay,notes}).select().single();
+  if(error){toast('Error saving log',true);return;}
+  // Auto-deduct stock: find matching stock items by name/size
+  await autoDeductStock(m,l,xl,xxl,data.id);
+  closeModal('production-modal');
+  toast('Production logged ✓');
+  await updateFinance();
+}
+async function autoDeductStock(m,l,xl,xxl,logId){
+  // Match stock items to frame sizes by name keywords
+  const deductions=[
+    {keywords:['30x40','30 x 40','m board','m size','m-board'],qty:m},
+    {keywords:['40x60','40 x 60','l board','l size','l-board'],qty:l},
+    {keywords:['60x80','60 x 80','xl board','xl size','xl-board'],qty:xl},
+    {keywords:['120x60','120 x 60','xxl board','xxl size','xxl-board'],qty:xxl},
+  ];
+  for(const d of deductions){
+    if(!d.qty)continue;
+    const item=allStockItems.find(s=>d.keywords.some(k=>s.name.toLowerCase().includes(k)||((s.size||'').toLowerCase().includes(k))));
+    if(!item)continue;
+    const newQty=Math.max(0,Number(item.quantity)-d.qty);
+    await sb.from('stock_items').update({quantity:newQty}).eq('id',item.id);
+    await sb.from('stock_usage_log').insert({production_log_id:logId,stock_item_id:item.id,quantity_used:d.qty});
+  }
+}
+
+// ── STOCK ACTIONS ──
+function openAddStock(){
+  ['stk-name','stk-size','stk-unit','stk-cost','stk-qty','stk-threshold'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('stk-unit').value='pieces';
+  document.getElementById('stock-modal').classList.add('open');
+}
+async function saveStockItem(){
+  const name=document.getElementById('stk-name').value.trim();
+  const size=document.getElementById('stk-size').value.trim();
+  const qty=parseFloat(document.getElementById('stk-qty').value)||0;
+  const threshold=parseFloat(document.getElementById('stk-threshold').value)||10;
+  const unit=document.getElementById('stk-unit').value.trim()||'pieces';
+  const cost=parseFloat(document.getElementById('stk-cost').value)||0;
+  if(!name){toast('Item name required',true);return;}
+  await sb.from('stock_items').insert({name,size,quantity:qty,low_stock_threshold:threshold,unit,cost_per_unit:cost});
+  closeModal('stock-modal');toast('Stock item added ✓');await updateFinance();
+}
+function openRestock(id,name){
+  restockingItemId=id;
+  document.getElementById('restock-item-name').textContent=name;
+  document.getElementById('restock-qty').value='';
+  document.getElementById('restock-modal').classList.add('open');
+}
+async function saveRestock(){
+  const qty=parseFloat(document.getElementById('restock-qty').value)||0;
+  if(!qty||!restockingItemId){toast('Enter a quantity',true);return;}
+  const item=allStockItems.find(s=>s.id===restockingItemId);
+  if(!item)return;
+  await sb.from('stock_items').update({quantity:Number(item.quantity)+qty}).eq('id',restockingItemId);
+  closeModal('restock-modal');toast('Stock updated ✓');await updateFinance();
+}
+async function deleteStockItem(id){
+  if(!confirm('Delete this stock item?'))return;
+  await sb.from('stock_items').delete().eq('id',id);
+  await updateFinance();toast('Deleted');
+}
+
+// ── EXPENSE ACTIONS ──
+function openAddExpense(){
+  document.getElementById('exp-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('exp-amount').value='';
+  document.getElementById('exp-desc').value='';
+  document.getElementById('expense-modal').classList.add('open');
+}
+async function saveExpense(){
+  const date=document.getElementById('exp-date').value;
+  const amount=parseFloat(document.getElementById('exp-amount').value)||0;
+  const category=document.getElementById('exp-category').value;
+  const description=document.getElementById('exp-desc').value.trim();
+  if(!date||!amount){toast('Date and amount required',true);return;}
+  await sb.from('expenses').insert({date,amount,category,description});
+  closeModal('expense-modal');toast('Expense added ✓');await updateFinance();
+}
+async function deleteExpense(id){
+  if(!confirm('Delete this expense?'))return;
+  await sb.from('expenses').delete().eq('id',id);
+  await updateFinance();toast('Deleted');
+}
+
+// ── MARK PAID ──
+function openMarkPaid(key,name,owed){
+  markPaidEmployee={key,name};
+  document.getElementById('markpaid-desc').textContent=`Marking payment for ${name}`;
+  document.getElementById('markpaid-amount').value=Math.round(owed);
+  const now=new Date();
+  const start=new Date(now.getFullYear(),now.getMonth(),1);
+  document.getElementById('markpaid-start').value=start.toISOString().split('T')[0];
+  document.getElementById('markpaid-end').value=now.toISOString().split('T')[0];
+  document.getElementById('markpaid-modal').classList.add('open');
+}
+async function saveMarkPaid(){
+  if(!markPaidEmployee)return;
+  const amount=parseFloat(document.getElementById('markpaid-amount').value)||0;
+  const start=document.getElementById('markpaid-start').value;
+  const end=document.getElementById('markpaid-end').value;
+  await sb.from('employee_pay_log').insert({
+    employee_name:markPaidEmployee.name,
+    employee_role:markPaidEmployee.key,
+    period_start:start,
+    period_end:end,
+    amount_owed:amount,
+    amount_paid:amount,
+    paid_at:new Date().toISOString()
+  });
+  closeModal('markpaid-modal');toast(`${markPaidEmployee.name} marked as paid ✓`);
+  markPaidEmployee=null;
+}
 
 // ── HELPERS ──
 function statusLabel(k){return STATUSES.find(s=>s.k===k)?.l||k;}
