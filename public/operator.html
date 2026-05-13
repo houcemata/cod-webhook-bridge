@@ -220,12 +220,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <input class="login-input" id="login-password" type="password" autocomplete="current-password" placeholder="Password">
   <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
   <div class="login-error" id="login-error"></div>
-  <div id="pin-dots" style="display:none">
+  <div id="pin-dots" style="display:none" hidden>
     <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
     <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
   </div>
-  <div class="pin-error" id="pin-error"></div>
-  <div class="pin-pad" style="display:none">
+  <div class="pin-error" id="pin-error" hidden></div>
+  <div class="pin-pad" style="display:none" hidden>
     <button class="pin-key" onclick="pinPress('1')">1</button>
     <button class="pin-key" onclick="pinPress('2')">2</button>
     <button class="pin-key" onclick="pinPress('3')">3</button>
