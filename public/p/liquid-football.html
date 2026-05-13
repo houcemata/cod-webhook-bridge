@@ -1280,6 +1280,17 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
 
     if (!r.ok) throw new Error('Failed');
 
+    // Notify via ntfy
+    fetch('https://ntfy.sh/arco-new-orders', {
+      method: 'POST',
+      headers: {
+        'Title': '🛍️ New Order',
+        'Priority': 'high',
+        'Tags': 'shopping',
+      },
+      body: `${orderData.name} — ${orderData.wilaya} — ${orderData.prix_total} DZD`,
+    }).catch(() => {});
+
     // Show success
     document.getElementById('success-order-id').textContent = '#' + orderId;
     document.getElementById('success-screen').classList.add('show');
