@@ -159,8 +159,14 @@ export default async function handler(req, res) {
           // Log special events
           if (newStatus === "delivered") {
             console.log(`[track-orders] 💰 Order ${order.order_id} delivered — Employee 3 eligible for 150 DZD`);
+            await sendNtfyNotification(
+              "arco-delivered",
+              `✅ Order Delivered`,
+              `${order.order_id} — ${order.prix_total || ''} DZD`
+            );
           } else if (newStatus === "canceled") {
             console.log(`[track-orders] ⚠️ Order ${order.order_id} returned/canceled`);
+          }
           }
         }
       } catch (err) {
@@ -236,5 +242,21 @@ async function getLatestNoestEvent(trackingNumber) {
   } catch (err) {
     console.error(`[getLatestNoestEvent] Error for ${trackingNumber}:`, err.message);
     return null;
+  }
+}
+async function sendNtfyNotification(topic, title, message) {
+  try {
+    await fetch(`https://ntfy.sh/${topic}`, {
+      method: "POST",
+      headers: {
+        "Title": title,
+        "Priority": "high",
+        "Tags": "white_check_mark",
+      },
+      body: message,
+    });
+    console.log(`[ntfy] Sent to ${topic}: ${title}`);
+  } catch (err) {
+    console.error(`[ntfy] Failed:`, err.message);
   }
 }
