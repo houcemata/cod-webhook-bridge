@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>ARCO Product</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--yellow:#F5C500;--black:#080808;--dark:#111;--line:rgba(255,255,255,.12);--muted:#aaa;--red:#e11d48;--green:#22c55e}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--black);color:#fff;font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(245,197,0,.13),transparent 290px),radial-gradient(circle at 50% 0,rgba(245,197,0,.14),transparent 38%);z-index:-1}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.shell{width:min(1160px,100%);margin:0 auto;padding:18px 18px 110px}
+.topbar{display:flex;align-items:center;justify-content:space-between;direction:ltr;padding-bottom:24px}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:5px;color:var(--yellow);text-decoration:none}
+.back{color:#ddd;text-decoration:none;border:1px solid var(--line);border-radius:4px;padding:7px 10px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:1px}
+.product-layout{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:28px;align-items:start;direction:ltr}
+.gallery{position:sticky;top:18px}.main-img{aspect-ratio:4/5;background:#131313;border:1px solid var(--line);border-radius:8px;overflow:hidden}.main-img img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}.thumb{aspect-ratio:1;border:1px solid var(--line);border-radius:5px;background:#151515;overflow:hidden}.thumb.active{border-color:var(--yellow)}.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.panel{direction:rtl}.kicker{font-family:'Barlow Condensed',sans-serif;color:var(--yellow);font-weight:900;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;direction:ltr;text-align:right}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-height:.88;letter-spacing:2px;direction:ltr;text-align:right}
+.desc{color:#d7d7d7;line-height:1.9;margin:16px 0 18px;font-size:16px}.price-row{display:flex;align-items:center;gap:12px;justify-content:flex-start;direction:ltr;margin-bottom:20px}
+.price{font-family:'Bebas Neue',sans-serif;color:var(--yellow);font-size:46px;letter-spacing:1px}.old{font-family:'Barlow Condensed',sans-serif;color:#777;text-decoration:line-through;font-size:24px}
+.block{border-top:1px solid var(--line);padding-top:18px;margin-top:18px}.label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:900;margin-bottom:10px}.hint{font-size:12px;color:var(--muted);font-weight:600}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.choice{border:1px solid var(--line);background:#111;color:#fff;border-radius:6px;padding:12px;text-align:right}.choice.active{border-color:var(--yellow);box-shadow:inset 0 0 0 1px rgba(245,197,0,.5)}.choice strong{display:block}.choice span{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+.form{display:grid;gap:10px}.field{display:grid;gap:6px}.field span{font-size:13px;color:#ddd;font-weight:700}.field input,.field select,.field textarea{width:100%;background:#111;color:#fff;border:1px solid var(--line);border-radius:5px;padding:12px;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--yellow)}
+.summary{display:grid;gap:8px;background:#101010;border:1px solid var(--line);border-radius:8px;padding:14px;margin-top:14px}.sum-row{display:flex;align-items:center;justify-content:space-between;gap:14px;color:#d2d2d2}.sum-row.total{border-top:1px solid var(--line);padding-top:9px;color:#fff;font-weight:900}
+.order-btn{width:100%;border:0;background:var(--yellow);color:var(--black);font-weight:900;border-radius:6px;padding:15px;margin-top:14px;min-height:56px}.order-btn.loading{opacity:.7;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#181818;color:#fff;border:1px solid var(--line);border-radius:999px;padding:10px 18px;z-index:30;opacity:0;pointer-events:none;transition:.2s;white-space:nowrap}.toast.show{opacity:1}.toast.err{border-color:rgba(225,29,72,.7)}
+.sticky{position:fixed;left:0;right:0;bottom:0;background:rgba(8,8,8,.9);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:10px 14px;display:none;align-items:center;justify-content:space-between;gap:12px;z-index:20;direction:ltr}.sticky strong{color:var(--yellow);font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px}.sticky button{background:var(--yellow);color:var(--black);border:0;border-radius:5px;padding:11px 18px;font-weight:900}
+.success{position:fixed;inset:0;background:rgba(8,8,8,.96);z-index:40;display:none;place-items:center;padding:22px;text-align:center}.success.show{display:grid}.success-box{max-width:460px}.success h2{font-family:'Bebas Neue',sans-serif;color:var(--yellow);font-size:58px;letter-spacing:2px}.success p{line-height:1.8;color:#ddd;margin-top:10px}.success a{display:inline-block;margin-top:20px;background:var(--yellow);color:#080808;text-decoration:none;font-weight:900;padding:12px 18px;border-radius:5px}
+.loader,.missing{min-height:60vh;display:grid;place-items:center;text-align:center;color:#ddd}
+@media(max-width:860px){.product-layout{grid-template-columns:1fr}.gallery{position:static}.choices{grid-template-columns:1fr}.sticky.visible{display:flex}.shell{padding-bottom:96px}}
+</style>
+</head>
+<body>
+<main class="shell" id="app">
+  <header class="topbar">
+    <a class="brand" href="/">ARCO</a>
+    <a class="back" href="/">Products</a>
+  </header>
+  <div class="loader">Loading product...</div>
+</main>
+<div class="sticky" id="sticky"><strong id="sticky-total">0 DZD</strong><button onclick="scrollToOrder()">اطلب الآن</button></div>
+<div class="toast" id="toast"></div>
+<div class="success" id="success"><div class="success-box"><h2>ORDER SENT</h2><p>تم تسجيل طلبك بنجاح. سيتصل بك فريق ARCO للتأكيد.</p><p id="success-id"></p><a href="/">العودة للمنتجات</a></div></div>
+
+<script>
+const SB_URL='https://zcsdkuzmogvpvqjzhnqu.supabase.co/rest/v1';
+const SB_KEY='sb_publishable_81QJsFjBfgG9fKhNIS2usA_sNqVQhLF';
+const H={apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'application/json'};
+const WILAYAS=[['01','Adrar'],['02','Chlef'],['03','Laghouat'],['04','Oum El Bouaghi'],['05','Batna'],['06','Bejaia'],['07','Biskra'],['08','Bechar'],['09','Blida'],['10','Bouira'],['11','Tamanrasset'],['12','Tebessa'],['13','Tlemcen'],['14','Tiaret'],['15','Tizi Ouzou'],['16','Algiers'],['17','Djelfa'],['18','Jijel'],['19','Setif'],['20','Saida'],['21','Skikda'],['22','Sidi Bel Abbes'],['23','Annaba'],['24','Guelma'],['25','Constantine'],['26','Medea'],['27','Mostaganem'],['28',"M'Sila"],['29','Mascara'],['30','Ouargla'],['31','Oran'],['32','El Bayadh'],['33','Illizi'],['34','Bordj Bou Arreridj'],['35','Boumerdes'],['36','El Tarf'],['37','Tindouf'],['38','Tissemsilt'],['39','El Oued'],['40','Khenchela'],['41','Souk Ahras'],['42','Tipaza'],['43','Mila'],['44','Ain Defla'],['45','Naama'],['46','Ain Temouchent'],['47','Ghardaia'],['48','Relizane'],['49','Timimoun'],['50','Bordj Badji Mokhtar'],['51','Ouled Djellal'],['52','Beni Abbes'],['53','In Salah'],['54','In Guezzam'],['55','Touggourt'],['56','Djanet'],['57',"El M'Ghair"],['58','El Menia']];
+let product=null,variant=null,delivery='home',shipping={home_delivery:0,stop_desk:0},desks=null,selectedDesk='';
+
+function slugFromPath(){const parts=location.pathname.split('/').filter(Boolean);return parts[1]&&parts[1]!=='product.html'?decodeURIComponent(parts[1]):new URLSearchParams(location.search).get('slug');}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function money(v){return Number(v||0).toLocaleString('fr-DZ')+' DZD';}
+function images(){return Array.isArray(product.images)?product.images:(product.images?[product.images]:[]);}
+function variants(){
+  const raw=product.variants;let list=[];
+  if(Array.isArray(raw))list=raw;
+  else if(raw&&typeof raw==='object')list=Object.entries(raw).map(([name,val])=>typeof val==='object'?{name,...val}:{name,price:val});
+  if(!list.length)list=[{name:'Standard',label:'Standard',price:product.price}];
+  return list.map(v=>({name:v.name||v.label||v.value||'Standard',label:v.label||v.name||v.value||'Standard',price:Number(v.price||product.price),stock:v.stock}));
+}
+async function loadProduct(){
+  const slug=slugFromPath();if(!slug){missing();return;}
+  try{
+    const res=await fetch(`${SB_URL}/products?select=*&slug=eq.${encodeURIComponent(slug)}&active=eq.true&limit=1`,{headers:H});
+    if(!res.ok)throw new Error(await res.text());
+    const data=await res.json();if(!data[0]){missing();return;}
+    product=data[0];variant=variants()[0];render();
+  }catch(e){document.getElementById('app').innerHTML='<div class="missing">تعذر تحميل المنتج.</div>';}
+}
+function missing(){document.getElementById('app').innerHTML='<div class="missing">هذا المنتج غير متوفر حاليا.</div>';}
+function render(){
+  const imgs=images();document.title=product.name+' - ARCO';
+  document.getElementById('app').innerHTML=`
+    <header class="topbar"><a class="brand" href="/">ARCO</a><a class="back" href="/">Products</a></header>
+    <section class="product-layout">
+      <div class="gallery">
+        <div class="main-img">${imgs[0]?`<img id="main-img" src="${esc(imgs[0])}" alt="${esc(product.name)}">`:''}</div>
+        ${imgs.length>1?`<div class="thumbs">${imgs.map((img,i)=>`<button class="thumb ${i===0?'active':''}" onclick="setImage(this,'${esc(img)}')"><img src="${esc(img)}" alt=""></button>`).join('')}</div>`:''}
+      </div>
+      <div class="panel">
+        <div class="kicker">ARCO - COD Algeria</div>
+        <h1>${esc(product.name)}</h1>
+        <div class="desc">${esc(product.description_ar||product.description_fr||'Poster premium disponible avec paiement à la livraison.')}</div>
+        <div class="price-row">${product.original_price?`<span class="old">${money(product.original_price)}</span>`:''}<span class="price" id="base-price">${money(variant.price)}</span></div>
+        <div class="block">
+          <div class="label">الموديل / المقاس <span class="hint">Choisir une option</span></div>
+          <div class="choices" id="variant-choices">${variants().map((v,i)=>`<button class="choice ${i===0?'active':''}" onclick="selectVariant(${i},this)"><strong>${esc(v.label)}</strong><span>${money(v.price)}</span></button>`).join('')}</div>
+        </div>
+        <div class="block" id="order">
+          <div class="label">معلومات الطلب <span class="hint">Paiement à la livraison</span></div>
+          <div class="form">
+            <label class="field"><span>الاسم الكامل</span><input id="f-name" autocomplete="name"></label>
+            <label class="field"><span>رقم الهاتف</span><input id="f-phone" inputmode="tel" placeholder="05xxxxxxxx"></label>
+            <label class="field"><span>الولاية</span><select id="f-wilaya" onchange="onWilayaChange()"><option value="">اختر الولاية</option>${WILAYAS.map(w=>`<option value="${w[0]}|${esc(w[1])}">${w[0]} - ${esc(w[1])}</option>`).join('')}</select></label>
+            <div class="choices"><button class="choice active" onclick="selectDelivery(event,'home')"><strong>توصيل للمنزل</strong><span id="home-price">اختر الولاية</span></button><button class="choice" onclick="selectDelivery(event,'pickup')"><strong>Stop Desk</strong><span id="desk-price">اختر الولاية</span></button></div>
+            <label class="field" id="commune-wrap"><span>البلدية / العنوان</span><input id="f-commune" placeholder="Commune, adresse"></label>
+            <label class="field" id="desk-wrap" style="display:none"><span>نقطة Stop Desk</span><select id="f-desk" onchange="selectedDesk=this.value"><option value="">اختر النقطة</option></select></label>
+            <label class="field"><span>ملاحظات</span><textarea id="f-notes" rows="2"></textarea></label>
+          </div>
+          <div class="summary"><div class="sum-row"><span>المنتج</span><strong id="sum-product">${money(variant.price)}</strong></div><div class="sum-row"><span>التوصيل</span><strong id="sum-ship">0 DZD</strong></div><div class="sum-row total"><span>المجموع</span><strong id="sum-total">${money(variant.price)}</strong></div></div>
+          <button class="order-btn" id="order-btn" onclick="submitOrder()">اطلب الآن</button>
+        </div>
+      </div>
+    </section>`;
+  updateTotals();
+}
+function setImage(btn,src){document.querySelectorAll('.thumb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('main-img').src=src;}
+function selectVariant(i,btn){variant=variants()[i];document.querySelectorAll('#variant-choices .choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');updateTotals();}
+function selectDelivery(ev,type){ev.preventDefault();delivery=type;selectedDesk='';ev.currentTarget.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));ev.currentTarget.classList.add('active');document.getElementById('commune-wrap').style.display=type==='home'?'grid':'none';document.getElementById('desk-wrap').style.display=type==='pickup'?'grid':'none';if(type==='pickup')loadDesks();updateTotals();}
+async function onWilayaChange(){
+  const val=document.getElementById('f-wilaya').value;if(!val)return;selectedDesk='';
+  const id=val.split('|')[0];
+  const res=await fetch(`${SB_URL}/shipping_rates?wilaya_id=eq.${Number(id)}&select=home_delivery,stop_desk&limit=1`,{headers:H});
+  const data=await res.json();shipping=data[0]||{home_delivery:0,stop_desk:0};
+  document.getElementById('home-price').textContent=money(shipping.home_delivery);
+  document.getElementById('desk-price').textContent=money(shipping.stop_desk);
+  if(delivery==='pickup')loadDesks();updateTotals();
+}
+async function loadDesks(){
+  const sel=document.getElementById('f-desk');if(!sel)return;
+  if(!desks){try{const r=await fetch('/api/noest-desks');if(r.ok)desks=await r.json();}catch(e){}}
+  const id=(document.getElementById('f-wilaya').value||'').split('|')[0];
+  const entries=Object.entries(desks||{}).filter(([code])=>id&&new RegExp('^'+id+'[A-Z]').test(code));
+  sel.innerHTML='<option value="">اختر النقطة</option>'+entries.map(([code,d])=>`<option value="${code}">${esc(d.name||code)}</option>`).join('');
+}
+function shippingCost(){return delivery==='home'?Number(shipping.home_delivery||0):Number(shipping.stop_desk||0);}
+function total(){return Number(variant.price||0)+shippingCost();}
+function updateTotals(){['sum-product','base-price'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=money(variant.price)});const s=document.getElementById('sum-ship'),t=document.getElementById('sum-total'),st=document.getElementById('sticky-total'),sticky=document.getElementById('sticky');if(s)s.textContent=money(shippingCost());if(t)t.textContent=money(total());if(st)st.textContent=money(total());if(sticky)sticky.classList.toggle('visible',!!product);}
+function scrollToOrder(){document.getElementById('order').scrollIntoView({behavior:'smooth'});}
+function sendAnalytics(eventName,orderData){
+  const payload={event_name:eventName,order_id:orderData.order_id,value:orderData.prix_total,currency:'DZD',product:orderData.product,variant:orderData.variable,phone:orderData.phone,name:orderData.name,event_source_url:location.href};
+  fetch('/api/meta-conversion',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(()=>{});
+  fetch('/api/tiktok-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(()=>{});
+}
+async function submitOrder(){
+  const name=document.getElementById('f-name').value.trim(),phone=document.getElementById('f-phone').value.replace(/\s/g,''),wilayaVal=document.getElementById('f-wilaya').value,commune=document.getElementById('f-commune').value.trim(),notes=document.getElementById('f-notes').value.trim();
+  if(!name)return toast('ادخل الاسم',true);
+  if(!/^0[567]\d{8}$/.test(phone))return toast('رقم الهاتف غير صحيح',true);
+  if(!wilayaVal)return toast('اختر الولاية',true);
+  if(!shippingCost())return toast('اختر ولاية متوفرة',true);
+  if(delivery==='home'&&!commune)return toast('ادخل البلدية أو العنوان',true);
+  if(delivery==='pickup'&&!selectedDesk)return toast('اختر نقطة Stop Desk',true);
+  const [,wilaya]=wilayaVal.split('|'),orderId=Date.now().toString(),btn=document.getElementById('order-btn');
+  btn.classList.add('loading');btn.textContent='جاري الإرسال...';
+  const orderData={order_id:orderId,name,phone,wilaya,commune:delivery==='home'?commune:'',type_livraison:delivery==='home'?'home':'pickup',station_code:delivery==='pickup'?selectedDesk:null,product:product.name,variable:variant.label,prix_total:total(),shipping_cost:shippingCost(),status:'pending',notes};
+  try{
+    const r=await fetch(`${SB_URL}/orders`,{method:'POST',headers:{...H,Prefer:'return=minimal'},body:JSON.stringify(orderData)});
+    if(!r.ok)throw new Error('failed');
+    fetch('https://ntfy.sh/arco-new-orders',{method:'POST',headers:{Title:'New Order',Priority:'high',Tags:'shopping'},body:`${orderData.name} - ${orderData.wilaya} - ${orderData.prix_total} DZD`}).catch(()=>{});
+    sendAnalytics('Purchase',orderData);
+    document.getElementById('success-id').textContent='#'+orderId;document.getElementById('success').classList.add('show');
+  }catch(e){btn.classList.remove('loading');btn.textContent='اطلب الآن';toast('حدث خطأ. حاول مرة أخرى',true);}
+}
+let tt;function toast(msg,err=false){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(err?' err':'');clearTimeout(tt);tt=setTimeout(()=>el.className='toast',2600);}
+loadProduct();
+</script>
+</body>
+</html>

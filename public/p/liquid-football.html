@@ -1228,6 +1228,30 @@ function scrollToOrder() {
   document.getElementById('order-section').scrollIntoView({ behavior: 'smooth' });
 }
 
+function sendAnalytics(eventName, orderData) {
+  const payload = {
+    event_name: eventName,
+    order_id: orderData.order_id,
+    value: orderData.prix_total,
+    currency: 'DZD',
+    product: orderData.product,
+    variant: orderData.variable,
+    phone: orderData.phone,
+    name: orderData.name,
+    event_source_url: location.href,
+  };
+  fetch('/api/meta-conversion', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(() => {});
+  fetch('/api/tiktok-event', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(() => {});
+}
+
 // ── SUBMIT ORDER ──
 async function submitOrder() {
   const name = document.getElementById('f-name').value.trim();
@@ -1290,6 +1314,8 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
       },
       body: `${orderData.name} - ${orderData.wilaya} - ${orderData.prix_total} DZD`,
     }).catch(() => {});
+
+    sendAnalytics('Purchase', orderData);
 
     // Show success
     document.getElementById('success-order-id').textContent = '#' + orderId;

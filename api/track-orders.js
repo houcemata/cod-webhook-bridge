@@ -8,6 +8,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { sendAllAnalytics } from "./_analytics.js";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -60,7 +61,7 @@ export default async function handler(req, res) {
     // Fetch all orders that need tracking (non-terminal, with tracking numbers)
     const { data: orders, error: fetchError } = await supabase
       .from("orders")
-      .select("id, order_id, tracking_number, status")
+      .select("id, order_id, tracking_number, status, name, phone, product, variable, prix_total")
       .not("tracking_number", "is", null)
       .not("status", "in", `(${TERMINAL_STATUSES.map(s => `"${s}"`).join(",")})`);
 
@@ -164,9 +165,19 @@ export default async function handler(req, res) {
               `✅ Order Delivered`,
               `${order.order_id} — ${order.prix_total || ''} DZD`
             );
+            await sendAllAnalytics({
+              event_name: "Purchase",
+              order_id: order.order_id,
+              value: order.prix_total,
+              currency: "DZD",
+              product: order.product,
+              variant: order.variable,
+              phone: order.phone,
+              name: order.name,
+              event_source_url: "https://arco-art.store",
+            });
           } else if (newStatus === "canceled") {
             console.log(`[track-orders] ⚠️ Order ${order.order_id} returned/canceled`);
-          }
           }
         }
       } catch (err) {

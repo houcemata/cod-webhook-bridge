@@ -250,6 +250,12 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 .prod-log-row:last-child{border-bottom:none}
 .size-revenue-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
 .size-revenue-row:last-child{border-bottom:none}
+.history-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px}
+.history-row:last-child{border-bottom:none}
+.history-title{font-weight:700;font-size:14px;margin-bottom:3px}
+.history-meta{font-size:11px;color:var(--gray);line-height:1.6}
+.history-amount{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--yellow);white-space:nowrap}
+.history-filter{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:5px}
@@ -502,7 +508,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         <div class="kpi-card"><div class="kpi-icon">👩‍💼</div><div class="kpi-label">Staff Costs</div><div class="kpi-value" id="fin-staffcost">—</div><div class="kpi-sub">Employee pay</div></div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px">
 
         <!-- PRODUCTION LOG -->
         <div class="glass-card" style="padding:20px">
@@ -523,7 +529,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px">
 
         <!-- EMPLOYEE PAY -->
         <div class="glass-card" style="padding:20px">
@@ -545,6 +551,31 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <div class="glass-card" style="padding:20px;margin-bottom:16px">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">REVENUE BY PRODUCT SIZE</div>
         <div id="revenue-by-size"></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <div class="glass-card" style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">PAY HISTORY</div>
+            <select class="filter-select" id="pay-history-filter" onchange="renderPayHistory()" style="width:auto;min-width:150px">
+              <option value="all">All Employees</option>
+              <option value="frame_maker">Frame Maker</option>
+              <option value="operator">Operator Girl</option>
+              <option value="print_guy">Print File Guy</option>
+            </select>
+          </div>
+          <div id="pay-history-list" style="max-height:320px;overflow-y:auto"></div>
+        </div>
+
+        <div class="glass-card" style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">STOCK USAGE HISTORY</div>
+            <select class="filter-select" id="stock-usage-filter" onchange="renderStockUsageHistory()" style="width:auto;min-width:150px">
+              <option value="all">All Items</option>
+            </select>
+          </div>
+          <div id="stock-usage-list" style="max-height:320px;overflow-y:auto"></div>
+        </div>
       </div>
 
     </div>
@@ -1223,7 +1254,7 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{
 });
 
 // ── FINANCE ──
-let allProductionLogs=[], allStockItems=[], allExpenses=[], allPayLogs=[];
+let allProductionLogs=[], allStockItems=[], allExpenses=[], allPayLogs=[], allStockUsage=[];
 let restockingItemId=null, markPaidEmployee=null;
 
 const FRAME_RATES={m:60,l:60,xl:100,xxl:200};
@@ -1234,16 +1265,18 @@ const EMPLOYEES=[
 ];
 
 async function loadFinanceData(){
-  const[{data:logs},{data:stock},{data:exp},{data:pay}]=await Promise.all([
+  const[{data:logs},{data:stock},{data:exp},{data:pay},{data:usage}]=await Promise.all([
     sb.from('production_logs').select('*').order('date',{ascending:false}),
     sb.from('stock_items').select('*').order('name'),
     sb.from('expenses').select('*').order('date',{ascending:false}),
     sb.from('employee_pay_log').select('*').order('created_at',{ascending:false}),
+    sb.from('stock_usage_log').select('*').order('created_at',{ascending:false}),
   ]);
   allProductionLogs=logs||[];
   allStockItems=stock||[];
   allExpenses=exp||[];
   allPayLogs=pay||[];
+  allStockUsage=usage||[];
 }
 
 function getFinPeriodRange(){
@@ -1309,6 +1342,9 @@ async function updateFinance(){
   renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,printGuyPay);
   renderExpenses(periodExpenses);
   renderRevenueBySize(deliveredOrders);
+  populateStockUsageFilter();
+  renderPayHistory();
+  renderStockUsageHistory();
 }
 
 function countThursdays(range){
@@ -1320,6 +1356,7 @@ function countThursdays(range){
 }
 
 function fmtDZD(n){return Math.round(n).toLocaleString()+' DZD';}
+function fmtDate(v){return v?new Date(v).toLocaleDateString('fr-DZ'):'-';}
 
 function renderProductionLogs(logs){
   const el=document.getElementById('production-log-list');
@@ -1428,6 +1465,76 @@ function renderRevenueBySize(deliveredOrders){
 }
 
 // ── PRODUCTION LOG ACTIONS ──
+function normalizeEmployeeRole(role){
+  const v=(role||'').toLowerCase();
+  if(v.includes('frame'))return'frame_maker';
+  if(v.includes('operator'))return'operator';
+  if(v.includes('print'))return'print_guy';
+  return v||'other';
+}
+
+function renderPayHistory(){
+  const el=document.getElementById('pay-history-list');
+  if(!el)return;
+  const filter=document.getElementById('pay-history-filter')?.value||'all';
+  const range=getFinPeriodRange();
+  const rows=allPayLogs
+    .filter(p=>filter==='all'||normalizeEmployeeRole(p.employee_role)===filter)
+    .filter(p=>inFinRange(p.paid_at||p.created_at||p.period_end,range));
+  if(!rows.length){
+    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">💸</div><div class="empty-text">No payments in this period</div></div>';
+    return;
+  }
+  el.innerHTML=rows.map(p=>`
+    <div class="history-row">
+      <div>
+        <div class="history-title">${esc(p.employee_name||'Employee')}</div>
+        <div class="history-meta">${esc(p.employee_role||'role')} · ${fmtDate(p.period_start)} to ${fmtDate(p.period_end)}</div>
+        <div class="history-meta">Paid ${fmtDate(p.paid_at||p.created_at)}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="history-amount">${fmtDZD(p.amount_paid||0)}</div>
+        <div class="history-meta">owed ${fmtDZD(p.amount_owed||0)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function populateStockUsageFilter(){
+  const sel=document.getElementById('stock-usage-filter');
+  if(!sel)return;
+  const current=sel.value||'all';
+  sel.innerHTML='<option value="all">All Items</option>'+allStockItems.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('');
+  sel.value=[...sel.options].some(o=>o.value===current)?current:'all';
+}
+
+function renderStockUsageHistory(){
+  const el=document.getElementById('stock-usage-list');
+  if(!el)return;
+  const filter=document.getElementById('stock-usage-filter')?.value||'all';
+  const range=getFinPeriodRange();
+  const rows=allStockUsage
+    .filter(u=>filter==='all'||String(u.stock_item_id)===String(filter))
+    .filter(u=>inFinRange(u.created_at,range));
+  if(!rows.length){
+    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📉</div><div class="empty-text">No stock usage in this period</div></div>';
+    return;
+  }
+  el.innerHTML=rows.map(u=>{
+    const item=allStockItems.find(i=>String(i.id)===String(u.stock_item_id));
+    const log=allProductionLogs.find(l=>String(l.id)===String(u.production_log_id));
+    const frames=log?`M:${log.m_frames||0} · L:${log.l_frames||0} · XL:${log.xl_frames||0} · XXL:${log.xxl_frames||0}`:'No production log';
+    return`
+      <div class="history-row">
+        <div>
+          <div class="history-title">${esc(item?.name||'Stock item')}</div>
+          <div class="history-meta">${esc(item?.size||'')} ${esc(item?.unit||'units')} · ${frames}</div>
+          <div class="history-meta">${fmtDate(u.created_at)}</div>
+        </div>
+        <div class="history-amount" style="color:var(--red)">-${Number(u.quantity_used||0).toLocaleString()}</div>
+      </div>`;
+  }).join('');
+}
+
 function openProductionLog(){
   document.getElementById('prod-date').value=new Date().toISOString().split('T')[0];
   ['prod-m','prod-l','prod-xl','prod-xxl'].forEach(id=>document.getElementById(id).value=0);
@@ -1564,6 +1671,7 @@ async function saveMarkPaid(){
   });
   closeModal('markpaid-modal');toast(`${markPaidEmployee.name} marked as paid ✓`);
   markPaidEmployee=null;
+  await updateFinance();
 }
 
 // ── HELPERS ──

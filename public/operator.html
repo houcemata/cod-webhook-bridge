@@ -4,31 +4,33 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>CODEX — Operator</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#000;color:#fff;min-height:100vh;overflow-x:hidden}
 
-/* PIN */
-#pin-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:24px;padding:32px}
-.pin-logo{font-size:32px;font-weight:900;letter-spacing:-1px}
-.pin-logo span{color:#e11d48}
-.pin-subtitle{font-size:13px;color:#555;letter-spacing:1px;text-transform:uppercase}
-#pin-dots{display:flex;gap:16px;margin:8px 0}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #333;transition:all .2s}
-.pin-dot.filled{background:#e11d48;border-color:#e11d48}
-.pin-error{color:#e11d48;font-size:13px;height:18px;text-align:center}
-.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:240px}
-.pin-key{background:#111;border:1px solid #222;color:#fff;font-size:22px;font-weight:600;padding:18px;border-radius:14px;cursor:pointer;transition:all .15s;text-align:center}
-.pin-key:active{background:#e11d48;border-color:#e11d48;transform:scale(.95)}
-.pin-key.del{font-size:16px;color:#888}
+/* LOGIN */
+#login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:18px;padding:32px}
+.login-card{width:min(360px,100%);background:#0a0a0a;border:1px solid #1a1a1a;border-radius:18px;padding:24px;display:grid;gap:14px}
+.login-logo{font-size:32px;font-weight:900;letter-spacing:-1px;text-align:center}
+.login-logo span{color:#e11d48}
+.login-subtitle{font-size:13px;color:#555;letter-spacing:1px;text-transform:uppercase;text-align:center;margin-bottom:6px}
+.login-input{width:100%;background:#111;border:1px solid #222;color:#fff;font-size:15px;padding:13px 14px;border-radius:12px;outline:none}
+.login-input:focus{border-color:#e11d48}
+.login-btn{background:#e11d48;border:none;color:#fff;padding:13px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer}
+.login-btn.loading{opacity:.7;pointer-events:none}
+.login-error{min-height:18px;color:#e11d48;font-size:13px;text-align:center}
 
 /* APP */
 #app{display:none;flex-direction:column;min-height:100vh}
 .app-header{background:#000;border-bottom:1px solid #1a1a1a;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .logo{font-size:20px;font-weight:900;letter-spacing:-0.5px}
 .logo span{color:#e11d48}
+.header-actions{display:flex;align-items:center;gap:8px}
 .refresh-btn{background:#111;border:1px solid #222;color:#888;width:34px;height:34px;border-radius:10px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .refresh-btn:active{background:#222}
+.logout-btn{background:#111;border:1px solid #222;color:#888;height:34px;border-radius:10px;padding:0 12px;font-size:12px;font-weight:700;cursor:pointer}
+.logout-btn:active{background:#222}
 
 /* Screens */
 .screen{display:none;flex-direction:column;flex:1}
@@ -209,16 +211,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </head>
 <body>
 
-<!-- PIN -->
-<div id="pin-screen">
-  <div class="pin-logo">COD<span>EX</span></div>
-  <div class="pin-subtitle">Operator Access</div>
-  <div id="pin-dots">
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+  <div class="login-logo">COD<span>EX</span></div>
+  <div class="login-subtitle">Operator Access</div>
+  <input class="login-input" id="login-email" type="email" autocomplete="email" placeholder="Email">
+  <input class="login-input" id="login-password" type="password" autocomplete="current-password" placeholder="Password">
+  <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
+  <div class="login-error" id="login-error"></div>
+  <div id="pin-dots" style="display:none">
     <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
     <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
   </div>
   <div class="pin-error" id="pin-error"></div>
-  <div class="pin-pad">
+  <div class="pin-pad" style="display:none">
     <button class="pin-key" onclick="pinPress('1')">1</button>
     <button class="pin-key" onclick="pinPress('2')">2</button>
     <button class="pin-key" onclick="pinPress('3')">3</button>
@@ -231,13 +238,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button class="pin-key" onclick="pinPress('0')" style="grid-column:2">0</button>
     <button class="pin-key del" onclick="pinDel()">⌫</button>
   </div>
+  </div>
 </div>
 
 <!-- APP -->
 <div id="app">
   <div class="app-header">
     <div class="logo">COD<span>EX</span></div>
+    <div class="header-actions">
     <button class="refresh-btn" onclick="refreshAll()">↻</button>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
   </div>
 
   <!-- Main screen (stats + orders) -->
@@ -386,7 +397,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <script>
 const SB_URL = 'https://zcsdkuzmogvpvqjzhnqu.supabase.co/rest/v1';
 const SB_KEY = 'sb_publishable_81QJsFjBfgG9fKhNIS2usA_sNqVQhLF';
-const PIN    = '1234';
+const SB_PROJECT = 'https://zcsdkuzmogvpvqjzhnqu.supabase.co';
+const { createClient } = supabase;
+const sb = createClient(SB_PROJECT, SB_KEY);
 
 const STATUSES = [
   {k:'pending',       l:'Pending',       c:'#f59e0b'},
@@ -414,34 +427,39 @@ const SB_H = {
 };
 
 let allOrders=[], filteredOrders=[], currentTab='all', currentOrder=null;
-let sortAsc=false, selectedIds=new Set(), pinVal='';
+let sortAsc=false, selectedIds=new Set(), currentUser=null;
 let noestDesks=null;
 let currentPage=1, pageSize=30;
 
 // ── PIN ──
-function pinPress(d){
-  if(pinVal.length>=4)return;
-  pinVal+=d;
-  document.getElementById(`d${pinVal.length-1}`).classList.add('filled');
-  if(pinVal.length===4)setTimeout(checkPin,150);
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
+  const errEl=document.getElementById('login-error');
+  const btn=document.getElementById('login-btn');
+  if(!email||!password){errEl.textContent='Please enter email and password';return;}
+  btn.classList.add('loading');btn.textContent='Signing in...';errEl.textContent='';
+  const{data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error){errEl.textContent='Invalid email or password';btn.classList.remove('loading');btn.textContent='Sign In';return;}
+  currentUser=data.user;
+  await showApp();
 }
-function pinDel(){
-  if(!pinVal.length)return;
-  document.getElementById(`d${pinVal.length-1}`).classList.remove('filled');
-  pinVal=pinVal.slice(0,-1);
-  document.getElementById('pin-error').textContent='';
+async function showApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+  await init();
 }
-function checkPin(){
-  if(pinVal===PIN){
-    document.getElementById('pin-screen').style.display='none';
-    document.getElementById('app').style.display='flex';
-    init();
-  } else {
-    document.getElementById('pin-error').textContent='Wrong PIN';
-    pinVal='';
-    ['d0','d1','d2','d3'].forEach(id=>document.getElementById(id).classList.remove('filled'));
-  }
+async function doLogout(){
+  await sb.auth.signOut();
+  currentUser=null;
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
 }
+window.addEventListener('DOMContentLoaded',async()=>{
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){currentUser=session.user;await showApp();}
+  document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+});
 
 // ── INIT ──
 async function init(){ buildTabs(); await loadOrders(); }
