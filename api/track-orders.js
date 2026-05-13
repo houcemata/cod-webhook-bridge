@@ -3,12 +3,8 @@
  * 
  * Auto-tracking system for ARCO COD CRM
  * Polls Noest Express API every 30 minutes (via pg_cron)
+ * Tracks: picked up by driver, out for delivery, delivered, suspended, returned
  * Updates order statuses + logs changes to order_history
- * 
- * Integration points:
- * - operator.html: Displays updated statuses in real-time
- * - admin.html: Finance tab counts delivered orders for employee pay calculation
- * - Employee 3 (operator girl): Gets 150 DZD per delivered order
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -23,24 +19,28 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const NOEST_BASE = "https://app.noest-dz.com/api/public";
 
 /**
- * Map Noest status codes to ARCO order statuses
- * These match the statuses defined in operator.html and admin.html
+ * Map Noest event keys to ARCO order statuses
+ * Only tracks the 5 important events
  */
-const STATUS_MAP = {
-  pending: "pending",
-  in_transit: "shipped",
-  delivered: "delivered",
-  failed: "attempt_1",
-  rescheduled: "rescheduled",
-  cancelled: "canceled",
+const EVENT_STATUS_MAP = {
+  validation_reception: "shipping",      // Picked up by driver
+  fdr_activated: "shipping",             // Out for delivery
+  livre: "delivered",                    // Delivered
+  livred: "delivered",                   // Delivered (alternate)
+  colis_suspendu: "suspended",           // Suspended
+  return_asked_by_customer: "canceled",  // Return requested
+  return_asked_by_hub: "canceled",       // Return in transit
+  retour_dispatched_to_partenaires: "canceled",  // Return dispatched
+  livraison_echoue_recu: "canceled",     // Return received
 };
 
 /**
- * Statuses that are considered "terminal" (don't need tracking anymore)
+ * Statuses that are terminal (don't need tracking anymore)
  */
 const TERMINAL_STATUSES = [
   "delivered",
   "canceled",
+  "suspended",
   "not_delivered",
   "duplicated",
 ];
@@ -57,6 +57,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Configuration error: missing env vars" });
     }
 
+    // Fetch all orders that need tracking (non-terminal, with tracking numbers)
     const { data: orders, error: fetchError } = await supabase
       .from("orders")
       .select("id, order_id, tracking_number, status")
@@ -86,24 +87,35 @@ export default async function handler(req, res) {
     let errors = 0;
     const updates = [];
 
+    // Track each order
     for (const order of orders) {
       try {
-        const noestStatus = await getNoestStatus(order.tracking_number);
+        const latestEvent = await getLatestNoestEvent(order.tracking_number);
 
-        if (!noestStatus) {
+        if (!latestEvent) {
           console.warn(
-            `[track-orders] No status from Noest for ${order.tracking_number} (${order.order_id})`
+            `[track-orders] No event from Noest for ${order.tracking_number} (${order.order_id})`
           );
           continue;
         }
 
-        const newStatus = STATUS_MAP[noestStatus.status] || order.status;
+        const newStatus = EVENT_STATUS_MAP[latestEvent.event_key];
 
+        // Only update if we care about this event
+        if (!newStatus) {
+          console.log(
+            `[track-orders] ~ ${order.order_id}: ignoring event "${latestEvent.event_key}"`
+          );
+          continue;
+        }
+
+        // Only update if status actually changed
         if (newStatus !== order.status) {
           console.log(
-            `[track-orders] ✓ ${order.order_id}: "${order.status}" → "${newStatus}"`
+            `[track-orders] ✓ ${order.order_id}: "${order.status}" → "${newStatus}" (event: ${latestEvent.event_key})`
           );
 
+          // Update orders table
           const { error: updateError } = await supabase
             .from("orders")
             .update({
@@ -118,6 +130,7 @@ export default async function handler(req, res) {
             continue;
           }
 
+          // Log to order_history
           const { error: historyError } = await supabase
             .from("order_history")
             .insert({
@@ -140,10 +153,14 @@ export default async function handler(req, res) {
             order_id: order.order_id,
             from: order.status,
             to: newStatus,
+            event: latestEvent.event_key,
           });
 
+          // Log special events
           if (newStatus === "delivered") {
             console.log(`[track-orders] 💰 Order ${order.order_id} delivered — Employee 3 eligible for 150 DZD`);
+          } else if (newStatus === "canceled") {
+            console.log(`[track-orders] ⚠️ Order ${order.order_id} returned/canceled`);
           }
         }
       } catch (err) {
@@ -177,40 +194,47 @@ export default async function handler(req, res) {
   }
 }
 
-async function getNoestStatus(trackingNumber) {
+/**
+ * Get the latest event from Noest for a tracking number
+ * Calls /api/public/get/trackings/info and returns the most recent activity
+ */
+async function getLatestNoestEvent(trackingNumber) {
   try {
-    const url = `${NOEST_BASE}/shipment/status?guid=${noestGuid}&tracking=${trackingNumber}`;
-    
-    const response = await fetch(url, {
-      method: "GET",
+    const response = await fetch(`${NOEST_BASE}/get/trackings/info`, {
+      method: "POST",
       headers: {
         "Authorization": `Bearer ${noestApiKey}`,
         "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        trackings: [trackingNumber],
+      }),
       timeout: 5000,
     });
 
     if (!response.ok) {
-      console.warn(
-        `[getNoestStatus] HTTP ${response.status} for tracking ${trackingNumber}`
-      );
+      console.warn(`[getLatestNoestEvent] HTTP ${response.status} for ${trackingNumber}`);
       return null;
     }
 
     const data = await response.json();
+    const orderData = data[trackingNumber];
 
-    const status = data.status || data.current_status || "pending";
-    const lastUpdate = data.last_update || data.updated_at || new Date().toISOString();
+    if (!orderData || !orderData.activity || orderData.activity.length === 0) {
+      console.warn(`[getLatestNoestEvent] No activity for ${trackingNumber}`);
+      return null;
+    }
+
+    // Get the LATEST event (first in array = most recent)
+    const latestActivity = orderData.activity[0];
 
     return {
-      status,
-      last_update: lastUpdate,
+      event_key: latestActivity.event_key || latestActivity.event,
+      event_name: latestActivity.event,
+      date: latestActivity.date,
     };
   } catch (err) {
-    console.error(
-      `[getNoestStatus] Error querying Noest for ${trackingNumber}:`,
-      err.message
-    );
+    console.error(`[getLatestNoestEvent] Error for ${trackingNumber}:`, err.message);
     return null;
   }
 }
