@@ -24,7 +24,7 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
 .desc{color:#d7d7d7;line-height:1.9;margin:16px 0 18px;font-size:16px}.price-row{display:flex;align-items:center;gap:12px;justify-content:flex-start;direction:ltr;margin-bottom:20px}
 .price{font-family:'Bebas Neue',sans-serif;color:var(--yellow);font-size:46px;letter-spacing:1px}.old{font-family:'Barlow Condensed',sans-serif;color:#777;text-decoration:line-through;font-size:24px}
 .block{border-top:1px solid var(--line);padding-top:18px;margin-top:18px}.label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:900;margin-bottom:10px}.hint{font-size:12px;color:var(--muted);font-weight:600}
-.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.choice{border:1px solid var(--line);background:#111;color:#fff;border-radius:6px;padding:12px;text-align:right}.choice.active{border-color:var(--yellow);box-shadow:inset 0 0 0 1px rgba(245,197,0,.5)}.choice strong{display:block}.choice span{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+.option-group{margin-top:12px}.option-group:first-child{margin-top:0}.option-title{font-weight:900;margin-bottom:8px;color:#ddd}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.choice{border:1px solid var(--line);background:#111;color:#fff;border-radius:6px;padding:12px;text-align:right}.choice.active{border-color:var(--yellow);box-shadow:inset 0 0 0 1px rgba(245,197,0,.5)}.choice strong{display:block}.choice span{display:block;color:var(--muted);font-size:13px;margin-top:4px}
 .form{display:grid;gap:10px}.field{display:grid;gap:6px}.field span{font-size:13px;color:#ddd;font-weight:700}.field input,.field select,.field textarea{width:100%;background:#111;color:#fff;border:1px solid var(--line);border-radius:5px;padding:12px;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--yellow)}
 .summary{display:grid;gap:8px;background:#101010;border:1px solid var(--line);border-radius:8px;padding:14px;margin-top:14px}.sum-row{display:flex;align-items:center;justify-content:space-between;gap:14px;color:#d2d2d2}.sum-row.total{border-top:1px solid var(--line);padding-top:9px;color:#fff;font-weight:900}
 .order-btn{width:100%;border:0;background:var(--yellow);color:var(--black);font-weight:900;border-radius:6px;padding:15px;margin-top:14px;min-height:56px}.order-btn.loading{opacity:.7;pointer-events:none}
@@ -52,10 +52,11 @@ const SB_URL='https://zcsdkuzmogvpvqjzhnqu.supabase.co/rest/v1';
 const SB_KEY='sb_publishable_81QJsFjBfgG9fKhNIS2usA_sNqVQhLF';
 const H={apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'application/json'};
 const WILAYAS=[['01','Adrar'],['02','Chlef'],['03','Laghouat'],['04','Oum El Bouaghi'],['05','Batna'],['06','Bejaia'],['07','Biskra'],['08','Bechar'],['09','Blida'],['10','Bouira'],['11','Tamanrasset'],['12','Tebessa'],['13','Tlemcen'],['14','Tiaret'],['15','Tizi Ouzou'],['16','Algiers'],['17','Djelfa'],['18','Jijel'],['19','Setif'],['20','Saida'],['21','Skikda'],['22','Sidi Bel Abbes'],['23','Annaba'],['24','Guelma'],['25','Constantine'],['26','Medea'],['27','Mostaganem'],['28',"M'Sila"],['29','Mascara'],['30','Ouargla'],['31','Oran'],['32','El Bayadh'],['33','Illizi'],['34','Bordj Bou Arreridj'],['35','Boumerdes'],['36','El Tarf'],['37','Tindouf'],['38','Tissemsilt'],['39','El Oued'],['40','Khenchela'],['41','Souk Ahras'],['42','Tipaza'],['43','Mila'],['44','Ain Defla'],['45','Naama'],['46','Ain Temouchent'],['47','Ghardaia'],['48','Relizane'],['49','Timimoun'],['50','Bordj Badji Mokhtar'],['51','Ouled Djellal'],['52','Beni Abbes'],['53','In Salah'],['54','In Guezzam'],['55','Touggourt'],['56','Djanet'],['57',"El M'Ghair"],['58','El Menia']];
-let product=null,variant=null,delivery='home',shipping={home_delivery:0,stop_desk:0},desks=null,selectedDesk='';
+let product=null,variant=null,selectedOptions={},delivery='home',shipping={home_delivery:0,stop_desk:0},desks=null,selectedDesk='';
 
 function slugFromPath(){const parts=location.pathname.split('/').filter(Boolean);return parts[1]&&parts[1]!=='product.html'?decodeURIComponent(parts[1]):new URLSearchParams(location.search).get('slug');}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function enc(v){return encodeURIComponent(String(v??''));}
 function money(v){return Number(v||0).toLocaleString('fr-DZ')+' DZD';}
 function images(){
   const base=Array.isArray(product.images)?product.images:(product.images?[product.images]:[]);
@@ -67,7 +68,41 @@ function variants(){
   if(Array.isArray(raw))list=raw;
   else if(raw&&typeof raw==='object')list=Object.entries(raw).map(([name,val])=>typeof val==='object'?{name,...val}:{name,price:val});
   if(!list.length)list=[{name:'Standard',label:'Standard',price:product.price}];
-  return list.map(v=>({name:v.name||v.label||v.value||'Standard',label:v.label||v.name||v.value||'Standard',price:Number(v.price||product.price),stock:v.stock,image:v.image||''}));
+  return list.map(v=>({name:v.name||v.label||v.value||'Standard',label:v.label||v.name||v.value||'Standard',price:Number(v.price||product.price),stock:v.stock,image:v.image||'',options:v.options||null}));
+}
+function optionGroups(){
+  const groups={};
+  variants().forEach(v=>{
+    if(!v.options)return;
+    Object.entries(v.options).forEach(([name,value])=>{
+      if(!groups[name])groups[name]=[];
+      if(value&&!groups[name].includes(value))groups[name].push(value);
+    });
+  });
+  return groups;
+}
+function hasOptionGroups(){return Object.keys(optionGroups()).length>0;}
+function setDefaultOptions(){
+  const first=variants()[0];
+  selectedOptions=first?.options?{...first.options}:{};
+}
+function findSelectedVariant(){
+  if(!hasOptionGroups())return variant||variants()[0];
+  return variants().find(v=>{
+    if(!v.options)return false;
+    return Object.entries(selectedOptions).every(([name,value])=>v.options[name]===value);
+  })||variants()[0];
+}
+function renderVariantControls(){
+  if(!hasOptionGroups()){
+    return `<div class="choices" id="variant-choices">${variants().map((v,i)=>`<button class="choice ${i===0?'active':''}" onclick="selectVariant(${i},this)"><strong>${esc(v.label)}</strong><span>${money(v.price)}</span></button>`).join('')}</div>`;
+  }
+  const groups=optionGroups();
+  return Object.entries(groups).map(([name,values])=>`
+    <div class="option-group">
+      <div class="option-title">${esc(name)}</div>
+      <div class="choices">${values.map(value=>`<button class="choice ${selectedOptions[name]===value?'active':''}" onclick="selectOption('${enc(name)}','${enc(value)}',this)"><strong>${esc(value)}</strong></button>`).join('')}</div>
+    </div>`).join('');
 }
 async function loadProduct(){
   const slug=slugFromPath();if(!slug){missing();return;}
@@ -75,7 +110,7 @@ async function loadProduct(){
     const res=await fetch(`${SB_URL}/products?select=*&slug=eq.${encodeURIComponent(slug)}&active=eq.true&limit=1`,{headers:H});
     if(!res.ok)throw new Error(await res.text());
     const data=await res.json();if(!data[0]){missing();return;}
-    product=data[0];variant=variants()[0];render();
+    product=data[0];variant=variants()[0];setDefaultOptions();render();
   }catch(e){document.getElementById('app').innerHTML='<div class="missing">تعذر تحميل المنتج.</div>';}
 }
 function missing(){document.getElementById('app').innerHTML='<div class="missing">هذا المنتج غير متوفر حاليا.</div>';}
@@ -95,7 +130,7 @@ function render(){
         <div class="price-row">${product.original_price?`<span class="old">${money(product.original_price)}</span>`:''}<span class="price" id="base-price">${money(variant.price)}</span></div>
         <div class="block">
           <div class="label">الموديل / المقاس <span class="hint">Choisir une option</span></div>
-          <div class="choices" id="variant-choices">${variants().map((v,i)=>`<button class="choice ${i===0?'active':''}" onclick="selectVariant(${i},this)"><strong>${esc(v.label)}</strong><span>${money(v.price)}</span></button>`).join('')}</div>
+          ${renderVariantControls()}
         </div>
         <div class="block" id="order">
           <div class="label">معلومات الطلب <span class="hint">Paiement à la livraison</span></div>
@@ -117,6 +152,7 @@ function render(){
 }
 function setImage(btn,src){document.querySelectorAll('.thumb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('main-img').src=src;}
 function selectVariant(i,btn){variant=variants()[i];document.querySelectorAll('#variant-choices .choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();}
+function selectOption(name,value,btn){name=decodeURIComponent(name);value=decodeURIComponent(value);selectedOptions[name]=value;variant=findSelectedVariant();btn.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();}
 function selectDelivery(ev,type){ev.preventDefault();delivery=type;selectedDesk='';ev.currentTarget.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));ev.currentTarget.classList.add('active');document.getElementById('commune-wrap').style.display=type==='home'?'grid':'none';document.getElementById('desk-wrap').style.display=type==='pickup'?'grid':'none';if(type==='pickup')loadDesks();updateTotals();}
 async function onWilayaChange(){
   const val=document.getElementById('f-wilaya').value;if(!val)return;selectedDesk='';

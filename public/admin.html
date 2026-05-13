@@ -177,6 +177,13 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 .form-input::placeholder,.form-textarea::placeholder{color:var(--gray2)}
 .form-textarea{resize:vertical;min-height:80px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.variant-builder{border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);border-radius:16px;padding:14px;margin-bottom:16px}
+.variant-help{font-size:12px;color:var(--gray);line-height:1.6;margin:-4px 0 12px}
+.variant-table{display:grid;gap:8px;margin-top:12px}
+.variant-row{display:grid;grid-template-columns:1.1fr 110px 1.5fr;gap:8px;align-items:center}
+.variant-label{font-size:13px;font-weight:800;color:var(--white);line-height:1.25}
+.variant-label span{display:block;color:var(--gray);font-size:11px;font-weight:600;margin-top:3px}
+.variant-empty{font-size:13px;color:var(--gray);padding:12px;border:1px dashed rgba(255,255,255,0.12);border-radius:12px}
 
 /* DONUT */
 .donut-wrap{display:flex;align-items:center;gap:20px;padding:16px 20px}
@@ -270,6 +277,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
   .kpi-grid{grid-template-columns:1fr 1fr}
   .chart-row{grid-template-columns:1fr}
   .form-row{grid-template-columns:1fr}
+  .variant-row{grid-template-columns:1fr}
   .modal-overlay{align-items:flex-end;padding:0}
   .modal{border-radius:26px 26px 0 0;max-width:100%;max-height:88vh}
   .data-table th:nth-child(3),.data-table td:nth-child(3),
@@ -741,7 +749,20 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <div class="form-field"><label class="form-label">Description (Arabic)</label><textarea class="form-textarea" id="p-desc-ar" placeholder="الوصف..." style="direction:rtl"></textarea></div>
       <div class="form-field"><label class="form-label">Description (French)</label><textarea class="form-textarea" id="p-desc-fr" placeholder="Description..."></textarea></div>
       <div class="form-field"><label class="form-label">Main Image URL</label><input class="form-input" id="p-image" placeholder="https://..."/></div>
-      <div class="form-field"><label class="form-label">Variants</label><textarea class="form-textarea" id="p-variants" placeholder="Medium | 2900 | https://image-url&#10;Large | 3900 | https://image-url"></textarea></div>
+      <div class="variant-builder">
+        <div class="form-label">Variants</div>
+        <div class="variant-help">Use Shopify-style options. Example: option name <b>Club</b> with values <b>RMA, FCB, MCA</b>, then option name <b>Taille</b> with values <b>30x40cm, 40x60cm</b>. Click Generate to edit each combination price and image.</div>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Option 1 Name</label><input class="form-input" id="p-opt1-name" placeholder="Club"/></div>
+          <div class="form-field"><label class="form-label">Option 1 Values</label><input class="form-input" id="p-opt1-values" placeholder="RMA, FCB, MCA"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Option 2 Name</label><input class="form-input" id="p-opt2-name" placeholder="Taille"/></div>
+          <div class="form-field"><label class="form-label">Option 2 Values</label><input class="form-input" id="p-opt2-values" placeholder="30x40cm, 40x60cm"/></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" type="button" onclick="generateVariantRows()">Generate Variants</button>
+        <div class="variant-table" id="variant-table"></div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('product-modal')">Cancel</button>
@@ -1192,7 +1213,8 @@ function renderProducts(){
 function openAddProduct(){
   editingProductId=null;
   document.getElementById('product-modal-title').textContent='ADD PRODUCT';
-  ['p-name','p-slug','p-price','p-oprice','p-desc-ar','p-desc-fr','p-image','p-variants'].forEach(id=>document.getElementById(id).value='');
+  ['p-name','p-slug','p-price','p-oprice','p-desc-ar','p-desc-fr','p-image','p-opt1-name','p-opt1-values','p-opt2-name','p-opt2-values'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('variant-table').innerHTML='<div class="variant-empty">Add option values, then generate variants.</div>';
   document.getElementById('product-modal').classList.add('open');
 }
 function openEditProduct(id){
@@ -1206,19 +1228,61 @@ function openEditProduct(id){
   document.getElementById('p-desc-ar').value=p.description_ar||'';
   document.getElementById('p-desc-fr').value=p.description_fr||'';
   document.getElementById('p-image').value=Array.isArray(p.images)?p.images[0]:(p.images||'');
-  document.getElementById('p-variants').value=variantRowsToText(p.variants);
+  fillVariantBuilder(p.variants);
   document.getElementById('product-modal').classList.add('open');
 }
-function variantRowsToText(raw){
-  if(!raw)return'';
+function splitValues(value){return String(value||'').split(',').map(v=>v.trim()).filter(Boolean);}
+function normalizeVariants(raw){
+  if(!raw)return[];
   const list=Array.isArray(raw)?raw:Object.entries(raw).map(([name,val])=>typeof val==='object'?{name,...val}:{name,price:val});
-  return list.map(v=>[v.label||v.name||'',v.price||'',v.image||''].join(' | ')).join('\n');
+  return list.map(v=>({name:v.name||v.label||'',label:v.label||v.name||'',price:Number(v.price||0),image:v.image||'',options:v.options||null})).filter(v=>v.label||v.name);
 }
-function parseVariantRows(text){
-  return text.split('\n').map(row=>row.trim()).filter(Boolean).map(row=>{
-    const parts=row.split('|').map(part=>part.trim());
-    return {name:parts[0],label:parts[0],price:Number(parts[1]||0),image:parts[2]||''};
-  }).filter(v=>v.name&&v.price);
+function fillVariantBuilder(raw){
+  const variants=normalizeVariants(raw);
+  ['p-opt1-name','p-opt1-values','p-opt2-name','p-opt2-values'].forEach(id=>document.getElementById(id).value='');
+  if(variants.some(v=>v.options)){
+    const optionNames=[...new Set(variants.flatMap(v=>Object.keys(v.options||{})))].slice(0,2);
+    optionNames.forEach((name,i)=>{
+      const values=[...new Set(variants.map(v=>v.options?.[name]).filter(Boolean))];
+      document.getElementById(`p-opt${i+1}-name`).value=name;
+      document.getElementById(`p-opt${i+1}-values`).value=values.join(', ');
+    });
+  }else if(variants.length){
+    document.getElementById('p-opt1-name').value='Variant';
+    document.getElementById('p-opt1-values').value=variants.map(v=>v.label||v.name).join(', ');
+  }
+  renderVariantRows(variants);
+}
+function generateVariantRows(){
+  const options=[
+    {name:document.getElementById('p-opt1-name').value.trim(),values:splitValues(document.getElementById('p-opt1-values').value)},
+    {name:document.getElementById('p-opt2-name').value.trim(),values:splitValues(document.getElementById('p-opt2-values').value)}
+  ].filter(o=>o.name&&o.values.length);
+  const price=parseFloat(document.getElementById('p-price').value)||0;
+  const image=document.getElementById('p-image').value.trim();
+  if(!options.length){document.getElementById('variant-table').innerHTML='<div class="variant-empty">Add at least one option name and values.</div>';return;}
+  const combos=options.reduce((rows,opt)=>rows.flatMap(row=>opt.values.map(value=>({...row,[opt.name]:value}))),[{}]);
+  const variants=combos.map(options=>({options,label:Object.values(options).join(' / '),name:Object.values(options).join(' / '),price,image}));
+  renderVariantRows(variants);
+}
+function renderVariantRows(variants){
+  const table=document.getElementById('variant-table');
+  if(!variants.length){table.innerHTML='<div class="variant-empty">Add option values, then generate variants.</div>';return;}
+  table.innerHTML=variants.map((v,i)=>`
+    <div class="variant-row" data-options="${esc(JSON.stringify(v.options||{}))}">
+      <div class="variant-label">${esc(v.label||v.name)}<span>${esc(Object.entries(v.options||{}).map(([k,val])=>`${k}: ${val}`).join(' | '))}</span></div>
+      <input class="form-input variant-price" type="number" min="0" value="${Number(v.price||document.getElementById('p-price').value||0)}" placeholder="Price">
+      <input class="form-input variant-image" value="${esc(v.image||'')}" placeholder="Variant image URL">
+    </div>`).join('');
+}
+function collectVariants(){
+  return [...document.querySelectorAll('#variant-table .variant-row')].map(row=>{
+    let options={};try{options=JSON.parse(row.dataset.options||'{}');}catch(e){}
+    const label=row.querySelector('.variant-label')?.childNodes[0]?.textContent.trim()||Object.values(options).join(' / ')||'Standard';
+    const price=Number(row.querySelector('.variant-price').value||0);
+    const image=row.querySelector('.variant-image').value.trim();
+    return {name:label,label,price,image,options:Object.keys(options).length?options:null};
+  }).filter(v=>v.label&&v.price);
 }
 async function saveProduct(){
   const name=document.getElementById('p-name').value.trim();
@@ -1228,7 +1292,7 @@ async function saveProduct(){
   const descAr=document.getElementById('p-desc-ar').value.trim();
   const descFr=document.getElementById('p-desc-fr').value.trim();
   const image=document.getElementById('p-image').value.trim();
-  const variants=parseVariantRows(document.getElementById('p-variants').value);
+  const variants=collectVariants();
   if(!name||!slug||!price){toast('Name, slug and price required',true);return;}
   const data={name,slug,price,original_price:oprice,description_ar:descAr,description_fr:descFr,images:image?[image]:[],variants,active:true};
   if(editingProductId){await sb.from('products').update(data).eq('id',editingProductId);toast('Product updated ✓');}
