@@ -94,7 +94,8 @@ async function loadProducts(){
     if(!res.ok)throw new Error(await res.text());
     const products=await res.json();
     if(!products.length){grid.innerHTML='<div class="empty">قريبا منتجات جديدة.</div>';return;}
-    const heroImage=productImages(products[0])[0];
+    const heroProduct=products.find(p=>p.slug==='liquid-football')||products[0];
+    const heroImage=productImages(heroProduct)[0];
     if(heroImage)document.getElementById('hero').style.backgroundImage=`url("${heroImage}")`;
     grid.innerHTML=products.map(p=>{
       const img=productImages(p)[0];
