@@ -8,7 +8,6 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
-import { sendAllAnalytics } from "./_analytics.js";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -165,17 +164,6 @@ export default async function handler(req, res) {
               `✅ Order Delivered`,
               `${order.order_id} — ${order.prix_total || ''} DZD`
             );
-            await sendAllAnalytics({
-              event_name: "Purchase",
-              order_id: order.order_id,
-              value: order.prix_total,
-              currency: "DZD",
-              product: order.product,
-              variant: order.variable,
-              phone: order.phone,
-              name: order.name,
-              event_source_url: "https://arco-art.store",
-            });
           } else if (newStatus === "canceled") {
             console.log(`[track-orders] ⚠️ Order ${order.order_id} returned/canceled`);
           }

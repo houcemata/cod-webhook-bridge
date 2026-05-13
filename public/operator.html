@@ -427,7 +427,7 @@ const SB_H = {
 };
 
 let allOrders=[], filteredOrders=[], currentTab='all', currentOrder=null;
-let sortAsc=false, selectedIds=new Set(), currentUser=null;
+let sortAsc=false, selectedIds=new Set(), currentUser=null, currentRole=null;
 let noestDesks=null;
 let currentPage=1, pageSize=30;
 
@@ -442,7 +442,23 @@ async function doLogin(){
   const{data,error}=await sb.auth.signInWithPassword({email,password});
   if(error){errEl.textContent='Invalid email or password';btn.classList.remove('loading');btn.textContent='Sign In';return;}
   currentUser=data.user;
+  const allowed=await ensureOperatorAccess();
+  if(!allowed){btn.classList.remove('loading');btn.textContent='Sign In';return;}
   await showApp();
+}
+async function ensureOperatorAccess(){
+  const errEl=document.getElementById('login-error');
+  const{data:roleData,error}=await sb.from('user_roles').select('*').eq('user_id',currentUser.id).in('role',['operator','admin']).single();
+  if(error||!roleData){
+    await sb.auth.signOut();
+    currentUser=null;currentRole=null;
+    document.getElementById('app').style.display='none';
+    document.getElementById('login-screen').style.display='flex';
+    errEl.textContent='This account is not an operator account.';
+    return false;
+  }
+  currentRole=roleData;
+  return true;
 }
 async function showApp(){
   document.getElementById('login-screen').style.display='none';
@@ -451,13 +467,13 @@ async function showApp(){
 }
 async function doLogout(){
   await sb.auth.signOut();
-  currentUser=null;
+  currentUser=null;currentRole=null;
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
 }
 window.addEventListener('DOMContentLoaded',async()=>{
   const{data:{session}}=await sb.auth.getSession();
-  if(session){currentUser=session.user;await showApp();}
+  if(session){currentUser=session.user;if(await ensureOperatorAccess())await showApp();}
   document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 });
 

@@ -741,6 +741,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <div class="form-field"><label class="form-label">Description (Arabic)</label><textarea class="form-textarea" id="p-desc-ar" placeholder="الوصف..." style="direction:rtl"></textarea></div>
       <div class="form-field"><label class="form-label">Description (French)</label><textarea class="form-textarea" id="p-desc-fr" placeholder="Description..."></textarea></div>
       <div class="form-field"><label class="form-label">Main Image URL</label><input class="form-input" id="p-image" placeholder="https://..."/></div>
+      <div class="form-field"><label class="form-label">Variants</label><textarea class="form-textarea" id="p-variants" placeholder="Medium | 2900 | https://image-url&#10;Large | 3900 | https://image-url"></textarea></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('product-modal')">Cancel</button>
@@ -758,14 +759,14 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     </div>
     <div class="modal-body">
       <div style="background:rgba(245,197,0,0.06);border:1px solid rgba(245,197,0,0.2);border-radius:14px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--gray)">
-        💡 To add an operator: go to <b style="color:var(--white)">Supabase → Authentication → Invite user</b>, then come back here to assign their role after they confirm their email.
+        Enter the operator email. They will receive an invite link, choose a password, then sign in from the operator page.
       </div>
       <div class="form-field"><label class="form-label">Operator Name</label><input class="form-input" id="op-name" placeholder="e.g. Mohamed Amrani"/></div>
-      <div class="form-field"><label class="form-label">User ID (from Supabase Auth)</label><input class="form-input" id="op-userid" placeholder="Paste UUID from Supabase"/></div>
+      <div class="form-field"><label class="form-label">Operator Email</label><input class="form-input" id="op-email" type="email" placeholder="operator@email.com"/></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('operator-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="saveOperator()">Add Operator</button>
+      <button class="btn btn-primary" id="operator-save-btn" onclick="saveOperator()">Send Invite</button>
     </div>
   </div>
 </div>
@@ -799,7 +800,7 @@ const STATUSES=[
   {k:'not_delivered',l:'Not Delivered',c:'#ef4444'},{k:'duplicated',l:'Duplicated',c:'#71717a'},
 ];
 
-let currentUser=null,allOrders=[],filteredOrders=[],allProducts=[],allOperators=[];
+let currentUser=null,currentRole=null,allOrders=[],filteredOrders=[],allProducts=[],allOperators=[];
 let currentPage=1;const PAGE_SIZE=30;let editingProductId=null;
 
 // ── AUTH ──
@@ -812,13 +813,29 @@ async function doLogin(){
   btn.classList.add('loading');btn.textContent='Signing in...';errEl.textContent='';
   const{data,error}=await sb.auth.signInWithPassword({email,password});
   if(error){errEl.textContent='Invalid email or password';btn.classList.remove('loading');btn.textContent='Sign In';return;}
-  currentUser=data.user;await initApp();
+  currentUser=data.user;
+  const allowed=await ensureAdminAccess();
+  if(!allowed){btn.classList.remove('loading');btn.textContent='Sign In';return;}
+  await initApp();
+}
+async function ensureAdminAccess(){
+  const errEl=document.getElementById('login-error');
+  const{data:roleData,error}=await sb.from('user_roles').select('*').eq('user_id',currentUser.id).eq('role','admin').single();
+  if(error||!roleData){
+    await sb.auth.signOut();
+    currentUser=null;currentRole=null;
+    document.getElementById('app').style.display='none';
+    document.getElementById('login-screen').style.display='flex';
+    errEl.textContent='This account is not an admin account.';
+    return false;
+  }
+  currentRole=roleData;
+  return true;
 }
 async function initApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').style.display='block';
-  const{data:roleData}=await sb.from('user_roles').select('*').eq('user_id',currentUser.id).single();
-  const name=roleData?.name||currentUser.email.split('@')[0];
+  const name=currentRole?.name||currentUser.email.split('@')[0];
   document.getElementById('sidebar-name').textContent=name;
   document.getElementById('sidebar-avatar').textContent=name.charAt(0).toUpperCase();
   document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -828,7 +845,7 @@ async function doLogout(){
   await sb.auth.signOut();
   document.getElementById('login-screen').style.display='flex';
   document.getElementById('app').style.display='none';
-  currentUser=null;
+  currentUser=null;currentRole=null;
 }
 async function refreshAll(){
   await Promise.all([loadOrders(),loadProducts(),loadOperators(),loadHistory()]);
@@ -836,7 +853,7 @@ async function refreshAll(){
 }
 window.addEventListener('DOMContentLoaded',async()=>{
   const{data:{session}}=await sb.auth.getSession();
-  if(session){currentUser=session.user;await initApp();}
+  if(session){currentUser=session.user;if(await ensureAdminAccess())await initApp();}
   document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 });
 
@@ -1175,7 +1192,7 @@ function renderProducts(){
 function openAddProduct(){
   editingProductId=null;
   document.getElementById('product-modal-title').textContent='ADD PRODUCT';
-  ['p-name','p-slug','p-price','p-oprice','p-desc-ar','p-desc-fr','p-image'].forEach(id=>document.getElementById(id).value='');
+  ['p-name','p-slug','p-price','p-oprice','p-desc-ar','p-desc-fr','p-image','p-variants'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('product-modal').classList.add('open');
 }
 function openEditProduct(id){
@@ -1189,7 +1206,19 @@ function openEditProduct(id){
   document.getElementById('p-desc-ar').value=p.description_ar||'';
   document.getElementById('p-desc-fr').value=p.description_fr||'';
   document.getElementById('p-image').value=Array.isArray(p.images)?p.images[0]:(p.images||'');
+  document.getElementById('p-variants').value=variantRowsToText(p.variants);
   document.getElementById('product-modal').classList.add('open');
+}
+function variantRowsToText(raw){
+  if(!raw)return'';
+  const list=Array.isArray(raw)?raw:Object.entries(raw).map(([name,val])=>typeof val==='object'?{name,...val}:{name,price:val});
+  return list.map(v=>[v.label||v.name||'',v.price||'',v.image||''].join(' | ')).join('\n');
+}
+function parseVariantRows(text){
+  return text.split('\n').map(row=>row.trim()).filter(Boolean).map(row=>{
+    const parts=row.split('|').map(part=>part.trim());
+    return {name:parts[0],label:parts[0],price:Number(parts[1]||0),image:parts[2]||''};
+  }).filter(v=>v.name&&v.price);
 }
 async function saveProduct(){
   const name=document.getElementById('p-name').value.trim();
@@ -1199,8 +1228,9 @@ async function saveProduct(){
   const descAr=document.getElementById('p-desc-ar').value.trim();
   const descFr=document.getElementById('p-desc-fr').value.trim();
   const image=document.getElementById('p-image').value.trim();
+  const variants=parseVariantRows(document.getElementById('p-variants').value);
   if(!name||!slug||!price){toast('Name, slug and price required',true);return;}
-  const data={name,slug,price,original_price:oprice,description_ar:descAr,description_fr:descFr,images:image?[image]:[],active:true};
+  const data={name,slug,price,original_price:oprice,description_ar:descAr,description_fr:descFr,images:image?[image]:[],variants,active:true};
   if(editingProductId){await sb.from('products').update(data).eq('id',editingProductId);toast('Product updated ✓');}
   else{await sb.from('products').insert(data);toast('Product added ✓');}
   closeModal('product-modal');await loadProducts();renderProducts();
@@ -1224,22 +1254,33 @@ function renderOperators(){
     <div class="operator-card">
       <div class="op-avatar">${(op.name||'O').charAt(0).toUpperCase()}</div>
       <div class="op-name">${esc(op.name||'Operator')}</div>
-      <div class="op-email">${esc(op.user_id||'')}</div>
+      <div class="op-email">${esc(op.email||op.user_id||'')}</div>
       <div style="margin-top:4px"><div class="op-stat-val">${allOrders.filter(o=>o.changed_by===op.name).length}</div><div class="op-stat-label">Orders Handled</div></div>
       <div style="margin-top:14px"><button class="btn btn-danger btn-sm" onclick="removeOperator('${op.user_id}')">Remove</button></div>
     </div>`).join('');
 }
 function openAddOperator(){
-  ['op-name','op-userid'].forEach(id=>document.getElementById(id).value='');
+  ['op-name','op-email'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('operator-modal').classList.add('open');
 }
 async function saveOperator(){
   const name=document.getElementById('op-name').value.trim();
-  const userId=document.getElementById('op-userid').value.trim();
-  if(!name||!userId){toast('Name and User ID required',true);return;}
-  await sb.from('user_roles').insert({user_id:userId,role:'operator',name});
+  const email=document.getElementById('op-email').value.trim().toLowerCase();
+  const btn=document.getElementById('operator-save-btn');
+  if(!name||!email){toast('Name and email required',true);return;}
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){toast('Please sign in again',true);return;}
+  btn.disabled=true;btn.textContent='Sending...';
+  const res=await fetch('/api/invite-operator',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},
+    body:JSON.stringify({name,email})
+  });
+  const result=await res.json().catch(()=>({error:'Invite failed'}));
+  btn.disabled=false;btn.textContent='Send Invite';
+  if(!res.ok){toast(result.error||'Invite failed',true);return;}
   closeModal('operator-modal');await loadOperators();renderOperators();
-  toast('Operator added ✓');
+  toast('Operator invite sent');
 }
 async function removeOperator(userId){
   if(!confirm('Remove this operator?'))return;

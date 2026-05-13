@@ -89,7 +89,7 @@ const H={apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`};
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function money(v){return Number(v||0).toLocaleString('fr-DZ')+' DZD';}
 function firstImage(p){return Array.isArray(p.images)?p.images[0]:(p.images||'');}
-function productUrl(slug){return slug==='liquid-football'?'/p/liquid-football.html':'/p/'+encodeURIComponent(slug);}
+function productUrl(slug){return slug==='liquid-football'?'/p/liquid-football.html':'/p/product.html?slug='+encodeURIComponent(slug);}
 
 async function loadProducts(){
   const grid=document.getElementById('products-grid');

@@ -1,4 +1,10 @@
 {
+  "rewrites": [
+    {
+      "source": "/p/:slug",
+      "destination": "/p/product.html?slug=:slug"
+    }
+  ],
   "functions": {
     "api/shopify-webhook.js": {
       "maxDuration": 10

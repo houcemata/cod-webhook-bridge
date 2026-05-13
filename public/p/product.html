@@ -57,13 +57,17 @@ let product=null,variant=null,delivery='home',shipping={home_delivery:0,stop_des
 function slugFromPath(){const parts=location.pathname.split('/').filter(Boolean);return parts[1]&&parts[1]!=='product.html'?decodeURIComponent(parts[1]):new URLSearchParams(location.search).get('slug');}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function money(v){return Number(v||0).toLocaleString('fr-DZ')+' DZD';}
-function images(){return Array.isArray(product.images)?product.images:(product.images?[product.images]:[]);}
+function images(){
+  const base=Array.isArray(product.images)?product.images:(product.images?[product.images]:[]);
+  const variantImages=variants().map(v=>v.image).filter(Boolean);
+  return [...new Set([...base,...variantImages])];
+}
 function variants(){
   const raw=product.variants;let list=[];
   if(Array.isArray(raw))list=raw;
   else if(raw&&typeof raw==='object')list=Object.entries(raw).map(([name,val])=>typeof val==='object'?{name,...val}:{name,price:val});
   if(!list.length)list=[{name:'Standard',label:'Standard',price:product.price}];
-  return list.map(v=>({name:v.name||v.label||v.value||'Standard',label:v.label||v.name||v.value||'Standard',price:Number(v.price||product.price),stock:v.stock}));
+  return list.map(v=>({name:v.name||v.label||v.value||'Standard',label:v.label||v.name||v.value||'Standard',price:Number(v.price||product.price),stock:v.stock,image:v.image||''}));
 }
 async function loadProduct(){
   const slug=slugFromPath();if(!slug){missing();return;}
@@ -112,7 +116,7 @@ function render(){
   updateTotals();
 }
 function setImage(btn,src){document.querySelectorAll('.thumb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('main-img').src=src;}
-function selectVariant(i,btn){variant=variants()[i];document.querySelectorAll('#variant-choices .choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');updateTotals();}
+function selectVariant(i,btn){variant=variants()[i];document.querySelectorAll('#variant-choices .choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();}
 function selectDelivery(ev,type){ev.preventDefault();delivery=type;selectedDesk='';ev.currentTarget.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));ev.currentTarget.classList.add('active');document.getElementById('commune-wrap').style.display=type==='home'?'grid':'none';document.getElementById('desk-wrap').style.display=type==='pickup'?'grid':'none';if(type==='pickup')loadDesks();updateTotals();}
 async function onWilayaChange(){
   const val=document.getElementById('f-wilaya').value;if(!val)return;selectedDesk='';
