@@ -211,6 +211,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 #toast.show{opacity:1}
 #toast.err{background:#1a0000;border-color:#e11d48;color:#e11d48}
 .empty-wrap{display:flex;align-items:center;justify-content:center;padding:60px;color:#333;font-size:14px;flex-direction:column;gap:8px}
+/* Duplicate warning banner */
+.dup-banner{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:12px;padding:10px 14px;margin:0 14px 8px;font-size:12px;color:#f59e0b;display:flex;align-items:flex-start;gap:8px}
+.dup-banner b{font-weight:700}
+.dup-banner-icon{font-size:15px;flex-shrink:0;margin-top:1px}
 </style>
 <style>
 :root{
@@ -983,6 +987,17 @@ async function updateStatusCard(sel,id){
   const newStatus=sel.value;
   const o=allOrders.find(x=>x.id===id);
   if(!o)return;
+  // Duplicate check on confirm
+  if(newStatus==='confirmed'){
+    const dups=getDuplicatesForOrder(o);
+    if(dups.length){
+      const names=dups.map(d=>`${d.name} [${d.status}]`).join(', ');
+      if(!confirm(`⚠️ Duplicate phone detected!\nSame number found in: ${names}\n\nStill confirm this order?`)){
+        sel.value=o.status;
+        return;
+      }
+    }
+  }
   const old=o.status;
   sel.disabled=true;
   await sbFetch(`orders?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({status:newStatus})});
@@ -998,17 +1013,21 @@ async function updateStatusCard(sel,id){
 function openDetail(id){
   currentOrder=allOrders.find(o=>o.id===id);
   if(!currentOrder)return;
-  renderDetail();
+  // Show duplicate warning in detail view
+  const dups=getDuplicatesForOrder(currentOrder);
+  renderDetail(dups);
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-detail').classList.add('active');
   document.getElementById('tab-bar').style.display='none';
 }
 
-function renderDetail(){
+function renderDetail(dups=[]){
   const o=currentOrder;
   const dateStr=o.created_at?toAlgeriaDate(o.created_at).toLocaleString('fr-DZ'):'';
+  const dupHtml=dups.length?`<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:#f59e0b;display:flex;gap:8px"><span style="font-size:15px">&#x26A0;&#xFE0F;</span><div><b>Duplicate phone!</b> Same number in: ${dups.map(d=>`${esc(d.name)} [${esc(d.status)}]`).join(', ')}</div></div>`:'';
   document.getElementById('detail-content').innerHTML=`
     <button class="back-btn" onclick="closeDetail()">< Back</button>
+    ${dupHtml}
     <div class="detail-section">
       <div class="detail-section-title">Customer</div>
       <div class="customer-name-big">${esc(o.name)}</div>
@@ -1266,6 +1285,33 @@ async function saveEdit(){
 }
 
 function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// ── DUPLICATE DETECTION ──
+function getDuplicatesForOrder(order){
+  if(!order||!order.phone)return[];
+  const cleaned=(order.phone||'').replace(/\s/g,'');
+  return allOrders.filter(o=>
+    o.id!==order.id &&
+    (o.phone||'').replace(/\s/g,'')===cleaned &&
+    !['canceled','duplicated'].includes(o.status)
+  );
+}
+function checkAndShowDupBanner(orderId){
+  const existing=document.getElementById('dup-banner-global');
+  if(existing)existing.remove();
+  if(!orderId)return;
+  const order=allOrders.find(o=>o.id===orderId);
+  if(!order)return;
+  const dups=getDuplicatesForOrder(order);
+  if(!dups.length)return;
+  const names=dups.map(d=>`${esc(d.name)} [${esc(d.status)}]`).join(', ');
+  const banner=document.createElement('div');
+  banner.id='dup-banner-global';
+  banner.className='dup-banner';
+  banner.innerHTML=`<span class="dup-banner-icon">⚠️</span><div><b>Duplicate phone detected!</b> ${esc(order.name)}'s number also found in: ${names}. Consider marking as Duplicated.</div>`;
+  const list=document.getElementById('orders-list');
+  if(list)list.insertAdjacentElement('beforebegin',banner);
+}
 
 // â”€â”€ HELPERS â”€â”€
 function statusLabel(k){return STATUSES.find(s=>s.k===k)?.l||k;}

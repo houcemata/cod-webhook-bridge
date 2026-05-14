@@ -330,6 +330,8 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     <div class="nav-item" onclick="showPage('operators')" id="nav-operators"><span class="nav-icon">👥</span>Operators</div>
     <div class="nav-section">Business</div>
     <div class="nav-item" onclick="showPage('finance')" id="nav-finance"><span class="nav-icon">💰</span>Finance</div>
+    <div class="nav-item" onclick="showPage('stock')" id="nav-stock"><span class="nav-icon">📦</span>Stock</div>
+    <div class="nav-item" onclick="showPage('performance')" id="nav-performance"><span class="nav-icon">🏆</span>Performance</div>
     <div class="sidebar-bottom">
       <div class="user-card">
         <div class="user-avatar" id="sidebar-avatar">H</div>
@@ -584,9 +586,62 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           </div>
           <div id="stock-usage-list" style="max-height:320px;overflow-y:auto"></div>
         </div>
+        </div>
+
+          <!-- STOCK MANAGEMENT -->
+    <div class="page" id="page-stock">
+      <div class="page-header">
+        <div><div class="page-title">STOCK</div><div class="page-subtitle">Variant stock levels &amp; history</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="openAddStock()">+ Add Item</button>
+          <button class="btn btn-primary" onclick="openManualStockAdjust()">✏️ Adjust</button>
+        </div>
       </div>
 
+      <!-- Stock KPIs -->
+      <div class="kpi-grid" style="margin-bottom:20px">
+        <div class="kpi-card hi"><div class="kpi-icon">📦</div><div class="kpi-label">Total Items</div><div class="kpi-value" id="stk-kpi-total">—</div><div class="kpi-sub">Tracked variants</div></div>
+        <div class="kpi-card"><div class="kpi-icon">⚠️</div><div class="kpi-label">Low Stock</div><div class="kpi-value" id="stk-kpi-low" style="color:var(--red)">—</div><div class="kpi-sub">Below threshold</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🔄</div><div class="kpi-label">Usage Today</div><div class="kpi-value" id="stk-kpi-today">—</div><div class="kpi-sub">Units deducted</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📈</div><div class="kpi-label">Total Value</div><div class="kpi-value" id="stk-kpi-value">—</div><div class="kpi-sub">At cost price</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <!-- Stock Levels -->
+        <div class="glass-card" style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">STOCK LEVELS</div>
+          </div>
+          <div id="stock-page-list"></div>
+        </div>
+        <!-- Usage History -->
+        <div class="glass-card" style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">USAGE HISTORY</div>
+            <select class="filter-select" id="stock-page-usage-filter" onchange="renderStockPageUsage()" style="width:auto;min-width:140px">
+              <option value="all">All Items</option>
+            </select>
+          </div>
+          <div id="stock-page-usage-list" style="max-height:420px;overflow-y:auto"></div>
+        </div>
+      </div>
     </div>
+
+    <!-- OPERATOR PERFORMANCE -->
+    <div class="page" id="page-performance">
+      <div class="page-header">
+        <div><div class="page-title">PERFORMANCE</div><div class="page-subtitle">Operator stats &amp; confirmation rates</div></div>
+        <select class="filter-select" id="perf-period" onchange="renderPerformance()">
+          <option value="all">All Time</option>
+          <option value="month" selected>This Month</option>
+          <option value="7days">Last 7 Days</option>
+          <option value="30days">Last 30 Days</option>
+        </select>
+      </div>
+      <div id="performance-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px"></div>
+    </div>
+
+  </div>
 
   </div>
 
@@ -598,6 +653,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <button class="mobile-nav-btn" onclick="showPage('products')" id="mnav-products"><span class="mobile-nav-icon">🛍️</span><span class="mobile-nav-label">Products</span></button>
       <button class="mobile-nav-btn" onclick="showPage('operators')" id="mnav-operators"><span class="mobile-nav-icon">👥</span><span class="mobile-nav-label">Team</span></button>
       <button class="mobile-nav-btn" onclick="showPage('finance')" id="mnav-finance"><span class="mobile-nav-icon">💰</span><span class="mobile-nav-label">Finance</span></button>
+      <button class="mobile-nav-btn" onclick="showPage('stock')" id="mnav-stock"><span class="mobile-nav-icon">📦</span><span class="mobile-nav-label">Stock</span></button>
     </div>
   </div>
 </div>
@@ -627,6 +683,17 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         </div>
       </div>
       <div class="form-field"><label class="form-label">Notes</label><textarea class="form-textarea" id="prod-notes" placeholder="Any notes..."></textarea></div>
+      <div style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:16px;margin-bottom:16px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--gray);margin-bottom:12px">PRINTER (450 DZD / m²)</div>
+        <div class="form-field" style="margin-bottom:0">
+          <label class="form-label">Total Print Area (m²)</label>
+          <input class="form-input" id="prod-sqm" type="number" min="0" step="0.01" value="0" oninput="calcProdPay()"/>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);margin-top:12px">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--gray)">PRINTER PAY</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#8b5cf6" id="prod-printer-preview">0 DZD</span>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('production-modal')">Cancel</button>
@@ -720,12 +787,21 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <button class="modal-close" onclick="closeModal('markpaid-modal')">×</button>
     </div>
     <div class="modal-body">
-      <div id="markpaid-desc" style="font-size:14px;color:var(--gray);margin-bottom:16px"></div>
+      <div id="markpaid-desc" style="font-size:14px;color:var(--gray);margin-bottom:8px"></div>
+      <div id="markpaid-owed-display" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--yellow);margin-bottom:16px"></div>
       <div class="form-row">
         <div class="form-field"><label class="form-label">Period Start</label><input class="form-input" id="markpaid-start" type="date"/></div>
         <div class="form-field"><label class="form-label">Period End</label><input class="form-input" id="markpaid-end" type="date"/></div>
       </div>
-      <div class="form-field"><label class="form-label">Amount Paid (DZD)</label><input class="form-input" id="markpaid-amount" type="number" min="0"/></div>
+      <div class="form-field">
+        <label class="form-label">Amount Paid (DZD)</label>
+        <input class="form-input" id="markpaid-amount" type="number" min="0"/>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('markpaid-amount').value=Math.round(markPaidEmployee?.owed||0)">Pay Full</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('markpaid-amount').value=Math.round((markPaidEmployee?.owed||0)/2)">Pay Half</button>
+        </div>
+      </div>
+      <div class="form-field"><label class="form-label">Note (optional)</label><input class="form-input" id="markpaid-note" placeholder="e.g. Advance payment, fund request..."/></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('markpaid-modal')">Cancel</button>
@@ -890,6 +966,8 @@ function showPage(name){
   if(name==='products')renderProducts();
   if(name==='operators')renderOperators();
   if(name==='finance')updateFinance();
+  if(name==='stock')updateFinance();
+  if(name==='performance')renderPerformance();
 }
 
 // ── DATA ──
@@ -1367,6 +1445,7 @@ const EMPLOYEES=[
   {key:'print_guy',  name:'Print File Guy', role:'Print & Shipping Prep', payType:'fixed_weekly', weeklyAmount:2000},
   {key:'frame_maker',name:'Frame Maker',     role:'Production & Packing',  payType:'per_frame'},
   {key:'operator',   name:'Operator Girl',  role:'Order Confirmation',    payType:'per_delivered', ratePerDelivered:150},
+  {key:'printer',    name:'Printer',        role:'Printing',              payType:'per_sqm', ratePerSqm:450},
 ];
 
 async function loadFinanceData(){
@@ -1427,7 +1506,11 @@ async function updateFinance(){
   // Print guy pay: count Thursdays in period
   const printGuyPay=countThursdays(range)*2000;
 
-  const staffCost=frameMakerPay+operatorPay+printGuyPay;
+  // Printer pay: 450 DZD per sqm printed (from production logs)
+  const printerSqm=periodLogs.reduce((s,l)=>s+Number(l.print_sqm||0),0);
+  const printerPay=printerSqm*450;
+
+  const staffCost=frameMakerPay+operatorPay+printGuyPay+printerPay;
   const totalExp=expTotal+staffCost;
   const profit=revenue-totalExp;
   const margin=revenue?((profit/revenue)*100).toFixed(1):'0.0';
@@ -1443,8 +1526,8 @@ async function updateFinance(){
   document.getElementById('fin-staffcost').textContent=fmtDZD(staffCost);
 
   renderProductionLogs(periodLogs);
-  renderStockList();
-  renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,printGuyPay);
+  renderStockList(true);// trigger ntfy alert check on each finance load
+  renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,printGuyPay,printerPay,printerSqm);
   renderExpenses(periodExpenses);
   renderRevenueBySize(deliveredOrders);
   populateStockUsageFilter();
@@ -1473,18 +1556,33 @@ function renderProductionLogs(logs){
         <div style="font-weight:700;font-size:14px">${new Date(l.date).toLocaleDateString('fr-DZ')}</div>
         <div style="font-size:11px;color:var(--gray);margin-top:2px">
           M:${l.m_frames||0} · L:${l.l_frames||0} · XL:${l.xl_frames||0} · XXL:${l.xxl_frames||0} = <b>${total} frames</b>
+          ${l.print_sqm?` · <span style="color:#8b5cf6">${Number(l.print_sqm).toFixed(2)} m² printed</span>`:''}
         </div>
         ${l.notes?`<div style="font-size:11px;color:var(--gray);margin-top:2px">📝 ${esc(l.notes)}</div>`:''}
       </div>
       <div style="text-align:right;flex-shrink:0;margin-left:12px">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--yellow)">${fmtDZD(l.total_pay_frame_maker||0)}</div>
         <div style="font-size:10px;color:var(--gray)">frame maker pay</div>
+        <button class="btn btn-danger btn-sm" style="margin-top:6px;padding:3px 8px" onclick="deleteProdLog(${l.id})">&#x1F5D1; Delete</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function renderStockList(){
+// ── LOW STOCK NTFY ALERT ──
+async function sendLowStockAlert(items){
+  if(!items.length)return;
+  const msg=items.map(i=>`${i.name}: ${i.quantity} ${i.unit||'units'} (threshold: ${i.low_stock_threshold})`).join('\n');
+  try{
+    await fetch('https://ntfy.sh/arco-admin-alerts',{
+      method:'POST',
+      headers:{'Content-Type':'text/plain','Title':'ARCO Low Stock Alert','Priority':'high','Tags':'warning,package'},
+      body:`Low stock detected!\n${msg}`
+    });
+  }catch(e){console.warn('ntfy alert failed',e);}
+}
+
+function renderStockList(triggerAlerts=false){
   const el=document.getElementById('stock-list');
   if(!allStockItems.length){el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📦</div><div class="empty-text">No stock items yet</div></div>';return;}
   el.innerHTML=allStockItems.map(s=>{
@@ -1504,12 +1602,13 @@ function renderStockList(){
   }).join('');
 }
 
-function renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,printGuyPay){
+function renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,printGuyPay,printerPay=0,printerSqm=0){
   const el=document.getElementById('employee-pay-list');
   const employees=[
     {key:'frame_maker',name:'Frame Maker',role:'Production & Packing',owed:frameMakerPay,basis:`${allProductionLogs.filter(l=>inFinRange(l.date,range)).reduce((s,l)=>s+(l.m_frames||0)+(l.l_frames||0)+(l.xl_frames||0)+(l.xxl_frames||0),0)} frames produced`},
     {key:'operator',name:'Operator Girl',role:'Order Confirmation',owed:operatorPay,basis:`${deliveredOrders.length} delivered orders × 150 DZD`},
     {key:'print_guy',name:'Print File Guy',role:'Print & Shipping Prep',owed:printGuyPay,basis:`${countThursdays(range)} Thursdays × 2,000 DZD`},
+    {key:'printer',name:'Printer',role:'Printing',owed:printerPay,basis:`${printerSqm.toFixed(2)} m² × 450 DZD`},
   ];
   el.innerHTML=employees.map(e=>`
     <div class="emp-card">
@@ -1595,11 +1694,12 @@ function renderPayHistory(){
       <div>
         <div class="history-title">${esc(p.employee_name||'Employee')}</div>
         <div class="history-meta">${esc(p.employee_role||'role')} · ${fmtDate(p.period_start)} to ${fmtDate(p.period_end)}</div>
-        <div class="history-meta">Paid ${fmtDate(p.paid_at||p.created_at)}</div>
+        <div class="history-meta">Paid ${fmtDate(p.paid_at||p.created_at)}${p.note?` · ${esc(p.note)}`:''}</div>
       </div>
       <div style="text-align:right">
         <div class="history-amount">${fmtDZD(p.amount_paid||0)}</div>
         <div class="history-meta">owed ${fmtDZD(p.amount_owed||0)}</div>
+        <button class="btn btn-danger btn-sm" style="margin-top:6px;padding:3px 8px" onclick="deletePayLog(${p.id})">&#x1F5D1; Delete</button>
       </div>
     </div>`).join('');
 }
@@ -1636,6 +1736,7 @@ function renderStockUsageHistory(){
           <div class="history-meta">${fmtDate(u.created_at)}</div>
         </div>
         <div class="history-amount" style="color:var(--red)">-${Number(u.quantity_used||0).toLocaleString()}</div>
+        <button class="btn btn-danger btn-sm" style="margin-top:6px;padding:3px 8px" onclick="deleteStockUsageLog(${u.id})">&#x1F5D1; Delete</button>
       </div>`;
   }).join('');
 }
@@ -1643,8 +1744,10 @@ function renderStockUsageHistory(){
 function openProductionLog(){
   document.getElementById('prod-date').value=new Date().toISOString().split('T')[0];
   ['prod-m','prod-l','prod-xl','prod-xxl'].forEach(id=>document.getElementById(id).value=0);
+  const sqmEl=document.getElementById('prod-sqm');if(sqmEl)sqmEl.value=0;
   document.getElementById('prod-notes').value='';
   document.getElementById('prod-pay-preview').textContent='0 DZD';
+  const pp=document.getElementById('prod-printer-preview');if(pp)pp.textContent='0 DZD';
   document.getElementById('production-modal').classList.add('open');
 }
 function calcProdPay(){
@@ -1652,8 +1755,12 @@ function calcProdPay(){
   const l=parseInt(document.getElementById('prod-l').value)||0;
   const xl=parseInt(document.getElementById('prod-xl').value)||0;
   const xxl=parseInt(document.getElementById('prod-xxl').value)||0;
+  const sqm=parseFloat(document.getElementById('prod-sqm')?.value)||0;
   const pay=m*60+l*60+xl*100+xxl*200;
+  const printerPay=sqm*450;
   document.getElementById('prod-pay-preview').textContent=pay.toLocaleString()+' DZD';
+  const pp=document.getElementById('prod-printer-preview');
+  if(pp)pp.textContent=printerPay.toLocaleString()+' DZD';
 }
 async function saveProductionLog(){
   const date=document.getElementById('prod-date').value;
@@ -1661,12 +1768,12 @@ async function saveProductionLog(){
   const l=parseInt(document.getElementById('prod-l').value)||0;
   const xl=parseInt(document.getElementById('prod-xl').value)||0;
   const xxl=parseInt(document.getElementById('prod-xxl').value)||0;
+  const sqm=parseFloat(document.getElementById('prod-sqm')?.value)||0;
   const notes=document.getElementById('prod-notes').value.trim();
   if(!date){toast('Please select a date',true);return;}
   const pay=m*60+l*60+xl*100+xxl*200;
-  const{data,error}=await sb.from('production_logs').insert({date,m_frames:m,l_frames:l,xl_frames:xl,xxl_frames:xxl,total_pay_frame_maker:pay,notes}).select().single();
+  const{data,error}=await sb.from('production_logs').insert({date,m_frames:m,l_frames:l,xl_frames:xl,xxl_frames:xxl,total_pay_frame_maker:pay,print_sqm:sqm,notes}).select().single();
   if(error){toast('Error saving log',true);return;}
-  // Auto-deduct stock: find matching stock items by name/size
   await autoDeductStock(m,l,xl,xxl,data.id);
   closeModal('production-modal');
   toast('Production logged ✓');
@@ -1754,10 +1861,14 @@ function openMarkPaid(key,name,owed){
   markPaidEmployee={key,name};
   document.getElementById('markpaid-desc').textContent=`Marking payment for ${name}`;
   document.getElementById('markpaid-amount').value=Math.round(owed);
+  document.getElementById('markpaid-owed-display').textContent=`Total owed: ${fmtDZD(owed)}`;
   const now=new Date();
   const start=new Date(now.getFullYear(),now.getMonth(),1);
   document.getElementById('markpaid-start').value=start.toISOString().split('T')[0];
   document.getElementById('markpaid-end').value=now.toISOString().split('T')[0];
+  // Pre-fill full amount
+  document.getElementById('markpaid-amount').value=Math.round(owed);
+  markPaidEmployee.owed=owed;
   document.getElementById('markpaid-modal').classList.add('open');
 }
 async function saveMarkPaid(){
@@ -1765,22 +1876,102 @@ async function saveMarkPaid(){
   const amount=parseFloat(document.getElementById('markpaid-amount').value)||0;
   const start=document.getElementById('markpaid-start').value;
   const end=document.getElementById('markpaid-end').value;
+  const note=document.getElementById('markpaid-note')?.value||'';
+  const isPartial=amount<(markPaidEmployee.owed||amount);
   await sb.from('employee_pay_log').insert({
     employee_name:markPaidEmployee.name,
     employee_role:markPaidEmployee.key,
     period_start:start,
     period_end:end,
-    amount_owed:amount,
+    amount_owed:markPaidEmployee.owed||amount,
     amount_paid:amount,
+    note:note||(isPartial?'Partial payment':'Full payment'),
     paid_at:new Date().toISOString()
   });
-  closeModal('markpaid-modal');toast(`${markPaidEmployee.name} marked as paid ✓`);
+  closeModal('markpaid-modal');
+  toast(`${markPaidEmployee.name} — ${fmtDZD(amount)} marked as paid${isPartial?' (partial)':''} ✓`);
   markPaidEmployee=null;
   await updateFinance();
 }
 
 // ── HELPERS ──
 function statusLabel(k){return STATUSES.find(s=>s.k===k)?.l||k;}
+async function deleteProdLog(id){
+  if(!confirm('Delete this production log?'))return;
+  await sb.from('production_logs').delete().eq('id',id);
+  await updateFinance();toast('Production log deleted');
+}
+async function deletePayLog(id){
+  if(!confirm('Delete this pay record?'))return;
+  await sb.from('employee_pay_log').delete().eq('id',id);
+  await updateFinance();toast('Pay record deleted');
+}
+async function deleteStockUsageLog(id){
+  if(!confirm('Delete this stock usage record?'))return;
+  await sb.from('stock_usage_log').delete().eq('id',id);
+  await updateFinance();toast('Stock usage record deleted');
+}
+
+// ── PERFORMANCE PAGE ──
+async function renderPerformance(){
+  const period=document.getElementById('perf-period')?.value||'all';
+  const grid=document.getElementById('performance-grid');
+  if(!grid)return;
+  // Build operator list from user_roles
+  if(!allOperators.length)await loadOperators();
+  if(!allOrders.length)await loadOrders();
+  // Get order_history to attribute changes per operator
+  const{data:hist}=await sb.from('order_history').select('*');
+  const history=hist||[];
+  // Period filter
+  const now=new Date();
+  let fromDate=null;
+  if(period==='month')fromDate=new Date(now.getFullYear(),now.getMonth(),1);
+  else if(period==='7days'){fromDate=new Date(now);fromDate.setDate(now.getDate()-7);}
+  else if(period==='30days'){fromDate=new Date(now);fromDate.setDate(now.getDate()-30);}
+  const filterDate=(d)=>!fromDate||!d||new Date(d)>=fromDate;
+  // For each operator build stats
+  const operatorStats=allOperators.map(op=>{
+    const opName=op.name||op.email||op.user_id;
+    // Orders last confirmed by this operator
+    const opHistory=history.filter(h=>(h.changed_by||'').toLowerCase().includes((opName||'').toLowerCase().split(' ')[0].toLowerCase())&&filterDate(h.changed_at));
+    const confirmedByOp=opHistory.filter(h=>h.new_status==='confirmed').length;
+    const deliveredByOp=opHistory.filter(h=>h.new_status==='delivered').length;
+    const canceledByOp=opHistory.filter(h=>h.new_status==='canceled').length;
+    const totalByOp=confirmedByOp+canceledByOp;
+    const confRate=totalByOp?((confirmedByOp/totalByOp)*100).toFixed(1):'—';
+    // Revenue: sum of delivered orders
+    const deliveredOrders=allOrders.filter(o=>o.status==='delivered'&&filterDate(o.created_at));
+    return{name:opName,email:op.email||'',confirmed:confirmedByOp,delivered:deliveredByOp,canceled:canceledByOp,confRate,revenue:deliveredOrders.length*0};
+  });
+  grid.innerHTML=operatorStats.map(op=>`
+    <div class="glass-card" style="padding:22px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <div style="width:44px;height:44px;border-radius:14px;background:rgba(245,197,0,.12);border:1px solid rgba(245,197,0,.25);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--yellow)">${(op.name||'O').charAt(0).toUpperCase()}</div>
+        <div><div style="font-weight:700;font-size:15px">${esc(op.name)}</div><div style="font-size:11px;color:var(--gray)">${esc(op.email)}</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:12px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--gray)">CONFIRMED</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#3b82f6">${op.confirmed}</div>
+        </div>
+        <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:12px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--gray)">DELIVERED</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--green)">${op.delivered}</div>
+        </div>
+        <div style="background:rgba(225,29,72,0.08);border:1px solid rgba(225,29,72,0.2);border-radius:12px;padding:12px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--gray)">CANCELED</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--red)">${op.canceled}</div>
+        </div>
+        <div style="background:rgba(245,197,0,0.08);border:1px solid rgba(245,197,0,0.2);border-radius:12px;padding:12px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--gray)">CONF. RATE</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--yellow)">${op.confRate}%</div>
+        </div>
+      </div>
+    </div>`).join('')||
+    '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">No operator data yet</div></div>';
+}
+
 function esc(v){if(v==null)return'';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 let _tt;
 function toast(msg,isErr=false){
