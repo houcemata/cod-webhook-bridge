@@ -34,6 +34,17 @@ function normalizePhone(phone) {
   return String(phone || "").replace(/\D/g, "");
 }
 
+function sanitizeNoestText(value, fallback = "") {
+  const normalized = String(value || fallback || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\p{L}\p{N}\s\-.,/()]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return normalized || String(fallback || "").trim();
+}
+
 function buildNoestReference(orderId, orderRef) {
   const safeRef = String(orderRef || orderId || "")
     .replace(/[^a-zA-Z0-9-]/g, "")
@@ -137,16 +148,23 @@ export default async function handler(req, res) {
 
   const isStopDesk = order.type_livraison === "pickup";
   const normalizedStationCode = normalizeStationCode(stationCode || order.station_code);
+  const clientName = sanitizeNoestText(order.name, `Client ${orderId}`);
+  const address = sanitizeNoestText(order.commune || order.wilaya, order.wilaya || "Algerie");
+  const commune = sanitizeNoestText(order.commune || "", "");
+  const productName = sanitizeNoestText(
+    order.product + (order.variable ? ` - ${order.variable}` : ""),
+    "Commande ARCO"
+  );
   const noestPayload = {
     user_guid: noestGuid,
     reference: buildNoestReference(orderId, order.order_id),
-    client: order.name,
+    client: clientName,
     phone,
-    adresse: order.commune || order.wilaya,
+    adresse: address,
     wilaya_id: wilayaId,
-    commune: order.commune || "",
+    commune,
     montant: parseFloat(order.prix_total || 0),
-    produit: order.product + (order.variable ? ` - ${order.variable}` : ""),
+    produit: productName,
     type_id: 1,
     stop_desk: isStopDesk ? 1 : 0,
     can_open: 1,
