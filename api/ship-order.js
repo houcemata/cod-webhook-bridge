@@ -30,6 +30,18 @@ function getWilayaId(wilayaName) {
   return WILAYA_MAP[cleaned] || null;
 }
 
+function normalizePhone(phone) {
+  return String(phone || "").replace(/\D/g, "");
+}
+
+function buildNoestReference(orderId, orderRef) {
+  const safeRef = String(orderRef || orderId || "")
+    .replace(/[^a-zA-Z0-9-]/g, "")
+    .slice(-30);
+
+  return `ARCO-${safeRef || orderId}`;
+}
+
 async function noestPost(endpoint, body, token) {
   const response = await fetch(`${NOEST_BASE}${endpoint}`, {
     method: "POST",
@@ -106,12 +118,19 @@ export default async function handler(req, res) {
     });
   }
 
+  const phone = normalizePhone(order.phone);
+  if (phone.length < 8) {
+    return res.status(400).json({
+      error: `Invalid phone number: "${order.phone}". Please edit the order and use digits only.`,
+    });
+  }
+
   const isStopDesk = order.type_livraison === "pickup";
   const noestPayload = {
     user_guid: noestGuid,
-    reference: order.order_id,
+    reference: buildNoestReference(orderId, order.order_id),
     client: order.name,
-    phone: String(order.phone || "").replace(/\s/g, ""),
+    phone,
     adresse: order.commune || order.wilaya,
     wilaya_id: wilayaId,
     commune: order.commune || "",
