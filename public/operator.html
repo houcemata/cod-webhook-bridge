@@ -565,6 +565,14 @@ const SB_H = {
 let allOrders=[], filteredOrders=[], currentTab='all', currentOrder=null;
 let sortAsc=false, selectedIds=new Set(), currentUser=null, currentRole=null;
 let noestDesks=null;
+
+function normalizeDeskCode(code){
+  const raw=String(code||'').trim().toUpperCase();
+  if(!raw)return '';
+  const m=raw.match(/^0*(\d+)([A-Z]+)$/);
+  if(!m)return raw;
+  return `${Number(m[1])}${m[2]}`;
+}
 let currentPage=1, pageSize=30;
 
 // â”€â”€ PIN â”€â”€
@@ -1229,12 +1237,18 @@ function populateEditDesks(selectedCode){
   const entries=Object.entries(noestDesks);
   const matching=entries.filter(([code])=>num&&new RegExp(`^${num}[A-Z]`).test(code));
   const others=entries.filter(([code])=>!matching.find(([mc])=>mc===code));
+  const selectedNorm=normalizeDeskCode(selectedCode);
+  const optionHtml=([code,d])=>{
+    const optionValue=normalizeDeskCode(d?.code||code);
+    const isSelected=optionValue===selectedNorm;
+    return `<option value="${esc(optionValue)}"${isSelected?' selected':''}>${esc(d.name||optionValue)}</option>`;
+  };
   sel.innerHTML='<option value="">Select Stop Desk</option>'+
     (matching.length?'<optgroup label="This Wilaya">'+
-      matching.map(([code,d])=>`<option value="${esc(code)}"${code===selectedCode?' selected':''}>${esc(d.name||code)}</option>`).join('')+
+      matching.map(optionHtml).join('')+
     '</optgroup>':'')+
     '<optgroup label="All Desks">'+
-      others.map(([code,d])=>`<option value="${esc(code)}"${code===selectedCode?' selected':''}>${esc(d.name||code)}</option>`).join('')+
+      others.map(optionHtml).join('')+
     '</optgroup>';
 }
 

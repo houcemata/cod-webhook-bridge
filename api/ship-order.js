@@ -42,6 +42,16 @@ function buildNoestReference(orderId, orderRef) {
   return `ARCO-${safeRef || orderId}`;
 }
 
+function normalizeStationCode(stationCode) {
+  const raw = String(stationCode || "").trim().toUpperCase();
+  if (!raw) return "";
+
+  const match = raw.match(/^0*(\d+)([A-Z]+)$/);
+  if (!match) return raw;
+
+  return `${Number(match[1])}${match[2]}`;
+}
+
 async function noestPost(endpoint, body, token) {
   const response = await fetch(`${NOEST_BASE}${endpoint}`, {
     method: "POST",
@@ -126,6 +136,7 @@ export default async function handler(req, res) {
   }
 
   const isStopDesk = order.type_livraison === "pickup";
+  const normalizedStationCode = normalizeStationCode(stationCode || order.station_code);
   const noestPayload = {
     user_guid: noestGuid,
     reference: buildNoestReference(orderId, order.order_id),
@@ -140,7 +151,7 @@ export default async function handler(req, res) {
     stop_desk: isStopDesk ? 1 : 0,
     can_open: 1,
     poids: 0.5,
-    ...(isStopDesk && stationCode ? { station_code: stationCode } : {}),
+    ...(isStopDesk && normalizedStationCode ? { station_code: normalizedStationCode } : {}),
   };
 
   const createRes = await noestPost("/create/order", noestPayload, noestToken);
