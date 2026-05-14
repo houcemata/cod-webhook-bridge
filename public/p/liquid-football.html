@@ -6,6 +6,7 @@
 <title>Liquid Football — ARCO</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="/meta-pixel.js"></script>
 <style>
 :root {
   --yellow: #F5C500;
@@ -1060,12 +1061,22 @@ let selectedDelivery = 'home';
 let shippingRates = {};
 let noestDesks = null;
 let currentShippingCost = 0;
+let checkoutTracked = false;
 
 // ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
   buildClubs();
   buildWilayas();
   setupStickyBar();
+  if (window.ARCOMeta) {
+    window.ARCOMeta.trackViewContent({
+      content_name: 'Liquid Football',
+      content_ids: [PRODUCT_SLUG],
+      content_category: `${selectedClub.value} - ${selectedSize}`,
+      value: selectedSizePrice,
+      currency: 'DZD'
+    });
+  }
 });
 
 // ── CLUBS ──
@@ -1229,6 +1240,18 @@ function scrollToOrder() {
   document.getElementById('order-section').scrollIntoView({ behavior: 'smooth' });
 }
 
+function trackProductCheckout() {
+  if (checkoutTracked || !window.ARCOMeta) return;
+  checkoutTracked = true;
+  window.ARCOMeta.trackInitiateCheckout({
+    content_name: 'Liquid Football',
+    content_ids: [PRODUCT_SLUG],
+    content_category: `${selectedClub.value} - ${selectedSize}`,
+    value: selectedSizePrice + currentShippingCost,
+    currency: 'DZD'
+  });
+}
+
 // ── SUBMIT ORDER ──
 async function submitOrder() {
   const name = document.getElementById('f-name').value.trim();
@@ -1247,6 +1270,7 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
   if (selectedDelivery === 'home' && !commune) { toast('Veuillez choisir votre commune — اختر البلدية', true); return; }
   if (selectedDelivery === 'desk' && !desk) { toast('Veuillez choisir un point Stop Desk', true); return; }
   if (!shippingRates.home_delivery) { toast('Choisissez une wilaya valide', true); return; }
+  trackProductCheckout();
 
   const btn = document.getElementById('order-btn');
   btn.classList.add('loading');
@@ -1288,6 +1312,16 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
     const result = await r.json().catch(() => ({}));
 
     if (!r.ok || !result.ok) throw new Error(result.error || 'Failed');
+    if (window.ARCOMeta) {
+      window.ARCOMeta.trackPurchase({
+        content_name: 'Liquid Football',
+        content_ids: [PRODUCT_SLUG],
+        content_category: `${selectedClub.value} - ${selectedSize}`,
+        value: total,
+        currency: 'DZD',
+        eventID: result.order_id
+      });
+    }
 
     // Show success
     document.getElementById('success-order-id').textContent = '#' + result.order_id;

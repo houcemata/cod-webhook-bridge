@@ -19,6 +19,7 @@ function eventTime() {
 export async function sendMetaConversion(input = {}) {
   const pixelId = process.env.META_PIXEL_ID;
   const accessToken = process.env.META_ACCESS_TOKEN;
+  const testEventCode = process.env.META_TEST_EVENT_CODE;
   if (!pixelId || !accessToken) return { skipped: true, provider: "meta", reason: "missing_env" };
 
   const eventName = input.event_name || "Purchase";
@@ -33,6 +34,8 @@ export async function sendMetaConversion(input = {}) {
         ph: sha256(cleanPhone(input.phone)),
         fn: sha256((input.name || "").split(/\s+/)[0]),
         ln: sha256((input.name || "").split(/\s+/).slice(1).join(" ")),
+        client_ip_address: input.client_ip_address,
+        client_user_agent: input.client_user_agent,
       },
       custom_data: {
         currency: input.currency || "DZD",
@@ -43,6 +46,7 @@ export async function sendMetaConversion(input = {}) {
       },
     }],
   };
+  if (testEventCode) body.test_event_code = testEventCode;
 
   const response = await fetch(`https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${accessToken}`, {
     method: "POST",

@@ -89,6 +89,14 @@ function isSameOriginRequest(req) {
   }
 }
 
+function clientIpFromRequest(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (typeof forwarded === "string" && forwarded.trim()) {
+    return forwarded.split(",")[0].trim();
+  }
+  return "";
+}
+
 async function sendOrderNotification(orderData) {
   const topic = process.env.NTFY_TOPIC || "arco-new-orders";
   try {
@@ -216,6 +224,8 @@ export default async function handler(req, res) {
       phone,
       name,
       event_source_url: normalizeText(body.event_source_url) || req.headers.referer || "",
+      client_ip_address: clientIpFromRequest(req),
+      client_user_agent: req.headers["user-agent"] || "",
     });
 
     return res.status(200).json({ ok: true, order_id: orderId });
