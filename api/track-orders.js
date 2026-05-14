@@ -8,6 +8,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
+import { isAuthorizedCronRequest, requireRole } from "./_auth.js";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -52,6 +53,13 @@ export default async function handler(req, res) {
   console.log(`[track-orders] ${timestamp} — Starting batch tracking...`);
 
   try {
+    if (!isAuthorizedCronRequest(req)) {
+      const auth = await requireRole(req, ["operator", "admin"]);
+      if (!auth.ok) {
+        return res.status(auth.status).json({ error: auth.error });
+      }
+    }
+
     if (!supabaseUrl || !supabaseServiceKey || !noestApiKey || !noestGuid) {
       console.error("[track-orders] Missing required environment variables");
       return res.status(500).json({ error: "Configuration error: missing env vars" });

@@ -619,7 +619,14 @@ async function refreshAll(){ await loadOrders(); toast('Refreshed'); }
 
 // â”€â”€ SUPABASE â”€â”€
 async function sbFetch(path,opts={}){
-  return fetch(`${SB_URL}/${path}`,{headers:{...SB_H,...(opts.headers||{})}, ...opts});
+  const { data: { session } } = await sb.auth.getSession();
+  const token = session?.access_token;
+  const headers = {
+    ...SB_H,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(opts.headers || {})
+  };
+  return fetch(`${SB_URL}/${path}`, { ...opts, headers });
 }
 async function loadOrders(){
   const r=await sbFetch('orders?select=*&order=created_at.desc');
@@ -929,15 +936,15 @@ async function shipSingle(id){
   }
   toast('Shipping...');
   try{
+    const{data:{session}}=await sb.auth.getSession();
     const payload={
       orderId: o.id,
       order: o,
-      // FIX: always send station_code explicitly
       stationCode: o.station_code || null
     };
     const r=await fetch('/api/ship-order',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${session?.access_token||''}`},
       body:JSON.stringify(payload)
     });
     const data=await r.json();
@@ -962,6 +969,7 @@ async function bulkShip(){
     return;
   }
   toast(`Shipping ${ids.length} orders...`);
+  const{data:{session}}=await sb.auth.getSession();
   let ok=0,fail=0;
   for(const id of ids){
     const o=allOrders.find(x=>x.id===id);
@@ -969,7 +977,7 @@ async function bulkShip(){
     try{
       const r=await fetch('/api/ship-order',{
         method:'POST',
-        headers:{'Content-Type':'application/json'},
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${session?.access_token||''}`},
         body:JSON.stringify({orderId:o.id,order:o,stationCode:o.station_code||null})
       });
       const data=await r.json();
@@ -1326,4 +1334,3 @@ function toast(msg,isErr=false){
 </script>
 </body>
 </html>
-

@@ -1229,30 +1229,6 @@ function scrollToOrder() {
   document.getElementById('order-section').scrollIntoView({ behavior: 'smooth' });
 }
 
-function sendAnalytics(eventName, orderData) {
-  const payload = {
-    event_name: eventName,
-    order_id: orderData.order_id,
-    value: orderData.prix_total,
-    currency: 'DZD',
-    product: orderData.product,
-    variant: orderData.variable,
-    phone: orderData.phone,
-    name: orderData.name,
-    event_source_url: location.href,
-  };
-  fetch('/api/meta-conversion', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  }).catch(() => {});
-  fetch('/api/tiktok-event', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  }).catch(() => {});
-}
-
 // ── SUBMIT ORDER ──
 async function submitOrder() {
   const name = document.getElementById('f-name').value.trim();
@@ -1297,29 +1273,24 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
   };
 
   try {
-    const r = await fetch(`${SB_URL}/orders`, {
+    orderData.product_slug = 'liquid-football';
+    orderData.wilaya_id = WILAYA_ID_MAP[wilayaClean];
+    orderData.delivery_type = selectedDelivery === 'home' ? 'home' : 'pickup';
+    orderData.variant_label = `${selectedClub.value} â€” ${selectedSize}`;
+    orderData.selected_options = { Club: selectedClub.value, Taille: selectedSize };
+    orderData.event_source_url = location.href;
+
+    const r = await fetch('/api/create-order', {
       method: 'POST',
-      headers: { ...SB_H, 'Prefer': 'return=minimal' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(orderData)
     });
+    const result = await r.json().catch(() => ({}));
 
-    if (!r.ok) throw new Error('Failed');
-
-    // Notify via ntfy
-    fetch('https://ntfy.sh/arco-new-orders', {
-      method: 'POST',
-      headers: {
-        'Title': 'New Order',
-        'Priority': 'high',
-        'Tags': 'shopping',
-      },
-      body: `${orderData.name} - ${orderData.wilaya} - ${orderData.prix_total} DZD`,
-    }).catch(() => {});
-
-    sendAnalytics('Purchase', orderData);
+    if (!r.ok || !result.ok) throw new Error(result.error || 'Failed');
 
     // Show success
-    document.getElementById('success-order-id').textContent = '#' + orderId;
+    document.getElementById('success-order-id').textContent = '#' + result.order_id;
     document.getElementById('success-screen').classList.add('show');
 
   } catch(e) {

@@ -43,9 +43,9 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
   </header>
   <div class="loader">Loading product...</div>
 </main>
-<div class="sticky" id="sticky"><strong id="sticky-total">0 DZD</strong><button onclick="scrollToOrder()">اطلب الآن</button></div>
+<div class="sticky" id="sticky"><strong id="sticky-total">0 DZD</strong><button onclick="scrollToOrder()">Ø§Ø·Ù„Ø¨ Ø§Ù„Ø¢Ù†</button></div>
 <div class="toast" id="toast"></div>
-<div class="success" id="success"><div class="success-box"><h2>ORDER SENT</h2><p>تم تسجيل طلبك بنجاح. سيتصل بك فريق ARCO للتأكيد.</p><p id="success-id"></p><a href="/">العودة للمنتجات</a></div></div>
+<div class="success" id="success"><div class="success-box"><h2>ORDER SENT</h2><p>ØªÙ… ØªØ³Ø¬ÙŠÙ„ Ø·Ù„Ø¨Ùƒ Ø¨Ù†Ø¬Ø§Ø­. Ø³ÙŠØªØµÙ„ Ø¨Ùƒ ÙØ±ÙŠÙ‚ ARCO Ù„Ù„ØªØ£ÙƒÙŠØ¯.</p><p id="success-id"></p><a href="/">Ø§Ù„Ø¹ÙˆØ¯Ø© Ù„Ù„Ù…Ù†ØªØ¬Ø§Øª</a></div></div>
 
 <script>
 const SB_URL='https://zcsdkuzmogvpvqjzhnqu.supabase.co/rest/v1';
@@ -82,16 +82,10 @@ function optionGroups(){
   return groups;
 }
 function hasOptionGroups(){return Object.keys(optionGroups()).length>0;}
-function setDefaultOptions(){
-  const first=variants()[0];
-  selectedOptions=first?.options?{...first.options}:{};
-}
+function setDefaultOptions(){const first=variants()[0];selectedOptions=first?.options?{...first.options}:{};}
 function findSelectedVariant(){
   if(!hasOptionGroups())return variant||variants()[0];
-  return variants().find(v=>{
-    if(!v.options)return false;
-    return Object.entries(selectedOptions).every(([name,value])=>v.options[name]===value);
-  })||variants()[0];
+  return variants().find(v=>v.options&&Object.entries(selectedOptions).every(([name,value])=>v.options[name]===value))||variants()[0];
 }
 function renderVariantControls(){
   if(!hasOptionGroups()){
@@ -111,9 +105,9 @@ async function loadProduct(){
     if(!res.ok)throw new Error(await res.text());
     const data=await res.json();if(!data[0]){missing();return;}
     product=data[0];variant=variants()[0];setDefaultOptions();render();
-  }catch(e){document.getElementById('app').innerHTML='<div class="missing">تعذر تحميل المنتج.</div>';}
+  }catch(e){document.getElementById('app').innerHTML='<div class="missing">ØªØ¹Ø°Ø± ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ù†ØªØ¬.</div>';}
 }
-function missing(){document.getElementById('app').innerHTML='<div class="missing">هذا المنتج غير متوفر حاليا.</div>';}
+function missing(){document.getElementById('app').innerHTML='<div class="missing">Ù‡Ø°Ø§ Ø§Ù„Ù…Ù†ØªØ¬ ØºÙŠØ± Ù…ØªÙˆÙØ± Ø­Ø§Ù„ÙŠØ§.</div>';}
 function render(){
   const imgs=images();document.title=product.name+' - ARCO';
   document.getElementById('app').innerHTML=`
@@ -129,22 +123,22 @@ function render(){
         <div class="desc">${esc(product.description_ar||product.description_fr||'Poster premium disponible avec paiement à la livraison.')}</div>
         <div class="price-row">${product.original_price?`<span class="old">${money(product.original_price)}</span>`:''}<span class="price" id="base-price">${money(variant.price)}</span></div>
         <div class="block">
-          <div class="label">الموديل / المقاس <span class="hint">Choisir une option</span></div>
+          <div class="label">Ø§Ù„Ù…ÙˆØ¯ÙŠÙ„ / Ø§Ù„Ù…Ù‚Ø§Ø³ <span class="hint">Choisir une option</span></div>
           ${renderVariantControls()}
         </div>
         <div class="block" id="order">
-          <div class="label">معلومات الطلب <span class="hint">Paiement à la livraison</span></div>
+          <div class="label">Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø·Ù„Ø¨ <span class="hint">Paiement à la livraison</span></div>
           <div class="form">
-            <label class="field"><span>الاسم الكامل</span><input id="f-name" autocomplete="name"></label>
-            <label class="field"><span>رقم الهاتف</span><input id="f-phone" inputmode="tel" placeholder="05xxxxxxxx"></label>
-            <label class="field"><span>الولاية</span><select id="f-wilaya" onchange="onWilayaChange()"><option value="">اختر الولاية</option>${WILAYAS.map(w=>`<option value="${w[0]}|${esc(w[1])}">${w[0]} - ${esc(w[1])}</option>`).join('')}</select></label>
-            <div class="choices"><button class="choice active" onclick="selectDelivery(event,'home')"><strong>توصيل للمنزل</strong><span id="home-price">اختر الولاية</span></button><button class="choice" onclick="selectDelivery(event,'pickup')"><strong>Stop Desk</strong><span id="desk-price">اختر الولاية</span></button></div>
-            <label class="field" id="commune-wrap"><span>البلدية / العنوان</span><input id="f-commune" placeholder="Commune, adresse"></label>
-            <label class="field" id="desk-wrap" style="display:none"><span>نقطة Stop Desk</span><select id="f-desk" onchange="selectedDesk=this.value"><option value="">اختر النقطة</option></select></label>
-            <label class="field"><span>ملاحظات</span><textarea id="f-notes" rows="2"></textarea></label>
+            <label class="field"><span>Ø§Ù„Ø§Ø³Ù… Ø§Ù„ÙƒØ§Ù…Ù„</span><input id="f-name" autocomplete="name"></label>
+            <label class="field"><span>Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ</span><input id="f-phone" inputmode="tel" placeholder="05xxxxxxxx"></label>
+            <label class="field"><span>Ø§Ù„ÙˆÙ„Ø§ÙŠØ©</span><select id="f-wilaya" onchange="onWilayaChange()"><option value="">Ø§Ø®ØªØ± Ø§Ù„ÙˆÙ„Ø§ÙŠØ©</option>${WILAYAS.map(w=>`<option value="${w[0]}|${esc(w[1])}">${w[0]} - ${esc(w[1])}</option>`).join('')}</select></label>
+            <div class="choices"><button class="choice active" onclick="selectDelivery(event,'home')"><strong>ØªÙˆØµÙŠÙ„ Ù„Ù„Ù…Ù†Ø²Ù„</strong><span id="home-price">Ø§Ø®ØªØ± Ø§Ù„ÙˆÙ„Ø§ÙŠØ©</span></button><button class="choice" onclick="selectDelivery(event,'pickup')"><strong>Stop Desk</strong><span id="desk-price">Ø§Ø®ØªØ± Ø§Ù„ÙˆÙ„Ø§ÙŠØ©</span></button></div>
+            <label class="field" id="commune-wrap"><span>Ø§Ù„Ø¨Ù„Ø¯ÙŠØ© / Ø§Ù„Ø¹Ù†ÙˆØ§Ù†</span><input id="f-commune" placeholder="Commune, adresse"></label>
+            <label class="field" id="desk-wrap" style="display:none"><span>Ù†Ù‚Ø·Ø© Stop Desk</span><select id="f-desk" onchange="selectedDesk=this.value"><option value="">Ø§Ø®ØªØ± Ø§Ù„Ù†Ù‚Ø·Ø©</option></select></label>
+            <label class="field"><span>Ù…Ù„Ø§Ø­Ø¸Ø§Øª</span><textarea id="f-notes" rows="2"></textarea></label>
           </div>
-          <div class="summary"><div class="sum-row"><span>المنتج</span><strong id="sum-product">${money(variant.price)}</strong></div><div class="sum-row"><span>التوصيل</span><strong id="sum-ship">0 DZD</strong></div><div class="sum-row total"><span>المجموع</span><strong id="sum-total">${money(variant.price)}</strong></div></div>
-          <button class="order-btn" id="order-btn" onclick="submitOrder()">اطلب الآن</button>
+          <div class="summary"><div class="sum-row"><span>Ø§Ù„Ù…Ù†ØªØ¬</span><strong id="sum-product">${money(variant.price)}</strong></div><div class="sum-row"><span>Ø§Ù„ØªÙˆØµÙŠÙ„</span><strong id="sum-ship">0 DZD</strong></div><div class="sum-row total"><span>Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹</span><strong id="sum-total">${money(variant.price)}</strong></div></div>
+          <button class="order-btn" id="order-btn" onclick="submitOrder()">Ø§Ø·Ù„Ø¨ Ø§Ù„Ø¢Ù†</button>
         </div>
       </div>
     </section>`;
@@ -168,35 +162,29 @@ async function loadDesks(){
   if(!desks){try{const r=await fetch('/api/noest-desks');if(r.ok)desks=await r.json();}catch(e){}}
   const id=(document.getElementById('f-wilaya').value||'').split('|')[0];
   const entries=Object.entries(desks||{}).filter(([code])=>id&&new RegExp('^'+id+'[A-Z]').test(code));
-  sel.innerHTML='<option value="">اختر النقطة</option>'+entries.map(([code,d])=>`<option value="${code}">${esc(d.name||code)}</option>`).join('');
+  sel.innerHTML='<option value="">Ø§Ø®ØªØ± Ø§Ù„Ù†Ù‚Ø·Ø©</option>'+entries.map(([code,d])=>`<option value="${code}">${esc(d.name||code)}</option>`).join('');
 }
 function shippingCost(){return delivery==='home'?Number(shipping.home_delivery||0):Number(shipping.stop_desk||0);}
 function total(){return Number(variant.price||0)+shippingCost();}
 function updateTotals(){['sum-product','base-price'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=money(variant.price)});const s=document.getElementById('sum-ship'),t=document.getElementById('sum-total'),st=document.getElementById('sticky-total'),sticky=document.getElementById('sticky');if(s)s.textContent=money(shippingCost());if(t)t.textContent=money(total());if(st)st.textContent=money(total());if(sticky)sticky.classList.toggle('visible',!!product);}
 function scrollToOrder(){document.getElementById('order').scrollIntoView({behavior:'smooth'});}
-function sendAnalytics(eventName,orderData){
-  const payload={event_name:eventName,order_id:orderData.order_id,value:orderData.prix_total,currency:'DZD',product:orderData.product,variant:orderData.variable,phone:orderData.phone,name:orderData.name,event_source_url:location.href};
-  fetch('/api/meta-conversion',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(()=>{});
-  fetch('/api/tiktok-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).catch(()=>{});
-}
 async function submitOrder(){
   const name=document.getElementById('f-name').value.trim(),phone=document.getElementById('f-phone').value.replace(/\s/g,''),wilayaVal=document.getElementById('f-wilaya').value,commune=document.getElementById('f-commune').value.trim(),notes=document.getElementById('f-notes').value.trim();
-  if(!name)return toast('ادخل الاسم',true);
-  if(!/^0[567]\d{8}$/.test(phone))return toast('رقم الهاتف غير صحيح',true);
-  if(!wilayaVal)return toast('اختر الولاية',true);
-  if(!shippingCost())return toast('اختر ولاية متوفرة',true);
-  if(delivery==='home'&&!commune)return toast('ادخل البلدية أو العنوان',true);
-  if(delivery==='pickup'&&!selectedDesk)return toast('اختر نقطة Stop Desk',true);
-  const [,wilaya]=wilayaVal.split('|'),orderId=Date.now().toString(),btn=document.getElementById('order-btn');
-  btn.classList.add('loading');btn.textContent='جاري الإرسال...';
-  const orderData={order_id:orderId,name,phone,wilaya,commune:delivery==='home'?commune:'',type_livraison:delivery==='home'?'home':'pickup',station_code:delivery==='pickup'?selectedDesk:null,product:product.name,variable:variant.label,prix_total:total(),shipping_cost:shippingCost(),status:'pending',notes};
+  if(!name)return toast('Ø§Ø¯Ø®Ù„ Ø§Ù„Ø§Ø³Ù…',true);
+  if(!/^0[567]\d{8}$/.test(phone))return toast('Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ ØºÙŠØ± ØµØ­ÙŠØ­',true);
+  if(!wilayaVal)return toast('Ø§Ø®ØªØ± Ø§Ù„ÙˆÙ„Ø§ÙŠØ©',true);
+  if(!shippingCost())return toast('Ø§Ø®ØªØ± ÙˆÙ„Ø§ÙŠØ© Ù…ØªÙˆÙØ±Ø©',true);
+  if(delivery==='home'&&!commune)return toast('Ø§Ø¯Ø®Ù„ Ø§Ù„Ø¨Ù„Ø¯ÙŠØ© Ø£Ùˆ Ø§Ù„Ø¹Ù†ÙˆØ§Ù†',true);
+  if(delivery==='pickup'&&!selectedDesk)return toast('Ø§Ø®ØªØ± Ù†Ù‚Ø·Ø© Stop Desk',true);
+  const [wilayaId,wilaya]=wilayaVal.split('|'),btn=document.getElementById('order-btn');
+  btn.classList.add('loading');btn.textContent='Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¥Ø±Ø³Ø§Ù„...';
+  const payload={product_slug:product.slug,name,phone,wilaya,wilaya_id:Number(wilayaId),commune:delivery==='home'?commune:'',delivery_type:delivery==='home'?'home':'pickup',station_code:delivery==='pickup'?selectedDesk:null,variant_label:variant.label,selected_options:selectedOptions,notes,event_source_url:location.href};
   try{
-    const r=await fetch(`${SB_URL}/orders`,{method:'POST',headers:{...H,Prefer:'return=minimal'},body:JSON.stringify(orderData)});
-    if(!r.ok)throw new Error('failed');
-    fetch('https://ntfy.sh/arco-new-orders',{method:'POST',headers:{Title:'New Order',Priority:'high',Tags:'shopping'},body:`${orderData.name} - ${orderData.wilaya} - ${orderData.prix_total} DZD`}).catch(()=>{});
-    sendAnalytics('Purchase',orderData);
-    document.getElementById('success-id').textContent='#'+orderId;document.getElementById('success').classList.add('show');
-  }catch(e){btn.classList.remove('loading');btn.textContent='اطلب الآن';toast('حدث خطأ. حاول مرة أخرى',true);}
+    const r=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const result=await r.json().catch(()=>({}));
+    if(!r.ok||!result.ok)throw new Error(result.error||'failed');
+    document.getElementById('success-id').textContent='#'+result.order_id;document.getElementById('success').classList.add('show');
+  }catch(e){btn.classList.remove('loading');btn.textContent='Ø§Ø·Ù„Ø¨ Ø§Ù„Ø¢Ù†';toast('Ø­Ø¯Ø« Ø®Ø·Ø£. Ø­Ø§ÙˆÙ„ Ù…Ø±Ø© Ø£Ø®Ø±Ù‰',true);}
 }
 let tt;function toast(msg,err=false){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(err?' err':'');clearTimeout(tt);tt=setTimeout(()=>el.className='toast',2600);}
 loadProduct();
