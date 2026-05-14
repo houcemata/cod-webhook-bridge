@@ -146,7 +146,7 @@ img{display:block;max-width:100%}
 .hero h1 .fr{
   display:block;
   direction:ltr;
-  text-align:right;
+  text-align:left;
   font:400 clamp(2.1rem,5.2vw,5rem)/.95 'Bebas Neue',sans-serif;
   letter-spacing:.03em;
   color:var(--yellow);
@@ -521,13 +521,27 @@ img{display:block;max-width:100%}
   .top-actions{display:none}
   .hero,.section,.footer{width:min(100% - 20px,1180px)}
   .hero{min-height:auto;padding:24px 0 24px}
+  .hero-copy{gap:14px}
+  .hero h1{font-size:clamp(2rem,11vw,3.2rem)}
+  .hero h1 .fr{font-size:clamp(1.65rem,10vw,2.4rem);text-align:left}
   .hero p{font-size:.96rem}
-  .metric{min-width:calc(50% - 6px)}
-  .mockup-frame{transform:none}
+  .hero-visual{min-height:320px}
+  .hero-visual:before{inset:12% 0 8%}
+  .metric{min-width:100%;padding:12px 14px}
+  .cta-row{flex-direction:column}
+  .primary-btn,.secondary-btn{width:100%}
+  .mockup-frame{transform:none;width:min(320px,94%);padding:10px}
+  .mockup-badge{top:14px;right:10px;padding:9px 12px;font-size:.8rem}
+  .mockup-price{left:10px;bottom:14px;padding:12px 14px}
+  .mockup-price strong{font-size:1.55rem}
   .products-grid,.why-grid{grid-template-columns:1fr}
   .section-head,.footer-shell{align-items:flex-start;flex-direction:column}
+  .section-note{direction:rtl;text-align:right}
+  .product-content{padding:16px}
   .product-bottom{align-items:flex-start;flex-direction:column}
   .product-btn{width:100%}
+  .footer-links{width:100%}
+  .footer-link{width:100%;justify-content:center;display:inline-flex}
 }
 </style>
 </head>
@@ -543,8 +557,8 @@ img{display:block;max-width:100%}
         </div>
       </a>
       <nav class="top-actions" aria-label="Quick links">
-        <a class="ghost-link" href="#products">Shop Posters</a>
-        <a class="ghost-link" href="#why-arco">Why ARCO</a>
+        <a class="ghost-link" href="#products">&#1578;&#1589;&#1601;&#1581; / Collection</a>
+        <a class="ghost-link" href="#why-arco">&#1604;&#1605;&#1575;&#1584;&#1575; ARCO / Pourquoi</a>
       </nav>
     </div>
   </header>
@@ -552,41 +566,41 @@ img{display:block;max-width:100%}
   <main>
     <section class="hero">
       <div class="hero-copy">
-        <div class="eyebrow">Made for Algeria</div>
+        <div class="eyebrow">&#1589;&#1606;&#1593; &#1604;&#1604;&#1580;&#1586;&#1575;&#1574;&#1585; / Made for Algeria</div>
         <h1>
-          لوحات كروية فنية تخطف النظر
-          <span class="fr">LUXURY STREET POSTERS FOR FOOTBALL CULTURE</span>
+          &#1604;&#1608;&#1581;&#1575;&#1578; &#1603;&#1585;&#1608;&#1610;&#1577; &#1601;&#1606;&#1610;&#1577; &#1578;&#1582;&#1591;&#1601; &#1575;&#1604;&#1606;&#1592;&#1585;
+          <span class="fr">POSTERS LIQUID ART PREMIUM POUR LA CULTURE FOOTBALL</span>
         </h1>
         <p>
-          ARCO يقدم بوسترات Liquid Art Premium مستوحاة من أكبر الأندية لعشاق الكرة في الجزائر.
-          تصميم جريء، طباعة راقية، ودفع عند الاستلام. Premium finish, club energy, and a collector look built for real fans.
+          ARCO &#1610;&#1602;&#1583;&#1605; &#1576;&#1608;&#1587;&#1578;&#1585;&#1575;&#1578; Liquid Art Premium &#1605;&#1587;&#1578;&#1608;&#1581;&#1575;&#1577; &#1605;&#1606; &#1571;&#1603;&#1576;&#1585; &#1575;&#1604;&#1571;&#1606;&#1583;&#1610;&#1577; &#1604;&#1593;&#1588;&#1575;&#1602; &#1575;&#1604;&#1603;&#1585;&#1577; &#1601;&#1610; &#1575;&#1604;&#1580;&#1586;&#1575;&#1574;&#1585;.
+          Finition premium, design audacieux, et paiement a la livraison pour les vrais supporters.
         </p>
         <div class="hero-metrics" aria-label="ARCO highlights">
           <div class="metric">
             <strong>COD</strong>
-            <span>Paiement a la livraison</span>
+            <span>&#1575;&#1604;&#1583;&#1601;&#1593; &#1593;&#1606;&#1583; &#1575;&#1604;&#1575;&#1587;&#1578;&#1604;&#1575;&#1605; / Paiement a la livraison</span>
           </div>
           <div class="metric">
             <strong>48H</strong>
-            <span>Livraison rapide en Algerie</span>
+            <span>&#1578;&#1608;&#1589;&#1610;&#1604; &#1587;&#1585;&#1610;&#1593; / Livraison rapide en Algerie</span>
           </div>
           <div class="metric">
             <strong>PREMIUM</strong>
-            <span>Liquid art finish</span>
+            <span>&#1578;&#1588;&#1591;&#1610;&#1576; &#1601;&#1575;&#1582;&#1585; / Finition premium</span>
           </div>
         </div>
         <div class="cta-row">
-          <a class="primary-btn" href="#products">Commander Maintenant</a>
-          <a class="secondary-btn" href="#why-arco">Discover ARCO</a>
+          <a class="primary-btn" href="#products">&#1575;&#1591;&#1604;&#1576; &#1575;&#1604;&#1570;&#1606; / Commander Maintenant</a>
+          <a class="secondary-btn" href="#why-arco">&#1575;&#1603;&#1578;&#1588;&#1601; ARCO / Decouvrir ARCO</a>
         </div>
       </div>
 
       <div class="hero-visual">
         <div class="mockup-frame">
           <img id="hero-product-image" alt="ARCO poster preview" src="https://images.unsplash.com/photo-1511884642898-4c92249e20b6?auto=format&fit=crop&w=900&q=80">
-          <div class="mockup-badge">Feature <span id="hero-product-name">Liquid Football</span></div>
+          <div class="mockup-badge">&#1575;&#1604;&#1571;&#1603;&#1579;&#1585; &#1591;&#1604;&#1576;&#1575; / <span id="hero-product-name">Liquid Football</span></div>
           <div class="mockup-price">
-            <small>Starting from</small>
+            <small>&#1610;&#1576;&#1583;&#1571; &#1605;&#1606; / A partir de</small>
             <strong id="hero-product-price">2,900 DZD</strong>
           </div>
         </div>
@@ -597,43 +611,43 @@ img{display:block;max-width:100%}
     <section class="section" id="products">
       <div class="section-head">
         <div class="section-copy">
-          <span class="section-kicker">Collection</span>
-          <h2>Shop Active Posters</h2>
+          <span class="section-kicker">&#1575;&#1604;&#1605;&#1580;&#1605;&#1608;&#1593;&#1577; / Collection</span>
+          <h2>&#1578;&#1587;&#1608;&#1602; &#1575;&#1604;&#1576;&#1608;&#1587;&#1578;&#1585;&#1575;&#1578; &#1575;&#1604;&#1605;&#1578;&#1608;&#1601;&#1585;&#1577; / Posters Disponibles</h2>
         </div>
-        <p class="section-note">Choisissez votre club, votre format, puis commandez en quelques secondes partout en Algerie.</p>
+        <p class="section-note">&#1575;&#1582;&#1578;&#1585; &#1606;&#1575;&#1583;&#1610;&#1603; &#1608;&#1575;&#1604;&#1605;&#1602;&#1575;&#1587; &#1575;&#1604;&#1605;&#1606;&#1575;&#1587;&#1576; &#1548; puis commandez en quelques secondes partout en Algerie.</p>
       </div>
       <div class="products-grid" id="products-grid">
-        <div class="loader">Loading ARCO products...</div>
+        <div class="loader">&#1580;&#1575;&#1585;&#1610; &#1578;&#1581;&#1605;&#1610;&#1604; &#1605;&#1606;&#1578;&#1580;&#1575;&#1578; ARCO... / Chargement des produits ARCO...</div>
       </div>
     </section>
 
     <section class="section" id="why-arco">
       <div class="section-head">
         <div class="section-copy">
-          <span class="section-kicker">Why ARCO</span>
-          <h2>Premium Feel. Local Delivery.</h2>
+          <span class="section-kicker">&#1604;&#1605;&#1575;&#1584;&#1575; ARCO / Pourquoi ARCO</span>
+          <h2>&#1601;&#1582;&#1575;&#1605;&#1577; &#1608;&#1578;&#1608;&#1589;&#1610;&#1604; &#1605;&#1581;&#1604;&#1610; / Premium et Livraison Locale</h2>
         </div>
       </div>
       <div class="why-grid">
         <article class="why-card">
           <div class="why-icon">01</div>
-          <h3>Premium Quality</h3>
-          <p>Liquid art style, sharp detail, and a bold finish built to stand out on your wall.</p>
+          <h3>&#1580;&#1608;&#1583;&#1577; &#1601;&#1575;&#1582;&#1585;&#1577; / Qualite Premium</h3>
+          <p>&#1578;&#1589;&#1605;&#1610;&#1605; Liquid Art &#1576;&#1578;&#1601;&#1575;&#1589;&#1610;&#1604; &#1608;&#1575;&#1590;&#1581;&#1577; &#1608;&#1604;&#1605;&#1587;&#1577; &#1601;&#1575;&#1582;&#1585;&#1577; qui attire le regard.</p>
         </article>
         <article class="why-card">
           <div class="why-icon">02</div>
-          <h3>Fast Delivery</h3>
-          <p>Quick processing and dispatch so your poster reaches you fast across Algeria.</p>
+          <h3>&#1578;&#1608;&#1589;&#1610;&#1604; &#1587;&#1585;&#1610;&#1593; / Livraison Rapide</h3>
+          <p>&#1578;&#1580;&#1607;&#1610;&#1586; &#1587;&#1585;&#1610;&#1593; et expedition efficace pour recevoir votre poster partout en Algerie.</p>
         </article>
         <article class="why-card">
           <div class="why-icon">03</div>
-          <h3>Cash on Delivery</h3>
-          <p>Simple ordering flow with payment on delivery for confidence and convenience.</p>
+          <h3>&#1575;&#1604;&#1583;&#1601;&#1593; &#1593;&#1606;&#1583; &#1575;&#1604;&#1575;&#1587;&#1578;&#1604;&#1575;&#1605; / Paiement a la Livraison</h3>
+          <p>&#1591;&#1604;&#1576; &#1587;&#1607;&#1604; et paiement a la livraison pour plus de confort et de confiance.</p>
         </article>
         <article class="why-card">
           <div class="why-icon">04</div>
-          <h3>Made for Algeria</h3>
-          <p>A local football-first brand with club culture, Arabic identity, and premium ambition.</p>
+          <h3>&#1605;&#1589;&#1605;&#1605; &#1604;&#1604;&#1580;&#1586;&#1575;&#1574;&#1585; / Pense pour l'Algerie</h3>
+          <p>&#1593;&#1604;&#1575;&#1605;&#1577; &#1605;&#1581;&#1604;&#1610;&#1577; &#1576;&#1607;&#1608;&#1610;&#1577; &#1603;&#1585;&#1608;&#1610;&#1577; et une ambition premium.</p>
         </article>
       </div>
     </section>
@@ -643,8 +657,8 @@ img{display:block;max-width:100%}
     <div class="footer-shell">
       <div class="footer-copy">
         <strong>ARCO</strong>
-        <span>Premium liquid art football posters for Algeria.</span>
-        <div class="copyright">© <span id="year"></span> ARCO. All rights reserved.</div>
+        <span>&#1576;&#1608;&#1587;&#1578;&#1585;&#1575;&#1578; &#1603;&#1585;&#1608;&#1610;&#1577; Liquid Art Premium / Posters premium pour l'Algerie.</span>
+        <div class="copyright">&#169; <span id="year"></span> ARCO. Tous droits reserves.</div>
       </div>
       <div class="footer-links">
         <a class="footer-link" href="https://www.instagram.com/" target="_blank" rel="noreferrer">Instagram</a>
@@ -674,8 +688,8 @@ function minVariantPrice(p){
 function productDescription(p){
   const variants=Array.isArray(p.variants)?p.variants:[];
   const sizes=[...new Set(variants.map(v=>v.option2||v.size||v.format).filter(Boolean))];
-  if(sizes.length)return 'Available in '+sizes.slice(0,3).join(' / ');
-  return 'Premium liquid art football poster';
+  if(sizes.length)return `\u0627\u0644\u0645\u0642\u0627\u0633\u0627\u062A / Formats: ${sizes.slice(0,3).join(' / ')}`;
+  return '\u0628\u0648\u0633\u062A\u0631 Liquid Art Premium / Poster premium';
 }
 function setHeroProduct(product){
   if(!product)return;
@@ -692,7 +706,7 @@ async function loadProducts(){
     if(!res.ok)throw new Error(await res.text());
     const products=(await res.json()).sort((a,b)=>(b.slug==='liquid-football')-(a.slug==='liquid-football'));
     if(!products.length){
-      grid.innerHTML='<div class="empty">قريباً ستتوفر منتجات جديدة على ARCO.</div>';
+      grid.innerHTML='<div class="empty">&#1602;&#1585;&#1610;&#1576;&#1575; &#1587;&#1578;&#1578;&#1608;&#1601;&#1585; &#1605;&#1606;&#1578;&#1580;&#1575;&#1578; &#1580;&#1583;&#1610;&#1583;&#1577; &#1593;&#1604;&#1609; ARCO. / De nouveaux produits arrivent bientot.</div>';
       return;
     }
 
@@ -703,7 +717,7 @@ async function loadProducts(){
       return `<article class="product-card">
         <a class="product-media" href="${productUrl(p.slug)}" aria-label="Open ${esc(p.name)}">
           ${img?`<img src="${esc(img)}" alt="${esc(p.name)}" loading="${index<2?'eager':'lazy'}">`:''}
-          <span class="product-tag">${p.slug==='liquid-football'?'Best Seller':'Active Drop'}</span>
+          <span class="product-tag">${p.slug==='liquid-football'?'Top Vente':'Disponible'}</span>
         </a>
         <div class="product-content">
           <div>
@@ -712,16 +726,16 @@ async function loadProducts(){
           </div>
           <div class="product-bottom">
             <div class="product-price">
-              <small>Price from</small>
+              <small>&#1575;&#1604;&#1587;&#1593;&#1585; / Prix</small>
               <strong>${money(minVariantPrice(p))}</strong>
             </div>
-            <a class="product-btn" href="${productUrl(p.slug)}">Order Now</a>
+            <a class="product-btn" href="${productUrl(p.slug)}">&#1575;&#1591;&#1604;&#1576; / Commander</a>
           </div>
         </div>
       </article>`;
     }).join('');
   }catch(e){
-    grid.innerHTML='<div class="error">تعذر تحميل المنتجات حالياً. حاول مرة أخرى لاحقاً.</div>';
+    grid.innerHTML='<div class="error">&#1578;&#1593;&#1584;&#1585; &#1578;&#1581;&#1605;&#1610;&#1604; &#1575;&#1604;&#1605;&#1606;&#1578;&#1580;&#1575;&#1578; &#1581;&#1575;&#1604;&#1610;&#1575;. / Impossible de charger les produits pour le moment.</div>';
     console.error(e);
   }
 }
