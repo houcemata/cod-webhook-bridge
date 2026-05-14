@@ -1,73 +1,658 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ARCO</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCO | Premium Liquid Art Posters</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@600;700;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--yellow:#F5C500;--black:#080808;--panel:#111;--text:#fff;--muted:#b8b8b8}
+:root{
+  --yellow:#F5C500;
+  --black:#080808;
+  --dark:#111111;
+  --red:#e11d48;
+  --green:#22c55e;
+  --text:#f8f8f8;
+  --muted:#b2b2b2;
+  --line:rgba(255,255,255,.1);
+  --shadow:0 24px 80px rgba(0,0,0,.38);
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{min-height:100vh;background:var(--black);color:var(--text);font-family:'Cairo',sans-serif}
+html{scroll-behavior:smooth}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top left, rgba(245,197,0,.18), transparent 28%),
+    radial-gradient(circle at 85% 15%, rgba(225,29,72,.14), transparent 24%),
+    linear-gradient(180deg, #0a0a0a 0%, #080808 30%, #111111 100%);
+  color:var(--text);
+  font-family:'Cairo',sans-serif;
+  overflow-x:hidden;
+}
 a{color:inherit;text-decoration:none}
-.topbar{height:68px;background:#101010;display:grid;grid-template-columns:48px 1fr 82px;align-items:center;padding:0 18px;position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(255,255,255,.06);direction:ltr}
-.icon-btn{width:34px;height:34px;border:0;background:transparent;color:#fff;display:grid;place-items:center;position:relative}
-.hamburger,.hamburger:before,.hamburger:after{display:block;width:19px;height:2px;background:#f2f2f2;border-radius:2px;content:""}
-.hamburger:before{transform:translateY(-7px)}.hamburger:after{transform:translateY(5px)}
-.brand{justify-self:center;font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;letter-spacing:1px}
-.actions{display:flex;align-items:center;justify-content:flex-end;gap:10px}
-.search-icon{width:19px;height:19px;border:2px solid #fff;border-radius:50%;position:relative}.search-icon:after{content:"";position:absolute;width:8px;height:2px;background:#fff;right:-6px;bottom:-4px;transform:rotate(45deg);border-radius:2px}
-.bag{width:21px;height:21px;border:2px solid #fff;border-radius:2px;position:relative}.bag:before{content:"";position:absolute;left:4px;right:4px;top:-8px;height:10px;border:2px solid #fff;border-bottom:0;border-radius:10px 10px 0 0}.cart-badge{position:absolute;right:-8px;bottom:-8px;width:18px;height:18px;border-radius:50%;background:var(--yellow);color:#080808;font-size:11px;font-weight:900;display:grid;place-items:center}
-.hero{min-height:388px;background:#1b1b1b center/cover no-repeat;position:relative;display:grid;place-items:center;text-align:center;padding:44px 18px}
-.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.45))}
-.hero-content{position:relative;z-index:1;display:grid;justify-items:center;gap:20px}
-.hero h1{font-size:clamp(31px,8vw,54px);font-weight:900;line-height:1.25;text-shadow:0 2px 16px rgba(0,0,0,.35)}
-.hero .btn{background:var(--yellow);color:#fff;min-width:122px;height:47px;display:inline-grid;place-items:center;font-weight:800}
-.wrap{max-width:1120px;margin:0 auto;padding:34px 12px 42px;direction:ltr}
-.section-title{font-size:20px;font-weight:900;margin-bottom:24px;direction:ltr;text-align:left}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;direction:ltr}
-.product{display:block;min-width:0}
-.thumb{position:relative;aspect-ratio:1;background:#eee;overflow:hidden}
-.thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.sale{position:absolute;left:12px;bottom:12px;background:#111;color:#fff;border-radius:999px;padding:6px 15px;font-size:12px;font-weight:800}
-.info{padding:10px 0 18px;direction:ltr}
-.name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;letter-spacing:.4px;text-transform:uppercase;line-height:1.15}
-.price{font-family:'Barlow Condensed',sans-serif;color:var(--yellow);font-size:17px;font-weight:800;margin-top:4px}
-.empty,.loader,.error{grid-column:1/-1;min-height:190px;display:grid;place-items:center;background:#101010;color:var(--muted);text-align:center;padding:24px}
-.footer{border-top:1px solid rgba(255,255,255,.08);padding:22px 14px 34px;text-align:center;color:#858585;font-size:12px;direction:ltr}
-@media(min-width:760px){
-  .topbar{height:74px;grid-template-columns:80px 1fr 110px;padding:0 28px}
-  .hero{min-height:500px}
-  .wrap{padding-left:24px;padding-right:24px}
-  .grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-  .section-title{font-size:24px}
+img{display:block;max-width:100%}
+.page-shell{position:relative;isolation:isolate}
+.page-shell:before,.page-shell:after{
+  content:"";
+  position:fixed;
+  inset:auto;
+  width:38vw;
+  height:38vw;
+  border-radius:50%;
+  filter:blur(80px);
+  pointer-events:none;
+  z-index:-1;
+}
+.page-shell:before{top:-10vw;left:-8vw;background:rgba(245,197,0,.11)}
+.page-shell:after{top:16rem;right:-10vw;background:rgba(225,29,72,.08)}
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  backdrop-filter:blur(18px);
+  background:rgba(8,8,8,.76);
+  border-bottom:1px solid var(--line);
+}
+.topbar-inner{
+  width:min(1180px,calc(100% - 32px));
+  margin:0 auto;
+  min-height:76px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+}
+.brand-lockup{display:flex;align-items:center;gap:12px}
+.brand-mark{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,var(--yellow),#ffd84d);
+  color:#080808;
+  box-shadow:0 0 0 1px rgba(255,255,255,.08),0 10px 30px rgba(245,197,0,.25);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;
+  letter-spacing:.08em;
+}
+.brand-copy strong{
+  display:block;
+  font:400 clamp(1.8rem,4vw,2.4rem)/.9 'Bebas Neue',sans-serif;
+  letter-spacing:.08em;
+}
+.brand-copy span{
+  display:block;
+  color:var(--muted);
+  font-size:.78rem;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  font-family:'Barlow Condensed',sans-serif;
+}
+.top-actions{display:flex;align-items:center;gap:12px}
+.ghost-link{
+  padding:11px 15px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  color:#f1f1f1;
+  font:700 .92rem/1 'Barlow Condensed',sans-serif;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  transition:.25s ease;
+}
+.ghost-link:hover{border-color:rgba(245,197,0,.5);color:var(--yellow)}
+.hero{
+  width:min(1180px,calc(100% - 32px));
+  margin:0 auto;
+  min-height:calc(100vh - 76px);
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  align-items:center;
+  gap:34px;
+  padding:48px 0 42px;
+}
+.hero-copy{display:grid;gap:18px}
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  justify-self:start;
+  padding:9px 14px;
+  border-radius:999px;
+  background:rgba(245,197,0,.12);
+  border:1px solid rgba(245,197,0,.24);
+  color:var(--yellow);
+  font:700 .88rem/1 'Barlow Condensed',sans-serif;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.eyebrow:before{
+  content:"";
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--yellow);
+  box-shadow:0 0 18px rgba(245,197,0,.8);
+}
+.hero h1{
+  font-family:'Cairo',sans-serif;
+  font-size:clamp(2.4rem,6vw,5.4rem);
+  font-weight:900;
+  line-height:1.06;
+  max-width:11ch;
+}
+.hero h1 .fr{
+  display:block;
+  direction:ltr;
+  text-align:right;
+  font:400 clamp(2.1rem,5.2vw,5rem)/.95 'Bebas Neue',sans-serif;
+  letter-spacing:.03em;
+  color:var(--yellow);
+  margin-top:10px;
+}
+.hero p{
+  max-width:38rem;
+  color:var(--muted);
+  font-size:1.04rem;
+  line-height:1.9;
+}
+.hero-metrics{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.metric{
+  min-width:150px;
+  padding:14px 16px;
+  border-radius:18px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+}
+.metric strong{
+  display:block;
+  font:400 2rem/.9 'Bebas Neue',sans-serif;
+  letter-spacing:.06em;
+  color:var(--yellow);
+}
+.metric span{
+  color:var(--muted);
+  font-size:.9rem;
+}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;padding-top:4px}
+.primary-btn,.secondary-btn{
+  min-height:54px;
+  padding:0 24px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  font:800 .98rem/1 'Barlow Condensed',sans-serif;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+}
+.primary-btn{
+  background:linear-gradient(135deg,var(--yellow),#ffd84d);
+  color:#080808;
+  box-shadow:0 16px 36px rgba(245,197,0,.28);
+}
+.primary-btn:hover{transform:translateY(-2px);box-shadow:0 20px 44px rgba(245,197,0,.34)}
+.secondary-btn{
+  color:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.03);
+}
+.secondary-btn:hover{border-color:rgba(245,197,0,.45);color:var(--yellow)}
+.hero-visual{
+  position:relative;
+  min-height:540px;
+  display:grid;
+  place-items:center;
+}
+.hero-visual:before{
+  content:"";
+  position:absolute;
+  inset:16% 5% 10%;
+  border-radius:32px;
+  background:
+    radial-gradient(circle at top, rgba(245,197,0,.3), transparent 44%),
+    linear-gradient(160deg, rgba(245,197,0,.12), rgba(255,255,255,.02) 46%, rgba(17,17,17,.85));
+  border:1px solid rgba(255,255,255,.08);
+}
+.hero-visual:after{
+  content:"";
+  position:absolute;
+  width:70%;
+  height:18%;
+  bottom:4%;
+  border-radius:50%;
+  background:rgba(245,197,0,.18);
+  filter:blur(48px);
+}
+.mockup-frame{
+  position:relative;
+  width:min(420px,92%);
+  aspect-ratio:4/5;
+  padding:14px;
+  border-radius:30px;
+  background:linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.04));
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:var(--shadow);
+  transform:rotate(6deg);
+  overflow:hidden;
+}
+.mockup-frame img{
+  width:100%;
+  height:100%;
+  border-radius:22px;
+  object-fit:cover;
+  background:#0d0d0d;
+}
+.mockup-badge,.mockup-price{
+  position:absolute;
+  border-radius:999px;
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(8,8,8,.72);
+  box-shadow:0 12px 30px rgba(0,0,0,.35);
+}
+.mockup-badge{
+  top:24px;
+  right:-8px;
+  padding:12px 16px;
+  color:#fff;
+  font:700 .92rem/1 'Barlow Condensed',sans-serif;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.mockup-badge span{color:var(--yellow)}
+.mockup-price{
+  left:-12px;
+  bottom:26px;
+  padding:16px 18px;
+}
+.mockup-price small{
+  display:block;
+  color:var(--muted);
+  font-size:.8rem;
+  margin-bottom:4px;
+}
+.mockup-price strong{
+  font:400 2rem/.9 'Bebas Neue',sans-serif;
+  color:var(--yellow);
+  letter-spacing:.05em;
+}
+.hero-glow{
+  position:absolute;
+  inset:auto 6% 8% auto;
+  width:130px;
+  height:130px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.08);
+  background:radial-gradient(circle, rgba(245,197,0,.3), rgba(245,197,0,.03) 62%, transparent 70%);
+}
+.section{
+  width:min(1180px,calc(100% - 32px));
+  margin:0 auto;
+  padding:34px 0 48px;
+}
+.section-head{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:24px;
+}
+.section-copy{display:grid;gap:6px}
+.section-kicker{
+  color:var(--yellow);
+  font:700 .9rem/1 'Barlow Condensed',sans-serif;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.section h2{
+  font:400 clamp(2rem,4vw,3.4rem)/.92 'Bebas Neue',sans-serif;
+  letter-spacing:.04em;
+}
+.section-note{
+  color:var(--muted);
+  max-width:34rem;
+  direction:ltr;
+  text-align:left;
+}
+.products-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:18px;
+}
+.product-card{
+  display:flex;
+  flex-direction:column;
+  min-height:100%;
+  border-radius:26px;
+  overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(17,17,17,.92));
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 18px 44px rgba(0,0,0,.22);
+  transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease;
+}
+.product-card:hover{
+  transform:translateY(-6px);
+  border-color:rgba(245,197,0,.45);
+  box-shadow:0 26px 64px rgba(0,0,0,.34);
+}
+.product-media{
+  position:relative;
+  aspect-ratio:4/4.6;
+  background:
+    linear-gradient(180deg, rgba(245,197,0,.08), transparent 30%),
+    #0d0d0d;
+}
+.product-media img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.product-tag{
+  position:absolute;
+  top:14px;
+  right:14px;
+  border-radius:999px;
+  padding:8px 12px;
+  background:rgba(8,8,8,.72);
+  border:1px solid rgba(255,255,255,.1);
+  color:var(--yellow);
+  font:700 .78rem/1 'Barlow Condensed',sans-serif;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.product-content{
+  display:grid;
+  gap:12px;
+  padding:18px;
+  direction:ltr;
+  text-align:left;
+  flex:1;
+}
+.product-title{
+  font:400 1.9rem/.92 'Bebas Neue',sans-serif;
+  letter-spacing:.04em;
+}
+.product-meta{
+  color:var(--muted);
+  font-size:.94rem;
+  min-height:2.8em;
+}
+.product-bottom{
+  margin-top:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.product-price{
+  display:grid;
+  gap:3px;
+}
+.product-price small{
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font:700 .75rem/1 'Barlow Condensed',sans-serif;
+}
+.product-price strong{
+  font:400 2rem/.9 'Bebas Neue',sans-serif;
+  letter-spacing:.04em;
+  color:var(--yellow);
+}
+.product-btn{
+  min-height:48px;
+  padding:0 18px;
+  border-radius:999px;
+  background:var(--yellow);
+  color:#080808;
+  font:800 .9rem/1 'Barlow Condensed',sans-serif;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 12px 28px rgba(245,197,0,.22);
+}
+.product-btn:hover{background:#ffd84d}
+.why-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:18px;
+}
+.why-card{
+  padding:24px;
+  border-radius:24px;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(17,17,17,.92));
+  border:1px solid rgba(255,255,255,.08);
+}
+.why-icon{
+  width:56px;
+  height:56px;
+  display:grid;
+  place-items:center;
+  border-radius:18px;
+  margin-bottom:18px;
+  background:linear-gradient(135deg,rgba(245,197,0,.18),rgba(245,197,0,.05));
+  border:1px solid rgba(245,197,0,.18);
+  color:var(--yellow);
+  font:400 1.8rem/1 'Bebas Neue',sans-serif;
+}
+.why-card h3{
+  font:400 1.7rem/.92 'Bebas Neue',sans-serif;
+  margin-bottom:8px;
+  letter-spacing:.04em;
+}
+.why-card p{color:var(--muted);line-height:1.8}
+.footer{
+  width:min(1180px,calc(100% - 32px));
+  margin:0 auto;
+  padding:22px 0 46px;
+}
+.footer-shell{
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  border-radius:28px;
+  padding:24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  flex-wrap:wrap;
+}
+.footer-copy{display:grid;gap:4px}
+.footer-copy strong{
+  font:400 2rem/.9 'Bebas Neue',sans-serif;
+  letter-spacing:.08em;
+}
+.footer-copy span{color:var(--muted)}
+.footer-links{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.footer-link{
+  padding:11px 16px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(8,8,8,.5);
+  font:700 .88rem/1 'Barlow Condensed',sans-serif;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.footer-link:hover{border-color:rgba(245,197,0,.4);color:var(--yellow)}
+.copyright{
+  color:#8c8c8c;
+  font-size:.88rem;
+}
+.loader,.empty,.error{
+  grid-column:1/-1;
+  min-height:220px;
+  padding:24px;
+  border-radius:26px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(17,17,17,.92));
+  color:var(--muted);
+}
+.error{color:#ffd3dc;border-color:rgba(225,29,72,.25)}
+@media (max-width: 980px){
+  .hero{grid-template-columns:1fr;padding-top:28px}
+  .hero-copy{order:2}
+  .hero-visual{order:1;min-height:420px}
+  .hero h1{max-width:none}
+  .hero h1 .fr{text-align:right}
+  .products-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .why-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width: 640px){
+  .topbar-inner{width:min(100% - 20px,1180px);min-height:68px}
+  .top-actions{display:none}
+  .hero,.section,.footer{width:min(100% - 20px,1180px)}
+  .hero{min-height:auto;padding:24px 0 24px}
+  .hero p{font-size:.96rem}
+  .metric{min-width:calc(50% - 6px)}
+  .mockup-frame{transform:none}
+  .products-grid,.why-grid{grid-template-columns:1fr}
+  .section-head,.footer-shell{align-items:flex-start;flex-direction:column}
+  .product-bottom{align-items:flex-start;flex-direction:column}
+  .product-btn{width:100%}
 }
 </style>
 </head>
 <body>
-<header class="topbar">
-  <button class="icon-btn" aria-label="Menu"><span class="hamburger"></span></button>
-  <a class="brand" href="/">ARCO</a>
-  <div class="actions">
-    <button class="icon-btn" aria-label="Search"><span class="search-icon"></span></button>
-    <button class="icon-btn" aria-label="Cart"><span class="bag"><span class="cart-badge">1</span></span></button>
-  </div>
-</header>
+<div class="page-shell">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand-lockup" href="/" aria-label="ARCO Home">
+        <div class="brand-mark">A</div>
+        <div class="brand-copy">
+          <strong>ARCO</strong>
+          <span>Liquid Art Posters</span>
+        </div>
+      </a>
+      <nav class="top-actions" aria-label="Quick links">
+        <a class="ghost-link" href="#products">Shop Posters</a>
+        <a class="ghost-link" href="#why-arco">Why ARCO</a>
+      </nav>
+    </div>
+  </header>
 
-<section class="hero" id="hero">
-  <div class="hero-content">
-    <h1>تصفح آخر منتجاتنا</h1>
-    <a class="btn" href="#products">تصفح الآن</a>
-  </div>
-</section>
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Made for Algeria</div>
+        <h1>
+          لوحات كروية فنية تخطف النظر
+          <span class="fr">LUXURY STREET POSTERS FOR FOOTBALL CULTURE</span>
+        </h1>
+        <p>
+          ARCO يقدم بوسترات Liquid Art Premium مستوحاة من أكبر الأندية لعشاق الكرة في الجزائر.
+          تصميم جريء، طباعة راقية، ودفع عند الاستلام. Premium finish, club energy, and a collector look built for real fans.
+        </p>
+        <div class="hero-metrics" aria-label="ARCO highlights">
+          <div class="metric">
+            <strong>COD</strong>
+            <span>Paiement a la livraison</span>
+          </div>
+          <div class="metric">
+            <strong>48H</strong>
+            <span>Livraison rapide en Algerie</span>
+          </div>
+          <div class="metric">
+            <strong>PREMIUM</strong>
+            <span>Liquid art finish</span>
+          </div>
+        </div>
+        <div class="cta-row">
+          <a class="primary-btn" href="#products">Commander Maintenant</a>
+          <a class="secondary-btn" href="#why-arco">Discover ARCO</a>
+        </div>
+      </div>
 
-<main class="wrap" id="products">
-  <h2 class="section-title">Featured products</h2>
-  <div class="grid" id="products-grid"><div class="loader">Loading products...</div></div>
-</main>
+      <div class="hero-visual">
+        <div class="mockup-frame">
+          <img id="hero-product-image" alt="ARCO poster preview" src="https://images.unsplash.com/photo-1511884642898-4c92249e20b6?auto=format&fit=crop&w=900&q=80">
+          <div class="mockup-badge">Feature <span id="hero-product-name">Liquid Football</span></div>
+          <div class="mockup-price">
+            <small>Starting from</small>
+            <strong id="hero-product-price">2,900 DZD</strong>
+          </div>
+        </div>
+        <div class="hero-glow" aria-hidden="true"></div>
+      </div>
+    </section>
 
-<footer class="footer">ARCO - Cash on Delivery - Algeria</footer>
+    <section class="section" id="products">
+      <div class="section-head">
+        <div class="section-copy">
+          <span class="section-kicker">Collection</span>
+          <h2>Shop Active Posters</h2>
+        </div>
+        <p class="section-note">Choisissez votre club, votre format, puis commandez en quelques secondes partout en Algerie.</p>
+      </div>
+      <div class="products-grid" id="products-grid">
+        <div class="loader">Loading ARCO products...</div>
+      </div>
+    </section>
+
+    <section class="section" id="why-arco">
+      <div class="section-head">
+        <div class="section-copy">
+          <span class="section-kicker">Why ARCO</span>
+          <h2>Premium Feel. Local Delivery.</h2>
+        </div>
+      </div>
+      <div class="why-grid">
+        <article class="why-card">
+          <div class="why-icon">01</div>
+          <h3>Premium Quality</h3>
+          <p>Liquid art style, sharp detail, and a bold finish built to stand out on your wall.</p>
+        </article>
+        <article class="why-card">
+          <div class="why-icon">02</div>
+          <h3>Fast Delivery</h3>
+          <p>Quick processing and dispatch so your poster reaches you fast across Algeria.</p>
+        </article>
+        <article class="why-card">
+          <div class="why-icon">03</div>
+          <h3>Cash on Delivery</h3>
+          <p>Simple ordering flow with payment on delivery for confidence and convenience.</p>
+        </article>
+        <article class="why-card">
+          <div class="why-icon">04</div>
+          <h3>Made for Algeria</h3>
+          <p>A local football-first brand with club culture, Arabic identity, and premium ambition.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-shell">
+      <div class="footer-copy">
+        <strong>ARCO</strong>
+        <span>Premium liquid art football posters for Algeria.</span>
+        <div class="copyright">© <span id="year"></span> ARCO. All rights reserved.</div>
+      </div>
+      <div class="footer-links">
+        <a class="footer-link" href="https://www.instagram.com/" target="_blank" rel="noreferrer">Instagram</a>
+        <a class="footer-link" href="https://wa.me/?text=Salam%20ARCO%2C%20je%20veux%20commander%20un%20poster." target="_blank" rel="noreferrer">WhatsApp</a>
+      </div>
+    </div>
+  </footer>
+</div>
 
 <script>
 const SB_URL='https://zcsdkuzmogvpvqjzhnqu.supabase.co/rest/v1';
@@ -83,8 +668,21 @@ function productImages(p){
   return [...new Set([...base,...variants])];
 }
 function minVariantPrice(p){
-  const prices=Array.isArray(p.variants)?p.variants.map(v=>Number(v.price||0)).filter(Boolean):[];
+  const prices=Array.isArray(p.variants)?p.variants.map(v=>Number(v.price||0)).filter(v=>Number.isFinite(v)&&v>0):[];
   return prices.length?Math.min(...prices):Number(p.price||0);
+}
+function productDescription(p){
+  const variants=Array.isArray(p.variants)?p.variants:[];
+  const sizes=[...new Set(variants.map(v=>v.option2||v.size||v.format).filter(Boolean))];
+  if(sizes.length)return 'Available in '+sizes.slice(0,3).join(' / ');
+  return 'Premium liquid art football poster';
+}
+function setHeroProduct(product){
+  if(!product)return;
+  const image=productImages(product)[0];
+  if(image)document.getElementById('hero-product-image').src=image;
+  document.getElementById('hero-product-name').textContent=product.name||'Liquid Football';
+  document.getElementById('hero-product-price').textContent=money(minVariantPrice(product));
 }
 
 async function loadProducts(){
@@ -93,24 +691,42 @@ async function loadProducts(){
     const res=await fetch(`${SB_URL}/products?select=*&active=eq.true&order=created_at.asc`,{headers:H});
     if(!res.ok)throw new Error(await res.text());
     const products=(await res.json()).sort((a,b)=>(b.slug==='liquid-football')-(a.slug==='liquid-football'));
-    if(!products.length){grid.innerHTML='<div class="empty">قريبا منتجات جديدة.</div>';return;}
-    const heroProduct=products.find(p=>p.slug==='liquid-football')||products[0];
-    const heroImage=productImages(heroProduct)[0];
-    if(heroImage)document.getElementById('hero').style.backgroundImage=`url("${heroImage}")`;
-    grid.innerHTML=products.map(p=>{
+    if(!products.length){
+      grid.innerHTML='<div class="empty">قريباً ستتوفر منتجات جديدة على ARCO.</div>';
+      return;
+    }
+
+    setHeroProduct(products.find(p=>p.slug==='liquid-football')||products[0]);
+
+    grid.innerHTML=products.map((p,index)=>{
       const img=productImages(p)[0];
-      return `<a class="product" href="${productUrl(p.slug)}">
-        <div class="thumb">${img?`<img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy">`:''}<span class="sale">Sale</span></div>
-        <div class="info">
-          <div class="name">${esc(p.name)}</div>
-          <div class="price">${money(minVariantPrice(p))}</div>
+      return `<article class="product-card">
+        <a class="product-media" href="${productUrl(p.slug)}" aria-label="Open ${esc(p.name)}">
+          ${img?`<img src="${esc(img)}" alt="${esc(p.name)}" loading="${index<2?'eager':'lazy'}">`:''}
+          <span class="product-tag">${p.slug==='liquid-football'?'Best Seller':'Active Drop'}</span>
+        </a>
+        <div class="product-content">
+          <div>
+            <h3 class="product-title">${esc(p.name)}</h3>
+            <p class="product-meta">${esc(productDescription(p))}</p>
+          </div>
+          <div class="product-bottom">
+            <div class="product-price">
+              <small>Price from</small>
+              <strong>${money(minVariantPrice(p))}</strong>
+            </div>
+            <a class="product-btn" href="${productUrl(p.slug)}">Order Now</a>
+          </div>
         </div>
-      </a>`;
+      </article>`;
     }).join('');
   }catch(e){
-    grid.innerHTML='<div class="error">تعذر تحميل المنتجات. حاول مرة أخرى لاحقا.</div>';
+    grid.innerHTML='<div class="error">تعذر تحميل المنتجات حالياً. حاول مرة أخرى لاحقاً.</div>';
+    console.error(e);
   }
 }
+
+document.getElementById('year').textContent=new Date().getFullYear();
 loadProducts();
 </script>
 </body>
