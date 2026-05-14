@@ -588,7 +588,9 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         </div>
         </div>
 
-          <!-- STOCK MANAGEMENT -->
+    </div><!-- end page-finance -->
+
+    <!-- STOCK MANAGEMENT -->
     <div class="page" id="page-stock">
       <div class="page-header">
         <div><div class="page-title">STOCK</div><div class="page-subtitle">Variant stock levels &amp; history</div></div>
@@ -966,7 +968,7 @@ function showPage(name){
   if(name==='products')renderProducts();
   if(name==='operators')renderOperators();
   if(name==='finance')updateFinance();
-  if(name==='stock')updateFinance();
+  if(name==='stock'){loadFinanceData().then(()=>{renderStockPage();});}
   if(name==='performance')renderPerformance();
 }
 
@@ -1892,6 +1894,87 @@ async function saveMarkPaid(){
   toast(`${markPaidEmployee.name} — ${fmtDZD(amount)} marked as paid${isPartial?' (partial)':''} ✓`);
   markPaidEmployee=null;
   await updateFinance();
+}
+
+// ── STOCK PAGE ──
+function renderStockPage(){
+  // KPIs
+  const total=allStockItems.length;
+  const low=allStockItems.filter(s=>Number(s.quantity)<=Number(s.low_stock_threshold||0)).length;
+  const totalValue=allStockItems.reduce((s,i)=>s+Number(i.quantity||0)*Number(i.cost_per_unit||0),0);
+  // Usage today
+  const todayStr=new Date().toISOString().split('T')[0];
+  const todayUsage=allStockUsage.filter(u=>u.created_at&&u.created_at.startsWith(todayStr)).reduce((s,u)=>s+Number(u.quantity_used||0),0);
+  const setKpi=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  setKpi('stk-kpi-total',total);
+  setKpi('stk-kpi-low',low);
+  setKpi('stk-kpi-today',todayUsage);
+  setKpi('stk-kpi-value',fmtDZD(totalValue));
+  // Stock levels list
+  const listEl=document.getElementById('stock-page-list');
+  if(listEl){
+    if(!allStockItems.length){
+      listEl.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📦</div><div class="empty-text">No stock items yet. Click + Add Item to start.</div></div>';
+    } else {
+      listEl.innerHTML=allStockItems.map(s=>{
+        const isLow=Number(s.quantity)<=Number(s.low_stock_threshold||0);
+        return`<div class="stock-row" style="${isLow?'border-left:3px solid var(--red);padding-left:12px;':''}">  
+          <div style="flex:1">
+            <div class="stock-name">${esc(s.name)}</div>
+            <div class="stock-meta">${esc(s.size||'')} · ${esc(s.unit||'units')} · ${fmtDZD(s.cost_per_unit||0)}/unit</div>
+            ${isLow?`<div style="font-size:11px;color:var(--red);margin-top:2px">⚠️ Below threshold (${s.low_stock_threshold})</div>`:''}
+          </div>
+          <div class="stock-qty ${isLow?'stock-low':'stock-ok'}" style="font-family:'Bebas Neue',sans-serif;font-size:24px">${Number(s.quantity).toLocaleString()}</div>
+          <div class="stock-actions">
+            <button class="btn btn-ghost btn-sm" onclick="openRestock(${s.id},'${esc(s.name)}')">+ Stock</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteStockItem(${s.id})">&#x1F5D1;</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
+  // Usage history
+  populateStockPageUsageFilter();
+  renderStockPageUsage();
+}
+function populateStockPageUsageFilter(){
+  const sel=document.getElementById('stock-page-usage-filter');
+  if(!sel)return;
+  const cur=sel.value||'all';
+  sel.innerHTML='<option value="all">All Items</option>'+allStockItems.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('');
+  sel.value=[...sel.options].some(o=>o.value===cur)?cur:'all';
+}
+function renderStockPageUsage(){
+  const el=document.getElementById('stock-page-usage-list');
+  if(!el)return;
+  const filter=document.getElementById('stock-page-usage-filter')?.value||'all';
+  const rows=allStockUsage.filter(u=>filter==='all'||String(u.stock_item_id)===String(filter));
+  if(!rows.length){
+    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📉</div><div class="empty-text">No usage recorded yet</div></div>';
+    return;
+  }
+  el.innerHTML=rows.map(u=>{
+    const item=allStockItems.find(i=>String(i.id)===String(u.stock_item_id));
+    return`<div class="history-row">
+      <div>
+        <div class="history-title">${esc(item?.name||'Unknown item')}</div>
+        <div class="history-meta">${esc(item?.size||'')} · ${fmtDate(u.created_at)}</div>
+        <div class="history-meta">${u.order_id?`Order #${esc(u.order_id)}`:(u.production_log_id?`Production log #${u.production_log_id}`:'Manual')}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red)">-${Number(u.quantity_used||0).toLocaleString()}</div>
+        <button class="btn btn-danger btn-sm" style="margin-top:4px;padding:3px 8px" onclick="deleteStockUsageLog(${u.id})">&#x1F5D1;</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openManualStockAdjust(){
+  // Reuse the restock modal for manual adjustment
+  if(!allStockItems.length){toast('No stock items to adjust',true);return;}
+  // Build a simple picker
+  const item=allStockItems[0];
+  openRestock(item.id,item.name);
+  document.querySelector('#restock-modal .modal-title').textContent='MANUAL STOCK ADJUST';
 }
 
 // ── HELPERS ──
