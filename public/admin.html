@@ -130,6 +130,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 .btn-ghost{background:rgba(255,255,255,0.05);color:var(--white);border:1px solid rgba(255,255,255,0.1)}
 .btn-ghost:hover{background:rgba(255,255,255,0.09)}
 .btn-sm{padding:6px 12px;font-size:12px;border-radius:9px}
+.btn:disabled{opacity:0.45;cursor:not-allowed;transform:none}
 
 /* PRODUCTS GRID */
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
@@ -257,9 +258,27 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 .material-kpi .material-name{font-size:12px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
 .material-kpi .material-qty{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:var(--yellow)}
 .material-kpi .material-meta{font-size:11px;color:var(--gray2);margin-top:4px}
+.stock-product-group{border:1px solid rgba(255,255,255,0.06);border-radius:16px;background:rgba(255,255,255,0.02);overflow:hidden}
+.stock-product-group + .stock-product-group{margin-top:10px}
+.stock-product-header{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 14px 12px;background:none;border:none;color:inherit;cursor:pointer;text-align:left}
+.stock-product-header:hover{background:rgba(255,255,255,0.02)}
+.stock-product-main{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.stock-product-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:1px;text-transform:uppercase;font-weight:700;color:var(--white)}
+.stock-product-sub{font-size:11px;color:var(--gray)}
+.stock-product-tools{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.stock-product-count{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--yellow)}
+.stock-product-chevron{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;color:var(--gray)}
+.stock-product-body{display:none;padding:0 14px 14px}
+.stock-product-group.open .stock-product-body{display:block}
+.stock-product-group.open .stock-product-chevron{color:var(--yellow)}
+.stock-product-empty{padding:12px 0 0;font-size:13px;color:var(--gray2)}
 .emp-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:16px;margin-bottom:12px}
 .emp-name{font-weight:700;font-size:15px;margin-bottom:2px}
 .emp-role{font-size:11px;color:var(--gray);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-bottom:10px}
+.emp-status{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;border:1px solid transparent;margin-bottom:10px}
+.emp-status-paid{background:rgba(34,197,94,0.08);color:var(--green);border-color:rgba(34,197,94,0.2)}
+.emp-status-partial{background:rgba(245,197,0,0.08);color:var(--yellow);border-color:rgba(245,197,0,0.2)}
+.emp-status-due{background:rgba(225,29,72,0.08);color:var(--red);border-color:rgba(225,29,72,0.18)}
 .emp-owed{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--yellow)}
 .emp-owed-label{font-size:11px;color:var(--gray);margin-bottom:10px}
 .exp-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px}
@@ -533,6 +552,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-label">Cost / Order</div><div class="kpi-value" id="fin-cpo">—</div><div class="kpi-sub">Per delivered order</div></div>
         <div class="kpi-card"><div class="kpi-icon">🖼️</div><div class="kpi-label">Frames Made</div><div class="kpi-value" id="fin-frames">—</div><div class="kpi-sub">In period</div></div>
         <div class="kpi-card"><div class="kpi-icon">👩‍💼</div><div class="kpi-label">Staff Costs</div><div class="kpi-value" id="fin-staffcost">—</div><div class="kpi-sub">Employee pay</div></div>
+        <div class="kpi-card hi"><div class="kpi-icon">📦</div><div class="kpi-label">Stock Value</div><div class="kpi-value" id="fin-stock-value">—</div><div class="kpi-sub">At cost price</div></div>
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px">
@@ -546,17 +566,6 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           <div id="production-log-list" style="max-height:300px;overflow-y:auto"></div>
         </div>
 
-        <!-- STOCK -->
-        <div class="glass-card" style="padding:20px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">STOCK LEVELS</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="btn btn-ghost btn-sm" onclick="openAddStock('ready_to_ship')">+ Ready Stock</button>
-              <button class="btn btn-ghost btn-sm" onclick="openAddStock('production_material')">+ Materials</button>
-            </div>
-          </div>
-          <div id="stock-list"></div>
-        </div>
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px">
@@ -638,7 +647,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           <div class="stock-section-title">
             <div>
               <strong>READY TO SHIP</strong>
-              <span>Finished posters ready for dispatch</span>
+              <span>Grouped by active product. Tap a product to expand or collapse its variants.</span>
             </div>
             <button class="btn btn-ghost btn-sm" onclick="openAddStock('ready_to_ship')">+ Add</button>
           </div>
@@ -845,19 +854,20 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <div class="modal-title">MARK AS PAID</div>
       <button class="modal-close" onclick="closeModal('markpaid-modal')">×</button>
     </div>
-    <div class="modal-body">
-      <div id="markpaid-desc" style="font-size:14px;color:var(--gray);margin-bottom:8px"></div>
-      <div id="markpaid-owed-display" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--yellow);margin-bottom:16px"></div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Period Start</label><input class="form-input" id="markpaid-start" type="date"/></div>
-        <div class="form-field"><label class="form-label">Period End</label><input class="form-input" id="markpaid-end" type="date"/></div>
-      </div>
+      <div class="modal-body">
+        <div id="markpaid-desc" style="font-size:14px;color:var(--gray);margin-bottom:8px"></div>
+        <div id="markpaid-owed-display" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--yellow);margin-bottom:16px"></div>
+        <div id="markpaid-paid-display" style="font-size:12px;color:var(--gray);margin-bottom:14px"></div>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Period Start</label><input class="form-input" id="markpaid-start" type="date"/></div>
+          <div class="form-field"><label class="form-label">Period End</label><input class="form-input" id="markpaid-end" type="date"/></div>
+        </div>
       <div class="form-field">
         <label class="form-label">Amount Paid (DZD)</label>
         <input class="form-input" id="markpaid-amount" type="number" min="0"/>
         <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('markpaid-amount').value=Math.round(markPaidEmployee?.owed||0)">Pay Full</button>
-          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('markpaid-amount').value=Math.round((markPaidEmployee?.owed||0)/2)">Pay Half</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('markpaid-amount').value=Math.round(markPaidEmployee?.remaining||0)">Pay Full</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('markpaid-amount').value=Math.round((markPaidEmployee?.remaining||0)/2)">Pay Half</button>
         </div>
       </div>
       <div class="form-field"><label class="form-label">Note (optional)</label><input class="form-input" id="markpaid-note" placeholder="e.g. Advance payment, fund request..."/></div>
@@ -1561,6 +1571,15 @@ function inFinRange(dateStr,range){
   const d=new Date(dateStr);
   return d>=range.from&&d<range.to;
 }
+function payLogInRange(log,range){
+  if(!range)return true;
+  const start=log?.period_start?new Date(log.period_start):null;
+  const end=log?.period_end?new Date(log.period_end):null;
+  if(start&&end){
+    return end>=range.from&&start<range.to;
+  }
+  return inFinRange(log?.paid_at||log?.created_at,range);
+}
 
 async function updateFinance(){
   await loadFinanceData();
@@ -1588,6 +1607,7 @@ async function updateFinance(){
   // Printer pay: 450 DZD per sqm printed (from production logs)
   const printerSqm=periodLogs.reduce((s,l)=>s+Number(l.print_sqm||0),0);
   const printerPay=printerSqm*450;
+  const stockValue=allStockItems.reduce((s,i)=>s+Number(i.quantity||0)*Number(i.cost_per_unit||0),0);
 
   const staffCost=frameMakerPay+operatorPay+printGuyPay+printerPay;
   const totalExp=expTotal+staffCost;
@@ -1603,6 +1623,7 @@ async function updateFinance(){
   document.getElementById('fin-cpo').textContent=fmtDZD(cpo);
   document.getElementById('fin-frames').textContent=totalFrames;
   document.getElementById('fin-staffcost').textContent=fmtDZD(staffCost);
+  document.getElementById('fin-stock-value').textContent=fmtDZD(stockValue);
 
   renderProductionLogs(periodLogs);
   renderStockList(true);// trigger ntfy alert check on each finance load
@@ -1620,6 +1641,15 @@ function countThursdays(range){
   const d=new Date(range.from);
   while(d<=range.to){if(d.getDay()===4)count++;d.setDate(d.getDate()+1);}
   return count;
+}
+
+function getEmployeePaySummary(key,grossOwed,range){
+  const logs=allPayLogs.filter(p=>normalizeEmployeeRole(p.employee_role)===key)
+    .filter(p=>payLogInRange(p,range));
+  const paid=logs.reduce((s,p)=>s+Number(p.amount_paid||0),0);
+  const remaining=Math.max(0,Number(grossOwed||0)-paid);
+  const status=remaining<=0&&paid>0?'paid':paid>0?'partial':'due';
+  return {paid,remaining,status,gross:Number(grossOwed||0)};
 }
 
 function fmtDZD(n){return Math.round(n).toLocaleString()+' DZD';}
@@ -1649,12 +1679,22 @@ function stockItemsByKind(items){
     material:items.filter(i=>inferStockKind(i)==='production_material'),
   };
 }
+const READY_STOCK_OPEN_KEY='arco_ready_stock_open_products';
+let readyStockOpenProducts=new Set();
+try{
+  const saved=JSON.parse(localStorage.getItem(READY_STOCK_OPEN_KEY)||'[]');
+  if(Array.isArray(saved))readyStockOpenProducts=new Set(saved);
+}catch(e){}
+
 function stockRowMarkup(s,opts={}){
   const low=Number(s.quantity)<=Number(s.low_stock_threshold||0);
   const kind=inferStockKind(s);
   const kindClass=kind==='production_material'?'stock-type-material':'stock-type-ready';
   const kindLabel=stockKindLabel(kind);
   const allowDeduct=opts.allowDeduct??kind==='ready_to_ship';
+  const title=opts.title||s.name;
+  const metaParts=opts.metaParts||[s.size,s.unit||'units',`${fmtDZD(s.cost_per_unit||0)}/unit`];
+  const meta=metaParts.filter(Boolean).map(v=>esc(String(v))).join(' · ');
   const actions=opts.actions===false?'':`
       <div class="stock-actions">
         <button class="btn btn-ghost btn-sm" onclick="openRestock(${s.id},'${esc(s.name)}')">+ Qty</button>
@@ -1664,8 +1704,8 @@ function stockRowMarkup(s,opts={}){
   return `<div class="stock-row">
       <div style="flex:1;min-width:0">
         <div class="stock-type-badge ${kindClass}">${kindLabel}</div>
-        <div class="stock-name">${esc(s.name)}</div>
-        <div class="stock-meta">${esc(s.size||'')} · ${esc(s.unit||'units')} · ${fmtDZD(s.cost_per_unit||0)}/unit</div>
+        <div class="stock-name">${esc(title)}</div>
+        <div class="stock-meta">${meta}</div>
         ${low?`<div style="font-size:11px;color:var(--red);margin-top:2px">⚠️ Low stock!</div>`:''}
       </div>
       <div class="stock-qty ${low?'stock-low':'stock-ok'}">${Number(s.quantity).toLocaleString()}</div>
@@ -1680,6 +1720,84 @@ function renderStockGroup(target, items, title, subtitle, emptyText, opts={}){
     return;
   }
   el.innerHTML=items.map(s=>stockRowMarkup(s,opts)).join('');
+}
+
+function persistReadyStockOpenProducts(){
+  localStorage.setItem(READY_STOCK_OPEN_KEY,JSON.stringify([...readyStockOpenProducts]));
+}
+function toggleReadyStockProduct(slug){
+  if(!slug)return;
+  if(readyStockOpenProducts.has(slug))readyStockOpenProducts.delete(slug);
+  else readyStockOpenProducts.add(slug);
+  persistReadyStockOpenProducts();
+  if(currentAdminPage==='stock')renderStockPage();
+}
+function getReadyStockGroups(items){
+  const activeProducts=getActiveProducts();
+  const grouped=new Map();
+  const orphans=[];
+  items.forEach(item=>{
+    const slug=String(item.product_slug||'').trim();
+    if(slug&&activeProducts.some(p=>String(p.slug)===slug)){
+      if(!grouped.has(slug))grouped.set(slug,[]);
+      grouped.get(slug).push(item);
+    }else{
+      orphans.push(item);
+    }
+  });
+  return {activeProducts,grouped,orphans};
+}
+function renderReadyStockAccordion(items){
+  const el=document.getElementById('stock-ready-list');
+  if(!el)return;
+  const {activeProducts,grouped,orphans}=getReadyStockGroups(items);
+  const productBlocks=activeProducts.map(product=>{
+    const slug=String(product.slug||'');
+    const rows=[...(grouped.get(slug)||[])].sort((a,b)=>{
+      const aLabel=String(a.variant_label||a.size||a.name||'').toLowerCase();
+      const bLabel=String(b.variant_label||b.size||b.name||'').toLowerCase();
+      return aLabel.localeCompare(bLabel);
+    });
+    const isOpen=readyStockOpenProducts.has(slug);
+    const totalQty=rows.reduce((s,i)=>s+Number(i.quantity||0),0);
+    const totalValue=rows.reduce((s,i)=>s+Number(i.quantity||0)*Number(i.cost_per_unit||0),0);
+    return `<div class="stock-product-group ${isOpen?'open':''}">
+      <div class="stock-product-header" role="button" tabindex="0" onclick="toggleReadyStockProduct('${esc(slug)}')">
+        <div class="stock-product-main">
+          <div class="stock-product-name">${esc(product.name||slug||'Product')}</div>
+          <div class="stock-product-sub">${rows.length} variant${rows.length===1?'':'s'} · ${totalQty.toLocaleString()} units · ${fmtDZD(totalValue)}</div>
+        </div>
+        <div class="stock-product-tools">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openAddStock('ready_to_ship','${esc(slug)}')">+ Add</button>
+          <div class="stock-product-count">${rows.length}</div>
+          <div class="stock-product-chevron">${isOpen?'−':'+'}</div>
+        </div>
+      </div>
+      <div class="stock-product-body">
+        ${rows.length?rows.map(row=>stockRowMarkup(
+          {...row,name:`${product.name||'Product'} - ${row.variant_label||row.size||row.name||'Variant'}`,size:row.variant_label||row.size||''},
+          {allowDeduct:true,title:row.variant_label||row.size||row.name||'Variant',metaParts:[product.name,row.variant_label||row.size,row.unit||'units',`${fmtDZD(row.cost_per_unit||0)}/unit`]}
+        )).join(''):`<div class="stock-product-empty">No stock added for this product yet.</div>`}
+      </div>
+    </div>`;
+  }).join('');
+  const orphanBlock=orphans.length?`
+    <div class="stock-product-group open">
+      <div class="stock-product-header" role="button" tabindex="0" onclick="this.parentElement.classList.toggle('open')">
+        <div class="stock-product-main">
+          <div class="stock-product-name">Unlinked / Legacy</div>
+          <div class="stock-product-sub">${orphans.length} item${orphans.length===1?'':'s'} without an active product link</div>
+        </div>
+        <div class="stock-product-tools">
+          <div class="stock-product-count">${orphans.length}</div>
+          <div class="stock-product-chevron">+</div>
+        </div>
+      </div>
+      <div class="stock-product-body">
+        ${orphans.map(row=>stockRowMarkup(row,{allowDeduct:true})).join('')}
+      </div>
+    </div>`:'';
+  el.innerHTML=productBlocks+orphanBlock||'<div class="stock-section-empty">No ready-to-ship stock yet.</div>';
 }
 
 function renderProductionLogs(logs){
@@ -1728,23 +1846,34 @@ function renderStockList(triggerAlerts=false){
 function renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,printGuyPay,printerPay=0,printerSqm=0){
   const el=document.getElementById('employee-pay-list');
   const employees=[
-    {key:'frame_maker',name:'Frame Maker',role:'Production & Packing',owed:frameMakerPay,basis:`${allProductionLogs.filter(l=>inFinRange(l.date,range)).reduce((s,l)=>s+(l.m_frames||0)+(l.l_frames||0)+(l.xl_frames||0)+(l.xxl_frames||0),0)} frames produced`},
-    {key:'operator',name:'Operator Girl',role:'Order Confirmation',owed:operatorPay,basis:`${deliveredOrders.length} delivered orders × 150 DZD`},
-    {key:'print_guy',name:'Print File Guy',role:'Print & Shipping Prep',owed:printGuyPay,basis:`${countThursdays(range)} Thursdays × 2,000 DZD`},
-    {key:'printer',name:'Printer',role:'Printing',owed:printerPay,basis:`${printerSqm.toFixed(2)} m² × 450 DZD`},
+    {key:'frame_maker',name:'Frame Maker',role:'Production & Packing',gross:frameMakerPay,basis:`${allProductionLogs.filter(l=>inFinRange(l.date,range)).reduce((s,l)=>s+(l.m_frames||0)+(l.l_frames||0)+(l.xl_frames||0)+(l.xxl_frames||0),0)} frames produced`},
+    {key:'operator',name:'Operator Girl',role:'Order Confirmation',gross:operatorPay,basis:`${deliveredOrders.length} delivered orders × 150 DZD`},
+    {key:'print_guy',name:'Print File Guy',role:'Print & Shipping Prep',gross:printGuyPay,basis:`${countThursdays(range)} Thursdays × 2,000 DZD`},
+    {key:'printer',name:'Printer',role:'Printing',gross:printerPay,basis:`${printerSqm.toFixed(2)} m² × 450 DZD`},
   ];
-  el.innerHTML=employees.map(e=>`
+  el.innerHTML=employees.map(e=>{
+    const summary=getEmployeePaySummary(e.key,e.gross,range);
+    const paidText=summary.paid?fmtDZD(summary.paid):'0 DZD';
+    const owedText=summary.remaining<=0&&summary.paid>0?'PAID':fmtDZD(summary.remaining);
+    const statusClass=summary.status==='paid'?'emp-status-paid':summary.status==='partial'?'emp-status-partial':'emp-status-due';
+    const actionBtn=summary.remaining<=0&&summary.paid>0
+      ?`<button class="btn btn-ghost btn-sm" disabled>Paid ✓</button>`
+      :`<button class="btn btn-ghost btn-sm" onclick="openMarkPaid('${e.key}','${e.name}',${summary.remaining},${summary.gross},${summary.paid})">Mark Paid</button>`;
+    return `
     <div class="emp-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div style="min-width:0">
           <div class="emp-name">${e.name}</div>
           <div class="emp-role">${e.role}</div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="openMarkPaid('${e.key}','${e.name}',${e.owed})">Mark Paid</button>
+        ${actionBtn}
       </div>
-      <div class="emp-owed">${fmtDZD(e.owed)}</div>
+      <div class="emp-status ${statusClass}">${summary.status==='paid'?'Paid':summary.status==='partial'?'Partial':'Due'}</div>
+      <div class="emp-owed">${owedText}</div>
+      <div class="emp-owed-label">Paid ${paidText} · Owed ${fmtDZD(summary.gross)}</div>
       <div class="emp-owed-label">${e.basis}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function renderExpenses(expenses){
@@ -1807,7 +1936,7 @@ function renderPayHistory(){
   const range=getFinPeriodRange();
   const rows=allPayLogs
     .filter(p=>filter==='all'||normalizeEmployeeRole(p.employee_role)===filter)
-    .filter(p=>inFinRange(p.paid_at||p.created_at||p.period_end,range));
+    .filter(p=>payLogInRange(p,range));
   if(!rows.length){
     el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">💸</div><div class="empty-text">No payments in this period</div></div>';
     return;
@@ -1980,18 +2109,19 @@ async function deleteExpense(id){
 }
 
 // ── MARK PAID ──
-function openMarkPaid(key,name,owed){
-  markPaidEmployee={key,name};
+function openMarkPaid(key,name,remaining,grossOwed,paidSoFar){
+  markPaidEmployee={key,name,remaining:Number(remaining||0),grossOwed:Number(grossOwed||remaining||0),paidSoFar:Number(paidSoFar||0)};
   document.getElementById('markpaid-desc').textContent=`Marking payment for ${name}`;
-  document.getElementById('markpaid-amount').value=Math.round(owed);
-  document.getElementById('markpaid-owed-display').textContent=`Total owed: ${fmtDZD(owed)}`;
+  document.getElementById('markpaid-amount').value=Math.round(markPaidEmployee.remaining);
+  document.getElementById('markpaid-owed-display').textContent=`Remaining due: ${fmtDZD(markPaidEmployee.remaining)}`;
+  const paidLine=document.getElementById('markpaid-paid-display');
+  if(paidLine)paidLine.textContent=`Paid this period: ${fmtDZD(markPaidEmployee.paidSoFar)} · Total owed: ${fmtDZD(markPaidEmployee.grossOwed)}`;
   const now=new Date();
   const start=new Date(now.getFullYear(),now.getMonth(),1);
   document.getElementById('markpaid-start').value=start.toISOString().split('T')[0];
   document.getElementById('markpaid-end').value=now.toISOString().split('T')[0];
   // Pre-fill full amount
-  document.getElementById('markpaid-amount').value=Math.round(owed);
-  markPaidEmployee.owed=owed;
+  document.getElementById('markpaid-amount').value=Math.round(markPaidEmployee.remaining);
   document.getElementById('markpaid-modal').classList.add('open');
 }
 async function saveMarkPaid(){
@@ -2000,13 +2130,13 @@ async function saveMarkPaid(){
   const start=document.getElementById('markpaid-start').value;
   const end=document.getElementById('markpaid-end').value;
   const note=document.getElementById('markpaid-note')?.value||'';
-  const isPartial=amount<(markPaidEmployee.owed||amount);
+  const isPartial=amount<(markPaidEmployee.remaining||amount);
   await sb.from('employee_pay_log').insert({
     employee_name:markPaidEmployee.name,
     employee_role:markPaidEmployee.key,
     period_start:start,
     period_end:end,
-    amount_owed:markPaidEmployee.owed||amount,
+    amount_owed:markPaidEmployee.grossOwed||amount,
     amount_paid:amount,
     note:note||(isPartial?'Partial payment':'Full payment'),
     paid_at:new Date().toISOString()
@@ -2314,7 +2444,7 @@ async function saveRestock(){
   await updateFinance();
   if(currentAdminPage==='stock')renderStockPage();
 }
-function openAddStock(kind='ready_to_ship'){
+function openAddStock(kind='ready_to_ship',selectedProductSlug=''){
   ['stk-name','stk-size','stk-unit','stk-cost','stk-qty','stk-threshold'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('stk-unit').value='pieces';
   const normalized=normalizeStockKind(kind)||'ready_to_ship';
@@ -2323,6 +2453,10 @@ function openAddStock(kind='ready_to_ship'){
   const titleEl=document.getElementById('stock-modal-title');
   if(titleEl)titleEl.textContent=normalized==='production_material'?'ADD MATERIAL STOCK':'ADD READY STOCK';
   syncStockModalFields(normalized);
+  if(normalized==='ready_to_ship'&&selectedProductSlug){
+    populateReadyStockProducts(selectedProductSlug);
+    populateReadyStockVariants();
+  }
   document.getElementById('stock-modal').classList.add('open');
 }
 
@@ -2393,7 +2527,7 @@ function renderStockPage(){
         }).join('')
       :'<div class="stock-section-empty">No production materials yet.</div>';
   }
-  renderStockGroup('stock-ready-list',groups.ready,'READY TO SHIP','Finished posters ready for dispatch','No ready-to-ship stock yet.',{allowDeduct:true});
+  renderReadyStockAccordion(groups.ready);
   renderStockGroup('stock-material-list',groups.material,'PRODUCTION MATERIALS','Boards, paper and workshop inputs','No production materials yet.');
   populateStockPageUsageFilter();
   renderStockPageUsage();
