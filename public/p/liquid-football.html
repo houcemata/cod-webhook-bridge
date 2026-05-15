@@ -1062,6 +1062,7 @@ let shippingRates = {};
 let noestDesks = null;
 let currentShippingCost = 0;
 let checkoutTracked = false;
+let clubImageSwapToken = 0;
 
 // ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
@@ -1097,12 +1098,24 @@ function selectClub(el, idx) {
   // Switch image with animation
   const img = document.getElementById('hero-img');
   const tag = document.getElementById('club-tag');
+  const nextSrc = selectedClub.image;
+  const swapToken = ++clubImageSwapToken;
   img.classList.add('switching');
-  setTimeout(() => {
-    img.src = selectedClub.image;
+  const finishSwap = () => {
+    if (swapToken !== clubImageSwapToken) return;
+    img.src = nextSrc;
     tag.textContent = selectedClub.label.toUpperCase();
-    img.classList.remove('switching');
-  }, 250);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (swapToken === clubImageSwapToken) img.classList.remove('switching');
+      });
+    });
+  };
+  const preloader = new Image();
+  preloader.onload = finishSwap;
+  preloader.onerror = finishSwap;
+  preloader.src = nextSrc;
+  if (preloader.complete && preloader.naturalWidth) finishSwap();
   updateGlow(idx);
   updateReminder();
 }
