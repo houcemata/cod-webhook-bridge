@@ -239,7 +239,19 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 .stock-qty{font-family:'Bebas Neue',sans-serif;font-size:22px;margin-left:auto;flex-shrink:0}
 .stock-low{color:var(--red)}
 .stock-ok{color:var(--green)}
+.stock-type-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.1);margin-bottom:4px}
+.stock-type-ready{background:rgba(34,197,94,0.08);color:var(--green);border-color:rgba(34,197,94,0.22)}
+.stock-type-material{background:rgba(245,197,0,0.08);color:var(--yellow);border-color:rgba(245,197,0,0.2)}
 .stock-actions{display:flex;gap:6px;flex-shrink:0}
+.stock-section{border:1px solid rgba(255,255,255,0.06);border-radius:18px;background:rgba(255,255,255,0.02);padding:16px}
+.stock-section + .stock-section{margin-top:14px}
+.stock-section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.stock-section-title strong{font-family:'Barlow Condensed',sans-serif;font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--white)}
+.stock-section-title span{font-size:11px;color:var(--gray)}
+.stock-section-empty{padding:20px 14px;border:1px dashed rgba(255,255,255,0.12);border-radius:14px;color:var(--gray2);font-size:13px;text-align:center}
+.stock-split-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.stock-split-grid .stock-section{margin-top:0}
+.stock-actions .btn{white-space:nowrap}
 .emp-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:16px;margin-bottom:12px}
 .emp-name{font-weight:700;font-size:15px;margin-bottom:2px}
 .emp-role{font-size:11px;color:var(--gray);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-bottom:10px}
@@ -533,7 +545,10 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         <div class="glass-card" style="padding:20px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
             <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">STOCK LEVELS</div>
-            <button class="btn btn-ghost btn-sm" onclick="openAddStock()">+ Add Item</button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-ghost btn-sm" onclick="openAddStock('ready_to_ship')">+ Ready Stock</button>
+              <button class="btn btn-ghost btn-sm" onclick="openAddStock('production_material')">+ Materials</button>
+            </div>
           </div>
           <div id="stock-list"></div>
         </div>
@@ -595,7 +610,8 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <div class="page-header">
         <div><div class="page-title">STOCK</div><div class="page-subtitle">Variant stock levels &amp; history</div></div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" onclick="openAddStock()">+ Add Item</button>
+          <button class="btn btn-ghost" onclick="openAddStock('ready_to_ship')">+ Ready Stock</button>
+          <button class="btn btn-ghost" onclick="openAddStock('production_material')">+ Materials</button>
           <button class="btn btn-primary" onclick="openManualStockAdjust()">✏️ Adjust</button>
         </div>
       </div>
@@ -603,23 +619,41 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <!-- Stock KPIs -->
       <div class="kpi-grid" style="margin-bottom:20px">
         <div class="kpi-card hi"><div class="kpi-icon">📦</div><div class="kpi-label">Total Items</div><div class="kpi-value" id="stk-kpi-total">—</div><div class="kpi-sub">Tracked variants</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🟢</div><div class="kpi-label">Ready Stock</div><div class="kpi-value" id="stk-kpi-ready">—</div><div class="kpi-sub">Ready to ship</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🪵</div><div class="kpi-label">Materials</div><div class="kpi-value" id="stk-kpi-material">—</div><div class="kpi-sub">Production inputs</div></div>
         <div class="kpi-card"><div class="kpi-icon">⚠️</div><div class="kpi-label">Low Stock</div><div class="kpi-value" id="stk-kpi-low" style="color:var(--red)">—</div><div class="kpi-sub">Below threshold</div></div>
-        <div class="kpi-card"><div class="kpi-icon">🔄</div><div class="kpi-label">Usage Today</div><div class="kpi-value" id="stk-kpi-today">—</div><div class="kpi-sub">Units deducted</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🔄</div><div class="kpi-label">Usage Today</div><div class="kpi-value" id="stk-kpi-today">—</div><div class="kpi-sub">Materials deducted</div></div>
         <div class="kpi-card"><div class="kpi-icon">📈</div><div class="kpi-label">Total Value</div><div class="kpi-value" id="stk-kpi-value">—</div><div class="kpi-sub">At cost price</div></div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-        <!-- Stock Levels -->
+      <div class="stock-split-grid" style="margin-bottom:16px">
         <div class="glass-card" style="padding:20px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">STOCK LEVELS</div>
+          <div class="stock-section-title">
+            <div>
+              <strong>READY TO SHIP</strong>
+              <span>Finished posters ready for dispatch</span>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="openAddStock('ready_to_ship')">+ Add</button>
           </div>
-          <div id="stock-page-list"></div>
+          <div id="stock-ready-list"></div>
         </div>
+        <div class="glass-card" style="padding:20px">
+          <div class="stock-section-title">
+            <div>
+              <strong>PRODUCTION MATERIALS</strong>
+              <span>Boards, paper and workshop inputs</span>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="openAddStock('production_material')">+ Add</button>
+          </div>
+          <div id="stock-material-list"></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
         <!-- Usage History -->
         <div class="glass-card" style="padding:20px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">USAGE HISTORY</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">PRODUCTION MATERIAL USAGE</div>
             <select class="filter-select" id="stock-page-usage-filter" onchange="renderStockPageUsage()" style="width:auto;min-width:140px">
               <option value="all">All Items</option>
             </select>
@@ -743,6 +777,13 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <button class="modal-close" onclick="closeModal('stock-modal')">×</button>
     </div>
     <div class="modal-body">
+      <div class="form-field">
+        <label class="form-label">Stock Type</label>
+        <select class="form-select" id="stk-kind">
+          <option value="ready_to_ship">Ready to Ship</option>
+          <option value="production_material">Production Material</option>
+        </select>
+      </div>
       <div class="form-row">
         <div class="form-field"><label class="form-label">Item Name</label><input class="form-input" id="stk-name" placeholder="e.g. M Board (30×40)"/></div>
         <div class="form-field"><label class="form-label">Size / Type</label><input class="form-input" id="stk-size" placeholder="e.g. 30×40cm"/></div>
@@ -829,7 +870,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <div class="form-field"><label class="form-label">Main Image URL</label><input class="form-input" id="p-image" placeholder="https://..."/></div>
       <div class="variant-builder">
         <div class="form-label">Variants</div>
-        <div class="variant-help">Use Shopify-style options. Example: option name <b>Club</b> with values <b>RMA, FCB, MCA</b>, then option name <b>Taille</b> with values <b>30x40cm, 40x60cm</b>. Click Generate to edit each combination price and image.</div>
+        <div class="variant-help">Use the two-option builder. Example: option name <b>Club</b> with values <b>RMA, FCB, MCA</b>, then option name <b>Taille</b> with values <b>30x40cm, 40x60cm</b>. Click Generate to edit each combination price and image.</div>
         <div class="form-row">
           <div class="form-field"><label class="form-label">Option 1 Name</label><input class="form-input" id="p-opt1-name" placeholder="Club"/></div>
           <div class="form-field"><label class="form-label">Option 1 Values</label><input class="form-input" id="p-opt1-values" placeholder="RMA, FCB, MCA"/></div>
@@ -1547,6 +1588,61 @@ function countThursdays(range){
 
 function fmtDZD(n){return Math.round(n).toLocaleString()+' DZD';}
 function fmtDate(v){return v?new Date(v).toLocaleDateString('fr-DZ'):'-';}
+function normalizeStockKind(value){
+  const v=String(value||'').toLowerCase().trim();
+  if(v==='ready_to_ship'||v==='ready-to-ship'||v==='ready')return'ready_to_ship';
+  if(v==='production_material'||v==='production-material'||v==='material'||v==='materials')return'production_material';
+  return v;
+}
+function inferStockKind(item){
+  const explicit=normalizeStockKind(item?.stock_kind||item?.kind||item?.category);
+  if(explicit==='ready_to_ship'||explicit==='production_material')return explicit;
+  const hay=[item?.name,item?.size,item?.unit].filter(Boolean).join(' ').toLowerCase();
+  if(/board|wood|ply|mdf|panel|sheet|material|production|raw|frame board|لوح/.test(hay))return'production_material';
+  return'ready_to_ship';
+}
+function stockKindLabel(kind){
+  return inferStockKind({stock_kind:kind})==='production_material'?'Production Materials':'Ready to Ship';
+}
+function stockItemGroupLabel(kind){
+  return kind==='production_material'?'PRODUCTION MATERIALS':'READY TO SHIP';
+}
+function stockItemsByKind(items){
+  return{
+    ready:items.filter(i=>inferStockKind(i)==='ready_to_ship'),
+    material:items.filter(i=>inferStockKind(i)==='production_material'),
+  };
+}
+function stockRowMarkup(s,opts={}){
+  const low=Number(s.quantity)<=Number(s.low_stock_threshold||0);
+  const kind=inferStockKind(s);
+  const kindClass=kind==='production_material'?'stock-type-material':'stock-type-ready';
+  const kindLabel=stockKindLabel(kind);
+  const actions=opts.actions===false?'':`
+      <div class="stock-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openRestock(${s.id},'${esc(s.name)}')">+ Qty</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteStockItem(${s.id})">🗑</button>
+      </div>`;
+  return `<div class="stock-row">
+      <div style="flex:1;min-width:0">
+        <div class="stock-type-badge ${kindClass}">${kindLabel}</div>
+        <div class="stock-name">${esc(s.name)}</div>
+        <div class="stock-meta">${esc(s.size||'')} · ${esc(s.unit||'units')} · ${fmtDZD(s.cost_per_unit||0)}/unit</div>
+        ${low?`<div style="font-size:11px;color:var(--red);margin-top:2px">⚠️ Low stock!</div>`:''}
+      </div>
+      <div class="stock-qty ${low?'stock-low':'stock-ok'}">${Number(s.quantity).toLocaleString()}</div>
+      ${actions}
+    </div>`;
+}
+function renderStockGroup(target, items, title, subtitle, emptyText, opts={}){
+  const el=document.getElementById(target);
+  if(!el)return;
+  if(!items.length){
+    el.innerHTML=`<div class="stock-section-empty">${esc(emptyText)}</div>`;
+    return;
+  }
+  el.innerHTML=items.map(s=>stockRowMarkup(s,opts)).join('');
+}
 
 function renderProductionLogs(logs){
   const el=document.getElementById('production-log-list');
@@ -1574,9 +1670,10 @@ function renderProductionLogs(logs){
 // ── LOW STOCK NTFY ALERT ──
 async function sendLowStockAlert(items){
   if(!items.length)return;
+  const topic=typeof NTFY_TOPIC!=='undefined'?NTFY_TOPIC:'arco-stock-a7x9k2m';
   const msg=items.map(i=>`${i.name}: ${i.quantity} ${i.unit||'units'} (threshold: ${i.low_stock_threshold})`).join('\n');
   try{
-    await fetch('https://ntfy.sh/arco-admin-alerts',{
+    await fetch(`https://ntfy.sh/${topic}`,{
       method:'POST',
       headers:{'Content-Type':'text/plain','Title':'ARCO Low Stock Alert','Priority':'high','Tags':'warning,package'},
       body:`Low stock detected!\n${msg}`
@@ -1979,11 +2076,6 @@ function openManualStockAdjust(){
 
 // ── HELPERS ──
 function statusLabel(k){return STATUSES.find(s=>s.k===k)?.l||k;}
-async function deleteProdLog(id){
-  if(!confirm('Delete this production log?'))return;
-  await sb.from('production_logs').delete().eq('id',id);
-  await updateFinance();toast('Production log deleted');
-}
 async function deletePayLog(id){
   if(!confirm('Delete this pay record?'))return;
   await sb.from('employee_pay_log').delete().eq('id',id);
@@ -1993,6 +2085,222 @@ async function deleteStockUsageLog(id){
   if(!confirm('Delete this stock usage record?'))return;
   await sb.from('stock_usage_log').delete().eq('id',id);
   await updateFinance();toast('Stock usage record deleted');
+}
+
+// ── STOCK OVERRIDES / SPLIT STOCK MANAGEMENT ──
+function renderStockList(triggerAlerts=false){
+  const el=document.getElementById('stock-list');
+  if(!el)return;
+  if(!allStockItems.length){
+    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📦</div><div class="empty-text">No stock items yet</div></div>';
+    return;
+  }
+  const groups=stockItemsByKind(allStockItems);
+  if(triggerAlerts){
+    const lowItems=allStockItems.filter(s=>Number(s.quantity)<=Number(s.low_stock_threshold||0));
+    if(lowItems.length)sendLowStockAlert(lowItems);
+  }
+  el.innerHTML=`
+    <div class="stock-section">
+      <div class="stock-section-title">
+        <div>
+          <strong>READY TO SHIP</strong>
+          <span>${groups.ready.length} items</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="openAddStock('ready_to_ship')">+ Add</button>
+      </div>
+      ${groups.ready.length?groups.ready.map(s=>stockRowMarkup(s)).join(''):'<div class="stock-section-empty">No ready-to-ship stock yet.</div>'}
+    </div>
+    <div class="stock-section">
+      <div class="stock-section-title">
+        <div>
+          <strong>PRODUCTION MATERIALS</strong>
+          <span>${groups.material.length} items</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="openAddStock('production_material')">+ Add</button>
+      </div>
+      ${groups.material.length?groups.material.map(s=>stockRowMarkup(s)).join(''):'<div class="stock-section-empty">No production materials yet.</div>'}
+    </div>`;
+}
+
+function populateStockUsageFilter(){
+  const sel=document.getElementById('stock-usage-filter');
+  if(!sel)return;
+  const current=sel.value||'all';
+  const materials=allStockItems.filter(i=>inferStockKind(i)==='production_material');
+  sel.innerHTML='<option value="all">All Materials</option>'+materials.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('');
+  sel.value=[...sel.options].some(o=>o.value===current)?current:'all';
+}
+
+function renderStockUsageHistory(){
+  const el=document.getElementById('stock-usage-list');
+  if(!el)return;
+  const filter=document.getElementById('stock-usage-filter')?.value||'all';
+  const range=getFinPeriodRange();
+  const rows=allStockUsage
+    .filter(u=>{
+      const item=allStockItems.find(i=>String(i.id)===String(u.stock_item_id));
+      if(!item||inferStockKind(item)!=='production_material')return false;
+      return filter==='all'||String(u.stock_item_id)===String(filter);
+    })
+    .filter(u=>inFinRange(u.created_at,range));
+  if(!rows.length){
+    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📉</div><div class="empty-text">No production material usage in this period</div></div>';
+    return;
+  }
+  el.innerHTML=rows.map(u=>{
+    const item=allStockItems.find(i=>String(i.id)===String(u.stock_item_id));
+    const log=allProductionLogs.find(l=>String(l.id)===String(u.production_log_id));
+    const frames=log?`M:${log.m_frames||0} · L:${log.l_frames||0} · XL:${log.xl_frames||0} · XXL:${log.xxl_frames||0}`:'No production log';
+    return`
+      <div class="history-row">
+        <div>
+          <div class="history-title">${esc(item?.name||'Stock item')}</div>
+          <div class="history-meta">${esc(item?.size||'')} ${esc(item?.unit||'units')} · ${frames}</div>
+          <div class="history-meta">${fmtDate(u.created_at)}</div>
+        </div>
+        <div class="history-amount" style="color:var(--red)">-${Number(u.quantity_used||0).toLocaleString()}</div>
+        <button class="btn btn-danger btn-sm" style="margin-top:6px;padding:3px 8px" onclick="deleteStockUsageLog(${u.id})">🗑 Delete</button>
+      </div>`;
+  }).join('');
+}
+
+async function saveProductionLog(){
+  const date=document.getElementById('prod-date').value;
+  const m=parseInt(document.getElementById('prod-m').value)||0;
+  const l=parseInt(document.getElementById('prod-l').value)||0;
+  const xl=parseInt(document.getElementById('prod-xl').value)||0;
+  const xxl=parseInt(document.getElementById('prod-xxl').value)||0;
+  const sqm=parseFloat(document.getElementById('prod-sqm')?.value)||0;
+  const notes=document.getElementById('prod-notes').value.trim();
+  if(!date){toast('Please select a date',true);return;}
+  const pay=m*60+l*60+xl*100+xxl*200;
+  const{data,error}=await sb.from('production_logs').insert({date,m_frames:m,l_frames:l,xl_frames:xl,xxl_frames:xxl,total_pay_frame_maker:pay,print_sqm:sqm,notes}).select().single();
+  if(error){toast(error.message||'Error saving log',true);return;}
+  await autoDeductStock(m,l,xl,xxl,data.id);
+  closeModal('production-modal');
+  toast('Production logged ✓');
+  await updateFinance();
+}
+
+async function autoDeductStock(m,l,xl,xxl,logId){
+  const materials=allStockItems.filter(i=>inferStockKind(i)==='production_material');
+  const deductions=[
+    {keywords:['30x40','30 x 40','m board','m size','m-board'],qty:m},
+    {keywords:['40x60','40 x 60','l board','l size','l-board'],qty:l},
+    {keywords:['60x80','60 x 80','xl board','xl size','xl-board'],qty:xl},
+    {keywords:['120x60','120 x 60','xxl board','xxl size','xxl-board'],qty:xxl},
+  ];
+  for(const d of deductions){
+    if(!d.qty)continue;
+    const item=materials.find(s=>d.keywords.some(k=>s.name.toLowerCase().includes(k)||((s.size||'').toLowerCase().includes(k))));
+    if(!item)continue;
+    const newQty=Math.max(0,Number(item.quantity)-d.qty);
+    const {error:qtyError}=await sb.from('stock_items').update({quantity:newQty}).eq('id',item.id);
+    if(qtyError){console.warn('stock deduction failed',qtyError);}
+    const {error:usageError}=await sb.from('stock_usage_log').insert({production_log_id:logId,stock_item_id:item.id,quantity_used:d.qty});
+    if(usageError){console.warn('stock usage insert failed',usageError);}
+  }
+}
+
+function openAddStock(kind='ready_to_ship'){
+  ['stk-name','stk-size','stk-unit','stk-cost','stk-qty','stk-threshold'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('stk-unit').value='pieces';
+  const kindEl=document.getElementById('stk-kind');
+  if(kindEl)kindEl.value=normalizeStockKind(kind)||'ready_to_ship';
+  const titleEl=document.getElementById('stock-modal-title');
+  if(titleEl)titleEl.textContent=normalizeStockKind(kind)==='production_material'?'ADD MATERIAL STOCK':'ADD READY STOCK';
+  document.getElementById('stock-modal').classList.add('open');
+}
+
+async function saveStockItem(){
+  const kind=normalizeStockKind(document.getElementById('stk-kind').value)||'ready_to_ship';
+  const name=document.getElementById('stk-name').value.trim();
+  const size=document.getElementById('stk-size').value.trim();
+  const qty=parseFloat(document.getElementById('stk-qty').value)||0;
+  const threshold=parseFloat(document.getElementById('stk-threshold').value)||10;
+  const unit=document.getElementById('stk-unit').value.trim()||'pieces';
+  const cost=parseFloat(document.getElementById('stk-cost').value)||0;
+  if(!name){toast('Item name required',true);return;}
+  const payload={name,size,quantity:qty,low_stock_threshold:threshold,unit,cost_per_unit:cost,stock_kind:kind};
+  let {error}=await sb.from('stock_items').insert(payload);
+  if(error&&String(error.message||'').toLowerCase().includes('stock_kind')){
+    const fallback={...payload};
+    delete fallback.stock_kind;
+    ({error}=await sb.from('stock_items').insert(fallback));
+  }
+  if(error){toast(error.message||'Error saving stock item',true);return;}
+  closeModal('stock-modal');toast('Stock item added ✓');await updateFinance();
+}
+
+function renderStockPage(){
+  const groups=stockItemsByKind(allStockItems);
+  const total=allStockItems.length;
+  const low=allStockItems.filter(s=>Number(s.quantity)<=Number(s.low_stock_threshold||0)).length;
+  const totalValue=allStockItems.reduce((s,i)=>s+Number(i.quantity||0)*Number(i.cost_per_unit||0),0);
+  const todayStr=new Date().toISOString().split('T')[0];
+  const todayUsage=allStockUsage.filter(u=>{
+    const item=allStockItems.find(i=>String(i.id)===String(u.stock_item_id));
+    return item&&inferStockKind(item)==='production_material'&&u.created_at&&u.created_at.startsWith(todayStr);
+  }).reduce((s,u)=>s+Number(u.quantity_used||0),0);
+  const setKpi=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  setKpi('stk-kpi-total',total);
+  setKpi('stk-kpi-ready',groups.ready.length);
+  setKpi('stk-kpi-material',groups.material.length);
+  setKpi('stk-kpi-low',low);
+  setKpi('stk-kpi-today',todayUsage);
+  setKpi('stk-kpi-value',fmtDZD(totalValue));
+  renderStockGroup('stock-ready-list',groups.ready,'READY TO SHIP','Finished posters ready for dispatch','No ready-to-ship stock yet.');
+  renderStockGroup('stock-material-list',groups.material,'PRODUCTION MATERIALS','Boards, paper and workshop inputs','No production materials yet.');
+  populateStockPageUsageFilter();
+  renderStockPageUsage();
+}
+
+function populateStockPageUsageFilter(){
+  const sel=document.getElementById('stock-page-usage-filter');
+  if(!sel)return;
+  const cur=sel.value||'all';
+  const materials=allStockItems.filter(i=>inferStockKind(i)==='production_material');
+  sel.innerHTML='<option value="all">All Materials</option>'+materials.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('');
+  sel.value=[...sel.options].some(o=>o.value===cur)?cur:'all';
+}
+
+function renderStockPageUsage(){
+  const el=document.getElementById('stock-page-usage-list');
+  if(!el)return;
+  const filter=document.getElementById('stock-page-usage-filter')?.value||'all';
+  const rows=allStockUsage.filter(u=>{
+    const item=allStockItems.find(i=>String(i.id)===String(u.stock_item_id));
+    if(!item||inferStockKind(item)!=='production_material')return false;
+    return filter==='all'||String(u.stock_item_id)===String(filter);
+  });
+  if(!rows.length){
+    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📉</div><div class="empty-text">No production material usage recorded yet</div></div>';
+    return;
+  }
+  el.innerHTML=rows.map(u=>{
+    const item=allStockItems.find(i=>String(i.id)===String(u.stock_item_id));
+    return`<div class="history-row">
+      <div>
+        <div class="history-title">${esc(item?.name||'Unknown item')}</div>
+        <div class="history-meta">${esc(item?.size||'')} · ${fmtDate(u.created_at)}</div>
+        <div class="history-meta">${u.production_log_id?`Production log #${u.production_log_id}`:'Manual'}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red)">-${Number(u.quantity_used||0).toLocaleString()}</div>
+        <button class="btn btn-danger btn-sm" style="margin-top:4px;padding:3px 8px" onclick="deleteStockUsageLog(${u.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteProdLog(id){
+  if(!confirm('Delete this production log?'))return;
+  const {error:usageError}=await sb.from('stock_usage_log').delete().eq('production_log_id',id);
+  if(usageError){toast(usageError.message||'Could not clear stock usage for this log',true);return;}
+  const {error}=await sb.from('production_logs').delete().eq('id',id);
+  if(error){toast(error.message||'Could not delete production log',true);return;}
+  await updateFinance();toast('Production log deleted');
 }
 
 // ── PERFORMANCE PAGE ──
