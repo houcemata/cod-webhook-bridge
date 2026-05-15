@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
 <script src="/meta-pixel.js"></script>
+<script src="/tiktok-pixel.js"></script>
 <style>
 :root {
   --yellow: #F5C500;
@@ -1078,6 +1079,15 @@ window.addEventListener('DOMContentLoaded', () => {
       currency: 'DZD'
     });
   }
+  if (window.ARCOTikTok) {
+    window.ARCOTikTok.trackViewContent({
+      content_name: 'Liquid Football',
+      content_ids: [PRODUCT_SLUG],
+      content_category: `${selectedClub.value} - ${selectedSize}`,
+      value: selectedSizePrice,
+      currency: 'DZD'
+    });
+  }
 });
 
 // ── CLUBS ──
@@ -1263,6 +1273,15 @@ function trackProductCheckout() {
     value: selectedSizePrice + currentShippingCost,
     currency: 'DZD'
   });
+  if (window.ARCOTikTok) {
+    window.ARCOTikTok.trackInitiateCheckout({
+      content_name: 'Liquid Football',
+      content_ids: [PRODUCT_SLUG],
+      content_category: `${selectedClub.value} - ${selectedSize}`,
+      value: selectedSizePrice + currentShippingCost,
+      currency: 'DZD'
+    });
+  }
 }
 
 // ── SUBMIT ORDER ──
@@ -1327,6 +1346,16 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
     if (!r.ok || !result.ok) throw new Error(result.error || 'Failed');
     if (window.ARCOMeta) {
       window.ARCOMeta.trackPurchase({
+        content_name: 'Liquid Football',
+        content_ids: [PRODUCT_SLUG],
+        content_category: `${selectedClub.value} - ${selectedSize}`,
+        value: total,
+        currency: 'DZD',
+        eventID: result.order_id
+      });
+    }
+    if (window.ARCOTikTok) {
+      window.ARCOTikTok.trackPurchase({
         content_name: 'Liquid Football',
         content_ids: [PRODUCT_SLUG],
         content_category: `${selectedClub.value} - ${selectedSize}`,

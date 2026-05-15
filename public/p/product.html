@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
 <script src="/meta-pixel.js"></script>
+<script src="/tiktok-pixel.js"></script>
 <style>
 :root{--yellow:#F5C500;--black:#080808;--dark:#111;--line:rgba(255,255,255,.12);--muted:#aaa;--red:#e11d48;--green:#22c55e}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -111,6 +112,9 @@ async function loadProduct(){
     if(window.ARCOMeta){
       window.ARCOMeta.trackViewContent({content_name:product.name,content_ids:[product.slug],content_category:variant.label,value:Number(variant.price||product.price||0),currency:'DZD'});
     }
+    if(window.ARCOTikTok){
+      window.ARCOTikTok.trackViewContent({content_name:product.name,content_ids:[product.slug],content_category:variant.label,value:Number(variant.price||product.price||0),currency:'DZD'});
+    }
   }catch(e){document.getElementById('app').innerHTML='<div class="missing">تعذر تحميل المنتج.</div>';}
 }
 function missing(){document.getElementById('app').innerHTML='<div class="missing">هذا المنتج غير متوفر حاليا.</div>';}
@@ -183,6 +187,9 @@ function trackProductCheckout(){
   if(checkoutTracked||!window.ARCOMeta||!product)return;
   checkoutTracked=true;
   window.ARCOMeta.trackInitiateCheckout({content_name:product.name,content_ids:[product.slug],content_category:variant.label,value:total(),currency:'DZD'});
+  if(window.ARCOTikTok){
+    window.ARCOTikTok.trackInitiateCheckout({content_name:product.name,content_ids:[product.slug],content_category:variant.label,value:total(),currency:'DZD'});
+  }
 }
 async function submitOrder(){
   const name=document.getElementById('f-name').value.trim(),phone=document.getElementById('f-phone').value.replace(/\s/g,''),wilayaVal=document.getElementById('f-wilaya').value,commune=document.getElementById('f-commune').value.trim();
@@ -202,6 +209,9 @@ async function submitOrder(){
     if(!r.ok||!result.ok)throw new Error(result.error||'failed');
     if(window.ARCOMeta){
       window.ARCOMeta.trackPurchase({content_name:product.name,content_ids:[product.slug],content_category:variant.label,value:total(),currency:'DZD',eventID:result.order_id});
+    }
+    if(window.ARCOTikTok){
+      window.ARCOTikTok.trackPurchase({content_name:product.name,content_ids:[product.slug],content_category:variant.label,value:total(),currency:'DZD',eventID:result.order_id});
     }
     document.getElementById('success-id').textContent='#'+result.order_id;document.getElementById('success').classList.add('show');
   }catch(e){btn.classList.remove('loading');btn.textContent='اطلب الآن';toast('حدث خطأ. حاول مرة أخرى',true);}
