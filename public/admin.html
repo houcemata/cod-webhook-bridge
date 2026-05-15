@@ -870,7 +870,6 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           <button class="btn btn-ghost btn-sm" onclick="document.getElementById('markpaid-amount').value=Math.round((markPaidEmployee?.remaining||0)/2)">Pay Half</button>
         </div>
       </div>
-      <div class="form-field"><label class="form-label">Note (optional)</label><input class="form-input" id="markpaid-note" placeholder="e.g. Advance payment, fund request..."/></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('markpaid-modal')">Cancel</button>
@@ -2129,7 +2128,6 @@ async function saveMarkPaid(){
   const amount=parseFloat(document.getElementById('markpaid-amount').value)||0;
   const start=document.getElementById('markpaid-start').value;
   const end=document.getElementById('markpaid-end').value;
-  const note=document.getElementById('markpaid-note')?.value||'';
   const isPartial=amount<(markPaidEmployee.remaining||amount);
   await sb.from('employee_pay_log').insert({
     employee_name:markPaidEmployee.name,
@@ -2138,7 +2136,6 @@ async function saveMarkPaid(){
     period_end:end,
     amount_owed:markPaidEmployee.grossOwed||amount,
     amount_paid:amount,
-    note:note||(isPartial?'Partial payment':'Full payment'),
     paid_at:new Date().toISOString()
   });
   closeModal('markpaid-modal');
