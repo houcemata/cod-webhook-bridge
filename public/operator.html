@@ -562,7 +562,8 @@ const SB_H = {
   'Prefer': 'return=minimal'
 };
 
-let allOrders=[], filteredOrders=[], currentTab='all', currentOrder=null;
+const OPERATOR_TAB_KEY='arco_operator_tab';
+let allOrders=[], filteredOrders=[], currentTab=localStorage.getItem(OPERATOR_TAB_KEY)||'all', currentOrder=null;
 let sortAsc=false, selectedIds=new Set(), currentUser=null, currentRole=null;
 let noestDesks=null;
 
@@ -622,7 +623,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
 });
 
 // â”€â”€ INIT â”€â”€
-async function init(){ buildTabs(); await loadOrders(); }
+async function init(){ buildTabs(); syncTabChrome(); await loadOrders(); }
 async function refreshAll(){ await loadOrders(); toast('Refreshed'); }
 
 // â”€â”€ SUPABASE â”€â”€
@@ -762,25 +763,25 @@ function onPageSizeChange(){
 function buildTabs(){
   const tabs=[{k:'all',l:'All'},...STATUSES];
   document.getElementById('tab-bar').innerHTML=tabs.map(t=>
-    `<button class="tab-btn${t.k==='all'?' active':''}" id="tab-${t.k}" onclick="switchTab('${t.k}')">
+    `<button class="tab-btn${t.k===currentTab?' active':''}" id="tab-${t.k}" onclick="switchTab('${t.k}')">
       ${t.l}<span class="tab-count" id="tc-${t.k}">0</span>
     </button>`
   ).join('');
 }
 
+function syncTabChrome(){
+  document.getElementById('stats-section').style.display=currentTab==='all'?'block':'none';
+  document.getElementById('bulk-bar').classList.toggle('show',currentTab==='confirmed');
+}
+
 function switchTab(k){
   currentTab=k;
+  localStorage.setItem(OPERATOR_TAB_KEY,k);
   currentPage=1;
   selectedIds.clear();
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(`tab-${k}`).classList.add('active');
-
-  // Show/hide stats section â€” only on "all" tab
-  document.getElementById('stats-section').style.display = k==='all' ? 'block' : 'none';
-
-  // Show bulk bar only on confirmed tab
-  document.getElementById('bulk-bar').classList.toggle('show', k==='confirmed');
-
+  syncTabChrome();
   applyFilters();
 }
 

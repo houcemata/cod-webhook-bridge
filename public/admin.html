@@ -252,6 +252,11 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 .stock-split-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .stock-split-grid .stock-section{margin-top:0}
 .stock-actions .btn{white-space:nowrap}
+.stock-material-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.material-kpi{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px}
+.material-kpi .material-name{font-size:12px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.material-kpi .material-qty{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:var(--yellow)}
+.material-kpi .material-meta{font-size:11px;color:var(--gray2);margin-top:4px}
 .emp-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:16px;margin-bottom:12px}
 .emp-name{font-weight:700;font-size:15px;margin-bottom:2px}
 .emp-role{font-size:11px;color:var(--gray);font-family:'Barlow Condensed',sans-serif;letter-spacing:1px;margin-bottom:10px}
@@ -616,14 +621,16 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         </div>
       </div>
 
-      <!-- Stock KPIs -->
-      <div class="kpi-grid" style="margin-bottom:20px">
-        <div class="kpi-card hi"><div class="kpi-icon">📦</div><div class="kpi-label">Total Items</div><div class="kpi-value" id="stk-kpi-total">—</div><div class="kpi-sub">Tracked variants</div></div>
-        <div class="kpi-card"><div class="kpi-icon">🟢</div><div class="kpi-label">Ready Stock</div><div class="kpi-value" id="stk-kpi-ready">—</div><div class="kpi-sub">Ready to ship</div></div>
-        <div class="kpi-card"><div class="kpi-icon">🪵</div><div class="kpi-label">Materials</div><div class="kpi-value" id="stk-kpi-material">—</div><div class="kpi-sub">Production inputs</div></div>
-        <div class="kpi-card"><div class="kpi-icon">⚠️</div><div class="kpi-label">Low Stock</div><div class="kpi-value" id="stk-kpi-low" style="color:var(--red)">—</div><div class="kpi-sub">Below threshold</div></div>
-        <div class="kpi-card"><div class="kpi-icon">🔄</div><div class="kpi-label">Usage Today</div><div class="kpi-value" id="stk-kpi-today">—</div><div class="kpi-sub">Materials deducted</div></div>
-        <div class="kpi-card"><div class="kpi-icon">📈</div><div class="kpi-label">Total Value</div><div class="kpi-value" id="stk-kpi-value">—</div><div class="kpi-sub">At cost price</div></div>
+      <div class="kpi-grid" style="margin-bottom:16px">
+        <div class="kpi-card hi"><div class="kpi-icon">📈</div><div class="kpi-label">Total Value</div><div class="kpi-value" id="stk-kpi-value">—</div><div class="kpi-sub">At cost price</div></div>
+      </div>
+
+      <div class="glass-card" style="padding:20px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">PRODUCTION MATERIAL STOCK</div>
+          <span style="font-size:12px;color:var(--gray)">Quantity left per material</span>
+        </div>
+        <div id="stock-material-kpis" class="stock-material-kpis"></div>
       </div>
 
       <div class="stock-split-grid" style="margin-bottom:16px">
@@ -779,14 +786,23 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     <div class="modal-body">
       <div class="form-field">
         <label class="form-label">Stock Type</label>
-        <select class="form-select" id="stk-kind">
+        <select class="form-select" id="stk-kind" onchange="syncStockModalFields(this.value)">
           <option value="ready_to_ship">Ready to Ship</option>
           <option value="production_material">Production Material</option>
         </select>
       </div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Item Name</label><input class="form-input" id="stk-name" placeholder="e.g. M Board (30×40)"/></div>
-        <div class="form-field"><label class="form-label">Size / Type</label><input class="form-input" id="stk-size" placeholder="e.g. 30×40cm"/></div>
+      <div id="stk-ready-fields" style="display:none">
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Product</label><select class="form-select" id="stk-product" onchange="populateReadyStockVariants()"></select></div>
+          <div class="form-field"><label class="form-label">Variant</label><select class="form-select" id="stk-variant"></select></div>
+        </div>
+        <div style="font-size:12px;color:var(--gray);margin-bottom:14px">Pick an active product and one of its variants, then enter the current stock quantity.</div>
+      </div>
+      <div id="stk-material-fields">
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Item Name</label><input class="form-input" id="stk-name" placeholder="e.g. M Board (30×40)"/></div>
+          <div class="form-field"><label class="form-label">Size / Type</label><input class="form-input" id="stk-size" placeholder="e.g. 30×40cm"/></div>
+        </div>
       </div>
       <div class="form-row">
         <div class="form-field"><label class="form-label">Current Qty</label><input class="form-input" id="stk-qty" type="number" min="0" placeholder="0"/></div>
@@ -942,6 +958,27 @@ const STATUSES=[
 
 let currentUser=null,currentRole=null,allOrders=[],filteredOrders=[],allProducts=[],allOperators=[];
 let currentPage=1;const PAGE_SIZE=30;let editingProductId=null;
+let currentAdminPage='dashboard';
+const ADMIN_PAGE_KEY='arco_admin_page';
+
+function getSavedAdminPage(){
+  const allowed=['dashboard','orders','products','operators','finance','stock','performance'];
+  const saved=localStorage.getItem(ADMIN_PAGE_KEY);
+  return allowed.includes(saved)?saved:'dashboard';
+}
+
+function renderCurrentAdminPage(){
+  if(currentAdminPage==='dashboard')updateDashboard();
+  if(currentAdminPage==='orders')renderOrdersTable();
+  if(currentAdminPage==='products')renderProducts();
+  if(currentAdminPage==='operators')renderOperators();
+  if(currentAdminPage==='finance')updateFinance();
+  if(currentAdminPage==='stock'){
+    if(allStockItems.length)renderStockPage();
+    else loadFinanceData().then(()=>{ if(currentAdminPage==='stock') renderStockPage(); });
+  }
+  if(currentAdminPage==='performance')renderPerformance();
+}
 
 // ── AUTH ──
 async function doLogin(){
@@ -979,7 +1016,9 @@ async function initApp(){
   document.getElementById('sidebar-name').textContent=name;
   document.getElementById('sidebar-avatar').textContent=name.charAt(0).toUpperCase();
   document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  currentAdminPage=getSavedAdminPage();
   await refreshAll();
+  showPage(currentAdminPage,false);
 }
 async function doLogout(){
   await sb.auth.signOut();
@@ -989,7 +1028,7 @@ async function doLogout(){
 }
 async function refreshAll(){
   await Promise.all([loadOrders(),loadProducts(),loadOperators(),loadHistory()]);
-  updateDashboard();
+  renderCurrentAdminPage();
 }
 window.addEventListener('DOMContentLoaded',async()=>{
   const{data:{session}}=await sb.auth.getSession();
@@ -998,19 +1037,16 @@ window.addEventListener('DOMContentLoaded',async()=>{
 });
 
 // ── NAVIGATION ──
-function showPage(name){
+function showPage(name,persist=true){
+  currentAdminPage=name;
+  if(persist)localStorage.setItem(ADMIN_PAGE_KEY,name);
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.querySelectorAll('.mobile-nav-btn').forEach(n=>n.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
   const nav=document.getElementById(`nav-${name}`);const mnav=document.getElementById(`mnav-${name}`);
   if(nav)nav.classList.add('active');if(mnav)mnav.classList.add('active');
-  if(name==='orders')renderOrdersTable();
-  if(name==='products')renderProducts();
-  if(name==='operators')renderOperators();
-  if(name==='finance')updateFinance();
-  if(name==='stock'){loadFinanceData().then(()=>{renderStockPage();});}
-  if(name==='performance')renderPerformance();
+  renderCurrentAdminPage();
 }
 
 // ── DATA ──
@@ -1481,7 +1517,7 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{
 
 // ── FINANCE ──
 let allProductionLogs=[], allStockItems=[], allExpenses=[], allPayLogs=[], allStockUsage=[];
-let restockingItemId=null, markPaidEmployee=null;
+let restockingItemId=null, restockMode='add', markPaidEmployee=null;
 
 const FRAME_RATES={m:60,l:60,xl:100,xxl:200};
 const EMPLOYEES=[
@@ -1618,9 +1654,11 @@ function stockRowMarkup(s,opts={}){
   const kind=inferStockKind(s);
   const kindClass=kind==='production_material'?'stock-type-material':'stock-type-ready';
   const kindLabel=stockKindLabel(kind);
+  const allowDeduct=opts.allowDeduct??kind==='ready_to_ship';
   const actions=opts.actions===false?'':`
       <div class="stock-actions">
         <button class="btn btn-ghost btn-sm" onclick="openRestock(${s.id},'${esc(s.name)}')">+ Qty</button>
+        ${allowDeduct?`<button class="btn btn-ghost btn-sm" onclick="openDeductStock(${s.id},'${esc(s.name)}')">- Qty</button>`:''}
         <button class="btn btn-danger btn-sm" onclick="deleteStockItem(${s.id})">🗑</button>
       </div>`;
   return `<div class="stock-row">
@@ -1684,21 +1722,7 @@ async function sendLowStockAlert(items){
 function renderStockList(triggerAlerts=false){
   const el=document.getElementById('stock-list');
   if(!allStockItems.length){el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📦</div><div class="empty-text">No stock items yet</div></div>';return;}
-  el.innerHTML=allStockItems.map(s=>{
-    const low=s.quantity<=s.low_stock_threshold;
-    return`<div class="stock-row">
-      <div style="flex:1">
-        <div class="stock-name">${esc(s.name)}</div>
-        <div class="stock-meta">${esc(s.size||'')} · ${esc(s.unit||'units')} · ${fmtDZD(s.cost_per_unit||0)}/unit</div>
-        ${low?`<div style="font-size:11px;color:var(--red);margin-top:2px">⚠️ Low stock!</div>`:''}
-      </div>
-      <div class="stock-qty ${low?'stock-low':'stock-ok'}">${Number(s.quantity).toLocaleString()}</div>
-      <div class="stock-actions">
-        <button class="btn btn-ghost btn-sm" onclick="openRestock(${s.id},'${esc(s.name)}')">+ Stock</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteStockItem(${s.id})">🗑</button>
-      </div>
-    </div>`;
-  }).join('');
+  el.innerHTML=allStockItems.map(s=>stockRowMarkup(s,{allowDeduct:inferStockKind(s)==='ready_to_ship'})).join('');
 }
 
 function renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,printGuyPay,printerPay=0,printerSqm=0){
@@ -2203,54 +2227,173 @@ async function autoDeductStock(m,l,xl,xxl,logId){
   }
 }
 
+function getActiveProducts(){
+  return (allProducts||[]).filter(p=>p.active);
+}
+function getProductVariants(product){
+  return normalizeVariants(product?.variants);
+}
+function syncStockModalFields(kind){
+  const isReady=normalizeStockKind(kind)==='ready_to_ship';
+  const readyWrap=document.getElementById('stk-ready-fields');
+  const materialWrap=document.getElementById('stk-material-fields');
+  if(readyWrap)readyWrap.style.display=isReady?'block':'none';
+  if(materialWrap)materialWrap.style.display=isReady?'none':'block';
+  const nameEl=document.getElementById('stk-name');
+  const sizeEl=document.getElementById('stk-size');
+  const costEl=document.getElementById('stk-cost');
+  if(nameEl)nameEl.value='';
+  if(sizeEl)sizeEl.value='';
+  if(costEl)costEl.value='';
+  document.getElementById('stk-unit').value='pieces';
+  if(isReady){
+    populateReadyStockProducts();
+    populateReadyStockVariants();
+  }
+}
+function populateReadyStockProducts(selectedSlug=''){
+  const sel=document.getElementById('stk-product');
+  if(!sel)return;
+  const products=getActiveProducts();
+  const prev=selectedSlug||sel.value||products[0]?.slug||'';
+  sel.innerHTML=products.length
+    ?products.map(p=>`<option value="${esc(p.slug)}">${esc(p.name)}</option>`).join('')
+    :'<option value="">No active products</option>';
+  sel.value=[...sel.options].some(o=>o.value===prev)?prev:'';
+}
+function populateReadyStockVariants(selectedLabel=''){
+  const productSlug=document.getElementById('stk-product')?.value||'';
+  const variantSel=document.getElementById('stk-variant');
+  if(!variantSel)return;
+  const product=getActiveProducts().find(p=>String(p.slug)===String(productSlug));
+  const variants=getProductVariants(product);
+  const prev=selectedLabel||variantSel.value||variants[0]?.label||'';
+  variantSel.innerHTML=variants.length
+    ?variants.map(v=>`<option value="${esc(v.label)}">${esc(v.label)}${v.price?` — ${fmtDZD(v.price)}`:''}</option>`).join('')
+    :'<option value="">No variants</option>';
+  variantSel.value=[...variantSel.options].some(o=>o.value===prev)?prev:'';
+  const variant=variants.find(v=>v.label===variantSel.value)||variants[0];
+  const nameEl=document.getElementById('stk-name');
+  const sizeEl=document.getElementById('stk-size');
+  const costEl=document.getElementById('stk-cost');
+  if(product&&variant){
+    if(nameEl)nameEl.value=product.name||'';
+    if(sizeEl)sizeEl.value=variant.label||'';
+    if(costEl&&!costEl.value)costEl.value=Number(variant.price||product.price||0);
+  }
+}
+function openStockAdjust(id,name,mode='add'){
+  restockingItemId=id;
+  restockMode=mode;
+  document.getElementById('restock-item-name').textContent=name;
+  document.getElementById('restock-qty').value='';
+  const title=document.querySelector('#restock-modal .modal-title');
+  const actionBtn=document.querySelector('#restock-modal .btn-primary');
+  if(title)title.textContent=mode==='deduct'?'DEDUCT STOCK':'RESTOCK';
+  if(actionBtn)actionBtn.textContent=mode==='deduct'?'Deduct Stock':'Add Stock';
+  document.getElementById('restock-modal').classList.add('open');
+}
+function openDeductStock(id,name){
+  openStockAdjust(id,name,'deduct');
+}
+function openRestock(id,name){
+  openStockAdjust(id,name,'add');
+}
+async function saveRestock(){
+  const qty=parseFloat(document.getElementById('restock-qty').value)||0;
+  if(!qty||!restockingItemId){toast('Enter a quantity',true);return;}
+  const item=allStockItems.find(s=>String(s.id)===String(restockingItemId));
+  if(!item)return;
+  const currentQty=Number(item.quantity||0);
+  const nextQty=restockMode==='deduct'?currentQty-qty:currentQty+qty;
+  if(restockMode==='deduct'&&nextQty<0){toast('Not enough stock to deduct',true);return;}
+  const {error}=await sb.from('stock_items').update({quantity:Math.max(0,nextQty)}).eq('id',restockingItemId);
+  if(error){toast(error.message||'Could not update stock',true);return;}
+  closeModal('restock-modal');
+  toast(restockMode==='deduct'?'Stock deducted ✓':'Stock updated ✓');
+  await updateFinance();
+  if(currentAdminPage==='stock')renderStockPage();
+}
 function openAddStock(kind='ready_to_ship'){
   ['stk-name','stk-size','stk-unit','stk-cost','stk-qty','stk-threshold'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('stk-unit').value='pieces';
+  const normalized=normalizeStockKind(kind)||'ready_to_ship';
   const kindEl=document.getElementById('stk-kind');
-  if(kindEl)kindEl.value=normalizeStockKind(kind)||'ready_to_ship';
+  if(kindEl)kindEl.value=normalized;
   const titleEl=document.getElementById('stock-modal-title');
-  if(titleEl)titleEl.textContent=normalizeStockKind(kind)==='production_material'?'ADD MATERIAL STOCK':'ADD READY STOCK';
+  if(titleEl)titleEl.textContent=normalized==='production_material'?'ADD MATERIAL STOCK':'ADD READY STOCK';
+  syncStockModalFields(normalized);
   document.getElementById('stock-modal').classList.add('open');
 }
 
 async function saveStockItem(){
-  const kind=normalizeStockKind(document.getElementById('stk-kind').value)||'ready_to_ship';
-  const name=document.getElementById('stk-name').value.trim();
-  const size=document.getElementById('stk-size').value.trim();
   const qty=parseFloat(document.getElementById('stk-qty').value)||0;
   const threshold=parseFloat(document.getElementById('stk-threshold').value)||10;
   const unit=document.getElementById('stk-unit').value.trim()||'pieces';
-  const cost=parseFloat(document.getElementById('stk-cost').value)||0;
-  if(!name){toast('Item name required',true);return;}
-  const payload={name,size,quantity:qty,low_stock_threshold:threshold,unit,cost_per_unit:cost,stock_kind:kind};
+  const kind=normalizeStockKind(document.getElementById('stk-kind').value)||'ready_to_ship';
+  let payload;
+  if(kind==='ready_to_ship'){
+    const productSlug=document.getElementById('stk-product').value;
+    const product=getActiveProducts().find(p=>String(p.slug)===String(productSlug));
+    const variants=getProductVariants(product);
+    const variantLabel=document.getElementById('stk-variant').value;
+    const variant=variants.find(v=>v.label===variantLabel)||variants[0];
+    if(!product){toast('Pick an active product',true);return;}
+    if(!variant){toast('Pick a variant',true);return;}
+    payload={
+      name:product.name||'Ready to ship',
+      size:variant.label||'Standard',
+      quantity:qty,
+      low_stock_threshold:threshold,
+      unit,
+      cost_per_unit:parseFloat(document.getElementById('stk-cost').value)||Number(variant.price||product.price||0),
+      stock_kind:kind,
+      product_slug:product.slug,
+      variant_label:variant.label,
+      variant_options:variant.options||null
+    };
+  }else{
+    const name=document.getElementById('stk-name').value.trim();
+    const size=document.getElementById('stk-size').value.trim();
+    const cost=parseFloat(document.getElementById('stk-cost').value)||0;
+    if(!name){toast('Item name required',true);return;}
+    payload={name,size,quantity:qty,low_stock_threshold:threshold,unit,cost_per_unit:cost,stock_kind:kind};
+  }
   let {error}=await sb.from('stock_items').insert(payload);
-  if(error&&String(error.message||'').toLowerCase().includes('stock_kind')){
+  if(error&&String(error.message||'').toLowerCase().includes('column')){
     const fallback={...payload};
     delete fallback.stock_kind;
+    delete fallback.product_slug;
+    delete fallback.variant_label;
+    delete fallback.variant_options;
     ({error}=await sb.from('stock_items').insert(fallback));
   }
   if(error){toast(error.message||'Error saving stock item',true);return;}
-  closeModal('stock-modal');toast('Stock item added ✓');await updateFinance();
+  closeModal('stock-modal');
+  toast('Stock item added ✓');
+  await updateFinance();
+  if(currentAdminPage==='stock')renderStockPage();
 }
 
 function renderStockPage(){
   const groups=stockItemsByKind(allStockItems);
-  const total=allStockItems.length;
-  const low=allStockItems.filter(s=>Number(s.quantity)<=Number(s.low_stock_threshold||0)).length;
   const totalValue=allStockItems.reduce((s,i)=>s+Number(i.quantity||0)*Number(i.cost_per_unit||0),0);
-  const todayStr=new Date().toISOString().split('T')[0];
-  const todayUsage=allStockUsage.filter(u=>{
-    const item=allStockItems.find(i=>String(i.id)===String(u.stock_item_id));
-    return item&&inferStockKind(item)==='production_material'&&u.created_at&&u.created_at.startsWith(todayStr);
-  }).reduce((s,u)=>s+Number(u.quantity_used||0),0);
   const setKpi=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  setKpi('stk-kpi-total',total);
-  setKpi('stk-kpi-ready',groups.ready.length);
-  setKpi('stk-kpi-material',groups.material.length);
-  setKpi('stk-kpi-low',low);
-  setKpi('stk-kpi-today',todayUsage);
   setKpi('stk-kpi-value',fmtDZD(totalValue));
-  renderStockGroup('stock-ready-list',groups.ready,'READY TO SHIP','Finished posters ready for dispatch','No ready-to-ship stock yet.');
+  const materialWrap=document.getElementById('stock-material-kpis');
+  if(materialWrap){
+    materialWrap.innerHTML=groups.material.length
+      ?groups.material.map(s=>{
+          const low=Number(s.quantity)<=Number(s.low_stock_threshold||0);
+          return `<div class="material-kpi">
+            <div class="material-name">${esc(s.name)}</div>
+            <div class="material-qty ${low?'stock-low':'stock-ok'}">${Number(s.quantity).toLocaleString()}</div>
+            <div class="material-meta">${esc(s.size||'')} · ${esc(s.unit||'units')}</div>
+          </div>`;
+        }).join('')
+      :'<div class="stock-section-empty">No production materials yet.</div>';
+  }
+  renderStockGroup('stock-ready-list',groups.ready,'READY TO SHIP','Finished posters ready for dispatch','No ready-to-ship stock yet.',{allowDeduct:true});
   renderStockGroup('stock-material-list',groups.material,'PRODUCTION MATERIALS','Boards, paper and workshop inputs','No production materials yet.');
   populateStockPageUsageFilter();
   renderStockPageUsage();
@@ -2300,7 +2443,20 @@ async function deleteProdLog(id){
   if(usageError){toast(usageError.message||'Could not clear stock usage for this log',true);return;}
   const {error}=await sb.from('production_logs').delete().eq('id',id);
   if(error){toast(error.message||'Could not delete production log',true);return;}
-  await updateFinance();toast('Production log deleted');
+  await updateFinance();
+  if(currentAdminPage==='stock')renderStockPage();
+  toast('Production log deleted');
+}
+
+async function deleteProdLog(id){
+  if(!confirm('Delete this production log?'))return;
+  const {error:usageError}=await sb.from('stock_usage_log').delete().eq('production_log_id',id);
+  if(usageError){toast(usageError.message||'Could not clear stock usage for this log',true);return;}
+  const {error}=await sb.from('production_logs').delete().eq('id',id);
+  if(error){toast(error.message||'Could not delete production log',true);return;}
+  await updateFinance();
+  if(currentAdminPage==='stock')renderStockPage();
+  toast('Production log deleted');
 }
 
 // ── PERFORMANCE PAGE ──
