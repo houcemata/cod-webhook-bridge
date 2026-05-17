@@ -101,7 +101,7 @@ body::before {
 .hero-image-wrap {
   position: relative;
   width: 100%;
-  padding-top: 60px;
+  padding-top: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -157,6 +157,11 @@ body::before {
   text-align: center;
 }
 
+.product-info.product-title-top {
+  padding-top: 74px;
+  padding-bottom: 16px;
+}
+
 .product-tag {
   display: inline-block;
   font-family: 'Barlow Condensed', sans-serif;
@@ -174,6 +179,7 @@ body::before {
   font-size: clamp(42px, 12vw, 64px);
   letter-spacing: 3px;
   line-height: 0.9;
+  white-space: nowrap;
   margin-bottom: 12px;
   background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
   -webkit-background-clip: text;
@@ -193,7 +199,12 @@ body::before {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin-bottom: 6px;
+  margin-bottom: 0;
+}
+
+.price-wrap.price-wrap-top {
+  margin-top: 8px;
+  margin-bottom: 16px;
 }
 
 .price-current {
@@ -823,6 +834,15 @@ body::before {
 <!-- Hero -->
 <div class="hero">
   <div class="hero-glow" id="hero-glow"></div>
+  <div class="product-info product-title-top">
+    <div class="product-tag">ARCO — Art Print</div>
+    <div class="product-name">LIQUID <span>FOOTBALL</span></div>
+    <div class="price-wrap price-wrap-top">
+      <div class="price-current" id="hero-price">2 900 DZD</div>
+      <div class="price-old">3 600 DZD</div>
+      <div class="price-save">-19%</div>
+    </div>
+  </div>
   <div class="hero-image-wrap">
     <img class="hero-image" id="hero-img"
       src="https://zcsdkuzmogvpvqjzhnqu.supabase.co/storage/v1/object/public/products/liquid-football/rma.png"
@@ -830,51 +850,12 @@ body::before {
     <div class="club-tag" id="club-tag">REAL MADRID</div>
   </div>
 
-  <div class="product-info">
-    <div class="product-tag">ARCO — Art Print</div>
-    <div class="product-name">LIQUID<br/><span>FOOTBALL</span></div>
-  </div>
-
   <!-- Club selector right below image -->
   <div style="padding:0 20px 20px">
     <div class="clubs-grid" id="clubs-grid"></div>
   </div>
 
-  <div class="product-info" style="padding-top:0">
-    <div class="price-wrap">
-      <div class="price-current" id="hero-price">2 900 DZD</div>
-      <div class="price-old">3 600 DZD</div>
-      <div class="price-save">-19%</div>
-    </div>
-  </div>
-
   <div class="scroll-hint"><span>↓</span></div>
-</div>
-
-<!-- Features strip -->
-<div class="features-strip">
-  <div class="feature-item">
-    <div class="feature-icon">🎨</div>
-    <div class="feature-text">Qualité<br/>Premium</div>
-  </div>
-  <div class="feature-item">
-    <div class="feature-icon">🚚</div>
-    <div class="feature-text">Livraison<br/>Partout</div>
-  </div>
-  <div class="feature-item">
-    <div class="feature-icon">💳</div>
-    <div class="feature-text">Paiement<br/>Livraison</div>
-  </div>
-  <div class="feature-item">
-    <div class="feature-icon">📦</div>
-    <div class="feature-text">Emballage<br/>Sécurisé</div>
-  </div>
-</div>
-
-<!-- Description -->
-<div class="description-section">
-  <div class="desc-ar">لوحات جدارية بجودة جد عالية، تصاميم أصلية وفريدة من نوعها! زيّن جدارك بألوان ناديك المفضل الآن! جودة طباعة جد عالية — كل أنديتكم المفضلة متوفرة.</div>
-  <div class="desc-fr">Posters muraux de très haute qualité, designs originaux et uniques. Décorez votre mur aux couleurs de votre club préféré. Qualité d'impression exceptionnelle.</div>
 </div>
 
 <!-- Order section -->
@@ -987,6 +968,32 @@ body::before {
     <div class="trust-item"><span>📞</span><span>Support client</span></div>
   </div>
 
+</div>
+
+<!-- Features strip -->
+<div class="features-strip">
+  <div class="feature-item">
+    <div class="feature-icon">🎨</div>
+    <div class="feature-text">Qualité<br/>Premium</div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">🚚</div>
+    <div class="feature-text">Livraison<br/>Partout</div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">💳</div>
+    <div class="feature-text">Paiement<br/>Livraison</div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">📦</div>
+    <div class="feature-text">Emballage<br/>Sécurisé</div>
+  </div>
+</div>
+
+<!-- Description -->
+<div class="description-section">
+  <div class="desc-ar">لوحات جدارية بجودة جد عالية، تصاميم أصلية وفريدة من نوعها! زيّن جدارك بألوان ناديك المفضل الآن! جودة طباعة جد عالية — كل أنديتكم المفضلة متوفرة.</div>
+  <div class="desc-fr">Posters muraux de très haute qualité, designs originaux et uniques. Décorez votre mur aux couleurs de votre club préféré. Qualité d'impression exceptionnelle.</div>
 </div>
 
 <!-- Success screen -->
@@ -1359,3 +1366,5 @@ function toast(msg, isErr = false) {
 </script>
 </body>
 </html>
+
+
