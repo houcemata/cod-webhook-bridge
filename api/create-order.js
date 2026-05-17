@@ -133,6 +133,7 @@ export default async function handler(req, res) {
     const wilaya = normalizeText(body.wilaya);
     const commune = normalizeText(body.commune);
     const notes = normalizeText(body.notes);
+    const draftOrderId = normalizeText(body.draft_order_id);
     const deliveryType = body.delivery_type === "pickup" ? "pickup" : "home";
     const stationCode = deliveryType === "pickup" ? normalizeText(body.station_code) : null;
     const wilayaId = Number(body.wilaya_id);
@@ -189,7 +190,6 @@ export default async function handler(req, res) {
     const total = Number(variant.price) + shippingCost;
     const orderId = createOrderId();
     const orderData = {
-      order_id: orderId,
       name,
       phone,
       wilaya,
@@ -203,20 +203,72 @@ export default async function handler(req, res) {
       status: "pending",
       notes,
     };
+    const finalOrderData = { ...orderData, order_id: orderId };
 
-    const { error: insertError } = await supabase
-      .from("orders")
-      .insert(orderData);
+    let updatedDraft = false;
+    const draftCandidates = [];
+    if (draftOrderId) {
+      draftCandidates.push(
+        supabase.from("orders").select("id, order_id").eq("order_id", draftOrderId).eq("status", "draft").maybeSingle()
+      );
+    }
+    draftCandidates.push(
+      supabase
+        .from("orders")
+        .select("id, order_id")
+        .eq("phone", phone)
+        .eq("product", product.name)
+        .eq("status", "draft")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+    );
 
-    if (insertError) {
-      console.error("[create-order] insert failed:", insertError);
-      return res.status(500).json({ error: "Failed to save order" });
+    for (const candidate of draftCandidates) {
+      const { data: draftRow } = await candidate;
+      if (!draftRow) continue;
+      const { error: updateError } = await supabase
+        .from("orders")
+        .update({
+          name,
+          phone,
+          wilaya,
+          commune: deliveryType === "home" ? commune : "",
+          type_livraison: deliveryType,
+          station_code: stationCode,
+          product: product.name,
+          variable: variant.label || variant.name,
+          prix_total: total,
+          shipping_cost: shippingCost,
+          status: "pending",
+          notes,
+        })
+        .eq("id", draftRow.id);
+
+      if (updateError) {
+        console.error("[create-order] draft update failed:", updateError);
+        return res.status(500).json({ error: "Failed to save order" });
+      }
+      updatedDraft = true;
+      finalOrderData.order_id = draftRow.order_id;
+      break;
     }
 
-    await sendOrderNotification(orderData);
+    if (!updatedDraft) {
+      const { error: insertError } = await supabase
+        .from("orders")
+        .insert(finalOrderData);
+
+      if (insertError) {
+        console.error("[create-order] insert failed:", insertError);
+        return res.status(500).json({ error: "Failed to save order" });
+      }
+    }
+
+    await sendOrderNotification(finalOrderData);
     await sendAllAnalytics({
       event_name: "Purchase",
-      order_id: orderId,
+      order_id: finalOrderData.order_id,
       value: total,
       currency: "DZD",
       product: product.name,
@@ -228,7 +280,7 @@ export default async function handler(req, res) {
       client_user_agent: req.headers["user-agent"] || "",
     });
 
-    return res.status(200).json({ ok: true, order_id: orderId });
+    return res.status(200).json({ ok: true, order_id: finalOrderData.order_id, updated_draft: updatedDraft });
   } catch (err) {
     console.error("[create-order]", err);
     return res.status(500).json({ error: err.message || "Order creation failed" });

@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
 <script src="/meta-pixel.js"></script>
 <script src="/tiktok-pixel.js"></script>
+<script src="/draft-capture.js"></script>
 <style>
 :root {
   --yellow: #F5C500;
@@ -1064,12 +1065,14 @@ let noestDesks = null;
 let currentShippingCost = 0;
 let checkoutTracked = false;
 let clubImageSwapToken = 0;
+let draftCaptureBound = false;
 
 // ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
   buildClubs();
   buildWilayas();
   setupStickyBar();
+  bindDraftCapture();
   if (window.ARCOMeta) {
     window.ARCOMeta.trackViewContent({
       content_name: 'Liquid Football',
@@ -1089,6 +1092,23 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+function bindDraftCapture() {
+  if (draftCaptureBound || !window.ARCODraft) return;
+  draftCaptureBound = window.ARCODraft.bindDraftCapture({
+    phoneInputId: 'f-phone',
+    buildPayload: () => ({
+      product_slug: PRODUCT_SLUG,
+      phone: document.getElementById('f-phone')?.value || '',
+      variant_label: `${selectedClub.value} - ${selectedSize}`,
+      selected_options: { Club: selectedClub.value, Size: selectedSize },
+      product_name: 'Liquid Football',
+      delivery_type: selectedDelivery === 'home' ? 'home' : 'pickup',
+      shipping_cost: currentShippingCost,
+      notes: 'draft lead',
+    }),
+  });
+}
 
 // ── CLUBS ──
 function buildClubs() {
@@ -1303,6 +1323,12 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
   if (selectedDelivery === 'desk' && !desk) { toast('Veuillez choisir un point Stop Desk', true); return; }
   if (!shippingRates.home_delivery) { toast('Choisissez une wilaya valide', true); return; }
   trackProductCheckout();
+  const draftOrderId = window.ARCODraft?.getStoredDraftId({
+    product_slug: PRODUCT_SLUG,
+    phone: phoneClean,
+    variant_label: `${selectedClub.value} - ${selectedSize}`,
+    delivery_type: selectedDelivery === 'home' ? 'home' : 'pickup',
+  });
 
   const btn = document.getElementById('order-btn');
   btn.classList.add('loading');
@@ -1325,7 +1351,8 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
     prix_total: total,
     shipping_cost: currentShippingCost,
     status: 'pending',
-    notes: ''
+    notes: '',
+    draft_order_id: draftOrderId || undefined
   };
 
   try {
@@ -1362,6 +1389,14 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
         value: total,
         currency: 'DZD',
         eventID: result.order_id
+      });
+    }
+    if (window.ARCODraft) {
+      window.ARCODraft.clearStoredDraftId({
+        product_slug: PRODUCT_SLUG,
+        phone: phoneClean,
+        variant_label: `${selectedClub.value} - ${selectedSize}`,
+        delivery_type: selectedDelivery === 'home' ? 'home' : 'pickup',
       });
     }
 

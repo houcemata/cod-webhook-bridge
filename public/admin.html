@@ -98,6 +98,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 
 /* STATUS BADGES */
 .badge{display:inline-block;padding:3px 10px;border-radius:99px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap}
+.badge-draft{background:#14161f;color:#c4b5fd;border:1px solid #8b5cf633}
 .badge-pending{background:#1a1200;color:#f59e0b;border:1px solid #f59e0b33}
 .badge-to_recall{background:#1a0f00;color:#fb923c;border:1px solid #fb923c33}
 .badge-attempt_1{background:#1a0800;color:#f97316;border:1px solid #f9731633}
@@ -466,6 +467,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           <input class="filter-input" id="order-search" placeholder="Search name or phone..." oninput="filterOrders()"/>
           <select class="filter-select" id="order-status" onchange="filterOrders()">
             <option value="">All Status</option>
+            <option value="draft">Draft</option>
             <option value="pending">Pending</option>
             <option value="to_recall">To Recall</option>
             <option value="attempt_1">Attempt 1</option>
@@ -957,6 +959,7 @@ const {createClient}=supabase;
 const sb=createClient(SB_PROJECT,SB_KEY);
 
 const STATUSES=[
+  {k:'draft',l:'Draft',c:'#8b5cf6'},
   {k:'pending',l:'Pending',c:'#f59e0b'},{k:'to_recall',l:'To Recall',c:'#fb923c'},
   {k:'attempt_1',l:'Attempt 1',c:'#f97316'},{k:'attempt_2',l:'Attempt 2',c:'#ea580c'},
   {k:'attempt_3',l:'Attempt 3',c:'#dc2626'},{k:'rescheduled',l:'Rescheduled',c:'#06b6d4'},
