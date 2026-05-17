@@ -245,7 +245,7 @@ body::before {
 .order-section {
   background: var(--dark);
   border-top: 1px solid var(--dark2);
-  padding: 32px 20px 120px;
+  padding: 32px 20px 32px;
 }
 
 .section-label {
@@ -844,6 +844,11 @@ body::before {
     <div class="club-tag" id="club-tag">REAL MADRID</div>
   </div>
 
+  <!-- Club selector right below image -->
+  <div style="padding:0 20px 20px">
+    <div class="clubs-grid" id="clubs-grid"></div>
+  </div>
+
   <div class="scroll-hint"><span>↓</span></div>
 </div>
 
@@ -853,18 +858,11 @@ body::before {
   <div class="section-label">Commander</div>
   <div class="section-title">CHOISIS TON CLUB</div>
 
-  <!-- Club selector -->
-  <div style="padding:8px 0 20px">
-    <div class="clubs-grid" id="clubs-grid"></div>
-  </div>
-
   <!-- Order reminder -->
   <div style="background:rgba(245,197,0,0.07);border:1px solid rgba(245,197,0,0.2);border-radius:12px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
     <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--gray);letter-spacing:0.5px">Vous commandez</span>
     <span style="font-family:'Cairo',sans-serif;font-weight:900;font-size:15px;color:var(--yellow);direction:rtl" id="order-reminder">Liquid Football — Real Madrid</span>
   </div>
-
-  <!-- Club selector (in order section removed — moved to hero) -->
 
   <!-- Size selector -->
   <div class="variant-label"><span>Taille</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">الحجم</span></div>
