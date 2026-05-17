@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8"/>
@@ -813,6 +813,296 @@ body::before {
   white-space: nowrap;
 }
 </style>
+<style>
+/* Shopify-inspired layout overrides */
+body{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(360px,460px);
+  gap:32px 44px;
+  width:min(1360px,calc(100% - 32px));
+  margin:0 auto;
+  padding:12px 16px 124px;
+  color:#111;
+  background:#f5f3ee;
+}
+body::before{
+  opacity:.18;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.38),transparent 220px),
+    radial-gradient(circle at 50% 0,rgba(245,197,0,.08),transparent 40%);
+}
+.header{
+  grid-column:1 / -1;
+  position:sticky;
+  top:0;
+  z-index:120;
+  padding:18px 2px 14px;
+  margin-bottom:4px;
+  background:linear-gradient(180deg,rgba(245,243,238,.98) 0%,rgba(245,243,238,.94) 72%,rgba(245,243,238,0) 100%);
+  backdrop-filter:blur(16px);
+}
+.logo{
+  color:#111;
+  text-shadow:none;
+  letter-spacing:5px;
+}
+.header-badge{
+  background:#111;
+  color:var(--yellow);
+  border-radius:999px;
+  padding:7px 12px;
+  font-size:11px;
+}
+.hero{
+  grid-column:1;
+  grid-row:2;
+  position:sticky;
+  top:92px;
+  min-height:auto;
+  padding:0;
+  display:block;
+}
+.hero-image-wrap{
+  padding-top:0;
+  background:#fff;
+  border:1px solid #e7e1d8;
+  border-radius:28px;
+  box-shadow:0 18px 50px rgba(0,0,0,.08);
+  overflow:hidden;
+}
+.hero-image{
+  width:100%;
+  max-width:none;
+  animation:none;
+  box-shadow:none;
+  border-radius:28px;
+  aspect-ratio:1/1;
+  object-fit:cover;
+}
+.hero-glow{display:none}
+.club-tag{
+  bottom:18px;
+  top:auto;
+  background:rgba(17,17,17,.9);
+  border-color:rgba(245,197,0,.24);
+}
+.product-info{
+  padding:0 !important;
+  text-align:left;
+}
+.product-tag{
+  display:block;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:12px;
+  letter-spacing:3px;
+  color:#8d7a41;
+  margin:0 0 8px;
+}
+.product-name{
+  font-size:clamp(48px,5vw,84px);
+  letter-spacing:1px;
+  color:#111;
+  -webkit-text-fill-color:initial;
+  background:none;
+  text-align:left;
+  margin-bottom:12px;
+}
+.product-name span{
+  background:none;
+  -webkit-text-fill-color:initial;
+  color:#111;
+}
+.price-wrap{
+  justify-content:flex-start;
+  gap:10px;
+  margin:0 0 18px;
+}
+.price-current{
+  font-size:40px;
+  color:#111;
+}
+.price-old{font-size:19px}
+.order-section{
+  grid-column:2;
+  grid-row:2 / span 2;
+  position:sticky;
+  top:92px;
+  background:#fff;
+  color:#111;
+  border:1px solid #e7e1d8;
+  border-radius:28px;
+  box-shadow:0 18px 50px rgba(0,0,0,.08);
+  padding:26px;
+}
+.section-label{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:11px;
+  letter-spacing:3px;
+  color:#8d7a41;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+.section-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:56px;
+  line-height:.9;
+  letter-spacing:1px;
+  color:#111;
+  margin-bottom:10px;
+}
+.order-section .product-info{margin-bottom:4px}
+.order-section .clubs-grid{
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:10px;
+  margin-top:8px;
+}
+.club-btn{
+  background:#f8f7f3;
+  border:1px solid #e1dbd2;
+  border-radius:999px;
+  padding:10px 12px;
+  box-shadow:none;
+}
+.club-btn-name{
+  font-size:12px;
+  letter-spacing:.06em;
+}
+.club-btn-dot{
+  width:8px;
+  height:8px;
+  border-width:2px;
+}
+.club-btn.active{
+  background:#111;
+  border-color:#111;
+}
+.sizes-row{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.size-btn{
+  background:#f8f7f3;
+  border:1px solid #e1dbd2;
+  border-radius:20px;
+  padding:14px 16px;
+}
+.size-btn.active{
+  background:#fff;
+  border-color:var(--yellow);
+  box-shadow:0 0 0 1px rgba(245,197,0,.35), inset 0 0 0 1px rgba(245,197,0,.15);
+}
+.delivery-row{gap:12px}
+.delivery-btn{
+  background:#f8f7f3;
+  border:1px solid #e1dbd2;
+  border-radius:20px;
+  padding:15px 16px;
+  min-height:92px;
+}
+.delivery-btn.active{
+  background:#fff;
+  border-color:var(--yellow);
+  box-shadow:0 0 0 1px rgba(245,197,0,.28);
+}
+.form-field{margin-top:14px}
+.form-label{font-size:13px;color:#262626}
+.form-input,.form-select{
+  background:#fff;
+  border:1px solid #dcd6cb;
+  color:#111;
+  border-radius:16px;
+  padding:14px 14px;
+}
+.form-input:focus,.form-select:focus{
+  border-color:var(--yellow);
+  box-shadow:0 0 0 3px rgba(245,197,0,.18);
+}
+.order-summary{
+  background:#f8f7f3;
+  border:1px solid #e1dbd2;
+  border-radius:22px;
+  padding:16px 18px;
+  margin-top:16px;
+}
+.order-btn{
+  border-radius:18px;
+  padding:16px 18px;
+  box-shadow:none;
+  margin-top:16px;
+}
+.trust-row{
+  margin-top:14px;
+  gap:10px;
+}
+.trust-item{
+  background:#f8f7f3;
+  border:1px solid #e1dbd2;
+  border-radius:999px;
+  padding:10px 12px;
+  font-size:12px;
+}
+.features-strip{display:none}
+.description-section{
+  grid-column:1;
+  grid-row:3;
+  background:#fff;
+  border:1px solid #e7e1d8;
+  border-radius:28px;
+  padding:18px 20px;
+  margin-top:18px;
+  box-shadow:0 18px 50px rgba(0,0,0,.06);
+}
+.desc-ar,.desc-fr{
+  color:#333;
+  line-height:1.85;
+  font-size:15px;
+}
+.desc-fr{
+  margin-top:10px;
+  color:#555;
+}
+.scroll-hint{display:none}
+.sticky-bar{
+  left:50%;
+  transform:translate(-50%,100%);
+  width:min(1360px,calc(100% - 32px));
+  border:1px solid #ddd6cb;
+  border-bottom:none;
+  border-radius:24px 24px 0 0;
+}
+.sticky-bar.visible{transform:translate(-50%,0)}
+@media(max-width:1100px){
+  body{
+    display:block;
+    width:100%;
+    margin:0;
+    padding:12px 14px 114px;
+  }
+  .header{
+    position:sticky;
+  }
+  .hero,.order-section{
+    position:static;
+    grid-column:auto;
+    grid-row:auto;
+  }
+  .hero{margin-bottom:18px}
+  .order-section{
+    padding:22px;
+    margin-top:18px;
+  }
+  .section-title{font-size:46px}
+  .order-section .clubs-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sizes-row,.delivery-row{grid-template-columns:1fr}
+  .sticky-bar{
+    width:auto;
+    left:0;
+    transform:translateY(100%);
+    border-radius:0;
+  }
+  .sticky-bar.visible{transform:translateY(0)}
+}
+</style>
 </head>
 <body>
 
@@ -831,26 +1121,6 @@ body::before {
       alt="Liquid Football Poster"/>
     <div class="club-tag" id="club-tag">REAL MADRID</div>
   </div>
-
-  <div class="product-info">
-    <div class="product-tag">ARCO — Art Print</div>
-    <div class="product-name">LIQUID<br/><span>FOOTBALL</span></div>
-  </div>
-
-  <!-- Club selector right below image -->
-  <div style="padding:0 20px 20px">
-    <div class="clubs-grid" id="clubs-grid"></div>
-  </div>
-
-  <div class="product-info" style="padding-top:0">
-    <div class="price-wrap">
-      <div class="price-current" id="hero-price">2 900 DZD</div>
-      <div class="price-old">3 600 DZD</div>
-      <div class="price-save">-19%</div>
-    </div>
-  </div>
-
-  <div class="scroll-hint"><span>↓</span></div>
 </div>
 
 <!-- Features strip -->
@@ -883,7 +1153,21 @@ body::before {
 <div class="order-section" id="order-section">
 
   <div class="section-label">Commander</div>
+  <div class="product-info">
+    <div class="product-tag">ARCO — Art Print</div>
+    <div class="product-name">LIQUID<br/><span>FOOTBALL</span></div>
+  </div>
+  <div class="price-wrap">
+    <div class="price-current" id="hero-price">2 900 DZD</div>
+    <div class="price-old">3 600 DZD</div>
+    <div class="price-save">-19%</div>
+  </div>
+
   <div class="section-title">CHOISIS TON CLUB</div>
+
+  <div style="padding:0 0 12px">
+    <div class="clubs-grid" id="clubs-grid"></div>
+  </div>
 
   <!-- Order reminder -->
   <div style="background:rgba(245,197,0,0.07);border:1px solid rgba(245,197,0,0.2);border-radius:12px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
