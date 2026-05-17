@@ -116,12 +116,6 @@ body::before {
   display: block;
   transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 60px rgba(245,197,0,0.1);
-  animation: float 4s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
 }
 
 .hero-image.switching {
@@ -850,11 +844,6 @@ body::before {
     <div class="club-tag" id="club-tag">REAL MADRID</div>
   </div>
 
-  <!-- Club selector right below image -->
-  <div style="padding:0 20px 20px">
-    <div class="clubs-grid" id="clubs-grid"></div>
-  </div>
-
   <div class="scroll-hint"><span>↓</span></div>
 </div>
 
@@ -863,6 +852,11 @@ body::before {
 
   <div class="section-label">Commander</div>
   <div class="section-title">CHOISIS TON CLUB</div>
+
+  <!-- Club selector -->
+  <div style="padding:8px 0 20px">
+    <div class="clubs-grid" id="clubs-grid"></div>
+  </div>
 
   <!-- Order reminder -->
   <div style="background:rgba(245,197,0,0.07);border:1px solid rgba(245,197,0,0.2);border-radius:12px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
