@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
 <script src="/meta-pixel.js"></script>
+<script src="/draft-capture.js"></script>
 <style>
 :root {
   --yellow: #F5C500;
@@ -1047,12 +1048,14 @@ let noestDesks = null;
 let currentShippingCost = 0;
 let checkoutTracked = false;
 let clubImageSwapToken = 0;
+let draftCaptureBound = false;
 
 // ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
   buildClubs();
   buildWilayas();
   setupStickyBar();
+  bindDraftCapture();
   if (window.ARCOMeta) {
     window.ARCOMeta.trackViewContent({
       content_name: 'Liquid Football',
@@ -1102,6 +1105,7 @@ function selectClub(el, idx) {
   if (preloader.complete && preloader.naturalWidth) finishSwap();
   updateGlow(idx);
   updateReminder();
+  window.ARCODraft?.triggerCapture?.();
 }
 
 function updateReminder() {
@@ -1131,6 +1135,7 @@ function selectSize(el, size, price) {
   document.getElementById('hero-price').textContent = total.toLocaleString() + ' DZD';
   document.getElementById('sticky-total').textContent = total.toLocaleString() + ' DZD';
   updateReminder();
+  window.ARCODraft?.triggerCapture?.();
 }
 
 // ── DELIVERY ──
@@ -1149,6 +1154,7 @@ function selectDelivery(el, type) {
     loadDesks();
   }
   updateShipping();
+  window.ARCODraft?.triggerCapture?.();
 }
 
 // ── WILAYA ──
@@ -1187,6 +1193,7 @@ async function onWilayaChange() {
 
   // Load desks if stop desk selected
   if (selectedDelivery === 'desk') loadDesks();
+  window.ARCODraft?.triggerCapture?.();
 }
 
 function updateShipping() {
@@ -1202,6 +1209,32 @@ function updateShipping() {
   document.getElementById('sticky-total').textContent = total.toLocaleString() + ' DZD';
 }
 
+function bindDraftCapture() {
+  if (draftCaptureBound || !window.ARCODraft) return;
+  draftCaptureBound = window.ARCODraft.bindDraftCapture({
+    phoneInputId: 'f-phone',
+    watchInputIds: ['f-name', 'f-phone', 'f-wilaya', 'f-commune', 'f-desk'],
+    buildPayload: () => {
+      const wilayaVal = document.getElementById('f-wilaya')?.value || '';
+      const [wilayaId, wilayaName] = wilayaVal.split('|');
+      return {
+        product_slug: PRODUCT_SLUG,
+        name: document.getElementById('f-name')?.value || '',
+        phone: document.getElementById('f-phone')?.value || '',
+        wilaya: wilayaName || '',
+        wilaya_id: Number(wilayaId || 0) || 0,
+        commune: document.getElementById('f-commune')?.value || '',
+        delivery_type: selectedDelivery === 'home' ? 'home' : 'pickup',
+        station_code: selectedDelivery === 'pickup' ? (document.getElementById('f-desk')?.value || '') : null,
+        variant_label: `${selectedClub.value} � ${selectedSize}`,
+        selected_options: { Club: selectedClub.value, Taille: selectedSize },
+        product_name: 'Liquid Football',
+        shipping_cost: currentShippingCost,
+        notes: 'draft lead',
+      };
+    },
+  });
+}
 // ── DESKS ──
 async function loadDesks() {
   if (noestDesks) { populateDesks(); return; }

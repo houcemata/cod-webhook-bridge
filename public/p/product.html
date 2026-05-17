@@ -155,11 +155,11 @@ function render(){
   updateTotals();
   bindDraftCapture();
 }
-function bindDraftCapture(){if(draftCaptureBound||!window.ARCODraft||!product)return;draftCaptureBound=window.ARCODraft.bindDraftCapture({phoneInputId:'f-phone',buildPayload:()=>({product_slug:product.slug,phone:document.getElementById('f-phone')?.value||'',variant_label:variant?.label||variant?.name||'Standard',selected_options:selectedOptions,product_name:product.name,delivery_type:delivery,shipping_cost:shippingCost(),notes:'draft lead'})});}
+function bindDraftCapture(){if(draftCaptureBound||!window.ARCODraft||!product)return;draftCaptureBound=window.ARCODraft.bindDraftCapture({phoneInputId:'f-phone',watchInputIds:['f-name','f-phone','f-wilaya','f-commune','f-desk'],buildPayload:()=>({product_slug:product.slug,name:document.getElementById('f-name')?.value||'',phone:document.getElementById('f-phone')?.value||'',wilaya:document.getElementById('f-wilaya')?.value.split('|')[1]||'',wilaya_id:Number((document.getElementById('f-wilaya')?.value||'').split('|')[0]||0)||0,commune:document.getElementById('f-commune')?.value||'',delivery_type:delivery,station_code:delivery==='pickup'?selectedDesk:null,variant_label:variant?.label||variant?.name||'Standard',selected_options:selectedOptions,product_name:product.name,shipping_cost:shippingCost(),notes:'draft lead'})});}
 function setImage(btn,src){document.querySelectorAll('.thumb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('main-img').src=src;}
-function selectVariant(i,btn){variant=variants()[i];document.querySelectorAll('#variant-choices .choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();}
-function selectOption(name,value,btn){name=decodeURIComponent(name);value=decodeURIComponent(value);selectedOptions[name]=value;variant=findSelectedVariant();btn.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();}
-function selectDelivery(ev,type){ev.preventDefault();delivery=type;selectedDesk='';ev.currentTarget.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));ev.currentTarget.classList.add('active');document.getElementById('commune-wrap').style.display=type==='home'?'grid':'none';document.getElementById('desk-wrap').style.display=type==='pickup'?'grid':'none';if(type==='pickup')loadDesks();updateTotals();}
+function selectVariant(i,btn){variant=variants()[i];document.querySelectorAll('#variant-choices .choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();window.ARCODraft?.triggerCapture?.();}
+function selectOption(name,value,btn){name=decodeURIComponent(name);value=decodeURIComponent(value);selectedOptions[name]=value;variant=findSelectedVariant();btn.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();window.ARCODraft?.triggerCapture?.();}
+function selectDelivery(ev,type){ev.preventDefault();delivery=type;selectedDesk='';ev.currentTarget.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));ev.currentTarget.classList.add('active');document.getElementById('commune-wrap').style.display=type==='home'?'grid':'none';document.getElementById('desk-wrap').style.display=type==='pickup'?'grid':'none';if(type==='pickup')loadDesks();updateTotals();window.ARCODraft?.triggerCapture?.();}
 async function onWilayaChange(){
   const val=document.getElementById('f-wilaya').value;if(!val)return;selectedDesk='';
   const id=val.split('|')[0];
@@ -168,7 +168,7 @@ async function onWilayaChange(){
   const data=await res.json();shipping=data[0]||{home_delivery:0,stop_desk:0};
   document.getElementById('home-price').textContent=money(shipping.home_delivery);
   document.getElementById('desk-price').textContent=money(shipping.stop_desk);
-  if(delivery==='pickup')loadDesks();updateTotals();
+  if(delivery==='pickup')loadDesks();updateTotals();window.ARCODraft?.triggerCapture?.();
 }
 function populateCommunes(wilayaId){
   const sel=document.getElementById('f-commune');if(!sel)return;

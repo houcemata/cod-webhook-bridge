@@ -52,7 +52,7 @@
       if (!PHONE_RE.test(phone)) return;
 
       const key = storageKey({ ...payload, phone });
-      if (localStorage.getItem(key) || inFlight.get(key)) return;
+      if (inFlight.get(key)) return;
 
       inFlight.set(key, true);
       try {
@@ -81,6 +81,17 @@
     input.addEventListener("input", scheduleCapture);
     input.addEventListener("blur", attemptCapture);
 
+    const extraIds = Array.isArray(config.watchInputIds) ? config.watchInputIds : [];
+    extraIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el || el === input) return;
+      el.addEventListener("input", scheduleCapture);
+      el.addEventListener("change", scheduleCapture);
+      el.addEventListener("blur", attemptCapture);
+    });
+
+    window.ARCODraft.triggerCapture = scheduleCapture;
+
     return true;
   }
 
@@ -88,5 +99,6 @@
     bindDraftCapture,
     getStoredDraftId,
     clearStoredDraftId,
+    triggerCapture: null,
   };
 })();

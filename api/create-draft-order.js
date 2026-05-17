@@ -78,6 +78,22 @@ export default async function handler(req, res) {
 
     const variant = resolveVariant(product, body);
     const productName = product.name || product.slug;
+    const shippingCost = Number(body.shipping_cost || 0);
+    const draftData = {
+      name: normalizeText(body.name) || "",
+      phone,
+      wilaya: normalizeText(body.wilaya) || "",
+      commune: normalizeText(body.commune) || "",
+      type_livraison: body.delivery_type === "pickup" ? "pickup" : "home",
+      station_code: body.delivery_type === "pickup" ? normalizeText(body.station_code) || null : null,
+      product: productName,
+      variable: normalizeText(variant.label || variant.name || "Standard"),
+      prix_total: Number(variant.price || product.price || 0) + shippingCost,
+      shipping_cost: shippingCost,
+      status: "draft",
+      notes: normalizeText(body.notes) || "draft lead",
+    };
+    const orderData = { order_id: createOrderId(), ...draftData };
 
     const { data: existingDraft } = await supabase
       .from("orders")
@@ -90,25 +106,16 @@ export default async function handler(req, res) {
       .maybeSingle();
 
     if (existingDraft) {
+      const { error: updateError } = await supabase
+        .from("orders")
+        .update(draftData)
+        .eq("id", existingDraft.id);
+      if (updateError) {
+        console.error("[create-draft-order] update failed:", updateError);
+        return res.status(500).json({ error: "Failed to update draft order" });
+      }
       return res.status(200).json({ ok: true, draft_order_id: existingDraft.order_id, reused: true });
     }
-
-    const orderId = createOrderId();
-    const orderData = {
-      order_id: orderId,
-      name: normalizeText(body.name) || "",
-      phone,
-      wilaya: normalizeText(body.wilaya) || "",
-      commune: normalizeText(body.commune) || "",
-      type_livraison: body.delivery_type === "pickup" ? "pickup" : "home",
-      station_code: body.delivery_type === "pickup" ? normalizeText(body.station_code) || null : null,
-      product: productName,
-      variable: normalizeText(variant.label || variant.name || "Standard"),
-      prix_total: Number(variant.price || product.price || 0),
-      shipping_cost: Number(body.shipping_cost || 0),
-      status: "draft",
-      notes: normalizeText(body.notes) || "draft lead",
-    };
 
     const { error: insertError } = await supabase.from("orders").insert(orderData);
     if (insertError) {
@@ -116,7 +123,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Failed to save draft order" });
     }
 
-    return res.status(200).json({ ok: true, draft_order_id: orderId });
+    return res.status(200).json({ ok: true, draft_order_id: orderData.order_id });
   } catch (err) {
     console.error("[create-draft-order]", err);
     return res.status(500).json({ error: err.message || "Draft order creation failed" });
