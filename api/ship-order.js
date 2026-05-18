@@ -18,6 +18,21 @@ const WILAYA_MAP = {
   "el meghaier": 57, "el meniaa": 58,
 };
 
+const WILAYA_ALIASES = {
+  "bordj bou arriedj": 34,
+  "bordj bou arreridj": 34,
+  "bordj bou arrÃ©ridj": 34,
+  "bordj bou arréridj": 34,
+  "setif": 19,
+  "sétif": 19,
+  "sÃ©tif": 19,
+  "medea": 26,
+  "médéa": 26,
+  "mÃ©dÃ©a": 26,
+  "ain defla": 44,
+  "aïn defla": 44,
+};
+
 function getWilayaId(wilayaName) {
   if (!wilayaName) return null;
   const raw = String(wilayaName).trim();
@@ -26,6 +41,7 @@ function getWilayaId(wilayaName) {
   for (const candidate of candidates) {
     const cleaned = normalizeWilayaKey(candidate);
     if (cleaned && WILAYA_MAP[cleaned]) return WILAYA_MAP[cleaned];
+    if (cleaned && WILAYA_ALIASES[cleaned]) return WILAYA_ALIASES[cleaned];
   }
 
   return null;
