@@ -548,7 +548,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 
       <!-- FINANCE KPIs -->
       <div class="kpi-grid" style="margin-bottom:20px">
-        <div class="kpi-card hi"><div class="kpi-icon">💵</div><div class="kpi-label">Revenue</div><div class="kpi-value" id="fin-revenue">—</div><div class="kpi-sub">Delivered orders</div></div>
+        <div class="kpi-card hi"><div class="kpi-icon">💵</div><div class="kpi-label">Product Revenue</div><div class="kpi-value" id="fin-revenue">—</div><div class="kpi-sub">Delivered orders minus shipping</div></div>
         <div class="kpi-card"><div class="kpi-icon">📤</div><div class="kpi-label">Expenses</div><div class="kpi-value" id="fin-expenses">—</div><div class="kpi-sub">All costs</div></div>
         <div class="kpi-card"><div class="kpi-icon">📈</div><div class="kpi-label">Net Profit</div><div class="kpi-value" id="fin-profit">—</div><div class="kpi-sub" id="fin-margin">—% margin</div></div>
         <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-label">Cost / Order</div><div class="kpi-value" id="fin-cpo">—</div><div class="kpi-sub">Per delivered order</div></div>
@@ -1609,7 +1609,7 @@ async function updateFinance(){
 
   // Revenue from delivered orders
   const deliveredOrders=allOrders.filter(o=>o.status==='delivered'&&inFinRange(o.created_at,range));
-  const revenue=deliveredOrders.reduce((s,o)=>s+Number(o.prix_total||0),0);
+  const revenue=deliveredOrders.reduce((s,o)=>s+Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0)),0);
 
   // Expenses in period
   const periodExpenses=allExpenses.filter(e=>inFinRange(e.date,range));
@@ -1922,7 +1922,7 @@ function renderRevenueBySize(deliveredOrders){
   const counts={M:0,L:0,XL:0,XXL:0,Other:0};
   deliveredOrders.forEach(o=>{
     const v=(o.variable||'').toUpperCase();
-    const p=Number(o.prix_total||0);
+    const p=Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0));
     if(v.includes('30X40')||v.includes('30 X 40')||v.startsWith('M')){sizes.M+=p;counts.M++;}
     else if(v.includes('40X60')||v.includes('40 X 60')||v.startsWith('L')){sizes.L+=p;counts.L++;}
     else if(v.includes('60X80')||v.includes('60 X 80')||v.startsWith('XL')&&!v.startsWith('XXL')){sizes.XL+=p;counts.XL++;}
