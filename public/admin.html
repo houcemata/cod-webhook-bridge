@@ -391,7 +391,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           <div class="page-title">DASHBOARD</div>
           <div class="page-subtitle" id="dash-date"></div>
         </div>
-        <button class="btn btn-ghost" onclick="refreshAll()">↻ Refresh</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-ghost" onclick="runTrackerNow()" title="Run Noest tracker now">Run Tracker</button><button class="btn btn-ghost" onclick="refreshAll()">Refresh</button></div>
       </div>
 
       <!-- DASHBOARD FILTERS -->
@@ -1041,6 +1041,26 @@ async function doLogout(){
 async function refreshAll(){
   await Promise.all([loadOrders(),loadProducts(),loadOperators(),loadHistory()]);
   renderCurrentAdminPage();
+}
+
+async function runTrackerNow(){
+  try{
+    const {data:{session}}=await sb.auth.getSession();
+    const token=session?.access_token;
+    if(!token){toast('Please sign in again',true);return;}
+    const res=await fetch('/api/track-orders',{
+      method:'GET',
+      headers:{Authorization:`Bearer ${token}`}
+    });
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok){
+      throw new Error(data.error||data.message||`Tracker failed (${res.status})`);
+    }
+    toast(`Tracker ran: ${data.orders_updated||0} updated`);
+    await refreshAll();
+  }catch(err){
+    toast(err.message||'Tracker failed',true);
+  }
 }
 window.addEventListener('DOMContentLoaded',async()=>{
   const{data:{session}}=await sb.auth.getSession();
