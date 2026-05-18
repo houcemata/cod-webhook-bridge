@@ -20,14 +20,42 @@ const WILAYA_MAP = {
 
 function getWilayaId(wilayaName) {
   if (!wilayaName) return null;
-  const cleaned = String(wilayaName)
+  const raw = String(wilayaName).trim();
+  const candidates = [raw, decodeMojibake(raw)];
+
+  for (const candidate of candidates) {
+    const cleaned = normalizeWilayaKey(candidate);
+    if (cleaned && WILAYA_MAP[cleaned]) return WILAYA_MAP[cleaned];
+  }
+
+  return null;
+}
+
+function decodeMojibake(value) {
+  const text = String(value || "");
+  if (!/[��]/.test(text)) return text;
+  try {
+    return new TextDecoder("utf-8").decode(Uint8Array.from(text, (ch) => ch.charCodeAt(0)));
+  } catch {
+    return text;
+  }
+}
+
+function stripDiacritics(value) {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function normalizeWilayaKey(value) {
+  return stripDiacritics(value)
     .toLowerCase()
     .trim()
     .replace("algiers", "alger")
     .replace(/^\d+\s*-\s*/, "")
-    .replace(/\s*Ø§Ù„Ø¬Ø²Ø§Ø¦Ø±\s*/, "")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .replace(/\s+/g, " ")
     .trim();
-  return WILAYA_MAP[cleaned] || null;
 }
 
 function normalizePhone(phone) {
