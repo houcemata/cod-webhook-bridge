@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/track-orders",
+      "schedule": "*/30 * * * *"
+    }
+  ],
   "rewrites": [
     { "source": "/p/:slug", "destination": "/p/product.html?slug=:slug" }
   ],
