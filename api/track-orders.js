@@ -20,19 +20,45 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 const NOEST_BASE = "https://app.noest-dz.com/api/public";
 
 /**
- * Map Noest event keys to ARCO order statuses
- * Only tracks the 5 important events
+ * Map Noest event keys to ARCO order statuses.
+ * We keep the map broad because Noest can return slightly different
+ * keys depending on carrier, language, or API version.
  */
 const EVENT_STATUS_MAP = {
-  validation_reception: "shipping",      // Picked up by driver
-  fdr_activated: "shipping",             // Out for delivery
-  livre: "delivered",                    // Delivered
-  livred: "delivered",                   // Delivered (alternate)
-  colis_suspendu: "suspended",           // Suspended
-  return_asked_by_customer: "canceled",  // Return requested
-  return_asked_by_hub: "canceled",       // Return in transit
-  retour_dispatched_to_partenaires: "canceled",  // Return dispatched
-  livraison_echoue_recu: "canceled",     // Return received
+  validation_reception: "shipping",
+  reception_validation: "shipping",
+  picked_up: "shipping",
+  pickup: "shipping",
+  collected: "shipping",
+  fdr_activated: "shipping",
+  out_for_delivery: "shipping",
+  en_livraison: "shipping",
+  transit: "shipping",
+  in_transit: "shipping",
+
+  livre: "delivered",
+  livred: "delivered",
+  delivered: "delivered",
+  delivery_delivered: "delivered",
+  livraison_terminee: "delivered",
+  livraison_termine: "delivered",
+  colis_livre: "delivered",
+  parcel_delivered: "delivered",
+  shipment_delivered: "delivered",
+  delivered_to_address: "delivered",
+  delivered_to_customer: "delivered",
+  closed: "delivered",
+
+  colis_suspendu: "suspended",
+  suspended: "suspended",
+  suspendu: "suspended",
+
+  return_asked_by_customer: "canceled",
+  return_asked_by_hub: "canceled",
+  retour_dispatched_to_partenaires: "canceled",
+  livraison_echoue_recu: "canceled",
+  returned: "canceled",
+  return_to_sender: "canceled",
 };
 
 /**
@@ -238,11 +264,25 @@ async function getLatestNoestEvent(trackingNumber) {
       return null;
     }
 
-    // Get the LATEST event (first in array = most recent)
-    const latestActivity = orderData.activity[0];
+    // Noest payloads are not always consistently ordered across carriers,
+    // so sort by the event timestamp when available and fall back to the
+    // original order if parsing fails.
+    const activity = [...orderData.activity].sort((a, b) => {
+      const aTime = parseNoestDate(a?.date || a?.created_at || a?.datetime);
+      const bTime = parseNoestDate(b?.date || b?.created_at || b?.datetime);
+      return bTime - aTime;
+    });
+
+    const latestActivity = activity[0];
 
     return {
-      event_key: latestActivity.event_key || latestActivity.event,
+      event_key: normalizeNoestEventKey(
+        latestActivity.event_key ||
+        latestActivity.event ||
+        latestActivity.status ||
+        latestActivity.label ||
+        ""
+      ),
       event_name: latestActivity.event,
       date: latestActivity.date,
     };
@@ -250,6 +290,25 @@ async function getLatestNoestEvent(trackingNumber) {
     console.error(`[getLatestNoestEvent] Error for ${trackingNumber}:`, err.message);
     return null;
   }
+}
+
+function parseNoestDate(value) {
+  if (!value) return 0;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function normalizeNoestEventKey(value) {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[ÃÂ]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[\s\-\/]+/g, "_")
+    .replace(/[^\p{L}\p{N}_]+/gu, "")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "");
 }
 async function sendNtfyNotification(topic, title, message) {
   try {
