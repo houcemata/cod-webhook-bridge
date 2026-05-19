@@ -294,6 +294,18 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 .prod-log-row:last-child{border-bottom:none}
 .size-revenue-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
 .size-revenue-row:last-child{border-bottom:none}
+.ad-summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.ad-summary-card{padding:14px 16px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)}
+.ad-summary-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--gray);margin-bottom:8px}
+.ad-summary-value{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--yellow);line-height:1}
+.ad-summary-sub{font-size:11px;color:var(--gray);margin-top:6px;line-height:1.4}
+.ad-table{border:1px solid rgba(255,255,255,0.06);border-radius:18px;overflow:hidden;background:rgba(255,255,255,0.02);overflow-x:auto}
+.ad-table-row{display:grid;grid-template-columns:110px 110px 110px 110px 110px 120px 120px 120px 120px;gap:0;align-items:center;min-width:1040px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.ad-table-row:last-child{border-bottom:none}
+.ad-table-head{background:rgba(255,255,255,0.03);font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray)}
+.ad-cell-date{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:0.8px;color:var(--white)}
+.ad-cell-num{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--yellow)}
+.ad-cell-muted{color:var(--gray);font-size:12px}
 .history-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px}
 .history-row:last-child{border-bottom:none}
 .history-title{font-weight:700;font-size:14px;margin-bottom:3px}
@@ -534,7 +546,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     <!-- FINANCE -->
     <div class="page" id="page-finance">
       <div class="page-header">
-        <div><div class="page-title">FINANCE</div><div class="page-subtitle">Revenue, expenses & production</div></div>
+        <div><div class="page-title">FINANCE</div><div class="page-subtitle">Revenue, ads & production</div></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <select class="filter-select" id="fin-period" onchange="updateFinance()">
             <option value="month">This Month</option>
@@ -555,6 +567,18 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         <div class="kpi-card"><div class="kpi-icon">🖼️</div><div class="kpi-label">Frames Made</div><div class="kpi-value" id="fin-frames">—</div><div class="kpi-sub">In period</div></div>
         <div class="kpi-card"><div class="kpi-icon">👩‍💼</div><div class="kpi-label">Staff Costs</div><div class="kpi-value" id="fin-staffcost">—</div><div class="kpi-sub">Employee pay</div></div>
         <div class="kpi-card hi"><div class="kpi-icon">📦</div><div class="kpi-label">Stock Value</div><div class="kpi-value" id="fin-stock-value">—</div><div class="kpi-sub">At cost price</div></div>
+      </div>
+
+      <div class="glass-card" style="padding:20px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">AD PERFORMANCE</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:4px">Daily ad spend vs orders and confirmed pipeline</div>
+          </div>
+          <div id="ad-performance-source" style="font-size:12px;color:var(--gray)"></div>
+        </div>
+        <div id="ad-performance-summary" class="ad-summary-grid" style="margin-bottom:16px"></div>
+        <div id="ad-performance-table" class="ad-table"></div>
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px">
@@ -1549,6 +1573,7 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{
 
 // ── FINANCE ──
 let allProductionLogs=[], allStockItems=[], allExpenses=[], allPayLogs=[], allStockUsage=[];
+let adPerformanceSummary=null;
 let restockingItemId=null, restockMode='add', markPaidEmployee=null;
 
 const FRAME_RATES={m:60,l:60,xl:100,xxl:200};
@@ -1603,12 +1628,144 @@ function payLogInRange(log,range){
   return inFinRange(log?.paid_at||log?.created_at,range);
 }
 
+async function loadAdPerformance(range){
+  const {data:{session}}=await sb.auth.getSession();
+  const token=session?.access_token;
+  if(!token) return {skipped:true,reason:'missing_session',daily:[],meta:{total_spend:0},tiktok:{total_spend:0}};
+  const from=range?.from instanceof Date ? range.from.toISOString().slice(0,10) : '';
+  const to=range?.to instanceof Date ? new Date(range.to.getTime()-1).toISOString().slice(0,10) : '';
+  if(!from||!to) return {skipped:true,reason:'missing_range',daily:[],meta:{total_spend:0},tiktok:{total_spend:0}};
+  const res=await fetch(`/api/ad-performance?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,{
+    headers:{Authorization:`Bearer ${token}`}
+  });
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error||data.message||`Ad performance failed (${res.status})`);
+  return data;
+}
+
+function dayKey(dateStr){
+  if(!dateStr)return'';
+  const d=new Date(dateStr);
+  if(Number.isNaN(d.getTime())) return String(dateStr).slice(0,10);
+  return d.toISOString().slice(0,10);
+}
+
+function formatDayLabel(dateKey){
+  const d=new Date(`${dateKey}T00:00:00Z`);
+  if(Number.isNaN(d.getTime())) return dateKey;
+  return d.toLocaleDateString('en-DZ',{month:'short',day:'2-digit'});
+}
+
+function safeRate(n,d){
+  return d?((n/d)*100):0;
+}
+
+function buildOrderDailyRows(orders){
+  const map=new Map();
+  orders.forEach(o=>{
+    const key=dayKey(o.created_at);
+    if(!key)return;
+    if(!map.has(key)) map.set(key,{date:key,total:0,confirmed:0,delivered:0});
+    const row=map.get(key);
+    row.total++;
+    if(['confirmed','shipped','delivered'].includes(o.status)) row.confirmed++;
+    if(o.status==='delivered') row.delivered++;
+  });
+  return [...map.values()].sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+function renderAdPerformancePanel(range,summary,periodOrders,deliveredOrders,confirmedOrders){
+  const sourceEl=document.getElementById('ad-performance-source');
+  const summaryEl=document.getElementById('ad-performance-summary');
+  const tableEl=document.getElementById('ad-performance-table');
+  if(!summaryEl||!tableEl)return;
+
+  const metaSpend=Number(summary?.meta?.total_spend||0);
+  const tiktokSpend=Number(summary?.tiktok?.total_spend||0);
+  const totalSpend=metaSpend+tiktokSpend;
+  const totalOrders=periodOrders.length;
+  const confirmedCount=confirmedOrders.length;
+  const deliveredCount=deliveredOrders.length;
+  const confirmRate=safeRate(confirmedCount,totalOrders);
+  const shipRate=safeRate(deliveredCount,confirmedCount);
+  const confirmedCPA=confirmedCount?totalSpend/confirmedCount:0;
+  const realCPA=deliveredCount?totalSpend/deliveredCount:0;
+  const dailyOrders=buildOrderDailyRows(periodOrders);
+  const spendMap=new Map();
+  (summary?.daily||[]).forEach(row=>{
+    if(!row?.date)return;
+    spendMap.set(row.date,{
+      date:row.date,
+      meta:Number(row.meta_spend||0),
+      tiktok:Number(row.tiktok_spend||0),
+    });
+  });
+  const mergedDates=[...new Set([...spendMap.keys(), ...dailyOrders.map(r=>r.date)])].sort();
+
+  if(sourceEl){
+    const metaState=summary?.meta?.skipped?'Meta not connected':(summary?.meta?.ok===false?'Meta error':'Meta connected');
+    const tiktokState=summary?.tiktok?.skipped?'TikTok not connected':(summary?.tiktok?.ok===false?'TikTok error':'TikTok connected');
+    sourceEl.textContent=`${metaState} | ${tiktokState}`;
+  }
+
+  summaryEl.innerHTML=[
+    {label:'Meta Spend', value:fmtDZD(metaSpend), sub:'Ads Manager'},
+    {label:'TikTok Spend', value:fmtDZD(tiktokSpend), sub:'Ads Manager'},
+    {label:'Total Ad Spend', value:fmtDZD(totalSpend), sub:'Meta + TikTok'},
+    {label:'Total Orders', value:String(totalOrders), sub:'In selected period'},
+    {label:'Confirmed Orders', value:String(confirmedCount), sub:'Confirmed / shipped / delivered'},
+    {label:'Delivered Orders', value:String(deliveredCount), sub:'Reached delivery'},
+    {label:'Confirmed CPA', value:fmtDZD(confirmedCPA), sub:'Spend / confirmed orders'},
+    {label:'Real CPA', value:fmtDZD(realCPA), sub:'Spend / delivered orders'},
+    {label:'Confirmation Rate', value:`${confirmRate.toFixed(1)}%`, sub:'Confirmed / total orders'},
+    {label:'Shipping Rate', value:`${shipRate.toFixed(1)}%`, sub:'Delivered / confirmed orders'},
+  ].map(card=>`
+    <div class="ad-summary-card">
+      <div class="ad-summary-label">${esc(card.label)}</div>
+      <div class="ad-summary-value">${esc(card.value)}</div>
+      <div class="ad-summary-sub">${esc(card.sub)}</div>
+    </div>
+  `).join('');
+
+  if(!mergedDates.length){
+    tableEl.innerHTML='<div style="padding:18px;color:var(--gray);font-size:13px">No ad spend or order data in the selected period yet.</div>';
+    return;
+  }
+
+  const headers=['Date','Meta','TikTok','Total Spend','Orders','Confirmed','Delivered','Confirmed CPA','Real CPA'];
+  const headerRow=`<div class="ad-table-row ad-table-head">${headers.map(h=>`<div>${esc(h)}</div>`).join('')}</div>`;
+  const rows=mergedDates.map(date=>{
+    const spend=spendMap.get(date)||{meta:0,tiktok:0};
+    const dayOrders=dailyOrders.find(r=>r.date===date)||{total:0,confirmed:0,delivered:0};
+    const total=spend.meta+spend.tiktok;
+    const confirmedDayCPA=dayOrders.confirmed?total/dayOrders.confirmed:0;
+    const realDayCPA=dayOrders.delivered?total/dayOrders.delivered:0;
+    return `
+      <div class="ad-table-row">
+        <div class="ad-cell-date">${esc(formatDayLabel(date))}</div>
+        <div class="ad-cell-num">${fmtDZD(spend.meta)}</div>
+        <div class="ad-cell-num">${fmtDZD(spend.tiktok)}</div>
+        <div class="ad-cell-num">${fmtDZD(total)}</div>
+        <div class="ad-cell-num">${dayOrders.total}</div>
+        <div class="ad-cell-num">${dayOrders.confirmed}</div>
+        <div class="ad-cell-num">${dayOrders.delivered}</div>
+        <div class="ad-cell-num">${fmtDZD(confirmedDayCPA)}</div>
+        <div class="ad-cell-num">${fmtDZD(realDayCPA)}</div>
+      </div>
+    `;
+  }).join('');
+
+  tableEl.innerHTML=headerRow+rows;
+}
+
 async function updateFinance(){
   await loadFinanceData();
   const range=getFinPeriodRange();
+  const periodOrders=allOrders.filter(o=>inFinRange(o.created_at,range));
 
   // Revenue from delivered orders
-  const deliveredOrders=allOrders.filter(o=>o.status==='delivered'&&inFinRange(o.created_at,range));
+  const deliveredOrders=periodOrders.filter(o=>o.status==='delivered');
+  const confirmedOrders=periodOrders.filter(o=>['confirmed','shipped','delivered'].includes(o.status));
   const revenue=deliveredOrders.reduce((s,o)=>s+Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0)),0);
 
   // Expenses in period
@@ -1630,6 +1787,16 @@ async function updateFinance(){
   const printerSqm=periodLogs.reduce((s,l)=>s+Number(l.print_sqm||0),0);
   const printerPay=printerSqm*450;
   const stockValue=allStockItems.reduce((s,i)=>s+Number(i.quantity||0)*Number(i.cost_per_unit||0),0);
+  let adSummary=null;
+  try{
+    adSummary=await loadAdPerformance(range);
+  }catch(err){
+    adSummary={error:err.message||'Unable to load ad performance',daily:[],meta:{total_spend:0},tiktok:{total_spend:0}};
+    const sourceEl=document.getElementById('ad-performance-source');
+    if(sourceEl) sourceEl.textContent=adSummary.error;
+  }
+  adPerformanceSummary=adSummary;
+  renderAdPerformancePanel(range,adSummary,periodOrders,deliveredOrders,confirmedOrders);
 
   const staffCost=frameMakerPay+operatorPay+printGuyPay+printerPay;
   const totalExp=expTotal+staffCost;
