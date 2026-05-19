@@ -1395,6 +1395,34 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
 
     // Show success
     document.getElementById('success-screen').classList.add('show');
+    const phoneBtn = document.getElementById('success-phone-btn');
+    const copyToast = document.getElementById('success-copy-toast');
+    if (phoneBtn && copyToast) {
+      phoneBtn.onclick = async () => {
+        const phone = '0550374607';
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(phone);
+          } else {
+            throw new Error('clipboard unavailable');
+          }
+        } catch (err) {
+          const ta = document.createElement('textarea');
+          ta.value = phone;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          ta.setAttribute('readonly', '');
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        copyToast.classList.add('show');
+        clearTimeout(window.__successCopyToastTimer);
+        window.__successCopyToastTimer = setTimeout(() => copyToast.classList.remove('show'), 1800);
+      };
+    }
 
   } catch(e) {
     btn.classList.remove('loading');
