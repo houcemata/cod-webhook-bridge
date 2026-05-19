@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8"/>
@@ -714,7 +714,7 @@ body::before {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 42px;
   letter-spacing: 3px;
-  color: #000000;
+  color: var(--yellow);
   margin-bottom: 12px;
 }
 
@@ -732,36 +732,73 @@ body::before {
   font-size: 15px;
   color: var(--gray);
   letter-spacing: 0.5px;
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 
-.success-order-id {
-  background: var(--dark2);
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
-  padding: 16px 24px;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 24px;
-  letter-spacing: 2px;
-  color: #000000;
-  margin-bottom: 32px;
-}
-
-.success-back-btn {
-  background: var(--yellow);
-  color: var(--black);
-  border: none;
-  border-radius: 12px;
-  padding: 14px 32px;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 700;
+.success-call-note {
+  font-family: 'Cairo', sans-serif;
   font-size: 16px;
+  line-height: 1.8;
+  color: var(--white);
+  margin: 6px 0 16px;
+  direction: rtl;
+}
+
+.success-phone-wrap {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+  margin-bottom: 28px;
+}
+
+.success-phone-btn {
+  width: 100%;
+  min-height: 56px;
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  background: var(--dark2);
+  color: var(--yellow);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
   letter-spacing: 2px;
-  text-transform: uppercase;
   cursor: pointer;
 }
 
-/* Sticky order bar for mobile */
+.success-phone-btn:active {
+  transform: translateY(1px);
+}
+
+.success-copy-hint {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: var(--gray);
+}
+
+.success-copy-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: rgba(8,8,8,.96);
+  border: 1px solid rgba(245,197,0,.3);
+  color: var(--yellow);
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  letter-spacing: 1px;
+  z-index: 700;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
+
+.success-copy-toast.show {
+  opacity: 1;
+}/* Sticky order bar for mobile */
 .sticky-bar {
   position: fixed;
   bottom: 0;
@@ -980,10 +1017,13 @@ body::before {
   <div class="success-title">COMMANDE REÇUE!</div>
   <div class="success-ar">شكراً لك! طلبك تم بنجاح</div>
   <div class="success-fr">Notre équipe vous contactera sous peu pour confirmer votre commande.</div>
-  <div class="success-order-id" id="success-order-id">#000000</div>
-  <button class="success-back-btn" onclick="location.reload()">Commander à nouveau</button>
+  <div class="success-call-note">احفظ هذا الرقم حتى نعاود الاتصال بك لاحقاً.</div>
+  <div class="success-phone-wrap">
+    <button class="success-phone-btn" id="success-phone-btn" type="button">0550374607</button>
+    <div class="success-copy-hint">اضغط لنسخ الرقم</div>
+  </div>
 </div>
-
+<div class="success-copy-toast" id="success-copy-toast">تم نسخ الرقم</div>
 <!-- Sticky bar -->
 <div class="sticky-bar" id="sticky-bar">
   <div class="sticky-price">
@@ -1226,7 +1266,7 @@ function bindDraftCapture() {
         commune: document.getElementById('f-commune')?.value || '',
         delivery_type: selectedDelivery === 'home' ? 'home' : 'pickup',
         station_code: selectedDelivery === 'pickup' ? (document.getElementById('f-desk')?.value || '') : null,
-        variant_label: `${selectedClub.value} � ${selectedSize}`,
+        variant_label: `${selectedClub.value} � ${selectedSize}`,
         selected_options: { Club: selectedClub.value, Taille: selectedSize },
         product_name: 'Liquid Football',
         shipping_cost: currentShippingCost,
@@ -1354,7 +1394,6 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
     }
 
     // Show success
-    document.getElementById('success-order-id').textContent = '#' + result.order_id;
     document.getElementById('success-screen').classList.add('show');
 
   } catch(e) {
@@ -1376,5 +1415,7 @@ function toast(msg, isErr = false) {
 </script>
 </body>
 </html>
+
+
 
 
