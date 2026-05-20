@@ -1,4 +1,4 @@
-import { requireRole } from "./_auth.js";
+﻿import { requireRole } from "./_auth.js";
 
 const NOEST_BASE = "https://app.noest-dz.com/api/public";
 
@@ -21,16 +21,16 @@ const WILAYA_MAP = {
 const WILAYA_ALIASES = {
   "bordj bou arriedj": 34,
   "bordj bou arreridj": 34,
+  "bordj bou arrÃ©ridj": 34,
   "bordj bou arréridj": 34,
-  "bordj bou arr�ridj": 34,
   "setif": 19,
-  "s�tif": 19,
   "sétif": 19,
+  "sÃ©tif": 19,
   "medea": 26,
-  "m�d�a": 26,
   "médéa": 26,
+  "mÃ©dÃ©a": 26,
   "ain defla": 44,
-  "a�n defla": 44,
+  "aïn defla": 44,
 };
 
 function getWilayaId(wilayaName) {
@@ -49,7 +49,7 @@ function getWilayaId(wilayaName) {
 
 function decodeMojibake(value) {
   const text = String(value || "");
-  if (!/[��]/.test(text)) return text;
+  if (!/[ÃÂ]/.test(text)) return text;
   try {
     return new TextDecoder("utf-8").decode(Uint8Array.from(text, (ch) => ch.charCodeAt(0)));
   } catch {
@@ -118,6 +118,22 @@ async function noestPost(endpoint, body, token) {
   });
   const data = await response.json();
   return { ok: response.ok, status: response.status, data };
+}
+
+function formatNoestError(data) {
+  if (!data) return "Noest create failed";
+  if (typeof data === "string") return data;
+  const pieces = [];
+  if (data.message) pieces.push(String(data.message));
+  if (data.error) pieces.push(String(data.error));
+  if (Array.isArray(data.errors) && data.errors.length) {
+    pieces.push(`errors: ${data.errors.map((e) => JSON.stringify(e)).join(" | ")}`);
+  }
+  if (data.details) pieces.push(`details: ${JSON.stringify(data.details)}`);
+  if (data.validation) pieces.push(`validation: ${JSON.stringify(data.validation)}`);
+  if (data.field) pieces.push(`field: ${JSON.stringify(data.field)}`);
+  if (!pieces.length) pieces.push(JSON.stringify(data));
+  return pieces.join(" ; ");
 }
 
 async function updateSupabase(orderId, fields) {
@@ -218,9 +234,20 @@ export default async function handler(req, res) {
 
   const createRes = await noestPost("/create/order", noestPayload, noestToken);
   if (!createRes.ok || !createRes.data?.success) {
-    const errMsg = createRes.data?.message || JSON.stringify(createRes.data) || "Noest create failed";
-    console.error("Noest create error:", errMsg);
-    return res.status(400).json({ error: errMsg });
+    const errMsg = formatNoestError(createRes.data);
+    console.error("Noest create error:", {
+      status: createRes.status,
+      orderId,
+      orderRef: order.order_id,
+      payload: noestPayload,
+      response: createRes.data,
+      message: errMsg,
+    });
+    return res.status(400).json({
+      error: errMsg,
+      noest_status: createRes.status,
+      noest_response: createRes.data,
+    });
   }
 
   const tracking = createRes.data.tracking;
