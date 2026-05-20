@@ -33,6 +33,12 @@ const WILAYA_ALIASES = {
   "aïn defla": 44,
 };
 
+const COMMUNE_ALIASES = {
+  27: {
+    "hassi mameche": "Hassi Maameche",
+  },
+};
+
 function getWilayaId(wilayaName) {
   if (!wilayaName) return null;
   const raw = String(wilayaName).trim();
@@ -105,6 +111,15 @@ function normalizeStationCode(stationCode) {
   if (!match) return raw;
 
   return `${Number(match[1])}${match[2]}`;
+}
+
+function normalizeCommuneForNoest(wilayaId, commune) {
+  const raw = sanitizeNoestText(commune || "", "");
+  if (!raw) return "";
+
+  const key = normalizeWilayaKey(raw);
+  const aliases = COMMUNE_ALIASES[Number(wilayaId)] || {};
+  return aliases[key] || raw;
 }
 
 async function noestPost(endpoint, body, token) {
@@ -237,7 +252,7 @@ export default async function handler(req, res) {
   const normalizedStationCode = normalizeStationCode(stationCode || order.station_code);
   const clientName = sanitizeNoestText(order.name, `Client ${orderId}`);
   const address = sanitizeNoestText(order.commune || order.wilaya, order.wilaya || "Algerie");
-  const commune = sanitizeNoestText(order.commune || "", "");
+  const commune = normalizeCommuneForNoest(wilayaId, order.commune || "");
   const primaryPayload = buildNoestPayload({
     noestGuid,
     orderId,
