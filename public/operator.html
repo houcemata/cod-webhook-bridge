@@ -1297,15 +1297,18 @@ async function saveEdit(){
           new_status:String(newVal),
           field_name:field,
           changed_by:'operator'
-        })});
+      })});
     }
   }
 
+  const listScrollTop=document.getElementById('orders-list')?.scrollTop||0;
   await sbFetch(`orders?id=eq.${o.id}`,{method:'PATCH',body:JSON.stringify(newData)});
   Object.assign(currentOrder,newData);
   closeModal('edit-modal');
   renderDetail();
   await loadOrders();
+  const ordersList=document.getElementById('orders-list');
+  if(ordersList)ordersList.scrollTop=listScrollTop;
   toast('Order updated');
 }
 
