@@ -136,6 +136,33 @@ function formatNoestError(data) {
   return pieces.join(" ; ");
 }
 
+function isCommuneValidationError(data) {
+  const text = JSON.stringify(data || {}).toLowerCase();
+  return text.includes("commune") && (text.includes("invalid") || text.includes("invalide"));
+}
+
+function buildNoestPayload({ noestGuid, orderId, order, wilayaId, phone, clientName, address, commune, isStopDesk, normalizedStationCode }) {
+  return {
+    user_guid: noestGuid,
+    reference: buildNoestReference(orderId, order.order_id),
+    client: clientName,
+    phone,
+    adresse: address,
+    wilaya_id: wilayaId,
+    ...(commune ? { commune } : {}),
+    montant: parseFloat(order.prix_total || 0),
+    produit: sanitizeNoestText(
+      order.product + (order.variable ? ` - ${order.variable}` : ""),
+      "Commande ARCO"
+    ),
+    type_id: 1,
+    stop_desk: isStopDesk ? 1 : 0,
+    can_open: 1,
+    poids: 0.5,
+    ...(isStopDesk && normalizedStationCode ? { station_code: normalizedStationCode } : {}),
+  };
+}
+
 async function updateSupabase(orderId, fields) {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -211,35 +238,51 @@ export default async function handler(req, res) {
   const clientName = sanitizeNoestText(order.name, `Client ${orderId}`);
   const address = sanitizeNoestText(order.commune || order.wilaya, order.wilaya || "Algerie");
   const commune = sanitizeNoestText(order.commune || "", "");
-  const productName = sanitizeNoestText(
-    order.product + (order.variable ? ` - ${order.variable}` : ""),
-    "Commande ARCO"
-  );
-  const noestPayload = {
-    user_guid: noestGuid,
-    reference: buildNoestReference(orderId, order.order_id),
-    client: clientName,
+  const primaryPayload = buildNoestPayload({
+    noestGuid,
+    orderId,
+    order,
+    wilayaId,
     phone,
-    adresse: address,
-    wilaya_id: wilayaId,
+    clientName,
+    address,
     commune,
-    montant: parseFloat(order.prix_total || 0),
-    produit: productName,
-    type_id: 1,
-    stop_desk: isStopDesk ? 1 : 0,
-    can_open: 1,
-    poids: 0.5,
-    ...(isStopDesk && normalizedStationCode ? { station_code: normalizedStationCode } : {}),
-  };
+    isStopDesk,
+    normalizedStationCode,
+  });
 
-  const createRes = await noestPost("/create/order", noestPayload, noestToken);
+  let createRes = await noestPost("/create/order", primaryPayload, noestToken);
+  let usedFallbackPayload = false;
+  let fallbackPayload = null;
+
+  if (!createRes.ok || !createRes.data?.success) {
+    const shouldRetryWithoutCommune = !isStopDesk && isCommuneValidationError(createRes.data);
+    if (shouldRetryWithoutCommune) {
+      fallbackPayload = buildNoestPayload({
+        noestGuid,
+        orderId,
+        order,
+        wilayaId,
+        phone,
+        clientName,
+        address,
+        commune: "",
+        isStopDesk,
+        normalizedStationCode,
+      });
+      createRes = await noestPost("/create/order", fallbackPayload, noestToken);
+      usedFallbackPayload = true;
+    }
+  }
+
   if (!createRes.ok || !createRes.data?.success) {
     const errMsg = formatNoestError(createRes.data);
     console.error("Noest create error:", {
       status: createRes.status,
       orderId,
       orderRef: order.order_id,
-      payload: noestPayload,
+      payload: usedFallbackPayload ? fallbackPayload : primaryPayload,
+      fallbackPayload,
       response: createRes.data,
       message: errMsg,
     });
@@ -247,6 +290,7 @@ export default async function handler(req, res) {
       error: errMsg,
       noest_status: createRes.status,
       noest_response: createRes.data,
+      retried_without_commune: usedFallbackPayload,
     });
   }
 
