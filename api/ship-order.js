@@ -29,13 +29,22 @@ const WILAYA_ALIASES = {
   "medea": 26,
   "médéa": 26,
   "mÃ©dÃ©a": 26,
+  "m s ila": 28,
+  "m'sila": 28,
   "ain defla": 44,
   "aïn defla": 44,
 };
 
 const COMMUNE_ALIASES = {
+  16: {
+    "bir touta": "Birtouta",
+    "bir khadem": "Birkhadem",
+  },
   27: {
     "hassi mameche": "Hassi Maameche",
+  },
+  42: {
+    "cherchell": "Cherchel",
   },
 };
 
