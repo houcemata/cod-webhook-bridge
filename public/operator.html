@@ -1271,6 +1271,15 @@ async function saveEdit(){
   const productPrice=parseFloat(document.getElementById('edit-product-price').value)||0;
   const shippingPrice=parseFloat(document.getElementById('edit-shipping-price').value)||0;
 
+  if(!wilayaClean){
+    toast('Wilaya is required',true);
+    return;
+  }
+  if(type==='home'&&!commune){
+    toast('Commune is required for home delivery',true);
+    return;
+  }
+
   const newData={
     name:document.getElementById('edit-name').value,
     phone:document.getElementById('edit-phone').value,
