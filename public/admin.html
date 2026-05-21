@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>ARCO â€” Admin</title>
+<title>ARCO — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -356,7 +356,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     </div>
     <div class="login-field">
       <label class="login-label">Password</label>
-      <input class="login-input" id="login-password" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password"/>
+      <input class="login-input" id="login-password" type="password" placeholder="••••••••" autocomplete="current-password"/>
     </div>
     <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
     <div class="login-error" id="login-error"></div>
@@ -371,16 +371,16 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     <div class="sidebar-logo">ARCO</div>
     <div class="sidebar-role">Admin Panel</div>
     <div class="nav-section">Overview</div>
-    <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard"><span class="nav-icon">ðŸ“Š</span>Dashboard</div>
+    <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard"><span class="nav-icon">📊</span>Dashboard</div>
     <div class="nav-section">Operations</div>
-    <div class="nav-item" onclick="showPage('orders')" id="nav-orders"><span class="nav-icon">ðŸ“¦</span>Orders<span class="nav-badge" id="pending-badge" style="display:none">0</span></div>
-    <div class="nav-item" onclick="showPage('products')" id="nav-products"><span class="nav-icon">ðŸ›ï¸</span>Products</div>
+    <div class="nav-item" onclick="showPage('orders')" id="nav-orders"><span class="nav-icon">📦</span>Orders<span class="nav-badge" id="pending-badge" style="display:none">0</span></div>
+    <div class="nav-item" onclick="showPage('products')" id="nav-products"><span class="nav-icon">🛍️</span>Products</div>
     <div class="nav-section">Team</div>
-    <div class="nav-item" onclick="showPage('operators')" id="nav-operators"><span class="nav-icon">ðŸ‘¥</span>Operators</div>
+    <div class="nav-item" onclick="showPage('operators')" id="nav-operators"><span class="nav-icon">👥</span>Operators</div>
     <div class="nav-section">Business</div>
-    <div class="nav-item" onclick="showPage('finance')" id="nav-finance"><span class="nav-icon">ðŸ’°</span>Finance</div>
-    <div class="nav-item" onclick="showPage('stock')" id="nav-stock"><span class="nav-icon">ðŸ“¦</span>Stock</div>
-    <div class="nav-item" onclick="showPage('performance')" id="nav-performance"><span class="nav-icon">ðŸ†</span>Performance</div>
+    <div class="nav-item" onclick="showPage('finance')" id="nav-finance"><span class="nav-icon">💰</span>Finance</div>
+    <div class="nav-item" onclick="showPage('stock')" id="nav-stock"><span class="nav-icon">📦</span>Stock</div>
+    <div class="nav-item" onclick="showPage('performance')" id="nav-performance"><span class="nav-icon">🏆</span>Performance</div>
     <div class="sidebar-bottom">
       <div class="user-card">
         <div class="user-avatar" id="sidebar-avatar">H</div>
@@ -388,7 +388,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           <div class="user-name" id="sidebar-name">Houssem</div>
           <div class="user-role-text">Administrator</div>
         </div>
-        <button class="logout-btn" onclick="doLogout()" title="Logout">â»</button>
+        <button class="logout-btn" onclick="doLogout()" title="Logout">⏻</button>
       </div>
     </div>
   </div>
@@ -437,24 +437,24 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 
         <!-- Mode description -->
         <div id="dash-mode-desc" style="margin-top:10px;font-size:12px;color:var(--gray);padding-top:10px;border-top:1px solid rgba(255,255,255,0.05)">
-          Showing orders <b style="color:var(--white)">created</b> in the selected period â€” with their current status breakdown.
+          Showing orders <b style="color:var(--white)">created</b> in the selected period — with their current status breakdown.
         </div>
       </div>
 
       <div class="kpi-grid">
-        <div class="kpi-card hi"><div class="kpi-icon">📦</div><div class="kpi-label">Total Orders</div><div class="kpi-value" id="kpi-total">—</div><div class="kpi-sub" id="kpi-total-sub">All time</div></div>
-        <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-label">Delivered</div><div class="kpi-value" id="kpi-delivered">—</div><div class="kpi-sub" id="kpi-del-rate">—% rate</div></div>
-        <div class="kpi-card"><div class="kpi-icon">📞</div><div class="kpi-label">Confirmed</div><div class="kpi-value" id="kpi-confirmed">—</div><div class="kpi-sub" id="kpi-conf-rate">—% rate</div></div>
-        <div class="kpi-card"><div class="kpi-icon">⏳</div><div class="kpi-label">Pending</div><div class="kpi-value" id="kpi-pending">—</div><div class="kpi-sub" id="kpi-pending-sub">Need attention</div></div>
-        <div class="kpi-card"><div class="kpi-icon">🚚</div><div class="kpi-label">Shipped</div><div class="kpi-value" id="kpi-shipped">—</div><div class="kpi-sub" id="kpi-shipped-sub">In transit</div></div>
-        <div class="kpi-card"><div class="kpi-icon">❌</div><div class="kpi-label">Canceled</div><div class="kpi-value" id="kpi-canceled">—</div><div class="kpi-sub" id="kpi-canceled-sub">Lost orders</div></div>
-        <div class="kpi-card rate"><div class="kpi-icon">📈</div><div class="kpi-label">Conf Rate</div><div class="kpi-value" id="kpi-conf-all">—</div><div class="kpi-sub">Confirmed / all leads</div></div>
-        <div class="kpi-card rate"><div class="kpi-icon">🧾</div><div class="kpi-label">Conf Rate</div><div class="kpi-value" id="kpi-conf-nondraft">—</div><div class="kpi-sub">Confirmed / non-draft orders</div></div>
-        <div class="kpi-card rate"><div class="kpi-icon">🚚</div><div class="kpi-label">Del Rate</div><div class="kpi-value" id="kpi-del-confirmed">—</div><div class="kpi-sub">Delivered / confirmed orders</div></div>
-        <div class="kpi-card rate"><div class="kpi-icon">🌍</div><div class="kpi-label">Del Rate</div><div class="kpi-value" id="kpi-del-all">—</div><div class="kpi-sub">Delivered / all leads</div></div>
+        <div class="kpi-card hi"><div class="kpi-icon">??</div><div class="kpi-label">Total Orders</div><div class="kpi-value" id="kpi-total">—</div><div class="kpi-sub" id="kpi-total-sub">All time</div></div>
+        <div class="kpi-card"><div class="kpi-icon">?</div><div class="kpi-label">Delivered</div><div class="kpi-value" id="kpi-delivered">—</div><div class="kpi-sub" id="kpi-del-rate">—% rate</div></div>
+        <div class="kpi-card"><div class="kpi-icon">??</div><div class="kpi-label">Confirmed</div><div class="kpi-value" id="kpi-confirmed">—</div><div class="kpi-sub" id="kpi-conf-rate">—% rate</div></div>
+        <div class="kpi-card"><div class="kpi-icon">?</div><div class="kpi-label">Pending</div><div class="kpi-value" id="kpi-pending">—</div><div class="kpi-sub" id="kpi-pending-sub">Need attention</div></div>
+        <div class="kpi-card"><div class="kpi-icon">??</div><div class="kpi-label">Shipped</div><div class="kpi-value" id="kpi-shipped">—</div><div class="kpi-sub" id="kpi-shipped-sub">In transit</div></div>
+        <div class="kpi-card"><div class="kpi-icon">?</div><div class="kpi-label">Canceled</div><div class="kpi-value" id="kpi-canceled">—</div><div class="kpi-sub" id="kpi-canceled-sub">Lost orders</div></div>
+        <div class="kpi-card rate"><div class="kpi-icon">??</div><div class="kpi-label">Conf Rate</div><div class="kpi-value" id="kpi-conf-all">—</div><div class="kpi-sub">Confirmed / all leads</div></div>
+        <div class="kpi-card rate"><div class="kpi-icon">??</div><div class="kpi-label">Conf Rate</div><div class="kpi-value" id="kpi-conf-nondraft">—</div><div class="kpi-sub">Confirmed / non-draft orders</div></div>
+        <div class="kpi-card rate"><div class="kpi-icon">??</div><div class="kpi-label">Del Rate</div><div class="kpi-value" id="kpi-del-confirmed">—</div><div class="kpi-sub">Delivered / confirmed orders</div></div>
+        <div class="kpi-card rate"><div class="kpi-icon">??</div><div class="kpi-label">Del Rate</div><div class="kpi-value" id="kpi-del-all">—</div><div class="kpi-sub">Delivered / all leads</div></div>
       </div>
       <div class="chart-row">
-        <!-- STATUS BREAKDOWN â€” redesigned donut -->
+        <!-- STATUS BREAKDOWN — redesigned donut -->
         <div class="glass-card" style="padding:20px">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">ORDER DISTRIBUTION</div>
           <div style="display:flex;align-items:center;gap:24px">
@@ -475,7 +475,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     <div class="page" id="page-orders">
       <div class="page-header">
         <div><div class="page-title">ORDERS</div><div class="page-subtitle">All orders from all operators</div></div>
-        <button class="btn btn-ghost" onclick="exportOrders()">â¬‡ Export CSV</button>
+        <button class="btn btn-ghost" onclick="exportOrders()">⬇ Export CSV</button>
       </div>
       <div class="glass-card">
         <div class="filters-bar">
@@ -563,13 +563,13 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 
       <!-- FINANCE KPIs -->
       <div class="kpi-grid" style="margin-bottom:20px">
-        <div class="kpi-card hi"><div class="kpi-icon">ðŸ’µ</div><div class="kpi-label">Product Revenue</div><div class="kpi-value" id="fin-revenue">â€”</div><div class="kpi-sub">Delivered orders minus shipping</div></div>
-        <div class="kpi-card"><div class="kpi-icon">ðŸ“¤</div><div class="kpi-label">Expenses</div><div class="kpi-value" id="fin-expenses">â€”</div><div class="kpi-sub">All costs</div></div>
-        <div class="kpi-card"><div class="kpi-icon">ðŸ“ˆ</div><div class="kpi-label">Net Profit</div><div class="kpi-value" id="fin-profit">â€”</div><div class="kpi-sub" id="fin-margin">â€”% margin</div></div>
-        <div class="kpi-card"><div class="kpi-icon">ðŸ“¦</div><div class="kpi-label">Cost / Order</div><div class="kpi-value" id="fin-cpo">â€”</div><div class="kpi-sub">Per delivered order</div></div>
-        <div class="kpi-card"><div class="kpi-icon">ðŸ–¼ï¸</div><div class="kpi-label">Frames Made</div><div class="kpi-value" id="fin-frames">â€”</div><div class="kpi-sub">In period</div></div>
-        <div class="kpi-card"><div class="kpi-icon">ðŸ‘©â€ðŸ’¼</div><div class="kpi-label">Staff Costs</div><div class="kpi-value" id="fin-staffcost">â€”</div><div class="kpi-sub">Employee pay</div></div>
-        <div class="kpi-card hi"><div class="kpi-icon">ðŸ“¦</div><div class="kpi-label">Stock Value</div><div class="kpi-value" id="fin-stock-value">â€”</div><div class="kpi-sub">At cost price</div></div>
+        <div class="kpi-card hi"><div class="kpi-icon">💵</div><div class="kpi-label">Product Revenue</div><div class="kpi-value" id="fin-revenue">—</div><div class="kpi-sub">Delivered orders minus shipping</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📤</div><div class="kpi-label">Expenses</div><div class="kpi-value" id="fin-expenses">—</div><div class="kpi-sub">All costs</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📈</div><div class="kpi-label">Net Profit</div><div class="kpi-value" id="fin-profit">—</div><div class="kpi-sub" id="fin-margin">—% margin</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-label">Cost / Order</div><div class="kpi-value" id="fin-cpo">—</div><div class="kpi-sub">Per delivered order</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🖼️</div><div class="kpi-label">Frames Made</div><div class="kpi-value" id="fin-frames">—</div><div class="kpi-sub">In period</div></div>
+        <div class="kpi-card"><div class="kpi-icon">👩‍💼</div><div class="kpi-label">Staff Costs</div><div class="kpi-value" id="fin-staffcost">—</div><div class="kpi-sub">Employee pay</div></div>
+        <div class="kpi-card hi"><div class="kpi-icon">📦</div><div class="kpi-label">Stock Value</div><div class="kpi-value" id="fin-stock-value">—</div><div class="kpi-sub">At cost price</div></div>
       </div>
 
       <div class="glass-card" style="padding:20px;margin-bottom:16px">
@@ -655,12 +655,12 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         <div style="display:flex;gap:8px">
           <button class="btn btn-ghost" onclick="openAddStock('ready_to_ship')">+ Ready Stock</button>
           <button class="btn btn-ghost" onclick="openAddStock('production_material')">+ Materials</button>
-          <button class="btn btn-primary" onclick="openManualStockAdjust()">âœï¸ Adjust</button>
+          <button class="btn btn-primary" onclick="openManualStockAdjust()">✏️ Adjust</button>
         </div>
       </div>
 
       <div class="kpi-grid" style="margin-bottom:16px">
-        <div class="kpi-card hi"><div class="kpi-icon">ðŸ“ˆ</div><div class="kpi-label">Total Value</div><div class="kpi-value" id="stk-kpi-value">â€”</div><div class="kpi-sub">At cost price</div></div>
+        <div class="kpi-card hi"><div class="kpi-icon">📈</div><div class="kpi-label">Total Value</div><div class="kpi-value" id="stk-kpi-value">—</div><div class="kpi-sub">At cost price</div></div>
       </div>
 
       <div class="glass-card" style="padding:20px;margin-bottom:16px">
@@ -729,12 +729,12 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
   <!-- Mobile nav -->
   <div class="mobile-nav">
     <div class="mobile-nav-items">
-      <button class="mobile-nav-btn active" onclick="showPage('dashboard')" id="mnav-dashboard"><span class="mobile-nav-icon">ðŸ“Š</span><span class="mobile-nav-label">Dashboard</span></button>
-      <button class="mobile-nav-btn" onclick="showPage('orders')" id="mnav-orders"><span class="mobile-nav-icon">ðŸ“¦</span><span class="mobile-nav-label">Orders</span></button>
-      <button class="mobile-nav-btn" onclick="showPage('products')" id="mnav-products"><span class="mobile-nav-icon">ðŸ›ï¸</span><span class="mobile-nav-label">Products</span></button>
-      <button class="mobile-nav-btn" onclick="showPage('operators')" id="mnav-operators"><span class="mobile-nav-icon">ðŸ‘¥</span><span class="mobile-nav-label">Team</span></button>
-      <button class="mobile-nav-btn" onclick="showPage('finance')" id="mnav-finance"><span class="mobile-nav-icon">ðŸ’°</span><span class="mobile-nav-label">Finance</span></button>
-      <button class="mobile-nav-btn" onclick="showPage('stock')" id="mnav-stock"><span class="mobile-nav-icon">ðŸ“¦</span><span class="mobile-nav-label">Stock</span></button>
+      <button class="mobile-nav-btn active" onclick="showPage('dashboard')" id="mnav-dashboard"><span class="mobile-nav-icon">📊</span><span class="mobile-nav-label">Dashboard</span></button>
+      <button class="mobile-nav-btn" onclick="showPage('orders')" id="mnav-orders"><span class="mobile-nav-icon">📦</span><span class="mobile-nav-label">Orders</span></button>
+      <button class="mobile-nav-btn" onclick="showPage('products')" id="mnav-products"><span class="mobile-nav-icon">🛍️</span><span class="mobile-nav-label">Products</span></button>
+      <button class="mobile-nav-btn" onclick="showPage('operators')" id="mnav-operators"><span class="mobile-nav-icon">👥</span><span class="mobile-nav-label">Team</span></button>
+      <button class="mobile-nav-btn" onclick="showPage('finance')" id="mnav-finance"><span class="mobile-nav-icon">💰</span><span class="mobile-nav-label">Finance</span></button>
+      <button class="mobile-nav-btn" onclick="showPage('stock')" id="mnav-stock"><span class="mobile-nav-icon">📦</span><span class="mobile-nav-label">Stock</span></button>
     </div>
   </div>
 </div>
@@ -744,19 +744,19 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title" id="prod-modal-title">LOG PRODUCTION</div>
-      <button class="modal-close" onclick="closeModal('production-modal')">Ã—</button>
+      <button class="modal-close" onclick="closeModal('production-modal')">×</button>
     </div>
     <div class="modal-body">
       <div class="form-field"><label class="form-label">Date</label><input class="form-input" id="prod-date" type="date"/></div>
       <div style="background:rgba(245,197,0,0.05);border:1px solid rgba(245,197,0,0.15);border-radius:14px;padding:16px;margin-bottom:16px">
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--gray);margin-bottom:12px">FRAMES PRODUCED</div>
         <div class="form-row">
-          <div class="form-field"><label class="form-label">M (30Ã—40) â€” 60 DZD</label><input class="form-input" id="prod-m" type="number" min="0" value="0" oninput="calcProdPay()"/></div>
-          <div class="form-field"><label class="form-label">L (40Ã—60) â€” 60 DZD</label><input class="form-input" id="prod-l" type="number" min="0" value="0" oninput="calcProdPay()"/></div>
+          <div class="form-field"><label class="form-label">M (30×40) — 60 DZD</label><input class="form-input" id="prod-m" type="number" min="0" value="0" oninput="calcProdPay()"/></div>
+          <div class="form-field"><label class="form-label">L (40×60) — 60 DZD</label><input class="form-input" id="prod-l" type="number" min="0" value="0" oninput="calcProdPay()"/></div>
         </div>
         <div class="form-row">
-          <div class="form-field"><label class="form-label">XL (60Ã—80) â€” 100 DZD</label><input class="form-input" id="prod-xl" type="number" min="0" value="0" oninput="calcProdPay()"/></div>
-          <div class="form-field"><label class="form-label">XXL (120Ã—60) â€” 200 DZD</label><input class="form-input" id="prod-xxl" type="number" min="0" value="0" oninput="calcProdPay()"/></div>
+          <div class="form-field"><label class="form-label">XL (60×80) — 100 DZD</label><input class="form-input" id="prod-xl" type="number" min="0" value="0" oninput="calcProdPay()"/></div>
+          <div class="form-field"><label class="form-label">XXL (120×60) — 200 DZD</label><input class="form-input" id="prod-xxl" type="number" min="0" value="0" oninput="calcProdPay()"/></div>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)">
           <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--gray)">FRAME MAKER PAY</span>
@@ -765,9 +765,9 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       </div>
       <div class="form-field"><label class="form-label">Notes</label><textarea class="form-textarea" id="prod-notes" placeholder="Any notes..."></textarea></div>
       <div style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:16px;margin-bottom:16px">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--gray);margin-bottom:12px">PRINTER (450 DZD / mÂ²)</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--gray);margin-bottom:12px">PRINTER (450 DZD / m²)</div>
         <div class="form-field" style="margin-bottom:0">
-          <label class="form-label">Total Print Area (mÂ²)</label>
+          <label class="form-label">Total Print Area (m²)</label>
           <input class="form-input" id="prod-sqm" type="number" min="0" step="0.01" value="0" oninput="calcProdPay()"/>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06);margin-top:12px">
@@ -788,7 +788,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">ADD EXPENSE</div>
-      <button class="modal-close" onclick="closeModal('expense-modal')">Ã—</button>
+      <button class="modal-close" onclick="closeModal('expense-modal')">×</button>
     </div>
     <div class="modal-body">
       <div class="form-row">
@@ -819,7 +819,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title" id="stock-modal-title">ADD STOCK ITEM</div>
-      <button class="modal-close" onclick="closeModal('stock-modal')">Ã—</button>
+      <button class="modal-close" onclick="closeModal('stock-modal')">×</button>
     </div>
     <div class="modal-body">
       <div class="form-field">
@@ -838,8 +838,8 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       </div>
       <div id="stk-material-fields">
         <div class="form-row">
-          <div class="form-field"><label class="form-label">Item Name</label><input class="form-input" id="stk-name" placeholder="e.g. M Board (30Ã—40)"/></div>
-          <div class="form-field"><label class="form-label">Size / Type</label><input class="form-input" id="stk-size" placeholder="e.g. 30Ã—40cm"/></div>
+          <div class="form-field"><label class="form-label">Item Name</label><input class="form-input" id="stk-name" placeholder="e.g. M Board (30×40)"/></div>
+          <div class="form-field"><label class="form-label">Size / Type</label><input class="form-input" id="stk-size" placeholder="e.g. 30×40cm"/></div>
         </div>
       </div>
       <div class="form-row">
@@ -863,7 +863,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">RESTOCK</div>
-      <button class="modal-close" onclick="closeModal('restock-modal')">Ã—</button>
+      <button class="modal-close" onclick="closeModal('restock-modal')">×</button>
     </div>
     <div class="modal-body">
       <div id="restock-item-name" style="font-weight:700;font-size:16px;margin-bottom:16px"></div>
@@ -881,7 +881,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">MARK AS PAID</div>
-      <button class="modal-close" onclick="closeModal('markpaid-modal')">Ã—</button>
+      <button class="modal-close" onclick="closeModal('markpaid-modal')">×</button>
     </div>
       <div class="modal-body">
         <div id="markpaid-desc" style="font-size:14px;color:var(--gray);margin-bottom:8px"></div>
@@ -910,7 +910,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title" id="product-modal-title">ADD PRODUCT</div>
-      <button class="modal-close" onclick="closeModal('product-modal')">Ã—</button>
+      <button class="modal-close" onclick="closeModal('product-modal')">×</button>
     </div>
     <div class="modal-body">
       <div class="form-field"><label class="form-label">Product Name</label><input class="form-input" id="p-name" placeholder="e.g. Liquid Football"/></div>
@@ -919,7 +919,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         <div class="form-field"><label class="form-label">Price (DZD)</label><input class="form-input" id="p-price" type="number" placeholder="2900"/></div>
         <div class="form-field"><label class="form-label">Original Price (DZD)</label><input class="form-input" id="p-oprice" type="number" placeholder="3600"/></div>
       </div>
-      <div class="form-field"><label class="form-label">Description (Arabic)</label><textarea class="form-textarea" id="p-desc-ar" placeholder="Ø§Ù„ÙˆØµÙ..." style="direction:rtl"></textarea></div>
+      <div class="form-field"><label class="form-label">Description (Arabic)</label><textarea class="form-textarea" id="p-desc-ar" placeholder="الوصف..." style="direction:rtl"></textarea></div>
       <div class="form-field"><label class="form-label">Description (French)</label><textarea class="form-textarea" id="p-desc-fr" placeholder="Description..."></textarea></div>
       <div class="form-field"><label class="form-label">Main Image URL</label><input class="form-input" id="p-image" placeholder="https://..."/></div>
       <div class="variant-builder">
@@ -949,7 +949,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">ADD OPERATOR</div>
-      <button class="modal-close" onclick="closeModal('operator-modal')">Ã—</button>
+      <button class="modal-close" onclick="closeModal('operator-modal')">×</button>
     </div>
     <div class="modal-body">
       <div style="background:rgba(245,197,0,0.06);border:1px solid rgba(245,197,0,0.2);border-radius:14px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--gray)">
@@ -970,7 +970,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
   <div class="modal">
     <div class="modal-header">
       <div class="modal-title">ORDER DETAIL</div>
-      <button class="modal-close" onclick="closeModal('order-modal')">Ã—</button>
+      <button class="modal-close" onclick="closeModal('order-modal')">×</button>
     </div>
     <div class="modal-body" id="order-modal-body" style="padding-bottom:24px"></div>
   </div>
@@ -1020,7 +1020,7 @@ function renderCurrentAdminPage(){
   if(currentAdminPage==='performance')renderPerformance();
 }
 
-// â”€â”€ AUTH â”€â”€
+// ── AUTH ──
 async function doLogin(){
   const email=document.getElementById('login-email').value.trim();
   const password=document.getElementById('login-password').value;
@@ -1096,7 +1096,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 });
 
-// â”€â”€ NAVIGATION â”€â”€
+// ── NAVIGATION ──
 function showPage(name,persist=true){
   currentAdminPage=name;
   if(persist)localStorage.setItem(ADMIN_PAGE_KEY,name);
@@ -1109,7 +1109,7 @@ function showPage(name,persist=true){
   renderCurrentAdminPage();
 }
 
-// â”€â”€ DATA â”€â”€
+// ── DATA ──
 async function loadOrders(){
   const{data}=await sb.from('orders').select('*').order('created_at',{ascending:false});
   allOrders=data||[];filteredOrders=[...allOrders];
@@ -1129,7 +1129,7 @@ async function loadOperators(){
   allOperators=data||[];
 }
 
-// â”€â”€ DASHBOARD FILTERS â”€â”€
+// ── DASHBOARD FILTERS ──
 let dashMode='created'; // 'created' | 'activity'
 let dashPeriod='all';   // 'all'|'today'|'yesterday'|'7days'|'30days'|'month'|'custom'
 let allHistory=[];
@@ -1147,9 +1147,9 @@ function setDashMode(mode){
   document.getElementById('mode-btn-activity').style.color=mode==='activity'?'var(--black)':'var(--gray)';
   const desc=document.getElementById('dash-mode-desc');
   if(mode==='created'){
-    desc.innerHTML='Showing orders <b style="color:var(--white)">created</b> in the selected period â€” with their current status breakdown.';
+    desc.innerHTML='Showing orders <b style="color:var(--white)">created</b> in the selected period — with their current status breakdown.';
   } else {
-    desc.innerHTML='Showing <b style="color:var(--white)">status changes</b> that happened in the selected period â€” grouped by the new status.';
+    desc.innerHTML='Showing <b style="color:var(--white)">status changes</b> that happened in the selected period — grouped by the new status.';
   }
   updateDashboard();
 }
@@ -1196,7 +1196,7 @@ function getPeriodRange(){
   return null;
 }
 
-// â”€â”€ DASHBOARD â”€â”€
+// ── DASHBOARD ──
 function updateDashboard(){
   const range=getPeriodRange();
 
@@ -1301,7 +1301,7 @@ function drawDonut(statusArray){
 
   document.getElementById('donut-svg').innerHTML=paths;
 
-  // Legend â€” show all with counts
+  // Legend — show all with counts
   document.getElementById('chart-legend').innerHTML=counts.map(s=>`
     <div style="display:flex;align-items:center;gap:8px">
       <div style="width:9px;height:9px;border-radius:2px;background:${s.c};flex-shrink:0"></div>
@@ -1315,16 +1315,16 @@ function renderRecentOrders(){
   document.getElementById('recent-orders-list').innerHTML=recent.length
     ?recent.map(o=>`
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-        <div><div style="font-weight:700;font-size:14px">${esc(o.name)}</div><div style="font-size:11px;color:var(--gray)">${esc(o.product)} â€” ${esc(o.wilaya)}</div></div>
+        <div><div style="font-weight:700;font-size:14px">${esc(o.name)}</div><div style="font-size:11px;color:var(--gray)">${esc(o.product)} — ${esc(o.wilaya)}</div></div>
         <div style="text-align:right;flex-shrink:0;margin-left:12px">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--yellow)">${Number(o.prix_total||0).toLocaleString()} DZD</div>
           <span class="badge badge-${o.status}">${statusLabel(o.status)}</span>
         </div>
       </div>`).join('')
-    :'<div class="empty-state"><div class="empty-icon">ðŸ“­</div><div class="empty-text">No orders yet</div></div>';
+    :'<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">No orders yet</div></div>';
 }
 
-// â”€â”€ ORDERS â”€â”€
+// ── ORDERS ──
 function filterOrders(){
   const q=(document.getElementById('order-search').value||'').toLowerCase().trim();
   const status=document.getElementById('order-status').value;
@@ -1367,16 +1367,16 @@ function renderOrdersTable(){
         <td style="font-size:13px;color:var(--gray)">${esc(o.wilaya)}</td>
         <td style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--yellow)">${Number(o.prix_total||0).toLocaleString()} DZD</td>
         <td><span class="badge badge-${o.status}">${statusLabel(o.status)}</span></td>
-        <td style="font-size:12px;color:var(--gray)">${o.created_at?new Date(o.created_at).toLocaleDateString('fr-DZ'):'â€”'}</td>
+        <td style="font-size:12px;color:var(--gray)">${o.created_at?new Date(o.created_at).toLocaleDateString('fr-DZ'):'—'}</td>
         <td><button class="btn btn-ghost btn-sm" onclick="openOrderDetail(${o.id})">View</button></td>
       </tr>`).join('')
-    :`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">ðŸ“­</div><div class="empty-text">No orders found</div></div></td></tr>`;
+    :`<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">No orders found</div></div></td></tr>`;
   const pgEl=document.getElementById('orders-pagination');
   if(totalPages<=1){pgEl.innerHTML='';return;}
   pgEl.innerHTML=`
-    <button class="page-btn" onclick="goOrderPage(${currentPage-1})" ${currentPage===1?'disabled':''}>â†</button>
+    <button class="page-btn" onclick="goOrderPage(${currentPage-1})" ${currentPage===1?'disabled':''}>←</button>
     <span class="page-info">${currentPage} / ${totalPages}</span>
-    <button class="page-btn" onclick="goOrderPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>â†’</button>`;
+    <button class="page-btn" onclick="goOrderPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>→</button>`;
 }
 function goOrderPage(p){currentPage=p;renderOrdersTable();}
 function openOrderDetail(id){
@@ -1388,7 +1388,7 @@ function openOrderDetail(id){
         <div><div style="font-size:10px;color:var(--gray);margin-bottom:4px;font-family:'Barlow Condensed',sans-serif;letter-spacing:1px">LOCATION</div><div style="font-size:14px">${esc(o.wilaya)}</div><div style="color:var(--gray);font-size:13px">${esc(o.commune||o.station_code||'')}</div></div>
       </div>
       <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:16px">
-        <div style="font-weight:700;margin-bottom:8px">${esc(o.product)}${o.variable?' â€” '+esc(o.variable):''}</div>
+        <div style="font-weight:700;margin-bottom:8px">${esc(o.product)}${o.variable?' — '+esc(o.variable):''}</div>
         <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:var(--gray)">Product</span><span>${Number((o.prix_total||0)-(o.shipping_cost||0)).toLocaleString()} DZD</span></div>
         <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px"><span style="color:var(--gray)">Shipping</span><span>${Number(o.shipping_cost||0).toLocaleString()} DZD</span></div>
         <div style="display:flex;justify-content:space-between;font-family:'Bebas Neue',sans-serif;font-size:20px"><span>TOTAL</span><span style="color:var(--yellow)">${Number(o.prix_total||0).toLocaleString()} DZD</span></div>
@@ -1397,8 +1397,8 @@ function openOrderDetail(id){
         <span class="badge badge-${o.status}" style="font-size:13px;padding:5px 14px">${statusLabel(o.status)}</span>
         <span style="font-size:12px;color:var(--gray)">#${esc(o.order_id)}</span>
       </div>
-      ${o.notes?`<div style="background:rgba(245,197,0,0.05);border:1px solid rgba(245,197,0,0.15);border-radius:12px;padding:12px;font-size:13px;color:var(--gray)">ðŸ“ ${esc(o.notes)}</div>`:''}
-      ${o.tracking_number?`<div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:12px;font-size:13px">ðŸšš Tracking: <b style="color:#8b5cf6">${esc(o.tracking_number)}</b></div>`:''}
+      ${o.notes?`<div style="background:rgba(245,197,0,0.05);border:1px solid rgba(245,197,0,0.15);border-radius:12px;padding:12px;font-size:13px;color:var(--gray)">📝 ${esc(o.notes)}</div>`:''}
+      ${o.tracking_number?`<div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:12px;font-size:13px">🚚 Tracking: <b style="color:#8b5cf6">${esc(o.tracking_number)}</b></div>`:''}
     </div>`;
   document.getElementById('order-modal').classList.add('open');
 }
@@ -1409,18 +1409,18 @@ function exportOrders(){
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download=`arco-orders-${Date.now()}.csv`;a.click();
-  toast('CSV exported âœ“',false);
+  toast('CSV exported ✓',false);
 }
 
-// â”€â”€ PRODUCTS â”€â”€
+// ── PRODUCTS ──
 function renderProducts(){
   const grid=document.getElementById('products-grid');
-  if(!allProducts.length){grid.innerHTML=`<div class="empty-state"><div class="empty-icon">ðŸ›ï¸</div><div class="empty-text">No products yet</div></div>`;return;}
+  if(!allProducts.length){grid.innerHTML=`<div class="empty-state"><div class="empty-icon">🛍️</div><div class="empty-text">No products yet</div></div>`;return;}
   grid.innerHTML=allProducts.map(p=>{
     const img=Array.isArray(p.images)?p.images[0]:(p.images||'');
     return `<div class="product-card">
       ${img?`<img class="product-img" src="${esc(img)}" alt="${esc(p.name)}" onerror="this.style.display='none'"/>`:
-        '<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.3">ðŸ–¼ï¸</div>'}
+        '<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.3">🖼️</div>'}
       <div class="product-body">
         <div class="product-name">${esc(p.name)}</div>
         <div class="product-slug">/p/${esc(p.slug)}</div>
@@ -1429,8 +1429,8 @@ function renderProducts(){
           ${p.original_price?`<div class="product-old-price">${Number(p.original_price).toLocaleString()}</div>`:''}
         </div>
         <div class="product-actions">
-          <button class="btn btn-ghost btn-sm" onclick="openEditProduct(${p.id})" style="flex:1">âœï¸ Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">ðŸ—‘</button>
+          <button class="btn btn-ghost btn-sm" onclick="openEditProduct(${p.id})" style="flex:1">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">🗑</button>
           <button class="toggle-btn ${p.active?'on':'off'}" onclick="toggleProduct(${p.id},${p.active})" title="${p.active?'Active':'Inactive'}"></button>
         </div>
       </div>
@@ -1522,8 +1522,8 @@ async function saveProduct(){
   const variants=collectVariants();
   if(!name||!slug||!price){toast('Name, slug and price required',true);return;}
   const data={name,slug,price,original_price:oprice,description_ar:descAr,description_fr:descFr,images:image?[image]:[],variants,active:true};
-  if(editingProductId){await sb.from('products').update(data).eq('id',editingProductId);toast('Product updated âœ“');}
-  else{await sb.from('products').insert(data);toast('Product added âœ“');}
+  if(editingProductId){await sb.from('products').update(data).eq('id',editingProductId);toast('Product updated ✓');}
+  else{await sb.from('products').insert(data);toast('Product added ✓');}
   closeModal('product-modal');await loadProducts();renderProducts();
 }
 async function deleteProduct(id){
@@ -1537,10 +1537,10 @@ async function toggleProduct(id,active){
   toast(`Product ${!active?'activated':'deactivated'}`);
 }
 
-// â”€â”€ OPERATORS â”€â”€
+// ── OPERATORS ──
 function renderOperators(){
   const grid=document.getElementById('operators-grid');
-  if(!allOperators.length){grid.innerHTML=`<div class="empty-state"><div class="empty-icon">ðŸ‘¥</div><div class="empty-text">No operators yet</div></div>`;return;}
+  if(!allOperators.length){grid.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">No operators yet</div></div>`;return;}
   grid.innerHTML=allOperators.map(op=>`
     <div class="operator-card">
       <div class="op-avatar">${(op.name||'O').charAt(0).toUpperCase()}</div>
@@ -1579,13 +1579,13 @@ async function removeOperator(userId){
   await loadOperators();renderOperators();toast('Operator removed');
 }
 
-// â”€â”€ MODALS â”€â”€
+// ── MODALS ──
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(o=>{
   o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
 });
 
-// â”€â”€ FINANCE â”€â”€
+// ── FINANCE ──
 let allProductionLogs=[], allStockItems=[], allExpenses=[], allPayLogs=[], allStockUsage=[];
 let adPerformanceSummary=null;
 let restockingItemId=null, restockMode='add', markPaidEmployee=null;
@@ -1867,7 +1867,7 @@ function inferStockKind(item){
   const explicit=normalizeStockKind(item?.stock_kind||item?.kind||item?.category);
   if(explicit==='ready_to_ship'||explicit==='production_material')return explicit;
   const hay=[item?.name,item?.size,item?.unit].filter(Boolean).join(' ').toLowerCase();
-  if(/board|wood|ply|mdf|panel|sheet|material|production|raw|frame board|Ù„ÙˆØ­/.test(hay))return'production_material';
+  if(/board|wood|ply|mdf|panel|sheet|material|production|raw|frame board|لوح/.test(hay))return'production_material';
   return'ready_to_ship';
 }
 function stockKindLabel(kind){
@@ -1897,19 +1897,19 @@ function stockRowMarkup(s,opts={}){
   const allowDeduct=opts.allowDeduct??kind==='ready_to_ship';
   const title=opts.title||s.name;
   const metaParts=opts.metaParts||[s.size,s.unit||'units',`${fmtDZD(s.cost_per_unit||0)}/unit`];
-  const meta=metaParts.filter(Boolean).map(v=>esc(String(v))).join(' Â· ');
+  const meta=metaParts.filter(Boolean).map(v=>esc(String(v))).join(' · ');
   const actions=opts.actions===false?'':`
       <div class="stock-actions">
         <button class="btn btn-ghost btn-sm" onclick="openRestock(${s.id},'${esc(s.name)}')">+ Qty</button>
         ${allowDeduct?`<button class="btn btn-ghost btn-sm" onclick="openDeductStock(${s.id},'${esc(s.name)}')">- Qty</button>`:''}
-        <button class="btn btn-danger btn-sm" onclick="deleteStockItem(${s.id})">ðŸ—‘</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteStockItem(${s.id})">🗑</button>
       </div>`;
   return `<div class="stock-row">
       <div style="flex:1;min-width:0">
         <div class="stock-type-badge ${kindClass}">${kindLabel}</div>
         <div class="stock-name">${esc(title)}</div>
         <div class="stock-meta">${meta}</div>
-        ${low?`<div style="font-size:11px;color:var(--red);margin-top:2px">âš ï¸ Low stock!</div>`:''}
+        ${low?`<div style="font-size:11px;color:var(--red);margin-top:2px">⚠️ Low stock!</div>`:''}
       </div>
       <div class="stock-qty ${low?'stock-low':'stock-ok'}">${Number(s.quantity).toLocaleString()}</div>
       ${actions}
@@ -1968,12 +1968,12 @@ function renderReadyStockAccordion(items){
       <div class="stock-product-header" role="button" tabindex="0" onclick="toggleReadyStockProduct('${esc(slug)}')">
         <div class="stock-product-main">
           <div class="stock-product-name">${esc(product.name||slug||'Product')}</div>
-          <div class="stock-product-sub">${rows.length} variant${rows.length===1?'':'s'} Â· ${totalQty.toLocaleString()} units Â· ${fmtDZD(totalValue)}</div>
+          <div class="stock-product-sub">${rows.length} variant${rows.length===1?'':'s'} · ${totalQty.toLocaleString()} units · ${fmtDZD(totalValue)}</div>
         </div>
         <div class="stock-product-tools">
           <button type="button" class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openAddStock('ready_to_ship','${esc(slug)}')">+ Add</button>
           <div class="stock-product-count">${rows.length}</div>
-          <div class="stock-product-chevron">${isOpen?'âˆ’':'+'}</div>
+          <div class="stock-product-chevron">${isOpen?'−':'+'}</div>
         </div>
       </div>
       <div class="stock-product-body">
@@ -2005,17 +2005,17 @@ function renderReadyStockAccordion(items){
 
 function renderProductionLogs(logs){
   const el=document.getElementById('production-log-list');
-  if(!logs.length){el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">ðŸ–¼ï¸</div><div class="empty-text">No production logged yet</div></div>';return;}
+  if(!logs.length){el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">🖼️</div><div class="empty-text">No production logged yet</div></div>';return;}
   el.innerHTML=logs.map(l=>{
     const total=(l.m_frames||0)+(l.l_frames||0)+(l.xl_frames||0)+(l.xxl_frames||0);
     return`<div class="prod-log-row">
       <div>
         <div style="font-weight:700;font-size:14px">${new Date(l.date).toLocaleDateString('fr-DZ')}</div>
         <div style="font-size:11px;color:var(--gray);margin-top:2px">
-          M:${l.m_frames||0} Â· L:${l.l_frames||0} Â· XL:${l.xl_frames||0} Â· XXL:${l.xxl_frames||0} = <b>${total} frames</b>
-          ${l.print_sqm?` Â· <span style="color:#8b5cf6">${Number(l.print_sqm).toFixed(2)} mÂ² printed</span>`:''}
+          M:${l.m_frames||0} · L:${l.l_frames||0} · XL:${l.xl_frames||0} · XXL:${l.xxl_frames||0} = <b>${total} frames</b>
+          ${l.print_sqm?` · <span style="color:#8b5cf6">${Number(l.print_sqm).toFixed(2)} m² printed</span>`:''}
         </div>
-        ${l.notes?`<div style="font-size:11px;color:var(--gray);margin-top:2px">ðŸ“ ${esc(l.notes)}</div>`:''}
+        ${l.notes?`<div style="font-size:11px;color:var(--gray);margin-top:2px">📝 ${esc(l.notes)}</div>`:''}
       </div>
       <div style="text-align:right;flex-shrink:0;margin-left:12px">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--yellow)">${fmtDZD(l.total_pay_frame_maker||0)}</div>
@@ -2026,7 +2026,7 @@ function renderProductionLogs(logs){
   }).join('');
 }
 
-// â”€â”€ LOW STOCK NTFY ALERT â”€â”€
+// ── LOW STOCK NTFY ALERT ──
 async function sendLowStockAlert(items){
   if(!items.length)return;
   const topic=typeof NTFY_TOPIC!=='undefined'?NTFY_TOPIC:'arco-stock-a7x9k2m';
@@ -2042,7 +2042,7 @@ async function sendLowStockAlert(items){
 
 function renderStockList(triggerAlerts=false){
   const el=document.getElementById('stock-list');
-  if(!allStockItems.length){el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">ðŸ“¦</div><div class="empty-text">No stock items yet</div></div>';return;}
+  if(!allStockItems.length){el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📦</div><div class="empty-text">No stock items yet</div></div>';return;}
   el.innerHTML=allStockItems.map(s=>stockRowMarkup(s,{allowDeduct:inferStockKind(s)==='ready_to_ship'})).join('');
 }
 
@@ -2050,9 +2050,9 @@ function renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,print
   const el=document.getElementById('employee-pay-list');
   const employees=[
     {key:'frame_maker',name:'Frame Maker',role:'Production & Packing',gross:frameMakerPay,basis:`${allProductionLogs.filter(l=>inFinRange(l.date,range)).reduce((s,l)=>s+(l.m_frames||0)+(l.l_frames||0)+(l.xl_frames||0)+(l.xxl_frames||0),0)} frames produced`},
-    {key:'operator',name:'Operator Girl',role:'Order Confirmation',gross:operatorPay,basis:`${deliveredOrders.length} delivered orders Ã— 150 DZD`},
-    {key:'print_guy',name:'Print File Guy',role:'Print & Shipping Prep',gross:printGuyPay,basis:`${countThursdays(range)} Thursdays Ã— 2,000 DZD`},
-    {key:'printer',name:'Printer',role:'Printing',gross:printerPay,basis:`${printerSqm.toFixed(2)} mÂ² Ã— 450 DZD`},
+    {key:'operator',name:'Operator Girl',role:'Order Confirmation',gross:operatorPay,basis:`${deliveredOrders.length} delivered orders × 150 DZD`},
+    {key:'print_guy',name:'Print File Guy',role:'Print & Shipping Prep',gross:printGuyPay,basis:`${countThursdays(range)} Thursdays × 2,000 DZD`},
+    {key:'printer',name:'Printer',role:'Printing',gross:printerPay,basis:`${printerSqm.toFixed(2)} m² × 450 DZD`},
   ];
   el.innerHTML=employees.map(e=>{
     const summary=getEmployeePaySummary(e.key,e.gross,range);
@@ -2060,7 +2060,7 @@ function renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,print
     const owedText=summary.remaining<=0&&summary.paid>0?'PAID':fmtDZD(summary.remaining);
     const statusClass=summary.status==='paid'?'emp-status-paid':summary.status==='partial'?'emp-status-partial':'emp-status-due';
     const actionBtn=summary.remaining<=0&&summary.paid>0
-      ?`<button class="btn btn-ghost btn-sm" disabled>Paid âœ“</button>`
+      ?`<button class="btn btn-ghost btn-sm" disabled>Paid ✓</button>`
       :`<button class="btn btn-ghost btn-sm" onclick="openMarkPaid('${e.key}','${e.name}',${summary.remaining},${summary.gross},${summary.paid})">Mark Paid</button>`;
     return `
     <div class="emp-card">
@@ -2073,7 +2073,7 @@ function renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,print
       </div>
       <div class="emp-status ${statusClass}">${summary.status==='paid'?'Paid':summary.status==='partial'?'Partial':'Due'}</div>
       <div class="emp-owed">${owedText}</div>
-      <div class="emp-owed-label">Paid ${paidText} Â· Owed ${fmtDZD(summary.gross)}</div>
+      <div class="emp-owed-label">Paid ${paidText} · Owed ${fmtDZD(summary.gross)}</div>
       <div class="emp-owed-label">${e.basis}</div>
     </div>`;
   }).join('');
@@ -2081,7 +2081,7 @@ function renderEmployeePay(range,deliveredOrders,frameMakerPay,operatorPay,print
 
 function renderExpenses(expenses){
   const el=document.getElementById('expenses-list');
-  if(!expenses.length){el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">ðŸ“‹</div><div class="empty-text">No expenses yet</div></div>';return;}
+  if(!expenses.length){el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📋</div><div class="empty-text">No expenses yet</div></div>';return;}
   el.innerHTML=expenses.map(e=>`
     <div class="exp-row">
       <div style="flex:1">
@@ -2093,7 +2093,7 @@ function renderExpenses(expenses){
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:12px">
         <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--red)">${fmtDZD(e.amount||0)}</span>
-        <button class="btn btn-danger btn-sm" onclick="deleteExpense(${e.id})" style="padding:4px 8px">Ã—</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteExpense(${e.id})" style="padding:4px 8px">×</button>
       </div>
     </div>`).join('');
 }
@@ -2123,7 +2123,7 @@ function renderRevenueBySize(deliveredOrders){
     </div>`).join('');
 }
 
-// â”€â”€ PRODUCTION LOG ACTIONS â”€â”€
+// ── PRODUCTION LOG ACTIONS ──
 function normalizeEmployeeRole(role){
   const v=(role||'').toLowerCase();
   if(v.includes('frame'))return'frame_maker';
@@ -2141,15 +2141,15 @@ function renderPayHistory(){
     .filter(p=>filter==='all'||normalizeEmployeeRole(p.employee_role)===filter)
     .filter(p=>payLogInRange(p,range));
   if(!rows.length){
-    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">ðŸ’¸</div><div class="empty-text">No payments in this period</div></div>';
+    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">💸</div><div class="empty-text">No payments in this period</div></div>';
     return;
   }
   el.innerHTML=rows.map(p=>`
     <div class="history-row">
       <div>
         <div class="history-title">${esc(p.employee_name||'Employee')}</div>
-        <div class="history-meta">${esc(p.employee_role||'role')} Â· ${fmtDate(p.period_start)} to ${fmtDate(p.period_end)}</div>
-        <div class="history-meta">Paid ${fmtDate(p.paid_at||p.created_at)}${p.note?` Â· ${esc(p.note)}`:''}</div>
+        <div class="history-meta">${esc(p.employee_role||'role')} · ${fmtDate(p.period_start)} to ${fmtDate(p.period_end)}</div>
+        <div class="history-meta">Paid ${fmtDate(p.paid_at||p.created_at)}${p.note?` · ${esc(p.note)}`:''}</div>
       </div>
       <div style="text-align:right">
         <div class="history-amount">${fmtDZD(p.amount_paid||0)}</div>
@@ -2176,18 +2176,18 @@ function renderStockUsageHistory(){
     .filter(u=>filter==='all'||String(u.stock_item_id)===String(filter))
     .filter(u=>inFinRange(u.created_at,range));
   if(!rows.length){
-    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">ðŸ“‰</div><div class="empty-text">No stock usage in this period</div></div>';
+    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📉</div><div class="empty-text">No stock usage in this period</div></div>';
     return;
   }
   el.innerHTML=rows.map(u=>{
     const item=allStockItems.find(i=>String(i.id)===String(u.stock_item_id));
     const log=allProductionLogs.find(l=>String(l.id)===String(u.production_log_id));
-    const frames=log?`M:${log.m_frames||0} Â· L:${log.l_frames||0} Â· XL:${log.xl_frames||0} Â· XXL:${log.xxl_frames||0}`:'No production log';
+    const frames=log?`M:${log.m_frames||0} · L:${log.l_frames||0} · XL:${log.xl_frames||0} · XXL:${log.xxl_frames||0}`:'No production log';
     return`
       <div class="history-row">
         <div>
           <div class="history-title">${esc(item?.name||'Stock item')}</div>
-          <div class="history-meta">${esc(item?.size||'')} ${esc(item?.unit||'units')} Â· ${frames}</div>
+          <div class="history-meta">${esc(item?.size||'')} ${esc(item?.unit||'units')} · ${frames}</div>
           <div class="history-meta">${fmtDate(u.created_at)}</div>
         </div>
         <div class="history-amount" style="color:var(--red)">-${Number(u.quantity_used||0).toLocaleString()}</div>
@@ -2231,7 +2231,7 @@ async function saveProductionLog(){
   if(error){toast('Error saving log',true);return;}
   await autoDeductStock(m,l,xl,xxl,data.id);
   closeModal('production-modal');
-  toast('Production logged âœ“');
+  toast('Production logged ✓');
   await updateFinance();
 }
 async function autoDeductStock(m,l,xl,xxl,logId){
@@ -2252,7 +2252,7 @@ async function autoDeductStock(m,l,xl,xxl,logId){
   }
 }
 
-// â”€â”€ STOCK ACTIONS â”€â”€
+// ── STOCK ACTIONS ──
 function openAddStock(){
   ['stk-name','stk-size','stk-unit','stk-cost','stk-qty','stk-threshold'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('stk-unit').value='pieces';
@@ -2267,7 +2267,7 @@ async function saveStockItem(){
   const cost=parseFloat(document.getElementById('stk-cost').value)||0;
   if(!name){toast('Item name required',true);return;}
   await sb.from('stock_items').insert({name,size,quantity:qty,low_stock_threshold:threshold,unit,cost_per_unit:cost});
-  closeModal('stock-modal');toast('Stock item added âœ“');await updateFinance();
+  closeModal('stock-modal');toast('Stock item added ✓');await updateFinance();
 }
 function openRestock(id,name){
   restockingItemId=id;
@@ -2281,7 +2281,7 @@ async function saveRestock(){
   const item=allStockItems.find(s=>s.id===restockingItemId);
   if(!item)return;
   await sb.from('stock_items').update({quantity:Number(item.quantity)+qty}).eq('id',restockingItemId);
-  closeModal('restock-modal');toast('Stock updated âœ“');await updateFinance();
+  closeModal('restock-modal');toast('Stock updated ✓');await updateFinance();
 }
 async function deleteStockItem(id){
   if(!confirm('Delete this stock item?'))return;
@@ -2289,7 +2289,7 @@ async function deleteStockItem(id){
   await updateFinance();toast('Deleted');
 }
 
-// â”€â”€ EXPENSE ACTIONS â”€â”€
+// ── EXPENSE ACTIONS ──
 function openAddExpense(){
   document.getElementById('exp-date').value=new Date().toISOString().split('T')[0];
   document.getElementById('exp-amount').value='';
@@ -2303,7 +2303,7 @@ async function saveExpense(){
   const description=document.getElementById('exp-desc').value.trim();
   if(!date||!amount){toast('Date and amount required',true);return;}
   await sb.from('expenses').insert({date,amount,category,description});
-  closeModal('expense-modal');toast('Expense added âœ“');await updateFinance();
+  closeModal('expense-modal');toast('Expense added ✓');await updateFinance();
 }
 async function deleteExpense(id){
   if(!confirm('Delete this expense?'))return;
@@ -2311,14 +2311,14 @@ async function deleteExpense(id){
   await updateFinance();toast('Deleted');
 }
 
-// â”€â”€ MARK PAID â”€â”€
+// ── MARK PAID ──
 function openMarkPaid(key,name,remaining,grossOwed,paidSoFar){
   markPaidEmployee={key,name,remaining:Number(remaining||0),grossOwed:Number(grossOwed||remaining||0),paidSoFar:Number(paidSoFar||0)};
   document.getElementById('markpaid-desc').textContent=`Marking payment for ${name}`;
   document.getElementById('markpaid-amount').value=Math.round(markPaidEmployee.remaining);
   document.getElementById('markpaid-owed-display').textContent=`Remaining due: ${fmtDZD(markPaidEmployee.remaining)}`;
   const paidLine=document.getElementById('markpaid-paid-display');
-  if(paidLine)paidLine.textContent=`Paid this period: ${fmtDZD(markPaidEmployee.paidSoFar)} Â· Total owed: ${fmtDZD(markPaidEmployee.grossOwed)}`;
+  if(paidLine)paidLine.textContent=`Paid this period: ${fmtDZD(markPaidEmployee.paidSoFar)} · Total owed: ${fmtDZD(markPaidEmployee.grossOwed)}`;
   const now=new Date();
   const start=new Date(now.getFullYear(),now.getMonth(),1);
   document.getElementById('markpaid-start').value=start.toISOString().split('T')[0];
@@ -2343,12 +2343,12 @@ async function saveMarkPaid(){
     paid_at:new Date().toISOString()
   });
   closeModal('markpaid-modal');
-  toast(`${markPaidEmployee.name} â€” ${fmtDZD(amount)} marked as paid${isPartial?' (partial)':''} âœ“`);
+  toast(`${markPaidEmployee.name} — ${fmtDZD(amount)} marked as paid${isPartial?' (partial)':''} ✓`);
   markPaidEmployee=null;
   await updateFinance();
 }
 
-// â”€â”€ STOCK PAGE â”€â”€
+// ── STOCK PAGE ──
 function renderStockPage(){
   // KPIs
   const total=allStockItems.length;
@@ -2366,15 +2366,15 @@ function renderStockPage(){
   const listEl=document.getElementById('stock-page-list');
   if(listEl){
     if(!allStockItems.length){
-      listEl.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">ðŸ“¦</div><div class="empty-text">No stock items yet. Click + Add Item to start.</div></div>';
+      listEl.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📦</div><div class="empty-text">No stock items yet. Click + Add Item to start.</div></div>';
     } else {
       listEl.innerHTML=allStockItems.map(s=>{
         const isLow=Number(s.quantity)<=Number(s.low_stock_threshold||0);
         return`<div class="stock-row" style="${isLow?'border-left:3px solid var(--red);padding-left:12px;':''}">  
           <div style="flex:1">
             <div class="stock-name">${esc(s.name)}</div>
-            <div class="stock-meta">${esc(s.size||'')} Â· ${esc(s.unit||'units')} Â· ${fmtDZD(s.cost_per_unit||0)}/unit</div>
-            ${isLow?`<div style="font-size:11px;color:var(--red);margin-top:2px">âš ï¸ Below threshold (${s.low_stock_threshold})</div>`:''}
+            <div class="stock-meta">${esc(s.size||'')} · ${esc(s.unit||'units')} · ${fmtDZD(s.cost_per_unit||0)}/unit</div>
+            ${isLow?`<div style="font-size:11px;color:var(--red);margin-top:2px">⚠️ Below threshold (${s.low_stock_threshold})</div>`:''}
           </div>
           <div class="stock-qty ${isLow?'stock-low':'stock-ok'}" style="font-family:'Bebas Neue',sans-serif;font-size:24px">${Number(s.quantity).toLocaleString()}</div>
           <div class="stock-actions">
@@ -2402,7 +2402,7 @@ function renderStockPageUsage(){
   const filter=document.getElementById('stock-page-usage-filter')?.value||'all';
   const rows=allStockUsage.filter(u=>filter==='all'||String(u.stock_item_id)===String(filter));
   if(!rows.length){
-    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">ðŸ“‰</div><div class="empty-text">No usage recorded yet</div></div>';
+    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📉</div><div class="empty-text">No usage recorded yet</div></div>';
     return;
   }
   el.innerHTML=rows.map(u=>{
@@ -2410,7 +2410,7 @@ function renderStockPageUsage(){
     return`<div class="history-row">
       <div>
         <div class="history-title">${esc(item?.name||'Unknown item')}</div>
-        <div class="history-meta">${esc(item?.size||'')} Â· ${fmtDate(u.created_at)}</div>
+        <div class="history-meta">${esc(item?.size||'')} · ${fmtDate(u.created_at)}</div>
         <div class="history-meta">${u.order_id?`Order #${esc(u.order_id)}`:(u.production_log_id?`Production log #${u.production_log_id}`:'Manual')}</div>
       </div>
       <div style="text-align:right;flex-shrink:0">
@@ -2429,7 +2429,7 @@ function openManualStockAdjust(){
   document.querySelector('#restock-modal .modal-title').textContent='MANUAL STOCK ADJUST';
 }
 
-// â”€â”€ HELPERS â”€â”€
+// ── HELPERS ──
 function statusLabel(k){return STATUSES.find(s=>s.k===k)?.l||k;}
 async function deletePayLog(id){
   if(!confirm('Delete this pay record?'))return;
@@ -2442,12 +2442,12 @@ async function deleteStockUsageLog(id){
   await updateFinance();toast('Stock usage record deleted');
 }
 
-// â”€â”€ STOCK OVERRIDES / SPLIT STOCK MANAGEMENT â”€â”€
+// ── STOCK OVERRIDES / SPLIT STOCK MANAGEMENT ──
 function renderStockList(triggerAlerts=false){
   const el=document.getElementById('stock-list');
   if(!el)return;
   if(!allStockItems.length){
-    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">ðŸ“¦</div><div class="empty-text">No stock items yet</div></div>';
+    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📦</div><div class="empty-text">No stock items yet</div></div>';
     return;
   }
   const groups=stockItemsByKind(allStockItems);
@@ -2500,22 +2500,22 @@ function renderStockUsageHistory(){
     })
     .filter(u=>inFinRange(u.created_at,range));
   if(!rows.length){
-    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">ðŸ“‰</div><div class="empty-text">No production material usage in this period</div></div>';
+    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📉</div><div class="empty-text">No production material usage in this period</div></div>';
     return;
   }
   el.innerHTML=rows.map(u=>{
     const item=allStockItems.find(i=>String(i.id)===String(u.stock_item_id));
     const log=allProductionLogs.find(l=>String(l.id)===String(u.production_log_id));
-    const frames=log?`M:${log.m_frames||0} Â· L:${log.l_frames||0} Â· XL:${log.xl_frames||0} Â· XXL:${log.xxl_frames||0}`:'No production log';
+    const frames=log?`M:${log.m_frames||0} · L:${log.l_frames||0} · XL:${log.xl_frames||0} · XXL:${log.xxl_frames||0}`:'No production log';
     return`
       <div class="history-row">
         <div>
           <div class="history-title">${esc(item?.name||'Stock item')}</div>
-          <div class="history-meta">${esc(item?.size||'')} ${esc(item?.unit||'units')} Â· ${frames}</div>
+          <div class="history-meta">${esc(item?.size||'')} ${esc(item?.unit||'units')} · ${frames}</div>
           <div class="history-meta">${fmtDate(u.created_at)}</div>
         </div>
         <div class="history-amount" style="color:var(--red)">-${Number(u.quantity_used||0).toLocaleString()}</div>
-        <button class="btn btn-danger btn-sm" style="margin-top:6px;padding:3px 8px" onclick="deleteStockUsageLog(${u.id})">ðŸ—‘ Delete</button>
+        <button class="btn btn-danger btn-sm" style="margin-top:6px;padding:3px 8px" onclick="deleteStockUsageLog(${u.id})">🗑 Delete</button>
       </div>`;
   }).join('');
 }
@@ -2534,7 +2534,7 @@ async function saveProductionLog(){
   if(error){toast(error.message||'Error saving log',true);return;}
   await autoDeductStock(m,l,xl,xxl,data.id);
   closeModal('production-modal');
-  toast('Production logged âœ“');
+  toast('Production logged ✓');
   await updateFinance();
 }
 
@@ -2600,7 +2600,7 @@ function populateReadyStockVariants(selectedLabel=''){
   const variants=getProductVariants(product);
   const prev=selectedLabel||variantSel.value||variants[0]?.label||'';
   variantSel.innerHTML=variants.length
-    ?variants.map(v=>`<option value="${esc(v.label)}">${esc(v.label)}${v.price?` â€” ${fmtDZD(v.price)}`:''}</option>`).join('')
+    ?variants.map(v=>`<option value="${esc(v.label)}">${esc(v.label)}${v.price?` — ${fmtDZD(v.price)}`:''}</option>`).join('')
     :'<option value="">No variants</option>';
   variantSel.value=[...variantSel.options].some(o=>o.value===prev)?prev:'';
   const variant=variants.find(v=>v.label===variantSel.value)||variants[0];
@@ -2641,7 +2641,7 @@ async function saveRestock(){
   const {error}=await sb.from('stock_items').update({quantity:Math.max(0,nextQty)}).eq('id',restockingItemId);
   if(error){toast(error.message||'Could not update stock',true);return;}
   closeModal('restock-modal');
-  toast(restockMode==='deduct'?'Stock deducted âœ“':'Stock updated âœ“');
+  toast(restockMode==='deduct'?'Stock deducted ✓':'Stock updated ✓');
   await updateFinance();
   if(currentAdminPage==='stock')renderStockPage();
 }
@@ -2705,7 +2705,7 @@ async function saveStockItem(){
   }
   if(error){toast(error.message||'Error saving stock item',true);return;}
   closeModal('stock-modal');
-  toast('Stock item added âœ“');
+  toast('Stock item added ✓');
   await updateFinance();
   if(currentAdminPage==='stock')renderStockPage();
 }
@@ -2723,7 +2723,7 @@ function renderStockPage(){
           return `<div class="material-kpi">
             <div class="material-name">${esc(s.name)}</div>
             <div class="material-qty ${low?'stock-low':'stock-ok'}">${Number(s.quantity).toLocaleString()}</div>
-            <div class="material-meta">${esc(s.size||'')} Â· ${esc(s.unit||'units')}</div>
+            <div class="material-meta">${esc(s.size||'')} · ${esc(s.unit||'units')}</div>
           </div>`;
         }).join('')
       :'<div class="stock-section-empty">No production materials yet.</div>';
@@ -2753,7 +2753,7 @@ function renderStockPageUsage(){
     return filter==='all'||String(u.stock_item_id)===String(filter);
   });
   if(!rows.length){
-    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">ðŸ“‰</div><div class="empty-text">No production material usage recorded yet</div></div>';
+    el.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">📉</div><div class="empty-text">No production material usage recorded yet</div></div>';
     return;
   }
   el.innerHTML=rows.map(u=>{
@@ -2761,12 +2761,12 @@ function renderStockPageUsage(){
     return`<div class="history-row">
       <div>
         <div class="history-title">${esc(item?.name||'Unknown item')}</div>
-        <div class="history-meta">${esc(item?.size||'')} Â· ${fmtDate(u.created_at)}</div>
+        <div class="history-meta">${esc(item?.size||'')} · ${fmtDate(u.created_at)}</div>
         <div class="history-meta">${u.production_log_id?`Production log #${u.production_log_id}`:'Manual'}</div>
       </div>
       <div style="text-align:right;flex-shrink:0">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red)">-${Number(u.quantity_used||0).toLocaleString()}</div>
-        <button class="btn btn-danger btn-sm" style="margin-top:4px;padding:3px 8px" onclick="deleteStockUsageLog(${u.id})">ðŸ—‘</button>
+        <button class="btn btn-danger btn-sm" style="margin-top:4px;padding:3px 8px" onclick="deleteStockUsageLog(${u.id})">🗑</button>
       </div>
     </div>`;
   }).join('');
@@ -2794,7 +2794,7 @@ async function deleteProdLog(id){
   toast('Production log deleted');
 }
 
-// â”€â”€ PERFORMANCE PAGE â”€â”€
+// ── PERFORMANCE PAGE ──
 async function renderPerformance(){
   const period=document.getElementById('perf-period')?.value||'all';
   const grid=document.getElementById('performance-grid');
@@ -2821,7 +2821,7 @@ async function renderPerformance(){
     const deliveredByOp=opHistory.filter(h=>h.new_status==='delivered').length;
     const canceledByOp=opHistory.filter(h=>h.new_status==='canceled').length;
     const totalByOp=confirmedByOp+canceledByOp;
-    const confRate=totalByOp?((confirmedByOp/totalByOp)*100).toFixed(1):'â€”';
+    const confRate=totalByOp?((confirmedByOp/totalByOp)*100).toFixed(1):'—';
     // Revenue: sum of delivered orders
     const deliveredOrders=allOrders.filter(o=>o.status==='delivered'&&filterDate(o.created_at));
     return{name:opName,email:op.email||'',confirmed:confirmedByOp,delivered:deliveredByOp,canceled:canceledByOp,confRate,revenue:deliveredOrders.length*0};
@@ -2851,7 +2851,7 @@ async function renderPerformance(){
         </div>
       </div>
     </div>`).join('')||
-    '<div class="empty-state"><div class="empty-icon">ðŸ‘¥</div><div class="empty-text">No operator data yet</div></div>';
+    '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">No operator data yet</div></div>';
 }
 
 function esc(v){if(v==null)return'';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
