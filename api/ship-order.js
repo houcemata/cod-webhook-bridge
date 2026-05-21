@@ -29,13 +29,6 @@ const WILAYA_ALIASES = {
   "medea": 26,
   "médéa": 26,
   "mÃ©dÃ©a": 26,
-  "msila": 28,
-  "m s ila": 28,
-  "m'sila": 28,
-  "m s'ila": 28,
-  "m's ila": 28,
-  "m s ila": 28,
-  "m'sila": 28,
   "ain defla": 44,
   "aïn defla": 44,
 };
@@ -56,6 +49,8 @@ const COMMUNE_ALIASES = {
 function getWilayaId(wilayaName) {
   if (!wilayaName) return null;
   const raw = String(wilayaName).trim();
+  const rawLower = raw.toLowerCase();
+  if (rawLower === "m'sila" || rawLower === "m’sila" || rawLower === "msila") return 28;
   const candidates = [raw, decodeMojibake(raw)];
 
   for (const candidate of candidates) {
