@@ -991,6 +991,7 @@ const STATUSES=[
   {k:'delivered',l:'Delivered',c:'#22c55e'},{k:'canceled',l:'Canceled',c:'#e11d48'},
   {k:'not_delivered',l:'Not Delivered',c:'#ef4444'},{k:'duplicated',l:'Duplicated',c:'#71717a'},
 ];
+const CONFIRMATION_FLOW_STATUSES=new Set(['confirmed','shipped','rescheduled','delivered','not_delivered']);
 
 let currentUser=null,currentRole=null,allOrders=[],filteredOrders=[],allProducts=[],allOperators=[];
 let currentPage=1;const PAGE_SIZE=30;let editingProductId=null;
@@ -1201,13 +1202,13 @@ function updateDashboard(){
     const orders=range?allOrders.filter(o=>inRange(o.created_at,range)):allOrders;
     const total=orders.length;
     const delivered=orders.filter(o=>o.status==='delivered').length;
-    const confirmed=orders.filter(o=>o.status==='confirmed').length;
+    const confirmed=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
     // Pending + total = always based on creation date
     const pending=orders.filter(o=>o.status==='pending').length;
     const shipped=orders.filter(o=>o.status==='shipped').length;
     const canceled=orders.filter(o=>o.status==='canceled').length;
     const delRate=total?(delivered/total*100).toFixed(1):'0.0';
-    const confRate=total?((confirmed+delivered)/total*100).toFixed(1):'0.0';
+    const confRate=total?(confirmed/total*100).toFixed(1):'0.0';
     document.getElementById('kpi-total').textContent=total;
     document.getElementById('kpi-delivered').textContent=delivered;
     document.getElementById('kpi-del-rate').textContent=`${delRate}% rate`;
@@ -1230,7 +1231,7 @@ function updateDashboard(){
     // count all status-change events in period grouped by new_status
     hist.forEach(h=>{if(countByStatus.hasOwnProperty(h.new_status))countByStatus[h.new_status]++;});
     const delivered=countByStatus['delivered']||0;
-    const confirmed=countByStatus['confirmed']||0;
+    const confirmed=['confirmed','shipped','rescheduled','delivered','not_delivered'].reduce((sum,status)=>sum+(countByStatus[status]||0),0);
     const shipped=countByStatus['shipped']||0;
     const canceled=countByStatus['canceled']||0;
     const pending=countByStatus['pending']||0;
@@ -1668,7 +1669,7 @@ function buildOrderDailyRows(orders){
     if(!map.has(key)) map.set(key,{date:key,total:0,confirmed:0,delivered:0});
     const row=map.get(key);
     row.total++;
-    if(['confirmed','shipped','delivered'].includes(o.status)) row.confirmed++;
+    if(['confirmed','shipped','rescheduled','delivered','not_delivered'].includes(o.status)) row.confirmed++;
     if(o.status==='delivered') row.delivered++;
   });
   return [...map.values()].sort((a,b)=>a.date.localeCompare(b.date));
@@ -1713,11 +1714,11 @@ function renderAdPerformancePanel(range,summary,periodOrders,deliveredOrders,con
     {label:'TikTok Spend', value:fmtDZD(tiktokSpend), sub:'Ads Manager'},
     {label:'Total Ad Spend', value:fmtDZD(totalSpend), sub:'Meta + TikTok'},
     {label:'Total Orders', value:String(totalOrders), sub:'In selected period'},
-    {label:'Confirmed Orders', value:String(confirmedCount), sub:'Confirmed / shipped / delivered'},
+    {label:'Confirmed Orders', value:String(confirmedCount), sub:'Confirmed / shipped / rescheduled / delivered / not delivered'},
     {label:'Delivered Orders', value:String(deliveredCount), sub:'Reached delivery'},
     {label:'Confirmed CPA', value:fmtDZD(confirmedCPA), sub:'Spend / confirmed orders'},
     {label:'Real CPA', value:fmtDZD(realCPA), sub:'Spend / delivered orders'},
-    {label:'Confirmation Rate', value:`${confirmRate.toFixed(1)}%`, sub:'Confirmed / total orders'},
+    {label:'Confirmation Rate', value:`${confirmRate.toFixed(1)}%`, sub:'Confirmed / shipped / rescheduled / delivered / not delivered'},
     {label:'Shipping Rate', value:`${shipRate.toFixed(1)}%`, sub:'Delivered / confirmed orders'},
   ].map(card=>`
     <div class="ad-summary-card">
@@ -1765,7 +1766,7 @@ async function updateFinance(){
 
   // Revenue from delivered orders
   const deliveredOrders=periodOrders.filter(o=>o.status==='delivered');
-  const confirmedOrders=periodOrders.filter(o=>['confirmed','shipped','delivered'].includes(o.status));
+  const confirmedOrders=periodOrders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status));
   const revenue=deliveredOrders.reduce((s,o)=>s+Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0)),0);
 
   // Expenses in period
