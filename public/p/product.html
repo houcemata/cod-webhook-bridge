@@ -723,13 +723,14 @@ function renderKidsPage(){
         <div class="kids-footer-item"><div class="fi-emoji">📦</div><strong>جاهزة للإهداء</strong><span>هدية لها قيمة حقيقية</span></div>
         <div class="kids-footer-item"><div class="fi-emoji">💬</div><strong>خدمة الدفع عند الاستلام</strong><span>نتواصل معك لتأكيد الطلب</span></div>
       </div>
-    </section>
+    </section>`;
   const stickyBtn = document.querySelector('#sticky button');
   if (stickyBtn) stickyBtn.textContent = 'اطلب الآن';
   updateTotals();
   updateKidsMeta();
   bindDraftCapture();
 }
+
 async function loadProduct(){
   const slug=slugFromPath();if(!slug){missing();return;}
   try{
