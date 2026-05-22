@@ -359,6 +359,9 @@ body.kids-theme::before{background:none;opacity:0}
   background:linear-gradient(180deg,rgba(248,243,235,.95),rgba(255,255,255,.92));
   border:1px solid rgba(104,124,105,.14);
 }
+.kids-summary .sum-row.total strong{
+  color:#111;
+}
 .kids-theme .order-btn{
   background:linear-gradient(180deg,#d9b55d,#cda746);
   color:#1d1b14;
@@ -783,12 +786,8 @@ function renderKidsPage(){
   const titleLine = [kidsVersionDisplay(version), kidsSizeDisplay(size)].filter(Boolean).join(' â€” ') || KIDS_TEXT.title;
   const heroImg = kidsVersionImage(version) || imgs[0] || '';
   document.getElementById('app').innerHTML = `
-    <header class="topbar kids-topbar">
-      <a class="brand" href="/">ARCO</a>
-      <a class="back" href="/">${KIDS_TEXT.back}</a>
-    </header>
     <section class="kids-benefits">
-      ${KIDS_TEXT.benefits.map(([t,s])=>`<div class="kid-benefit"><div class="icon">â­</div><strong>${t}</strong><span>${s}</span></div>`).join('')}
+      ${KIDS_TEXT.benefits.map(([t,s])=>`<div class="kid-benefit"><div class="icon">&#11088;</div><strong>${t}</strong><span>${s}</span></div>`).join('')}
     </section>
     <section class="kids-hero">
       <div class="kids-hero-card">
@@ -843,7 +842,7 @@ function renderKidsPage(){
     </section>
     <section class="kids-footer">
       <div class="kids-footer-grid">
-        ${KIDS_TEXT.footer.map(([title,desc], i)=>`<div class="kids-footer-item"><div class="fi-emoji">${['👁️','🌿','📦','💬'][i]}</div><strong>${title}</strong><span>${desc}</span></div>`).join('')}
+        ${KIDS_TEXT.footer.map(([title,desc], i)=>`<div class="kids-footer-item"><div class="fi-emoji">${['&#128065;&#65039;','&#127793;','&#128230;','&#128172;'][i]}</div><strong>${title}</strong><span>${desc}</span></div>`).join('')}
       </div>
     </section>`;
   const stickyBtn = document.querySelector('#sticky button');
