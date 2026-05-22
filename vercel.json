@@ -6,6 +6,7 @@
     }
   ],
   "rewrites": [
+    { "source": "/p/zikr-kids", "destination": "/p/product.html?slug=zikr-kids" },
     { "source": "/p/:slug", "destination": "/p/product.html?slug=:slug" }
   ],
   "headers": [

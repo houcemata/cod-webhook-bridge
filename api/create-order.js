@@ -1,5 +1,6 @@
 import { sendAllAnalytics } from "./_analytics.js";
 import { getServiceClient } from "./_auth.js";
+import { getCustomCatalogProduct } from "./_catalog.js";
 
 function normalizeVariants(raw) {
   if (!raw) return [];
@@ -151,13 +152,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Station code is required for pickup" });
     }
 
-    const { data: product, error: productError } = await supabase
+    const { data: productRow, error: productError } = await supabase
       .from("products")
       .select("name, slug, price, active, variants")
       .eq("slug", productSlug)
       .eq("active", true)
       .limit(1)
       .maybeSingle();
+
+    const product = productRow || getCustomCatalogProduct(productSlug);
 
     if (productError || !product) {
       return res.status(404).json({ error: "Product not found" });

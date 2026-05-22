@@ -1,4 +1,5 @@
 import { getServiceClient } from "./_auth.js";
+import { getCustomCatalogProduct } from "./_catalog.js";
 
 function normalizeText(value) {
   return String(value || "").trim();
@@ -64,13 +65,15 @@ export default async function handler(req, res) {
     if (!productSlug) return res.status(400).json({ error: "Product is required" });
     if (!/^0[567]\d{8}$/.test(phone)) return res.status(400).json({ error: "Invalid phone number" });
 
-    const { data: product, error: productError } = await supabase
+    const { data: productRow, error: productError } = await supabase
       .from("products")
       .select("name, slug, price, active, variants")
       .eq("slug", productSlug)
       .eq("active", true)
       .limit(1)
       .maybeSingle();
+
+    const product = productRow || getCustomCatalogProduct(productSlug);
 
     if (productError || !product) {
       return res.status(404).json({ error: "Product not found" });

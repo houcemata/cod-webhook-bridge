@@ -313,7 +313,11 @@ const H={apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`};
 
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function money(v){return Number(v||0).toLocaleString('fr-DZ')+' DZD';}
-function productUrl(slug){return slug==='liquid-football'?'/p/liquid-football.html':'/p/'+encodeURIComponent(slug);}
+function productUrl(slug){
+  if(slug==='liquid-football') return '/p/liquid-football.html';
+  if(slug==='zikr-kids') return '/p/zikr-kids';
+  return '/p/'+encodeURIComponent(slug);
+}
 function productImages(p){
   const base=Array.isArray(p.images)?p.images:(p.images?[p.images]:[]);
   const variants=Array.isArray(p.variants)?p.variants.map(v=>v.image).filter(Boolean):[];

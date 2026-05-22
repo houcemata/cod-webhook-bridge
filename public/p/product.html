@@ -37,6 +37,378 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
 .loader,.missing{min-height:60vh;display:grid;place-items:center;text-align:center;color:#ddd}
 @media(max-width:860px){.product-layout{grid-template-columns:1fr}.gallery{position:static}.choices{grid-template-columns:1fr}.sticky.visible{display:flex}.shell{padding-bottom:96px}}
 </style>
+<style>
+.kids-theme{
+  --yellow:#d9b35b;
+  --black:#f8f3ea;
+  --dark:#fffaf4;
+  --line:rgba(104,124,105,.16);
+  --muted:#6f7480;
+  --red:#b95b74;
+  --green:#5b8b79;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(183,214,186,.44), transparent 26%),
+    radial-gradient(circle at 82% 14%, rgba(226,184,205,.42), transparent 24%),
+    linear-gradient(180deg, #f7f4ef 0%, #f4f0e9 48%, #f8f3ea 100%);
+  color:#2f2f2f;
+}
+body.kids-theme::before{background:none;opacity:0}
+.kids-theme .shell{padding:18px 18px 128px}
+.kids-theme .topbar{padding-bottom:18px}
+.kids-theme .brand{color:#cbad4e;text-shadow:none}
+.kids-theme .back{background:rgba(255,255,255,.7);color:#4d5360;border-color:rgba(104,124,105,.18)}
+.kids-hero{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(300px,460px);
+  gap:24px;
+  align-items:center;
+  margin-top:10px;
+}
+.kids-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family:'Poppins',sans-serif;
+  font-weight:700;
+  font-size:12px;
+  letter-spacing:1.8px;
+  text-transform:uppercase;
+  color:#7d7a78;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(104,124,105,.12);
+  border-radius:999px;
+  padding:8px 12px;
+  width:fit-content;
+}
+.kids-hero h1{
+  font-family:'Cairo',sans-serif;
+  font-size:clamp(34px,6vw,66px);
+  line-height:1.02;
+  letter-spacing:-.5px;
+  color:#2f3b34;
+  margin-top:14px;
+}
+.kids-lead{
+  margin-top:14px;
+  color:#5f646c;
+  line-height:1.9;
+  font-size:16px;
+  max-width:600px;
+}
+.kids-price-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  gap:14px;
+  margin-top:16px;
+}
+.kids-price{
+  font-family:'Poppins',sans-serif;
+  font-size:44px;
+  font-weight:800;
+  color:#deaf28;
+}
+.kids-old{
+  font-family:'Poppins',sans-serif;
+  font-size:24px;
+  color:#87909b;
+  text-decoration:line-through;
+}
+.kids-chip{
+  background:#fff;
+  border:1px solid rgba(104,124,105,.15);
+  color:#6d5d3a;
+  border-radius:999px;
+  padding:8px 12px;
+  font-family:'Poppins',sans-serif;
+  font-size:12px;
+  font-weight:700;
+}
+.kids-hero-card{
+  background:linear-gradient(180deg,#fffef9,#eef2e9);
+  border:1px solid rgba(104,124,105,.15);
+  border-radius:28px;
+  padding:18px;
+  box-shadow:0 24px 60px rgba(61,75,52,.08);
+}
+.kids-mockup{
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255,255,255,.95), rgba(245,241,232,.88) 52%, rgba(228,236,224,.92) 100%);
+  border:1px solid rgba(104,124,105,.14);
+  border-radius:22px;
+  overflow:hidden;
+  aspect-ratio:4/5;
+  position:relative;
+}
+.kids-mockup img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.kids-mockup-tag{
+  position:absolute;
+  left:18px;
+  bottom:18px;
+  background:rgba(255,255,255,.86);
+  border:1px solid rgba(104,124,105,.12);
+  color:#49504c;
+  border-radius:999px;
+  padding:10px 16px;
+  font-family:'Poppins',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  box-shadow:0 10px 20px rgba(77,83,76,.08);
+}
+.kids-benefits{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin-top:22px;
+}
+.kid-benefit{
+  background:rgba(255,255,255,.8);
+  border:1px solid rgba(104,124,105,.12);
+  border-radius:18px;
+  padding:16px 14px;
+  min-height:120px;
+  box-shadow:0 14px 30px rgba(61,75,52,.05);
+}
+.kid-benefit .icon{
+  font-size:24px;
+  margin-bottom:10px;
+}
+.kid-benefit strong{
+  display:block;
+  font-family:'Cairo',sans-serif;
+  font-size:15px;
+  color:#324038;
+  line-height:1.4;
+}
+.kid-benefit span{
+  display:block;
+  margin-top:6px;
+  color:#6a7280;
+  font-family:'Poppins',sans-serif;
+  font-size:12px;
+  line-height:1.6;
+}
+.kids-panel{
+  margin-top:24px;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(104,124,105,.14);
+  border-radius:28px;
+  padding:20px;
+  box-shadow:0 18px 40px rgba(61,75,52,.05);
+}
+.kids-panel-title{
+  font-family:'Cairo',sans-serif;
+  font-size:28px;
+  font-weight:900;
+  color:#2f3b34;
+  line-height:1.2;
+}
+.kids-panel-sub{
+  margin-top:6px;
+  color:#757b85;
+  font-family:'Poppins',sans-serif;
+  font-size:13px;
+}
+.kids-reminder{
+  margin-top:16px;
+  background:linear-gradient(135deg,rgba(209,232,207,.45),rgba(247,231,208,.55));
+  border:1px solid rgba(104,124,105,.14);
+  border-radius:18px;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.kids-reminder .kleft{
+  font-family:'Poppins',sans-serif;
+  color:#73807a;
+  font-size:12px;
+}
+.kids-reminder .kright{
+  font-family:'Cairo',sans-serif;
+  font-weight:900;
+  color:#3a4b41;
+  text-align:right;
+}
+.kids-select-card{
+  margin-top:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.82),rgba(245,241,235,.88));
+  border:1px solid rgba(104,124,105,.12);
+  border-radius:24px;
+  padding:16px;
+}
+.kids-select-title{
+  font-family:'Poppins',sans-serif;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  font-size:12px;
+  font-weight:800;
+  color:#7a7f83;
+  margin-bottom:12px;
+}
+.kids-select-block{margin-top:16px}
+.kids-select-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  font-family:'Cairo',sans-serif;
+  font-size:15px;
+  font-weight:900;
+  color:#39443b;
+  margin-bottom:10px;
+}
+.kids-select-head small{
+  font-family:'Poppins',sans-serif;
+  font-size:12px;
+  color:#7d838d;
+  font-weight:600;
+}
+.kids-theme .choices{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.kids-theme .choice{
+  background:rgba(255,255,255,.9);
+  color:#39443b;
+  border-color:rgba(104,124,105,.16);
+  border-radius:18px;
+  padding:14px 14px 13px;
+  text-align:right;
+  min-height:86px;
+}
+.kids-theme .choice strong{
+  font-family:'Cairo',sans-serif;
+  font-size:18px;
+  font-weight:900;
+  color:#34403a;
+}
+.kids-theme .choice span{
+  display:block;
+  font-family:'Poppins',sans-serif;
+  color:#7a828e;
+  font-size:12px;
+  margin-top:6px;
+}
+.kids-theme .choice.active{
+  border-color:#d8b85d;
+  box-shadow:inset 0 0 0 1px rgba(216,184,93,.25), 0 12px 26px rgba(166,140,55,.12);
+  background:linear-gradient(180deg,rgba(255,255,250,.96),rgba(247,238,218,.96));
+}
+.kids-section-label{
+  font-family:'Poppins',sans-serif;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  color:#9a8d6f;
+  font-size:12px;
+  font-weight:800;
+}
+.kids-form-grid .field input,
+.kids-form-grid .field select,
+.kids-form-grid .field textarea{
+  background:rgba(255,255,255,.88);
+  border-color:rgba(104,124,105,.16);
+  color:#2d3330;
+  border-radius:16px;
+  padding:14px 14px;
+}
+.kids-form-grid .field span{
+  color:#4c5652;
+  font-family:'Cairo',sans-serif;
+  font-weight:700;
+}
+.kids-summary{
+  background:linear-gradient(180deg,rgba(248,243,235,.95),rgba(255,255,255,.92));
+  border:1px solid rgba(104,124,105,.14);
+}
+.kids-theme .order-btn{
+  background:linear-gradient(180deg,#d9b55d,#cda746);
+  color:#1d1b14;
+  border-radius:18px;
+  min-height:60px;
+  box-shadow:0 18px 30px rgba(207,170,67,.22);
+}
+.kids-footer{
+  margin-top:20px;
+  background:rgba(255,255,255,.75);
+  border:1px solid rgba(104,124,105,.12);
+  border-radius:22px;
+  padding:18px;
+}
+.kids-footer-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.kids-footer-item{
+  background:rgba(243,239,231,.85);
+  border:1px solid rgba(104,124,105,.12);
+  border-radius:18px;
+  padding:14px 12px;
+  text-align:center;
+}
+.kids-footer-item .fi-emoji{font-size:20px;margin-bottom:8px}
+.kids-footer-item strong{
+  display:block;
+  font-family:'Cairo',sans-serif;
+  color:#334139;
+  font-size:14px;
+}
+.kids-footer-item span{
+  display:block;
+  margin-top:4px;
+  font-family:'Poppins',sans-serif;
+  font-size:12px;
+  color:#7a8089;
+}
+.kids-theme .sticky{
+  background:rgba(251,248,241,.94);
+  border-top:1px solid rgba(104,124,105,.16);
+}
+.kids-theme .sticky strong{color:#c8a03d}
+.kids-theme .sticky button{
+  background:linear-gradient(180deg,#d9b55d,#cda746);
+  color:#1d1b14;
+  border-radius:16px;
+}
+.kids-theme .success{
+  background:rgba(246,243,236,.98);
+}
+.kids-theme .success-box{
+  background:rgba(255,255,255,.88);
+  border:1px solid rgba(104,124,105,.14);
+  border-radius:28px;
+  padding:24px 22px 22px;
+  box-shadow:0 20px 50px rgba(61,75,52,.08);
+}
+.kids-theme .success h2{color:#c6a03d}
+.kids-theme .success p{color:#51565c}
+.kids-theme .success a{background:linear-gradient(180deg,#d9b55d,#cda746);color:#1d1b14;border-radius:16px}
+.kids-theme .success-copy-toast{
+  background:#f4ead1;
+  color:#4c3b15;
+  border-color:rgba(197,160,60,.26);
+}
+@media(max-width:1024px){
+  .kids-hero,.kids-benefits,.kids-footer-grid{grid-template-columns:1fr}
+  .kids-mockup{max-width:620px;margin:0 auto}
+}
+@media(max-width:860px){
+  .kids-hero{grid-template-columns:1fr}
+  .kids-benefits,.kids-footer-grid{grid-template-columns:1fr 1fr}
+  .kids-theme .choices{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .kids-benefits,.kids-footer-grid{grid-template-columns:1fr}
+  .kids-price{font-size:36px}
+  .kids-old{font-size:20px}
+}
+</style>
 </head>
 <body>
 <main class="shell" id="app">
@@ -103,6 +475,134 @@ function renderVariantControls(){
       <div class="choices">${values.map(value=>`<button class="choice ${selectedOptions[name]===value?'active':''}" onclick="selectOption('${enc(name)}','${enc(value)}',this)"><strong>${esc(value)}</strong></button>`).join('')}</div>
     </div>`).join('');
 }
+function isKidsProduct(){
+  return String(product?.slug || '').toLowerCase() === 'zikr-kids';
+}
+function kidsVersionValues(){
+  return optionGroups().Version || [];
+}
+function kidsSizeValues(){
+  return optionGroups().Size || [];
+}
+function kidsOldPriceForSize(size){
+  return String(size || '').includes('40×60') ? 4900 : 3600;
+}
+function updateKidsMeta(){
+  if (!isKidsProduct()) return;
+  const version = selectedOptions.Version || variant?.options?.Version || kidsVersionValues()[0] || '';
+  const size = selectedOptions.Size || variant?.options?.Size || kidsSizeValues()[0] || '';
+  const title = [version, size].filter(Boolean).join(' — ');
+  const titleEl = document.getElementById('kids-order-title');
+  const captionEl = document.getElementById('kids-mockup-tag');
+  const oldPriceEl = document.getElementById('kids-old-price');
+  if (titleEl) titleEl.textContent = title || product.name;
+  if (captionEl) captionEl.textContent = title || product.name;
+  if (oldPriceEl) oldPriceEl.textContent = money(kidsOldPriceForSize(size));
+}
+function renderKidsSelectors(){
+  const versions = kidsVersionValues();
+  const sizes = kidsSizeValues();
+  return `
+    <div class="kids-select-card">
+      <div class="kids-select-title">Choisissez votre version et votre taille</div>
+      <div class="kids-select-block">
+        <div class="kids-select-head"><span>Version</span><small>Boy / Girl</small></div>
+        <div class="choices">
+          ${versions.map(value=>`<button class="choice ${selectedOptions.Version===value?'active':''}" onclick="selectOption('Version','${enc(value)}',this)"><strong>${esc(value)}</strong><span>Illustrations complètes</span></button>`).join('')}
+        </div>
+      </div>
+      <div class="kids-select-block">
+        <div class="kids-select-head"><span>Taille</span><small>Impression premium</small></div>
+        <div class="choices">
+          ${sizes.map(value=>{
+            const matched = variants().find(v=>v.options && v.options.Version === (selectedOptions.Version || versions[0]) && v.options.Size === value);
+            return `<button class="choice ${selectedOptions.Size===value?'active':''}" onclick="selectOption('Size','${enc(value)}',this)"><strong>${esc(value)}</strong><span>${money(matched?.price || (String(value).includes('40×60') ? 3900 : 2900))}</span></button>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+function renderKidsPage(){
+  document.body.classList.add('kids-theme');
+  document.title = product.name + ' - ARCO';
+  const imgs = images();
+  const version = selectedOptions.Version || variant?.options?.Version || kidsVersionValues()[0] || '';
+  const size = selectedOptions.Size || variant?.options?.Size || kidsSizeValues()[0] || '';
+  const titleLine = [version, size].filter(Boolean).join(' — ') || product.name;
+  const firstImg = imgs[0] || '';
+  document.getElementById('app').innerHTML = `
+    <header class="topbar kids-topbar">
+      <a class="brand" href="/">ARCO</a>
+      <a class="back" href="/">Products</a>
+    </header>
+    <section class="kids-hero">
+      <div class="kids-hero-copy">
+        <div class="kids-kicker">ARCO ART • ENFANTS</div>
+        <h1>${esc(product.name)}</h1>
+        <div class="kids-lead">3 toiles sans cadre pour aider votre enfant à apprendre ses invocations quotidiennes naturellement, avec une décoration douce et rassurante pour sa chambre.</div>
+        <div class="kids-price-row">
+          <span class="kids-old" id="kids-old-price">${money(kidsOldPriceForSize(size))}</span>
+          <span class="kids-price" id="base-price">${money(variant.price)}</span>
+          <span class="kids-chip">Paiement à la livraison فقط</span>
+        </div>
+      </div>
+      <div class="kids-hero-card">
+        <div class="kids-mockup">
+          ${firstImg ? `<img id="main-img" src="${esc(firstImg)}" alt="${esc(product.name)}">` : ''}
+          <div class="kids-mockup-tag" id="kids-mockup-tag">${esc(titleLine)}</div>
+        </div>
+      </div>
+    </section>
+    <section class="kids-benefits">
+      <div class="kid-benefit"><div class="icon">👀</div><strong>Apprentissage visuel</strong><span>Les invocations deviennent simples à retenir avec une présence douce au quotidien.</span></div>
+      <div class="kid-benefit"><div class="icon">🧒</div><strong>Illustrations enfantines</strong><span>Un style chaleureux et rassurant, pensé pour une chambre d’enfant.</span></div>
+      <div class="kid-benefit"><div class="icon">🖨️</div><strong>Qualité d'impression</strong><span>Des couleurs douces, nettes et adaptées à une finition premium.</span></div>
+      <div class="kid-benefit"><div class="icon">🎁</div><strong>Idée cadeau</strong><span>Un cadeau utile, beau et plein de sens pour une naissance ou un emménagement.</span></div>
+    </section>
+    <section class="kids-panel" id="order">
+      <div class="kids-section-label">Commander</div>
+      <div class="kids-panel-title">Choisissez la version</div>
+      <div class="kids-panel-sub">Garçon ou Fille, puis la taille que vous préférez. Le prix se met à jour instantanément.</div>
+      <div class="kids-reminder">
+        <div class="kleft">Vous commandez</div>
+        <div class="kright" id="kids-order-title">${esc(titleLine)}</div>
+      </div>
+      ${renderKidsSelectors()}
+      <div class="variant-label"><span>Informations</span><span style="font-family:'Poppins',sans-serif;font-weight:700;direction:rtl">معلوماتك</span></div>
+      <div class="form kids-form-grid">
+        <label class="field"><span>Nom complet / الاسم الكامل</span><input id="f-name" autocomplete="name" placeholder="مثال: أحمد بن علي"></label>
+        <label class="field"><span>Téléphone / رقم الهاتف</span><input id="f-phone" inputmode="tel" placeholder="05XXXXXXXX"></label>
+        <label class="field"><span>Wilaya / الولاية</span><select id="f-wilaya" onchange="onWilayaChange()"><option value="">اختر الولاية — Choisir la wilaya</option>${WILAYAS.map(w=>`<option value="${w[0]}|${esc(w[1])}">${w[0]} - ${esc(w[1])}</option>`).join('')}</select></label>
+        <div class="choices"><button class="choice active" onclick="selectDelivery(event,'home')"><strong>إلى المنزل</strong><span id="home-price">اختر الولاية</span></button><button class="choice" onclick="selectDelivery(event,'pickup')"><strong>إلى أقرب مكتب</strong><span id="desk-price">اختر الولاية</span></button></div>
+        <label class="field" id="commune-wrap"><span>Commune / البلدية</span><select id="f-commune"><option value="">اختر البلدية</option></select></label>
+        <label class="field" id="desk-wrap" style="display:none"><span>Stop Desk / نقطة الاستلام</span><select id="f-desk" onchange="selectedDesk=this.value"><option value="">اختر نقطة</option></select></label>
+      </div>
+      <div class="summary kids-summary"><div class="sum-row"><span>Produit</span><strong id="sum-product">${money(variant.price)}</strong></div><div class="sum-row"><span>Livraison</span><strong id="sum-ship">0 DZD</strong></div><div class="sum-row total"><span>Total</span><strong id="sum-total">${money(variant.price)}</strong></div></div>
+      <button class="order-btn" id="order-btn" onclick="submitOrder()"><span class="order-btn-ar">اطلب الآن</span><span class="order-btn-fr">Commander Maintenant</span></button>
+      <div class="trust-row" style="margin-top:16px">
+        <div class="trust-item"><span>✅</span><span>Paiement à la livraison</span></div>
+        <div class="trust-item"><span>🎨</span><span>Illustrations douces</span></div>
+        <div class="trust-item"><span>🎁</span><span>Cadeau utile</span></div>
+      </div>
+    </section>
+    <section class="kids-footer">
+      <div class="kids-footer-grid">
+        <div class="kids-footer-item"><div class="fi-emoji">👁️</div><strong>Lecture naturelle</strong><span>Apprentissage quotidien sans pression</span></div>
+        <div class="kids-footer-item"><div class="fi-emoji">🌿</div><strong>Palette douce</strong><span>Sage, blush, lavande et crème</span></div>
+        <div class="kids-footer-item"><div class="fi-emoji">📦</div><strong>Prêt à offrir</strong><span>Un cadeau qui fait vraiment sens</span></div>
+        <div class="kids-footer-item"><div class="fi-emoji">💬</div><strong>Support COD</strong><span>On vous contacte pour confirmer</span></div>
+      </div>
+      <div class="description-section" style="margin-top:16px">
+        <div class="desc-ar">ثلاث لوحات قماشية بدون إطار لتزيين غرفة الطفل بطريقة جميلة ومفيدة، مع أذكار الصباح والمساء والنوم مكتوبة بالعربية والفرنسية في أسلوب لطيف ومحبب للأطفال.</div>
+        <div class="desc-fr">Set de 3 posters sur toile, doux et éducatifs, pour accompagner votre enfant dans l’apprentissage de ses invocations quotidiennes avec une décoration chaleureuse et moderne.</div>
+      </div>
+    </section>`;
+  const stickyBtn = document.querySelector('#sticky-bar .sticky-order-btn');
+  if (stickyBtn) stickyBtn.textContent = 'Commander maintenant ↓';
+  updateTotals();
+  updateKidsMeta();
+  bindDraftCapture();
+}
 async function loadProduct(){
   const slug=slugFromPath();if(!slug){missing();return;}
   try{
@@ -120,6 +620,10 @@ async function loadProduct(){
 }
 function missing(){document.getElementById('app').innerHTML='<div class="missing">هذا المنتج غير متوفر حاليا.</div>';}
 function render(){
+  if (isKidsProduct()) {
+    renderKidsPage();
+    return;
+  }
   const imgs=images();document.title=product.name+' - ARCO';
   document.getElementById('app').innerHTML=`
     <header class="topbar"><a class="brand" href="/">ARCO</a><a class="back" href="/">Products</a></header>
@@ -157,8 +661,8 @@ function render(){
 }
 function bindDraftCapture(){if(draftCaptureBound||!window.ARCODraft||!product)return;draftCaptureBound=window.ARCODraft.bindDraftCapture({phoneInputId:'f-phone',watchInputIds:['f-name','f-phone','f-wilaya','f-commune','f-desk'],buildPayload:()=>({product_slug:product.slug,name:document.getElementById('f-name')?.value||'',phone:document.getElementById('f-phone')?.value||'',wilaya:document.getElementById('f-wilaya')?.value.split('|')[1]||'',wilaya_id:Number((document.getElementById('f-wilaya')?.value||'').split('|')[0]||0)||0,commune:document.getElementById('f-commune')?.value||'',delivery_type:delivery,station_code:delivery==='pickup'?selectedDesk:null,variant_label:variant?.label||variant?.name||'Standard',selected_options:selectedOptions,product_name:product.name,shipping_cost:shippingCost(),notes:'draft lead'})});}
 function setImage(btn,src){document.querySelectorAll('.thumb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('main-img').src=src;}
-function selectVariant(i,btn){variant=variants()[i];document.querySelectorAll('#variant-choices .choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();window.ARCODraft?.triggerCapture?.();}
-function selectOption(name,value,btn){name=decodeURIComponent(name);value=decodeURIComponent(value);selectedOptions[name]=value;variant=findSelectedVariant();btn.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();window.ARCODraft?.triggerCapture?.();}
+function selectVariant(i,btn){variant=variants()[i];document.querySelectorAll('#variant-choices .choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();updateKidsMeta();window.ARCODraft?.triggerCapture?.();}
+function selectOption(name,value,btn){name=decodeURIComponent(name);value=decodeURIComponent(value);selectedOptions[name]=value;variant=findSelectedVariant();btn.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();updateKidsMeta();window.ARCODraft?.triggerCapture?.();}
 function selectDelivery(ev,type){ev.preventDefault();delivery=type;selectedDesk='';ev.currentTarget.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));ev.currentTarget.classList.add('active');document.getElementById('commune-wrap').style.display=type==='home'?'grid':'none';document.getElementById('desk-wrap').style.display=type==='pickup'?'grid':'none';if(type==='pickup')loadDesks();updateTotals();window.ARCODraft?.triggerCapture?.();}
 async function onWilayaChange(){
   const val=document.getElementById('f-wilaya').value;if(!val)return;selectedDesk='';
@@ -184,7 +688,7 @@ async function loadDesks(){
 }
 function shippingCost(){return delivery==='home'?Number(shipping.home_delivery||0):Number(shipping.stop_desk||0);}
 function total(){return Number(variant.price||0)+shippingCost();}
-function updateTotals(){['sum-product','base-price'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=money(variant.price)});const s=document.getElementById('sum-ship'),t=document.getElementById('sum-total'),st=document.getElementById('sticky-total'),sticky=document.getElementById('sticky');if(s)s.textContent=money(shippingCost());if(t)t.textContent=money(total());if(st)st.textContent=money(total());if(sticky)sticky.classList.toggle('visible',!!product);}
+function updateTotals(){['sum-product','base-price'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=money(variant.price)});const s=document.getElementById('sum-ship'),t=document.getElementById('sum-total'),st=document.getElementById('sticky-total'),sticky=document.getElementById('sticky');if(s)s.textContent=money(shippingCost());if(t)t.textContent=money(total());if(st)st.textContent=money(total());if(sticky)sticky.classList.toggle('visible',!!product);if(isKidsProduct())updateKidsMeta();}
 function scrollToOrder(){document.getElementById('order').scrollIntoView({behavior:'smooth'});}
 function trackProductCheckout(){
   if(checkoutTracked||!window.ARCOMeta||!product)return;
@@ -196,6 +700,10 @@ function trackProductCheckout(){
 }
 async function submitOrder(){
   const name=document.getElementById('f-name').value.trim(),phone=document.getElementById('f-phone').value.replace(/\s/g,''),wilayaVal=document.getElementById('f-wilaya').value,commune=document.getElementById('f-commune').value.trim();
+  const btn=document.getElementById('order-btn');
+  const btnAr=btn?.querySelector('.order-btn-ar');
+  const btnFr=btn?.querySelector('.order-btn-fr');
+  const restoreButton=()=>{ if(btnAr){btnAr.textContent='اطلب الآن';} else if(btn){btn.textContent='اطلب الآن';} if(btnFr){btnFr.textContent='Commander Maintenant';} };
   if(!name)return toast('ادخل الاسم',true);
   if(!/^0[567]\d{8}$/.test(phone))return toast('رقم الهاتف غير صحيح',true);
   if(!wilayaVal)return toast('اختر الولاية',true);
@@ -203,8 +711,9 @@ async function submitOrder(){
   if(delivery==='home'&&!commune)return toast('اختر البلدية',true);
   if(delivery==='pickup'&&!selectedDesk)return toast('اختر نقطة Stop Desk',true);
   trackProductCheckout();
-  const [wilayaId,wilaya]=wilayaVal.split('|'),btn=document.getElementById('order-btn');
-  btn.classList.add('loading');btn.textContent='جاري الإرسال...';
+  const [wilayaId,wilaya]=wilayaVal.split('|');
+  btn.classList.add('loading');
+  if(btnAr){btnAr.textContent='جاري الإرسال...';} else if(btn){btn.textContent='جاري الإرسال...';}
   const payload={product_slug:product.slug,name,phone,wilaya,wilaya_id:Number(wilayaId),commune:delivery==='home'?commune:'',delivery_type:delivery==='home'?'home':'pickup',station_code:delivery==='pickup'?selectedDesk:null,variant_label:variant.label,selected_options:selectedOptions,event_source_url:location.href,draft_order_id:(window.ARCODraft?.getStoredDraftId({product_slug:product.slug,phone,variant_label:variant?.label||variant?.name||'Standard',delivery_type:delivery})||undefined)};
   try{
     const r=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
@@ -218,7 +727,7 @@ async function submitOrder(){
     }
     if(window.ARCODraft){window.ARCODraft.clearStoredDraftId({product_slug:product.slug,phone,variant_label:variant?.label||variant?.name||'Standard',delivery_type:delivery});}
     document.getElementById('success-id').textContent='#'+result.order_id;document.getElementById('success').classList.add('show');
-  }catch(e){btn.classList.remove('loading');btn.textContent='اطلب الآن';toast('حدث خطأ. حاول مرة أخرى',true);}
+  }catch(e){btn.classList.remove('loading');restoreButton();toast('حدث خطأ. حاول مرة أخرى',true);}
 }
 let tt;function toast(msg,err=false){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(err?' err':'');clearTimeout(tt);tt=setTimeout(()=>el.className='toast',2600);}
 loadProduct();
