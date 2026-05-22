@@ -621,8 +621,8 @@ const KIDS_TEXT = {
   namePlaceholder: 'مثال: أحمد بن علي',
   phonePlaceholder: '05XXXXXXXX',
   wilayaPlaceholder: 'اختر الولاية',
-  communePlaceholder: 'اختر البلدية',
-  deskPlaceholder: 'اختر النقطة',
+  communePlaceholder: '\u0627\u062e\u062a\u0631 \u0627\u0644\u0628\u0644\u062f\u064a\u0629',
+  deskPlaceholder: '\u0627\u062e\u062a\u0631 \u0627\u0644\u0646\u0642\u0637\u0629',
   homeHint: 'اختر الولاية',
   pickupHint: 'اختر الولاية',
   trust: [
@@ -791,7 +791,7 @@ function renderKidsPage(){
     </section>
     <section class="kids-panel" id="order">
       <div class="kids-section-label">${KIDS_TEXT.order}</div>
-      <div class="kids-panel-title">${KIDS_TEXT.selectSize} ${KIDS_TEXT.orderData}</div>
+      <div class="kids-panel-title">${KIDS_TEXT.selectSize}</div>
       <div class="kids-panel-sub">${KIDS_TEXT.panelSub}</div>
       <div class="kids-order-price">
         <div class="kids-price-row">
@@ -805,7 +805,7 @@ function renderKidsPage(){
         <div class="kright" id="kids-order-title">${esc(titleLine)}</div>
       </div>
       ${renderKidsSizeSelector()}
-      <div class="variant-label"><span>${KIDS_TEXT.info}</span><span style="font-family:'Cairo',sans-serif;font-weight:700;direction:rtl">${KIDS_TEXT.orderData}</span></div>
+      <div class="variant-label"><span>${KIDS_TEXT.info}</span></div>
       <div class="form kids-form-grid">
         <label class="field"><span>${KIDS_TEXT.name}</span><input id="f-name" autocomplete="name" placeholder="${KIDS_TEXT.namePlaceholder}"></label>
         <label class="field"><span>${KIDS_TEXT.phone}</span><input id="f-phone" inputmode="tel" placeholder="${KIDS_TEXT.phonePlaceholder}"></label>
