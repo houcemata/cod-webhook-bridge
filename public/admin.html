@@ -1900,8 +1900,8 @@ function stockRowMarkup(s,opts={}){
   const meta=metaParts.filter(Boolean).map(v=>esc(String(v))).join(' · ');
   const actions=opts.actions===false?'':`
       <div class="stock-actions">
-        <button class="btn btn-ghost btn-sm" onclick="openRestock(${s.id},'${esc(s.name)}')">+ Qty</button>
-        ${allowDeduct?`<button class="btn btn-ghost btn-sm" onclick="openDeductStock(${s.id},'${esc(s.name)}')">- Qty</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="adjustStockByOne(${s.id},1)">+ Qty</button>
+        ${allowDeduct?`<button class="btn btn-ghost btn-sm" onclick="adjustStockByOne(${s.id},-1)">- Qty</button>`:''}
         <button class="btn btn-danger btn-sm" onclick="deleteStockItem(${s.id})">🗑</button>
       </div>`;
   return `<div class="stock-row">
@@ -2282,6 +2282,18 @@ async function saveRestock(){
   if(!item)return;
   await sb.from('stock_items').update({quantity:Number(item.quantity)+qty}).eq('id',restockingItemId);
   closeModal('restock-modal');toast('Stock updated ✓');await updateFinance();
+}
+async function adjustStockByOne(id,delta){
+  const item=allStockItems.find(s=>String(s.id)===String(id));
+  if(!item)return;
+  const currentQty=Number(item.quantity||0);
+  const nextQty=currentQty+Number(delta||0);
+  if(nextQty<0){toast('Not enough stock to deduct',true);return;}
+  const {error}=await sb.from('stock_items').update({quantity:nextQty}).eq('id',id);
+  if(error){toast(error.message||'Could not update stock',true);return;}
+  toast(delta>0?'Stock updated ✓':'Stock deducted ✓');
+  await updateFinance();
+  if(currentAdminPage==='stock')renderStockPage();
 }
 async function deleteStockItem(id){
   if(!confirm('Delete this stock item?'))return;
