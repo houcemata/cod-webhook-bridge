@@ -1895,13 +1895,14 @@ function stockRowMarkup(s,opts={}){
   const kindClass=kind==='production_material'?'stock-type-material':'stock-type-ready';
   const kindLabel=stockKindLabel(kind);
   const allowDeduct=opts.allowDeduct??kind==='ready_to_ship';
+  const quickAdjust=opts.quickAdjust??kind==='ready_to_ship';
   const title=opts.title||s.name;
   const metaParts=opts.metaParts||[s.size,s.unit||'units',`${fmtDZD(s.cost_per_unit||0)}/unit`];
   const meta=metaParts.filter(Boolean).map(v=>esc(String(v))).join(' · ');
   const actions=opts.actions===false?'':`
       <div class="stock-actions">
-        <button class="btn btn-ghost btn-sm" onclick="adjustStockByOne(${s.id},1)">+ Qty</button>
-        ${allowDeduct?`<button class="btn btn-ghost btn-sm" onclick="adjustStockByOne(${s.id},-1)">- Qty</button>`:''}
+        <button class="btn btn-ghost btn-sm" onclick="${quickAdjust?`adjustStockByOne(${s.id},1)`:`openRestock(${s.id},'${esc(s.name)}')`}">+ Qty</button>
+        ${allowDeduct?`<button class="btn btn-ghost btn-sm" onclick="${quickAdjust?`adjustStockByOne(${s.id},-1)`:`openDeductStock(${s.id},'${esc(s.name)}')`}">- Qty</button>`:''}
         <button class="btn btn-danger btn-sm" onclick="deleteStockItem(${s.id})">🗑</button>
       </div>`;
   return `<div class="stock-row">
