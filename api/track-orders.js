@@ -59,6 +59,14 @@ const EVENT_STATUS_MAP = {
   livraison_echoue_recu: "canceled",
   returned: "canceled",
   return_to_sender: "canceled",
+  cancelled: "canceled",
+  cancelled_by_customer: "canceled",
+  cancelled_by_hub: "canceled",
+  cancelled_to_sender: "canceled",
+  return: "canceled",
+  retour: "canceled",
+  retour_to_sender: "canceled",
+  retour_au_sender: "canceled",
 };
 
 /**
