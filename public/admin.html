@@ -1208,6 +1208,7 @@ function updateDashboard(){
     const confirmed=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
     // Pending + total = always based on creation date
     const pending=orders.filter(o=>o.status==='pending').length;
+    const canceled=orders.filter(o=>o.status==='canceled').length;
     const delRate=total?(delivered/total*100).toFixed(1):'0.0';
     const confRateAll=total?(confirmed/total*100).toFixed(1):'0.0';
     const nonDraft=orders.filter(o=>o.status!=='draft').length;
@@ -1242,12 +1243,13 @@ function updateDashboard(){
     const shipped=countByStatus['shipped']||0;
     const canceled=countByStatus['canceled']||0;
     const pending=countByStatus['pending']||0;
+    const total=hist.length;
     document.getElementById('kpi-total').textContent=total;
     document.getElementById('kpi-delivered').textContent=delivered;
     document.getElementById('kpi-del-rate').textContent='deliveries';
     document.getElementById('kpi-confirmed').textContent=confirmed;
     document.getElementById('kpi-conf-rate').textContent='confirmations';
-    const nonDraft=orders.filter(o=>o.status!=='draft').length;
+    const nonDraft=allOrders.filter(o=>o.status!=='draft').length;
     const confRateAll=total?(confirmed/total*100).toFixed(1):'0.0';
     const confRateNonDraft=nonDraft?(confirmed/nonDraft*100).toFixed(1):'0.0';
     const delRateConfirmed=confirmed?(delivered/confirmed*100).toFixed(1):'0.0';
