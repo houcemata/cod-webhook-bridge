@@ -315,6 +315,7 @@ function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function money(v){return Number(v||0).toLocaleString('fr-DZ')+' DZD';}
 function productUrl(slug){
   if(slug==='liquid-football') return '/p/liquid-football.html';
+  if(slug==='barber-shop') return '/p/barber-shop.html';
   if(slug==='zikr-kids') return '/p/zikr-kids';
   return '/p/'+encodeURIComponent(slug);
 }
