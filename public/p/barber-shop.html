@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8"/>
@@ -1038,8 +1038,8 @@ body::before {
 <div id="toast"></div>
 
 <script>
-const SB_URL = 'https://lsslryttmbiniwymvnkg.supabase.co/rest/v1';
-const SB_KEY = 'sb_publishable_iUAFfCKfuomfAmXChOf3Nw_O4BkMWsK';
+const SB_URL = 'https://mpkpehuatqsubohltssi.supabase.co/rest/v1';
+const SB_KEY = 'sb_publishable_LU6k721gj0obvo297d9QSA_dxuC7nHU';
 const PRODUCT_SLUG = 'barber-shop';
 const PRODUCT_PRICE = 2900;
 
@@ -1080,7 +1080,7 @@ const WILAYA_ID_MAP = {
 let selectedClub = CLUBS[0];
 let selectedSize = '3x30x40cm';
 let selectedDelivery = 'home';
-let shippingRates = {};
+let shippingRates = { home_delivery: 0, stop_desk: 0 };
 let noestDesks = null;
 let currentShippingCost = 0;
 let checkoutTracked = false;
@@ -1198,33 +1198,37 @@ function selectDelivery(el, type) {
 function buildWilayas() {
   const sel = document.getElementById('f-wilaya');
   sel.innerHTML = '<option value="">اختر الولاية — Choisir la wilaya</option>' +
-    WILAYA_NAMES.map(w => `<option value="${w}">${w}</option>`).join('');
+    WILAYA_NAMES.map(w => {
+      const id = (w.match(/^(\d+)/) || [])[1] || '';
+      return `<option value="${id}|${w}">${w}</option>`;
+    }).join('');
 }
 
 async function onWilayaChange() {
-  const wilaya = document.getElementById('f-wilaya').value;
-  if (!wilaya) return;
+  const wilayaVal = document.getElementById('f-wilaya').value || '';
+  if (!wilayaVal) return;
+  const [wilayaIdRaw, wilayaLabel] = wilayaVal.split('|');
+  const wilayaId = Number(wilayaIdRaw || 0);
+  if (!wilayaLabel) return;
 
   // Populate communes
-  const communes = WILAYA_DATA[wilaya] || [];
+  const communes = WILAYA_DATA[wilayaLabel] || [];
   const commSel = document.getElementById('f-commune');
   commSel.innerHTML = '<option value="">Choisir la commune — اختر البلدية</option>' +
     communes.map(c => `<option value="${c}">${c}</option>`).join('');
 
   // Load shipping rates for this wilaya
-  const wilayaClean = wilaya.replace(/^\d+\s*-\s*/, '').trim();
-  const wilayaId = WILAYA_ID_MAP[wilayaClean];
+  const wilayaClean = wilayaLabel.replace(/^\d+\s*-\s*/, '').trim();
+  const shippingWilayaId = wilayaId || WILAYA_ID_MAP[wilayaClean];
 
-  if (wilayaId) {
+  if (shippingWilayaId) {
     try {
-      const r = await fetch(`${SB_URL}/shipping_rates?wilaya_id=eq.${wilayaId}&select=home_delivery,stop_desk`, {headers: SB_H});
+      const r = await fetch(`${SB_URL}/shipping_rates?wilaya_id=eq.${shippingWilayaId}&select=home_delivery,stop_desk`, {headers: SB_H});
       const data = await r.json();
-      if (data && data[0]) {
-        shippingRates = data[0];
-        document.getElementById('home-price').textContent = data[0].home_delivery.toLocaleString() + ' DZD';
-        document.getElementById('desk-price').textContent = data[0].stop_desk.toLocaleString() + ' DZD';
-        updateShipping();
-      }
+      shippingRates = data && data[0] ? data[0] : { home_delivery: 0, stop_desk: 0 };
+      document.getElementById('home-price').textContent = Number(shippingRates.home_delivery || 0).toLocaleString() + ' DZD';
+      document.getElementById('desk-price').textContent = Number(shippingRates.stop_desk || 0).toLocaleString() + ' DZD';
+      updateShipping();
     } catch(e) {}
   }
 
@@ -1234,10 +1238,9 @@ async function onWilayaChange() {
 }
 
 function updateShipping() {
-  if (!shippingRates.home_delivery) return;
   currentShippingCost = selectedDelivery === 'home'
-    ? shippingRates.home_delivery
-    : shippingRates.stop_desk;
+    ? Number(shippingRates.home_delivery || 0)
+    : Number(shippingRates.stop_desk || 0);
   const total = selectedSizePrice + currentShippingCost;
   document.getElementById('sum-product').textContent = selectedSizePrice.toLocaleString() + ' DZD';
   document.getElementById('sum-shipping').textContent = currentShippingCost.toLocaleString() + ' DZD';
@@ -1284,8 +1287,8 @@ async function loadDesks() {
 function populateDesks() {
   const sel = document.getElementById('f-desk');
   if (!noestDesks) { sel.innerHTML = '<option value="">Erreur de chargement</option>'; return; }
-  const wilayaKey = document.getElementById('f-wilaya').value;
-  const num = (wilayaKey.match(/^(\d+)/) || [])[1] || '';
+  const wilayaKey = document.getElementById('f-wilaya').value || '';
+  const num = (wilayaKey.split('|')[0] || (wilayaKey.match(/^(\d+)/) || [])[1] || '');
   const entries = Object.entries(noestDesks);
   const matching = entries.filter(([code]) => num && new RegExp(`^${num}[A-Z]`).test(code));
   const others = entries.filter(([code]) => !matching.find(([mc]) => mc === code));
@@ -1336,14 +1339,14 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
   if (!wilayaKey) { toast('Veuillez choisir votre wilaya — اختر الولاية', true); return; }
   if (selectedDelivery === 'home' && !commune) { toast('Veuillez choisir votre commune — اختر البلدية', true); return; }
   if (selectedDelivery === 'desk' && !desk) { toast('Veuillez choisir un point Stop Desk', true); return; }
-  if (!shippingRates.home_delivery) { toast('Choisissez une wilaya valide', true); return; }
   trackProductCheckout();
 
   const btn = document.getElementById('order-btn');
   btn.classList.add('loading');
   btn.querySelector('.order-btn-ar').textContent = 'جاري الإرسال...';
 
-  const wilayaClean = wilayaKey.replace(/^\d+\s*-\s*/, '').trim();
+  const [wilayaIdRaw, wilayaLabel] = wilayaKey.split('|');
+  const wilayaClean = (wilayaLabel || wilayaKey).replace(/^\d+\s*-\s*/, '').trim();
   const orderId = Date.now().toString();
   const total = selectedSizePrice + currentShippingCost;
 
@@ -1365,7 +1368,7 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
 
   try {
     orderData.product_slug = 'barber-shop';
-    orderData.wilaya_id = WILAYA_ID_MAP[wilayaClean];
+    orderData.wilaya_id = Number(wilayaIdRaw || WILAYA_ID_MAP[wilayaClean] || 0) || 0;
     orderData.delivery_type = selectedDelivery === 'home' ? 'home' : 'pickup';
     orderData.variant_label = `${selectedClub.value} - ${selectedSize}`;
     orderData.selected_options = { Model: selectedClub.value, Taille: selectedSize };
@@ -1440,7 +1443,3 @@ function toast(msg, isErr = false) {
 </script>
 </body>
 </html>
-
-
-
-
