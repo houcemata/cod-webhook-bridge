@@ -1266,8 +1266,8 @@ function bindDraftCapture() {
         commune: document.getElementById('f-commune')?.value || '',
         delivery_type: selectedDelivery === 'home' ? 'home' : 'pickup',
         station_code: selectedDelivery === 'pickup' ? (document.getElementById('f-desk')?.value || '') : null,
-        variant_label: `${selectedClub.value} - ${selectedSize}`,
-        selected_options: { Model: selectedClub.value, Taille: selectedSize },
+        variant_label: `${selectedClub.value} / ${selectedSize}`,
+        selected_options: { MODEL: selectedClub.value, Taille: selectedSize },
         product_name: 'Barber Shop',
         shipping_cost: currentShippingCost,
         notes: 'draft lead',
@@ -1359,7 +1359,7 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
     type_livraison: selectedDelivery === 'home' ? 'home' : 'pickup',
     station_code: selectedDelivery === 'desk' ? desk : null,
     product: 'Barber Shop',
-    variable: `Modèle ${selectedClub.value} - ${selectedSize}`,
+    variable: `${selectedClub.value} / ${selectedSize}`,
     prix_total: total,
     shipping_cost: currentShippingCost,
     status: 'pending',
@@ -1370,8 +1370,8 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
     orderData.product_slug = 'barber-shop';
     orderData.wilaya_id = Number(wilayaIdRaw || WILAYA_ID_MAP[wilayaClean] || 0) || 0;
     orderData.delivery_type = selectedDelivery === 'home' ? 'home' : 'pickup';
-    orderData.variant_label = `${selectedClub.value} - ${selectedSize}`;
-    orderData.selected_options = { Model: selectedClub.value, Taille: selectedSize };
+    orderData.variant_label = `${selectedClub.value} / ${selectedSize}`;
+    orderData.selected_options = { MODEL: selectedClub.value, Taille: selectedSize };
     orderData.event_source_url = location.href;
 
     const r = await fetch('/api/create-order', {
