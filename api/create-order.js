@@ -167,7 +167,18 @@ export default async function handler(req, res) {
     }
 
     const variant = resolveVariant(product, body);
-    if (!variant || !Number.isFinite(variant.price) || variant.price <= 0) {
+    const fallbackVariantLabel = normalizeText(body.variant_label) || normalizeText(body.selected_options?.MODEL) || normalizeText(body.selected_options?.Model) || "Standard";
+    const resolvedVariant = variant || (productSlug === "barber-shop"
+      ? {
+          name: fallbackVariantLabel,
+          label: fallbackVariantLabel,
+          price: Number(product.price || 0),
+          image: "",
+          options: null,
+        }
+      : null);
+
+    if (!resolvedVariant || !Number.isFinite(resolvedVariant.price) || resolvedVariant.price <= 0) {
       return res.status(400).json({ error: "Invalid variant selection" });
     }
 
@@ -190,7 +201,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Shipping price is unavailable" });
     }
 
-    const total = Number(variant.price) + shippingCost;
+    const total = Number(resolvedVariant.price) + shippingCost;
     const orderId = createOrderId();
     const orderData = {
       name,
@@ -200,7 +211,7 @@ export default async function handler(req, res) {
       type_livraison: deliveryType,
       station_code: stationCode,
       product: product.name,
-      variable: variant.label || variant.name,
+      variable: resolvedVariant.label || resolvedVariant.name,
       prix_total: total,
       shipping_cost: shippingCost,
       status: "pending",
@@ -240,7 +251,7 @@ export default async function handler(req, res) {
           type_livraison: deliveryType,
           station_code: stationCode,
           product: product.name,
-          variable: variant.label || variant.name,
+          variable: resolvedVariant.label || resolvedVariant.name,
           prix_total: total,
           shipping_cost: shippingCost,
           status: "pending",

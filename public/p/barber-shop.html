@@ -1215,8 +1215,10 @@ function updateShipping() {
   document.getElementById('sum-product').textContent = PRODUCT_PRICE.toLocaleString() + ' DZD';
   document.getElementById('sum-shipping').textContent = currentShippingCost.toLocaleString() + ' DZD';
   document.getElementById('sum-total').textContent = total.toLocaleString() + ' DZD';
-  document.getElementById('hero-price').textContent = total.toLocaleString() + ' DZD';
-  document.getElementById('sticky-total').textContent = total.toLocaleString() + ' DZD';
+  const heroPrice = document.getElementById('hero-price');
+  if (heroPrice) heroPrice.textContent = total.toLocaleString() + ' DZD';
+  const stickyTotal = document.getElementById('sticky-total');
+  if (stickyTotal) stickyTotal.textContent = total.toLocaleString() + ' DZD';
 }
 
 function bindDraftCapture() {
