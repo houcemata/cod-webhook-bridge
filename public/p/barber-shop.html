@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>Barber Shop â€” ARCO</title>
+<title>Barber Shop — ARCO</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
 <script src="/meta-pixel.js"></script>
@@ -31,7 +31,7 @@ body {
   min-height: 100vh;
 }
 
-/* â”€â”€ NOISE TEXTURE OVERLAY â”€â”€ */
+/* ── NOISE TEXTURE OVERLAY ── */
 body::before {
   content: '';
   position: fixed;
@@ -42,7 +42,7 @@ body::before {
   opacity: 0.4;
 }
 
-/* â”€â”€ HEADER â”€â”€ */
+/* ── HEADER ── */
 .header {
   position: fixed;
   top: 0;
@@ -81,7 +81,7 @@ body::before {
   color: #000000;
 }
 
-/* â”€â”€ HERO â”€â”€ */
+/* ── HERO ── */
 .hero {
   position: relative;
   min-height: auto;
@@ -151,7 +151,7 @@ body::before {
   transition: all 0.3s ease;
 }
 
-/* â”€â”€ PRODUCT INFO â”€â”€ */
+/* ── PRODUCT INFO ── */
 .product-info {
   padding: 0 20px 20px;
   text-align: center;
@@ -233,7 +233,7 @@ body::before {
 }
 
 /* scroll indicator */
-/* â”€â”€ ORDER SECTION â”€â”€ */
+/* ── ORDER SECTION ── */
 .order-section {
   background: var(--dark);
   border-top: 1px solid var(--dark2);
@@ -855,7 +855,7 @@ body::before {
 <!-- Header -->
 <div class="header">
   <a class="logo" href="/" aria-label="ARCO home">ARCO</a>
-  <div class="header-badge">COD â€” Ø§Ù„Ø¯ÙØ¹ Ø¹Ù†Ø¯ Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…</div>
+  <div class="header-badge">COD — الدفع عند الاستلام</div>
 </div>
 
 <!-- Hero -->
@@ -868,7 +868,7 @@ body::before {
 <div class="order-section" id="order-section">
 
   <div class="section-label">Commander</div>
-  <div class="section-title">CHOISIS TON MODÃˆLE</div>
+  <div class="section-title">CHOISIS TON MODÈLE</div>
 
 
   <div class="hero-image-wrap" style="padding-top:0;margin-bottom:4px">
@@ -888,54 +888,54 @@ body::before {
   </div>
 
   <!-- Customer info -->
-  <div class="variant-label"><span>Informations</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">Ù…Ø¹Ù„ÙˆÙ…Ø§ØªÙƒ</span></div>
+  <div class="variant-label"><span>Informations</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">معلوماتك</span></div>
 
   <div class="form-field">
-    <label class="form-label" style="display:flex;justify-content:space-between"><span>Nom complet</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">Ø§Ù„Ø§Ø³Ù… Ø§Ù„ÙƒØ§Ù…Ù„</span></label>
-    <input class="form-input" id="f-name" type="text" placeholder="Ù…Ø«Ø§Ù„: Ø£Ø­Ù…Ø¯ Ø¨Ù† Ø¹Ù„ÙŠ" autocomplete="name"/>
+    <label class="form-label" style="display:flex;justify-content:space-between"><span>Nom complet</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">الاسم الكامل</span></label>
+    <input class="form-input" id="f-name" type="text" placeholder="مثال: أحمد بن علي" autocomplete="name"/>
   </div>
 
   <div class="form-field">
-    <label class="form-label" style="display:flex;justify-content:space-between"><span>TÃ©lÃ©phone</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ</span></label>
+    <label class="form-label" style="display:flex;justify-content:space-between"><span>Téléphone</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">رقم الهاتف</span></label>
     <input class="form-input" id="f-phone" type="tel" placeholder="05XXXXXXXX" autocomplete="tel"/>
   </div>
 
   <!-- Wilaya -->
   <div class="form-field">
-    <label class="form-label" style="display:flex;justify-content:space-between"><span>Wilaya</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">Ø§Ù„ÙˆÙ„Ø§ÙŠØ©</span></label>
+    <label class="form-label" style="display:flex;justify-content:space-between"><span>Wilaya</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">الولاية</span></label>
     <select class="form-select" id="f-wilaya" onchange="onWilayaChange()">
-      <option value="">Ø§Ø®ØªØ± Ø§Ù„ÙˆÙ„Ø§ÙŠØ© â€” Choisir la wilaya</option>
+      <option value="">اختر الولاية — Choisir la wilaya</option>
     </select>
   </div>
 
   <!-- Delivery type -->
-  <div class="variant-label"><span>Livraison</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">Ù†ÙˆØ¹ Ø§Ù„ØªÙˆØµÙŠÙ„</span></div>
+  <div class="variant-label"><span>Livraison</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">نوع التوصيل</span></div>
   <div class="delivery-row" id="delivery-row">
     <div class="delivery-btn active" onclick="selectDelivery(this, 'home')">
-      <span class="delivery-btn-icon">ðŸ </span>
-      <span class="delivery-btn-name" style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">Ø¥Ù„Ù‰ Ø§Ù„Ù…Ù†Ø²Ù„</span>
-      <span class="delivery-btn-price" id="home-price">â€” DZD</span>
+      <span class="delivery-btn-icon">🏠</span>
+      <span class="delivery-btn-name" style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">إلى المنزل</span>
+      <span class="delivery-btn-price" id="home-price">— DZD</span>
     </div>
     <div class="delivery-btn" onclick="selectDelivery(this, 'desk')">
-      <span class="delivery-btn-icon">ðŸª</span>
-      <span class="delivery-btn-name" style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">Ø¥Ù„Ù‰ Ø£Ù‚Ø±Ø¨ Ù…ÙƒØªØ¨</span>
-      <span class="delivery-btn-price" id="desk-price">â€” DZD</span>
+      <span class="delivery-btn-icon">🏪</span>
+      <span class="delivery-btn-name" style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">إلى أقرب مكتب</span>
+      <span class="delivery-btn-price" id="desk-price">— DZD</span>
     </div>
   </div>
 
   <!-- Commune (home delivery) -->
   <div class="form-field" id="commune-wrap">
-    <label class="form-label" style="display:flex;justify-content:space-between"><span>Commune</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">Ø§Ù„Ø¨Ù„Ø¯ÙŠØ©</span></label>
+    <label class="form-label" style="display:flex;justify-content:space-between"><span>Commune</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">البلدية</span></label>
     <select class="form-select" id="f-commune">
-      <option value="">Ø§Ø®ØªØ± Ø§Ù„Ø¨Ù„Ø¯ÙŠØ© â€” Choisir la commune</option>
+      <option value="">اختر البلدية — Choisir la commune</option>
     </select>
   </div>
 
   <!-- Stop desk (pickup) -->
   <div class="form-field" id="desk-wrap" style="display:none">
-    <label class="form-label" style="display:flex;justify-content:space-between"><span>Stop Desk</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">Ù†Ù‚Ø·Ø© Ø§Ù„Ø§Ø³ØªÙ„Ø§Ù…</span></label>
+    <label class="form-label" style="display:flex;justify-content:space-between"><span>Stop Desk</span><span style="font-family:'Cairo',sans-serif;font-weight:900;direction:rtl">نقطة الاستلام</span></label>
     <select class="form-select" id="f-desk">
-      <option value="">Ø§Ø®ØªØ± Ù†Ù‚Ø·Ø© â€” Choisir un point</option>
+      <option value="">اختر نقطة — Choisir un point</option>
     </select>
   </div>
 
@@ -947,25 +947,25 @@ body::before {
     </div>
     <div class="summary-row">
       <span class="summary-label">Livraison</span>
-      <span class="summary-value" id="sum-shipping">â€” DZD</span>
+      <span class="summary-value" id="sum-shipping">— DZD</span>
     </div>
     <div class="summary-row">
       <span class="summary-total-label">TOTAL</span>
-      <span class="summary-total-value" id="sum-total">â€” DZD</span>
+      <span class="summary-total-value" id="sum-total">— DZD</span>
     </div>
   </div>
 
   <!-- Order button -->
   <button class="order-btn" id="order-btn" onclick="submitOrder()">
-    <span class="order-btn-ar">Ø§Ø·Ù„Ø¨ Ø§Ù„Ø¢Ù†</span>
+    <span class="order-btn-ar">اطلب الآن</span>
     <span class="order-btn-fr">Commander Maintenant</span>
   </button>
 
   <!-- Trust -->
   <div class="trust-row">
-    <div class="trust-item"><span>âœ…</span><span>Paiement Ã  la livraison</span></div>
-    <div class="trust-item"><span>ðŸ”’</span><span>Commande sÃ©curisÃ©e</span></div>
-    <div class="trust-item"><span>ðŸ“ž</span><span>Support client</span></div>
+    <div class="trust-item"><span>✅</span><span>Paiement à la livraison</span></div>
+    <div class="trust-item"><span>🔒</span><span>Commande sécurisée</span></div>
+    <div class="trust-item"><span>📞</span><span>Support client</span></div>
   </div>
 
 </div>
@@ -973,49 +973,49 @@ body::before {
 <!-- Features strip -->
 <div class="features-strip">
   <div class="feature-item">
-    <div class="feature-icon">ðŸŽ¨</div>
-    <div class="feature-text">QualitÃ©<br/>Premium</div>
+    <div class="feature-icon">🎨</div>
+    <div class="feature-text">Qualité<br/>Premium</div>
   </div>
   <div class="feature-item">
-    <div class="feature-icon">ðŸšš</div>
+    <div class="feature-icon">🚚</div>
     <div class="feature-text">Livraison<br/>Partout</div>
   </div>
   <div class="feature-item">
-    <div class="feature-icon">ðŸ’³</div>
+    <div class="feature-icon">💳</div>
     <div class="feature-text">Paiement<br/>Livraison</div>
   </div>
   <div class="feature-item">
-    <div class="feature-icon">ðŸ“¦</div>
-    <div class="feature-text">Emballage<br/>SÃ©curisÃ©</div>
+    <div class="feature-icon">📦</div>
+    <div class="feature-text">Emballage<br/>Sécurisé</div>
   </div>
 </div>
 
 <!-- Description -->
 <div class="description-section">
-  <div class="desc-ar">Ù„ÙˆØ­Ø§Øª Ø¬Ø¯Ø§Ø±ÙŠØ© Ø£Ù†ÙŠÙ‚Ø© Ù…Ø³ØªÙˆØ­Ø§Ø© Ù…Ù† Ø£Ø¬ÙˆØ§Ø¡ Ø§Ù„Ø­Ù„Ø§Ù‚Ø© ÙˆØ§Ù„Ø³ØªØ§ÙŠÙ„ Ø§Ù„Ø±Ø¬Ø§Ù„ÙŠØŒ Ø¨Ø·Ø¨Ø§Ø¹Ø© Ø¹Ø§Ù„ÙŠØ© Ø§Ù„Ø¬ÙˆØ¯Ø© ÙˆÙ„Ù…Ø³Ø© Ø¯ÙŠÙƒÙˆØ± Ø¹ØµØ±ÙŠØ© ØªÙ†Ø§Ø³Ø¨ Ø§Ù„ØµØ§Ù„ÙˆÙ† Ø£Ùˆ Ø§Ù„Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ø´Ø®ØµÙŠØ©.</div>
-  <div class="desc-fr">Des toiles dÃ©coratives Ã©lÃ©gantes inspirÃ©es de l'univers barber shop, imprimÃ©es en haute qualitÃ© pour apporter une touche moderne et premium.</div>
+  <div class="desc-ar">لوحات جدارية أنيقة مستوحاة من أجواء الحلاقة والستايل الرجالي، بطباعة عالية الجودة ولمسة ديكور عصرية تناسب الصالون أو المساحة الشخصية.</div>
+  <div class="desc-fr">Des toiles décoratives élégantes inspirées de l'univers barber shop, imprimées en haute qualité pour apporter une touche moderne et premium.</div>
 </div>
 
 <!-- Success screen -->
 <div id="success-screen">
-  <div class="success-icon">ðŸŽ‰</div>
-  <div class="success-title">COMMANDE REÃ‡UE!</div>
-  <div class="success-ar">Ø´ÙƒØ±Ø§Ù‹ Ù„Ùƒ! Ø·Ù„Ø¨Ùƒ ØªÙ… Ø¨Ù†Ø¬Ø§Ø­</div>
-  <div class="success-fr">Notre Ã©quipe vous contactera sous peu pour confirmer votre commande.</div>
-  <div class="success-call-note">Ø§Ø­ÙØ¸ Ù‡Ø°Ø§ Ø§Ù„Ø±Ù‚Ù… Ø­ØªÙ‰ Ù†Ø¹Ø§ÙˆØ¯ Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ùƒ Ù„Ø§Ø­Ù‚Ø§Ù‹.</div>
+  <div class="success-icon">🎉</div>
+  <div class="success-title">COMMANDE REÇUE!</div>
+  <div class="success-ar">شكراً لك! طلبك تم بنجاح</div>
+  <div class="success-fr">Notre équipe vous contactera sous peu pour confirmer votre commande.</div>
+  <div class="success-call-note">احفظ هذا الرقم حتى نعاود الاتصال بك لاحقاً.</div>
   <div class="success-phone-wrap">
     <button class="success-phone-btn" id="success-phone-btn" type="button">0550374607</button>
-    <div class="success-copy-hint">Ø§Ø¶ØºØ· Ù„Ù†Ø³Ø® Ø§Ù„Ø±Ù‚Ù…</div>
+    <div class="success-copy-hint">اضغط لنسخ الرقم</div>
   </div>
 </div>
-<div class="success-copy-toast" id="success-copy-toast">ØªÙ… Ù†Ø³Ø® Ø§Ù„Ø±Ù‚Ù…</div>
+<div class="success-copy-toast" id="success-copy-toast">تم نسخ الرقم</div>
 <!-- Sticky bar -->
 <div class="sticky-bar" id="sticky-bar">
   <div class="sticky-price">
     <div class="sticky-price-val" id="sticky-total">2 900 DZD</div>
     <div class="sticky-price-label">TOTAL TTC</div>
   </div>
-  <button class="sticky-order-btn" onclick="scrollToOrder()">Ø§Ø·Ù„Ø¨ Ø§Ù„Ø¢Ù† â†“</button>
+  <button class="sticky-order-btn" onclick="scrollToOrder()">اطلب الآن ↓</button>
 </div>
 
 <div id="toast"></div>
@@ -1045,23 +1045,23 @@ const CLUBS = [
   {value:'ESS', label:'ESS', image:'https://i.postimg.cc/pTNCTDVR/ess.jpg'},
 ];
 
-const WILAYA_DATA = {"01 - Adrar":["Adrar","Akabli","Aougrout","Aoulef","Bouda","Charouine","Deldoul","Fenoughil","Reggane","Sali","Sbaa","Talmine","Tamentit","Timimoun","Tinerkouk","Tit","Tsabit","Zaouiet Kounta"],"02 - Chlef":["Abou El Hassen","Ain Merane","Benairia","Beni Haoua","Beni Rached","Boukadir","Breira","Chettia","Chlef","Dahra","El Hadjadj","El Karimia","El Marsa","Harchoun","Herenfa","Moussadek","Oued Fodda","Oued Sly","Ouled Fares","Sendjas","Sobha","Tadjna","Taougrite","Tenes","Zeboudja"],"03 - Laghouat":["Aflou","Ain Mahdi","Brida","El Ghicha","El Haouaita","Gueltat Sidi Saad","Hadj Mechri","Hassi Delaa","Hassi R'Mel","Ksar El Hirane","Laghouat","Oued M'Zi","Sidi Makhlouf","Tadjmout"],"04 - Oum El Bouaghi":["Ain Beida","Ain Fekroune","Ain Kercha","Ain M'lila","Berriche","El Amiria","El Djazia","Fkirina","Ksar Sbahi","Meskiana","Oum El Bouaghi","Rahia","Sigus","Souk Naamane"],"05 - Batna":["Ain Touta","Arris","Barika","Batna","Bouzina","Chemora","El Madher","Fesdis","Ghassira","Ichmoul","Ksar Belezma","Larbaa","Menaa","Merouana","N Gaous","Oued Chaaba","Ras El Aioun","Seriana","Tazoult","Timgad","Tkout"],"06 - BÃ©jaÃ¯a":["Adekar","Akbou","Akfadou","Amalou","Amizour","Aokas","Barbacha","Bejaia","Beni Ksila","Chemini","Darguina","El Kseur","Feraoun","Ighil Ali","Ighram","Kendira","Kherrata","Melbou","Oued Ghir","Seddouk","Sidi Aich","Souk El Thenine","Tazmalt","Tichi","Toudja"],"07 - Biskra":["Ain Naga","Biskra","Chetma","Djemorah","Doucen","El Kantara","El Outaya","Foughala","Lichana","M'lili","Mchouneche","Ouled Djellal","Oumache","Sidi Khaled","Sidi Okba","Tolga","Zeribet El Oued"],"08 - BÃ©char":["Abadla","Bechar","Beni Abbes","Beni Ounif","Boukais","Igli","Kenedsa","Kerzaz","Lahmar","Mogheul","Taghit","Timoudi"],"09 - Blida":["Ain Romana","Beni Mered","Blida","Bouarfa","Boufarik","Bougara","Bouinan","Chebli","Chiffa","El Affroun","Guerrouaou","Hammam Melouane","Larbaa","Meftah","Mouzaia","Oued El Alleug","Ouled Yaich","Soumaa"],"10 - BouÃ¯ra":["Aghbalou","Ain Bessem","Ain El Hadjar","Bechloul","Bir Ghbalou","Bordj Oukhriss","Bouira","Chorfa","Djebahia","El Adjiba","El Hachimia","El Mokrani","Haizer","Kadiria","Lakhdaria","Mchedallah","Oued El Berdi","Ouled Rached","Saharidj","Souk El Khemis","Sour El Ghozlane","Taghzout"],"11 - Tamanrasset":["Abalessa","Idles","In Amguel","In Ghar","In Guezzam","In Salah","Tamanrasset","Tinzaouatine"],"12 - TÃ©bessa":["Ain Zerga","Bekkaria","Bir El Ater","Bir El Mokadem","Boukhadra","Boulhaf Dyr","Cheria","El Aouinet","El Kouif","El Ma El Biodh","El Meridj","Ferkane","Hammamet","Morsot","Negrine","Ouenza","Oum Ali","Tebessa","Tlidjene"],"13 - Tlemcen":["Ain Fezza","Ain Ghoraba","Ain Nehala","Ain Tallout","Bab El Assa","Beni Bahdel","Beni Boussaid","Beni Mester","Beni Snous","Bensekrane","Chetouane","El Aricha","Fellaoucene","Ghazaouet","Hammam Boughrara","Hennaya","Honaine","Maghnia","Mansourah","Nedroma","Ouled Mimoun","Remchi","Sebdou","Sidi Abdelli","Sidi Djillali","Souahlia","Tlemcen"],"14 - Tiaret":["Ain Bouchekif","Ain Deheb","Ain El Hadid","Chehaima","Dahmouni","Frenda","Guertoufa","Hamadia","Ksar Chellala","Mahdia","Meghila","Naima","Oued Lilli","Rahouia","Rechaiga","Sidi Hosni","Sougueur","Tagdemt","Takhemaret","Tiaret","Tidda","Tousnina"],"15 - Tizi Ouzou":["Ain El Hammam","Ain Zaouia","Azazga","Azzefoun","Beni Yenni","Boghni","Boudjima","Bouzguene","Draa Ben Khedda","Draa El Mizan","Freha","Iferhounene","Iflissen","Larba Nath Irathen","Maatkas","Makouda","Mekla","Ouacif","Ouadhia","Ouaguenoun","Souk El Thenine","Tadmait","Tigzirt","Timizart","Tizi Ouzou","Tizi Rached","Yakourene"],"16 - Algiers":["Ain Benian","Ain Taya","Alger Centre","Bab El Oued","Bab Ezzouar","Baba Hesen","Bachedjerah","Baraki","Ben Aknoun","Bir Mourad Rais","Bir Touta","Birkhadem","Bordj El Bahri","Bordj El Kiffan","Bourouba","Bouzareah","Casbah","Cheraga","Dar El Beida","Dely Ibrahim","Douira","Draria","El Achour","El Biar","El Harrach","El Madania","El Mouradia","Herraoua","Hussein Dey","Hydra","Kheraisia","Kouba","Marsa","Mohamed Belouzdad","Mohammadia","Oued Smar","Ouled Fayet","Rahmania","Reghaia","Rouiba","Sidi M'hamed","Sidi Moussa","Souidania","Zeralda"],"17 - Djelfa":["Ain El Ibel","Ain Oussera","Benhar","Birine","Charef","Djelfa","El Idrissia","El Khemis","Guernini","Had Sahary","Hassi Bahbah","Hassi El Euch","M'Liliha","Messaad","Moudjebara","Sidi Ladjel","Zaafrane"],"18 - Jijel":["Bordj T'her","Chekfa","El Ancer","El Aouana","El Milia","Erraguene","Jijel","Ouadjana","Sidi Abdelaziz","Taher","Texena","Ziamma Mansouriah"],"19 - SÃ©tif":["Ain Abessa","Ain Arnat","Ain El Kebira","Ain Oulmane","Amoucha","Babor","Beni Aziz","Beni Ouartilane","Bir El Arch","Bouandas","Bougaa","Bousselam","Boutaleb","Djemila","El Eulma","El Ouricia","Guenzet","Guidjel","Hamma","Hammam Guergour","Mezloug","Ouled Sabor","Rosfa","Salah Bey","Setif","Taya","Tella"],"20 - SaÃ¯da":["Ain El Hadjar","Ain Sekhouna","Doui Thabet","El Hassasna","Moulay Larbi","Ouled Brahim","Saida","Sidi Boubekeur","Youb"],"21 - Skikda":["Ain Cherchar","Azzaba","Collo","El Harrouch","El Marsa","Kerkera","Ramdane Djamel","Sidi Mezghiche","Skikda","Tamalous","Zitouna"],"22 - Sidi Bel AbbÃ¨s":["Ain El Berd","Belarbi","Ben Badis","Bir El Hammam","Dhaya","Lamtar","Makedra","Marhoum","Merine","Mostefa Ben Brahim","Moulay Slissen","Ras El Ma","Sfissef","Sidi Ali Benyoub","Sidi Bel Abbes","Sidi Brahim","Tabia","Telagh","Tenira","Tessala"],"23 - Annaba":["Ain Berda","Annaba","Berrahel","Chetaibi","El Bouni","El Hadjar","Seraidi","Sidi Amer"],"24 - Guelma":["Ain Ben Beida","Ain Larbi","Ain Makhlouf","Ain Reggada","Belkhir","Bouchegouf","Guelma","Hammam Maskhoutine","Heliopolis","Medjez Amar","Nechmaya","Oued Zenati","Roknia","Tamlouka"],"25 - Constantine":["Ain Abid","Ain Smara","Beni Hamiden","Constantine","Didouche Mourad","El Khroub","Hamma Bouziane","Ibn Badis","Ibn Ziad","Ouled Rahmoune","Zighoud Youcef"],"26 - MÃ©dÃ©a":["Ain Boucif","Berrouaghia","Boghar","Boughezoul","El Hamdania","El Omaria","Ksar El Boukhari","Medea","Meftaha","Mihoub","Ouled Antar","Sedraia","Sidi Naamane","Souagui","Tablat","Zoubiria"],"27 - Mostaganem":["Achaacha","Ain Nouissy","Ain Tadles","Bouguirat","El Hassiane","Hadjadj","Hassi Mameche","Mostaganem","Oued El Kheir","Ouled Boughalem","Safsaf","Sayada","Sidi Ali","Sidi Lakhdar","Stidia","Touahria"],"28 - M'Sila":["Ain El Hadjel","Ain El Melh","Beni Ilmane","Bir Foda","Bou Saada","Chellal","El Hamel","Hammam Dhalaa","M'sila","Maadid","Magra","Medjedel","Ouanougha","Ouled Addi Guebala","Ouled Mansour","Sidi Aissa","Sidi Ameur","Zarzour"],"29 - Mascara":["Ain Fekan","Alaimia","Aouf","Benian","Bou Hanifia","Chorfa","El Bordj","El Hachem","Froha","Ghriss","Hacine","Maoussa","Mascara","Mohammadia","Oggaz","Oued El Abtal","Oued Taria","Sehailia","Sidi Abdelmoumene","Sig","Teghennif","Zahana"],"30 - Ouargla":["Ain Beida","Benaceur","El Allia","El Hadjira","Hassi Ben Abdellah","Hassi Messaoud","Megarine","Nezla","Ngoussa","Ouargla","Rouissat","Sidi Khouiled","Taibet","Tamacine","Touggourt","Zaouia El Abidia"],"31 - Oran":["Ain Biya","Ain Turk","Arzew","Ben Freha","Bethioua","Bir El Djir","Boufatis","Bousfer","Boutlelis","El Karma","Es Senia","Gdyel","Hassi Ben Okba","Hassi Bounif","Mers El Kebir","Messerghin","Oran","Oued Tlelat","Sidi Ben Yebka","Sidi Chami","Tafraoui"],"32 - El Bayadh":["Boualem","Brezina","El Abiodh Sidi Cheikh","El Bayadh","El Bnoud","El Kheither","Ghassoul","Rogassa","Sidi Ameur","Sidi Slimane"],"33 - Illizi":["Bordj El Haouasse","Bordj Omar Driss","Debdeb","Djanet","Illizi","In Amenas"],"34 - Bordj Bou ArrÃ©ridj":["Ain Taghrout","Belimour","Bir Kasdali","Bordj Bou Arreridj","Bordj Ghdir","Bordj Zemoura","Djaafra","El Achir","El Hamadia","El Main","Ghilassa","Hasnaoua","Khelil","Mansoura","Medjana","Ouled Brahem","Ras El Oued","Sidi Embarek","Teniet En Nasr","Tixter"],"35 - BoumerdÃ¨s":["Afir","Ammal","Baghlia","Beni Amrane","Bordj Menaiel","Boudouaou","Boumerdes","Chabet El Ameur","Corso","Dellys","Djinet","El Kharrouba","Hammedi","Isser","Khemis El Khechna","Larbatache","Naciria","Ouled Aissa","Ouled Moussa","Si Mustapha","Sidi Daoud","Souk El Had","Thenia","Tidjelabine","Timezrit","Zemmouri"],"36 - El Tarf":["Ain El Assel","Ben M Hidi","Besbes","Bouhadjar","Bouteldja","Chefia","Drean","El Kala","El Tarf","Oued Zitoun","Zitouna"],"37 - Tindouf":["Oum El Assel","Tindouf"],"38 - Tissemsilt":["Bordj Bou Naama","Boucaid","Khemisti","Lardjem","Layoune","Lazharia","Melaab","Ouled Bessem","Sidi Abed","Sidi Lantri","Sidi Slimane","Theniet El Had","Tissemsilt"],"39 - El Oued":["Bayadha","Debila","Djamaa","El Mghair","El Ogla","El Oued","Guemar","Hassi Khelifa","Kouinine","Mrara","Nakhla","Oued El Alenda","Oum Touyour","Reguiba","Robbah","Sidi Amrane","Sidi Aoun","Still","Taghzout","Taleb Larbi","Tendla"],"40 - Khenchela":["Ain Touila","Babar","Baghai","Bouhmama","Chelia","Cherchar","Djellal","El Hamma","El Mahmal","Kais","Khenchela","Msara","Ouled Rechache","Remila","Tamza","Yabous"],"41 - Souk Ahras":["Ain Soltane","Bir Bouhouche","Haddada","Hanancha","Khedara","Khemissa","M'daourouche","Mechroha","Merahna","Oued Keberit","Ouled Driss","Sedrata","Sidi Fredj","Souk Ahras","Taoura","Tiffech"],"42 - Tipaza":["Ain Tagourait","Attatba","Bou Haroun","Bou Ismail","Bourkika","Cherchell","Damous","Douaouda","Fouka","Gouraya","Hadjout","Khemisti","Kolea","Larhat","Menaceur","Meurad","Sidi Amar","Sidi Ghiles","Sidi Rached","Tipaza"],"43 - Mila":["Ahmed Rachedi","Ain Mellouk","Amira Arras","Chelghoum Laid","El Mechira","Ferdjioua","Grarem Gouga","Mila","Minar Zarza","Oued Athmenia","Oued Endja","Rouached","Sidi Khelifa","Sidi Merouane","Tadjenanet","Telerghma","Zeghaia"],"44 - AÃ¯n Defla":["Ain Benian","Ain Defla","Ain Lechiakh","Arib","Belaas","Bordj Emir Khaled","Boumedfaa","Djelida","Djendel","El Abadia","El Amra","El Attaf","Hammam Righa","Khemis Miliana","Miliana","Oued Chorfa","Rouina","Sidi Lakhdar","Zeddine"],"45 - NaÃ¢ma":["Ain Ben Khelil","Ain Sefra","El Biod","Kasdir","Mechria","Moghrar","Naama","Sfissifa","Tiout"],"46 - AÃ¯n TÃ©mouchent":["Ain El Arbaa","Ain Kihal","Ain Temouchent","Ain Tolba","Beni Saf","Bou Zedjar","El Amria","El Malah","Hammam Bouhadjar","Hassi El Ghella","Oued Berkeche","Ouled Boudjemaa","Ouled Kihal","Sidi Ben Adda","Sidi Boumediene","Sidi Safi","Tamzoura","Terga"],"47 - GhardaÃ¯a":["Berriane","Bounoura","El Atteuf","El Guerrara","El Meniaa","Ghardaia","Hassi Fehal","Mansoura","Metlili","Sebseb","Zelfana"],"48 - Relizane":["Ain Rahma","Ammi Moussa","Bendaoud","Beni Zentis","Djidiouia","El Guettar","El Hamadna","El Matmar","Had Echkalla","Kalaa","Lahlef","Mazouna","Mediouna","Ouarizane","Oued Rhiou","Relizane","Sidi Khettab","Sidi M'hamed Benali","Sidi Saada","Yellel","Zemmoura"],"49 - Timimoun":["Aougrout","Charouine","Deldoul","Metarfa","Ouled Aissa","Talmine","Timimoun","Tinerkouk"],"51 - Ouled Djellal":["Besbes","Chaiba","Doucen","Ouled Djellal","Ras El Miad","Sidi Khaled"],"52 - BÃ©ni AbbÃ¨s":["Beni-Abbes","Beni-Ikhlef","El Ouata","Igli","Kerzaz","Ksabi","Tamtert","Timoudi"],"53 - In Salah":["Ain Salah","Foggaret Ezzoua","Inghar"],"55 - Touggourt":["Blidet Amor","El Alia","El-Hadjira","Megarine","Nezla","Sidi Slimane","Taibet","Tebesbest","Temacine","Touggourt","Zaouia El Abidia"],"56 - Djanet":["Bordj El Haouass","Djanet"],"57 - El M'Ghair":["Djamaa","El-M'ghaier","M'rara","Oum Touyour","Sidi Amrane","Sidi Khelil","Still","Tenedla"],"58 - El Menia":["El Meniaa","Hassi Fehal","Hassi Gara"]};
+const WILAYA_DATA = {"01 - Adrar":["Adrar","Akabli","Aougrout","Aoulef","Bouda","Charouine","Deldoul","Fenoughil","Reggane","Sali","Sbaa","Talmine","Tamentit","Timimoun","Tinerkouk","Tit","Tsabit","Zaouiet Kounta"],"02 - Chlef":["Abou El Hassen","Ain Merane","Benairia","Beni Haoua","Beni Rached","Boukadir","Breira","Chettia","Chlef","Dahra","El Hadjadj","El Karimia","El Marsa","Harchoun","Herenfa","Moussadek","Oued Fodda","Oued Sly","Ouled Fares","Sendjas","Sobha","Tadjna","Taougrite","Tenes","Zeboudja"],"03 - Laghouat":["Aflou","Ain Mahdi","Brida","El Ghicha","El Haouaita","Gueltat Sidi Saad","Hadj Mechri","Hassi Delaa","Hassi R'Mel","Ksar El Hirane","Laghouat","Oued M'Zi","Sidi Makhlouf","Tadjmout"],"04 - Oum El Bouaghi":["Ain Beida","Ain Fekroune","Ain Kercha","Ain M'lila","Berriche","El Amiria","El Djazia","Fkirina","Ksar Sbahi","Meskiana","Oum El Bouaghi","Rahia","Sigus","Souk Naamane"],"05 - Batna":["Ain Touta","Arris","Barika","Batna","Bouzina","Chemora","El Madher","Fesdis","Ghassira","Ichmoul","Ksar Belezma","Larbaa","Menaa","Merouana","N Gaous","Oued Chaaba","Ras El Aioun","Seriana","Tazoult","Timgad","Tkout"],"06 - Béjaïa":["Adekar","Akbou","Akfadou","Amalou","Amizour","Aokas","Barbacha","Bejaia","Beni Ksila","Chemini","Darguina","El Kseur","Feraoun","Ighil Ali","Ighram","Kendira","Kherrata","Melbou","Oued Ghir","Seddouk","Sidi Aich","Souk El Thenine","Tazmalt","Tichi","Toudja"],"07 - Biskra":["Ain Naga","Biskra","Chetma","Djemorah","Doucen","El Kantara","El Outaya","Foughala","Lichana","M'lili","Mchouneche","Ouled Djellal","Oumache","Sidi Khaled","Sidi Okba","Tolga","Zeribet El Oued"],"08 - Béchar":["Abadla","Bechar","Beni Abbes","Beni Ounif","Boukais","Igli","Kenedsa","Kerzaz","Lahmar","Mogheul","Taghit","Timoudi"],"09 - Blida":["Ain Romana","Beni Mered","Blida","Bouarfa","Boufarik","Bougara","Bouinan","Chebli","Chiffa","El Affroun","Guerrouaou","Hammam Melouane","Larbaa","Meftah","Mouzaia","Oued El Alleug","Ouled Yaich","Soumaa"],"10 - Bouïra":["Aghbalou","Ain Bessem","Ain El Hadjar","Bechloul","Bir Ghbalou","Bordj Oukhriss","Bouira","Chorfa","Djebahia","El Adjiba","El Hachimia","El Mokrani","Haizer","Kadiria","Lakhdaria","Mchedallah","Oued El Berdi","Ouled Rached","Saharidj","Souk El Khemis","Sour El Ghozlane","Taghzout"],"11 - Tamanrasset":["Abalessa","Idles","In Amguel","In Ghar","In Guezzam","In Salah","Tamanrasset","Tinzaouatine"],"12 - Tébessa":["Ain Zerga","Bekkaria","Bir El Ater","Bir El Mokadem","Boukhadra","Boulhaf Dyr","Cheria","El Aouinet","El Kouif","El Ma El Biodh","El Meridj","Ferkane","Hammamet","Morsot","Negrine","Ouenza","Oum Ali","Tebessa","Tlidjene"],"13 - Tlemcen":["Ain Fezza","Ain Ghoraba","Ain Nehala","Ain Tallout","Bab El Assa","Beni Bahdel","Beni Boussaid","Beni Mester","Beni Snous","Bensekrane","Chetouane","El Aricha","Fellaoucene","Ghazaouet","Hammam Boughrara","Hennaya","Honaine","Maghnia","Mansourah","Nedroma","Ouled Mimoun","Remchi","Sebdou","Sidi Abdelli","Sidi Djillali","Souahlia","Tlemcen"],"14 - Tiaret":["Ain Bouchekif","Ain Deheb","Ain El Hadid","Chehaima","Dahmouni","Frenda","Guertoufa","Hamadia","Ksar Chellala","Mahdia","Meghila","Naima","Oued Lilli","Rahouia","Rechaiga","Sidi Hosni","Sougueur","Tagdemt","Takhemaret","Tiaret","Tidda","Tousnina"],"15 - Tizi Ouzou":["Ain El Hammam","Ain Zaouia","Azazga","Azzefoun","Beni Yenni","Boghni","Boudjima","Bouzguene","Draa Ben Khedda","Draa El Mizan","Freha","Iferhounene","Iflissen","Larba Nath Irathen","Maatkas","Makouda","Mekla","Ouacif","Ouadhia","Ouaguenoun","Souk El Thenine","Tadmait","Tigzirt","Timizart","Tizi Ouzou","Tizi Rached","Yakourene"],"16 - Algiers":["Ain Benian","Ain Taya","Alger Centre","Bab El Oued","Bab Ezzouar","Baba Hesen","Bachedjerah","Baraki","Ben Aknoun","Bir Mourad Rais","Bir Touta","Birkhadem","Bordj El Bahri","Bordj El Kiffan","Bourouba","Bouzareah","Casbah","Cheraga","Dar El Beida","Dely Ibrahim","Douira","Draria","El Achour","El Biar","El Harrach","El Madania","El Mouradia","Herraoua","Hussein Dey","Hydra","Kheraisia","Kouba","Marsa","Mohamed Belouzdad","Mohammadia","Oued Smar","Ouled Fayet","Rahmania","Reghaia","Rouiba","Sidi M'hamed","Sidi Moussa","Souidania","Zeralda"],"17 - Djelfa":["Ain El Ibel","Ain Oussera","Benhar","Birine","Charef","Djelfa","El Idrissia","El Khemis","Guernini","Had Sahary","Hassi Bahbah","Hassi El Euch","M'Liliha","Messaad","Moudjebara","Sidi Ladjel","Zaafrane"],"18 - Jijel":["Bordj T'her","Chekfa","El Ancer","El Aouana","El Milia","Erraguene","Jijel","Ouadjana","Sidi Abdelaziz","Taher","Texena","Ziamma Mansouriah"],"19 - Sétif":["Ain Abessa","Ain Arnat","Ain El Kebira","Ain Oulmane","Amoucha","Babor","Beni Aziz","Beni Ouartilane","Bir El Arch","Bouandas","Bougaa","Bousselam","Boutaleb","Djemila","El Eulma","El Ouricia","Guenzet","Guidjel","Hamma","Hammam Guergour","Mezloug","Ouled Sabor","Rosfa","Salah Bey","Setif","Taya","Tella"],"20 - Saïda":["Ain El Hadjar","Ain Sekhouna","Doui Thabet","El Hassasna","Moulay Larbi","Ouled Brahim","Saida","Sidi Boubekeur","Youb"],"21 - Skikda":["Ain Cherchar","Azzaba","Collo","El Harrouch","El Marsa","Kerkera","Ramdane Djamel","Sidi Mezghiche","Skikda","Tamalous","Zitouna"],"22 - Sidi Bel Abbès":["Ain El Berd","Belarbi","Ben Badis","Bir El Hammam","Dhaya","Lamtar","Makedra","Marhoum","Merine","Mostefa Ben Brahim","Moulay Slissen","Ras El Ma","Sfissef","Sidi Ali Benyoub","Sidi Bel Abbes","Sidi Brahim","Tabia","Telagh","Tenira","Tessala"],"23 - Annaba":["Ain Berda","Annaba","Berrahel","Chetaibi","El Bouni","El Hadjar","Seraidi","Sidi Amer"],"24 - Guelma":["Ain Ben Beida","Ain Larbi","Ain Makhlouf","Ain Reggada","Belkhir","Bouchegouf","Guelma","Hammam Maskhoutine","Heliopolis","Medjez Amar","Nechmaya","Oued Zenati","Roknia","Tamlouka"],"25 - Constantine":["Ain Abid","Ain Smara","Beni Hamiden","Constantine","Didouche Mourad","El Khroub","Hamma Bouziane","Ibn Badis","Ibn Ziad","Ouled Rahmoune","Zighoud Youcef"],"26 - Médéa":["Ain Boucif","Berrouaghia","Boghar","Boughezoul","El Hamdania","El Omaria","Ksar El Boukhari","Medea","Meftaha","Mihoub","Ouled Antar","Sedraia","Sidi Naamane","Souagui","Tablat","Zoubiria"],"27 - Mostaganem":["Achaacha","Ain Nouissy","Ain Tadles","Bouguirat","El Hassiane","Hadjadj","Hassi Mameche","Mostaganem","Oued El Kheir","Ouled Boughalem","Safsaf","Sayada","Sidi Ali","Sidi Lakhdar","Stidia","Touahria"],"28 - M'Sila":["Ain El Hadjel","Ain El Melh","Beni Ilmane","Bir Foda","Bou Saada","Chellal","El Hamel","Hammam Dhalaa","M'sila","Maadid","Magra","Medjedel","Ouanougha","Ouled Addi Guebala","Ouled Mansour","Sidi Aissa","Sidi Ameur","Zarzour"],"29 - Mascara":["Ain Fekan","Alaimia","Aouf","Benian","Bou Hanifia","Chorfa","El Bordj","El Hachem","Froha","Ghriss","Hacine","Maoussa","Mascara","Mohammadia","Oggaz","Oued El Abtal","Oued Taria","Sehailia","Sidi Abdelmoumene","Sig","Teghennif","Zahana"],"30 - Ouargla":["Ain Beida","Benaceur","El Allia","El Hadjira","Hassi Ben Abdellah","Hassi Messaoud","Megarine","Nezla","Ngoussa","Ouargla","Rouissat","Sidi Khouiled","Taibet","Tamacine","Touggourt","Zaouia El Abidia"],"31 - Oran":["Ain Biya","Ain Turk","Arzew","Ben Freha","Bethioua","Bir El Djir","Boufatis","Bousfer","Boutlelis","El Karma","Es Senia","Gdyel","Hassi Ben Okba","Hassi Bounif","Mers El Kebir","Messerghin","Oran","Oued Tlelat","Sidi Ben Yebka","Sidi Chami","Tafraoui"],"32 - El Bayadh":["Boualem","Brezina","El Abiodh Sidi Cheikh","El Bayadh","El Bnoud","El Kheither","Ghassoul","Rogassa","Sidi Ameur","Sidi Slimane"],"33 - Illizi":["Bordj El Haouasse","Bordj Omar Driss","Debdeb","Djanet","Illizi","In Amenas"],"34 - Bordj Bou Arréridj":["Ain Taghrout","Belimour","Bir Kasdali","Bordj Bou Arreridj","Bordj Ghdir","Bordj Zemoura","Djaafra","El Achir","El Hamadia","El Main","Ghilassa","Hasnaoua","Khelil","Mansoura","Medjana","Ouled Brahem","Ras El Oued","Sidi Embarek","Teniet En Nasr","Tixter"],"35 - Boumerdès":["Afir","Ammal","Baghlia","Beni Amrane","Bordj Menaiel","Boudouaou","Boumerdes","Chabet El Ameur","Corso","Dellys","Djinet","El Kharrouba","Hammedi","Isser","Khemis El Khechna","Larbatache","Naciria","Ouled Aissa","Ouled Moussa","Si Mustapha","Sidi Daoud","Souk El Had","Thenia","Tidjelabine","Timezrit","Zemmouri"],"36 - El Tarf":["Ain El Assel","Ben M Hidi","Besbes","Bouhadjar","Bouteldja","Chefia","Drean","El Kala","El Tarf","Oued Zitoun","Zitouna"],"37 - Tindouf":["Oum El Assel","Tindouf"],"38 - Tissemsilt":["Bordj Bou Naama","Boucaid","Khemisti","Lardjem","Layoune","Lazharia","Melaab","Ouled Bessem","Sidi Abed","Sidi Lantri","Sidi Slimane","Theniet El Had","Tissemsilt"],"39 - El Oued":["Bayadha","Debila","Djamaa","El Mghair","El Ogla","El Oued","Guemar","Hassi Khelifa","Kouinine","Mrara","Nakhla","Oued El Alenda","Oum Touyour","Reguiba","Robbah","Sidi Amrane","Sidi Aoun","Still","Taghzout","Taleb Larbi","Tendla"],"40 - Khenchela":["Ain Touila","Babar","Baghai","Bouhmama","Chelia","Cherchar","Djellal","El Hamma","El Mahmal","Kais","Khenchela","Msara","Ouled Rechache","Remila","Tamza","Yabous"],"41 - Souk Ahras":["Ain Soltane","Bir Bouhouche","Haddada","Hanancha","Khedara","Khemissa","M'daourouche","Mechroha","Merahna","Oued Keberit","Ouled Driss","Sedrata","Sidi Fredj","Souk Ahras","Taoura","Tiffech"],"42 - Tipaza":["Ain Tagourait","Attatba","Bou Haroun","Bou Ismail","Bourkika","Cherchell","Damous","Douaouda","Fouka","Gouraya","Hadjout","Khemisti","Kolea","Larhat","Menaceur","Meurad","Sidi Amar","Sidi Ghiles","Sidi Rached","Tipaza"],"43 - Mila":["Ahmed Rachedi","Ain Mellouk","Amira Arras","Chelghoum Laid","El Mechira","Ferdjioua","Grarem Gouga","Mila","Minar Zarza","Oued Athmenia","Oued Endja","Rouached","Sidi Khelifa","Sidi Merouane","Tadjenanet","Telerghma","Zeghaia"],"44 - Aïn Defla":["Ain Benian","Ain Defla","Ain Lechiakh","Arib","Belaas","Bordj Emir Khaled","Boumedfaa","Djelida","Djendel","El Abadia","El Amra","El Attaf","Hammam Righa","Khemis Miliana","Miliana","Oued Chorfa","Rouina","Sidi Lakhdar","Zeddine"],"45 - Naâma":["Ain Ben Khelil","Ain Sefra","El Biod","Kasdir","Mechria","Moghrar","Naama","Sfissifa","Tiout"],"46 - Aïn Témouchent":["Ain El Arbaa","Ain Kihal","Ain Temouchent","Ain Tolba","Beni Saf","Bou Zedjar","El Amria","El Malah","Hammam Bouhadjar","Hassi El Ghella","Oued Berkeche","Ouled Boudjemaa","Ouled Kihal","Sidi Ben Adda","Sidi Boumediene","Sidi Safi","Tamzoura","Terga"],"47 - Ghardaïa":["Berriane","Bounoura","El Atteuf","El Guerrara","El Meniaa","Ghardaia","Hassi Fehal","Mansoura","Metlili","Sebseb","Zelfana"],"48 - Relizane":["Ain Rahma","Ammi Moussa","Bendaoud","Beni Zentis","Djidiouia","El Guettar","El Hamadna","El Matmar","Had Echkalla","Kalaa","Lahlef","Mazouna","Mediouna","Ouarizane","Oued Rhiou","Relizane","Sidi Khettab","Sidi M'hamed Benali","Sidi Saada","Yellel","Zemmoura"],"49 - Timimoun":["Aougrout","Charouine","Deldoul","Metarfa","Ouled Aissa","Talmine","Timimoun","Tinerkouk"],"51 - Ouled Djellal":["Besbes","Chaiba","Doucen","Ouled Djellal","Ras El Miad","Sidi Khaled"],"52 - Béni Abbès":["Beni-Abbes","Beni-Ikhlef","El Ouata","Igli","Kerzaz","Ksabi","Tamtert","Timoudi"],"53 - In Salah":["Ain Salah","Foggaret Ezzoua","Inghar"],"55 - Touggourt":["Blidet Amor","El Alia","El-Hadjira","Megarine","Nezla","Sidi Slimane","Taibet","Tebesbest","Temacine","Touggourt","Zaouia El Abidia"],"56 - Djanet":["Bordj El Haouass","Djanet"],"57 - El M'Ghair":["Djamaa","El-M'ghaier","M'rara","Oum Touyour","Sidi Amrane","Sidi Khelil","Still","Tenedla"],"58 - El Menia":["El Meniaa","Hassi Fehal","Hassi Gara"]};
 
 const WILAYA_NAMES = Object.keys(WILAYA_DATA);
 
 // Map wilaya names to IDs for shipping lookup
 const WILAYA_ID_MAP = {
   "Adrar":1,"Chlef":2,"Laghouat":3,"Oum El Bouaghi":4,"Batna":5,
-  "BÃ©jaÃ¯a":6,"Biskra":7,"BÃ©char":8,"Blida":9,"BouÃ¯ra":10,
-  "Tamanrasset":11,"TÃ©bessa":12,"Tlemcen":13,"Tiaret":14,"Tizi Ouzou":15,
-  "Algiers":16,"Alger":16,"Djelfa":17,"Jijel":18,"SÃ©tif":19,"SaÃ¯da":20,
-  "Skikda":21,"Sidi Bel AbbÃ¨s":22,"Annaba":23,"Guelma":24,"Constantine":25,
-  "MÃ©dÃ©a":26,"Mostaganem":27,"M'Sila":28,"Mascara":29,"Ouargla":30,
-  "Oran":31,"El Bayadh":32,"Illizi":33,"Bordj Bou ArrÃ©ridj":34,"BoumerdÃ¨s":35,
+  "Béjaïa":6,"Biskra":7,"Béchar":8,"Blida":9,"Bouïra":10,
+  "Tamanrasset":11,"Tébessa":12,"Tlemcen":13,"Tiaret":14,"Tizi Ouzou":15,
+  "Algiers":16,"Alger":16,"Djelfa":17,"Jijel":18,"Sétif":19,"Saïda":20,
+  "Skikda":21,"Sidi Bel Abbès":22,"Annaba":23,"Guelma":24,"Constantine":25,
+  "Médéa":26,"Mostaganem":27,"M'Sila":28,"Mascara":29,"Ouargla":30,
+  "Oran":31,"El Bayadh":32,"Illizi":33,"Bordj Bou Arréridj":34,"Boumerdès":35,
   "El Tarf":36,"Tindouf":37,"Tissemsilt":38,"El Oued":39,"Khenchela":40,
-  "Souk Ahras":41,"Tipaza":42,"Mila":43,"AÃ¯n Defla":44,"NaÃ¢ma":45,
-  "AÃ¯n TÃ©mouchent":46,"GhardaÃ¯a":47,"Relizane":48,"Timimoun":49,
-  "Ouled Djellal":51,"BÃ©ni AbbÃ¨s":52,"In Salah":53,"Touggourt":55,
+  "Souk Ahras":41,"Tipaza":42,"Mila":43,"Aïn Defla":44,"Naâma":45,
+  "Aïn Témouchent":46,"Ghardaïa":47,"Relizane":48,"Timimoun":49,
+  "Ouled Djellal":51,"Béni Abbès":52,"In Salah":53,"Touggourt":55,
   "Djanet":56,"El M'Ghair":57,"El Menia":58
 };
 
@@ -1074,7 +1074,7 @@ let checkoutTracked = false;
 let clubImageSwapToken = 0;
 let draftCaptureBound = false;
 
-// â”€â”€ INIT â”€â”€
+// ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
   buildClubs();
   buildWilayas();
@@ -1091,7 +1091,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// â”€â”€ CLUBS â”€â”€
+// ── CLUBS ──
 function buildClubs() {
   const grid = document.getElementById('clubs-grid');
   grid.innerHTML = CLUBS.map((c, i) => `
@@ -1145,7 +1145,7 @@ function updateGlow(idx) {
     `radial-gradient(circle, ${colors[idx]||'rgba(245,197,0,0.12)'} 0%, transparent 70%)`;
 }
 
-// â”€â”€ DELIVERY â”€â”€
+// ── DELIVERY ──
 function selectDelivery(el, type) {
   document.querySelectorAll('.delivery-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
@@ -1164,10 +1164,10 @@ function selectDelivery(el, type) {
   window.ARCODraft?.triggerCapture?.();
 }
 
-// â”€â”€ WILAYA â”€â”€
+// ── WILAYA ──
 function buildWilayas() {
   const sel = document.getElementById('f-wilaya');
-  sel.innerHTML = '<option value="">Ø§Ø®ØªØ± Ø§Ù„ÙˆÙ„Ø§ÙŠØ© â€” Choisir la wilaya</option>' +
+  sel.innerHTML = '<option value="">اختر الولاية — Choisir la wilaya</option>' +
     WILAYA_NAMES.map(w => {
       const id = (w.match(/^(\d+)/) || [])[1] || '';
       return `<option value="${id}|${w}">${w}</option>`;
@@ -1184,7 +1184,7 @@ async function onWilayaChange() {
   // Populate communes
   const communes = WILAYA_DATA[wilayaLabel] || [];
   const commSel = document.getElementById('f-commune');
-  commSel.innerHTML = '<option value="">Choisir la commune â€” Ø§Ø®ØªØ± Ø§Ù„Ø¨Ù„Ø¯ÙŠØ©</option>' +
+  commSel.innerHTML = '<option value="">Choisir la commune — اختر البلدية</option>' +
     communes.map(c => `<option value="${c}">${c}</option>`).join('');
 
   // Load shipping rates for this wilaya
@@ -1245,7 +1245,7 @@ function bindDraftCapture() {
     },
   });
 }
-// â”€â”€ DESKS â”€â”€
+// ── DESKS ──
 async function loadDesks() {
   if (noestDesks) { populateDesks(); return; }
   try {
@@ -1262,11 +1262,11 @@ function populateDesks() {
   const entries = Object.entries(noestDesks);
   const matching = entries.filter(([code]) => num && new RegExp(`^${num}[A-Z]`).test(code));
   const others = entries.filter(([code]) => !matching.find(([mc]) => mc === code));
-  sel.innerHTML = '<option value="">Ø§Ø®ØªØ± Ù†Ù‚Ø·Ø© â€” Choisir un point</option>' +
+  sel.innerHTML = '<option value="">اختر نقطة — Choisir un point</option>' +
     matching.map(([code, d]) => `<option value="${code}">${d.name || code}</option>`).join('');
 }
 
-// â”€â”€ STICKY BAR â”€â”€
+// ── STICKY BAR ──
 function setupStickyBar() {
   const orderSection = document.getElementById('order-section');
   const stickyBar = document.getElementById('sticky-bar');
@@ -1292,7 +1292,7 @@ function trackProductCheckout() {
   });
 }
 
-// â”€â”€ SUBMIT ORDER â”€â”€
+// ── SUBMIT ORDER ──
 async function submitOrder() {
   const name = document.getElementById('f-name').value.trim();
   const phone = document.getElementById('f-phone').value.trim();
@@ -1300,20 +1300,20 @@ async function submitOrder() {
   const commune = document.getElementById('f-commune').value;
   const desk = document.getElementById('f-desk').value;
 
-  if (!name) { toast('Veuillez entrer votre nom â€” Ø£Ø¯Ø®Ù„ Ø§Ø³Ù…Ùƒ', true); return; }
+  if (!name) { toast('Veuillez entrer votre nom — أدخل اسمك', true); return; }
   const phoneClean = phone.replace(/\s/g, '');
 if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) { 
-  toast('Ø±Ù‚Ù… Ø§Ù„Ù‡Ø§ØªÙ ØºÙŠØ± ØµØ­ÙŠØ­', true); 
+  toast('رقم الهاتف غير صحيح', true); 
   return; 
 }
-  if (!wilayaKey) { toast('Veuillez choisir votre wilaya â€” Ø§Ø®ØªØ± Ø§Ù„ÙˆÙ„Ø§ÙŠØ©', true); return; }
-  if (selectedDelivery === 'home' && !commune) { toast('Veuillez choisir votre commune â€” Ø§Ø®ØªØ± Ø§Ù„Ø¨Ù„Ø¯ÙŠØ©', true); return; }
+  if (!wilayaKey) { toast('Veuillez choisir votre wilaya — اختر الولاية', true); return; }
+  if (selectedDelivery === 'home' && !commune) { toast('Veuillez choisir votre commune — اختر البلدية', true); return; }
   if (selectedDelivery === 'desk' && !desk) { toast('Veuillez choisir un point Stop Desk', true); return; }
   trackProductCheckout();
 
   const btn = document.getElementById('order-btn');
   btn.classList.add('loading');
-  btn.querySelector('.order-btn-ar').textContent = 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø¥Ø±Ø³Ø§Ù„...';
+  btn.querySelector('.order-btn-ar').textContent = 'جاري الإرسال...';
 
   const [wilayaIdRaw, wilayaLabel] = wilayaKey.split('|');
   const wilayaClean = (wilayaLabel || wilayaKey).replace(/^\d+\s*-\s*/, '').trim();
@@ -1396,12 +1396,12 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
 
   } catch(e) {
     btn.classList.remove('loading');
-    btn.querySelector('.order-btn-ar').textContent = 'Ø§Ø·Ù„Ø¨ Ø§Ù„Ø¢Ù†';
-    toast('Erreur. RÃ©essayez â€” Ø­Ø§ÙˆÙ„ Ù…Ø¬Ø¯Ø¯Ù‹Ø§', true);
+    btn.querySelector('.order-btn-ar').textContent = 'اطلب الآن';
+    toast('Erreur. Réessayez — حاول مجددًا', true);
   }
 }
 
-// â”€â”€ TOAST â”€â”€
+// ── TOAST ──
 let _tt;
 function toast(msg, isErr = false) {
   const el = document.getElementById('toast');
@@ -1413,4 +1413,3 @@ function toast(msg, isErr = false) {
 </script>
 </body>
 </html>
-
