@@ -6,7 +6,7 @@
 <title>ARCO | بوسترات و لوحات فنية فاخرة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Changa:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --y:#F5C500;--yd:#c49a00;--bk:#080808;--dk:#111111;--dk2:#0d0d0d;
@@ -17,41 +17,40 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
-body{min-height:100vh;background:#080808;color:var(--tx);font-family:'Cairo',sans-serif;overflow-x:hidden}
+body{min-height:100vh;background:#080808;color:var(--tx);font-family:'Changa',sans-serif;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
 .wrap{width:min(1240px,calc(100% - 32px));margin:0 auto}
 
 /* ── AMBIENT ORBS ── */
 .orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.orb{position:absolute;border-radius:50%;filter:blur(110px)}
-.orb-1{width:800px;height:800px;background:rgba(245,197,0,.06);top:-300px;left:-200px;animation:drift 18s ease-in-out infinite alternate}
-.orb-2{width:500px;height:500px;background:rgba(225,29,72,.04);top:15%;right:-140px;animation:drift 22s ease-in-out infinite alternate-reverse}
-@keyframes drift{from{transform:translate(0,0)}to{transform:translate(30px,20px)}}
+.orb{position:absolute;border-radius:50%;filter:blur(70px)}
+.orb-1{width:500px;height:500px;background:rgba(245,197,0,.05);top:-200px;left:-150px}
+.orb-2{width:360px;height:360px;background:rgba(225,29,72,.035);top:15%;right:-120px}
 
 /* ── ANNOUNCEMENT BAR ── */
 .announce{position:relative;z-index:30;background:var(--bk);border-bottom:1px solid var(--ln);text-align:center;padding:9px 12px}
-.announce span{font:700 .82rem/1 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--y)}
+.announce span{font:700 .82rem/1 'Changa',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--y)}
 
 /* ── TOPBAR ── */
 .topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(24px);background:rgba(8,8,8,.84);border-bottom:1px solid var(--ln)}
 .topbar-inner{position:relative;z-index:1;min-height:74px;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .brand{display:flex;align-items:center;gap:13px}
-.brand-mark{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--y),#ffd84d);color:#080808;font:400 30px/1 'Bebas Neue',sans-serif;letter-spacing:.06em;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 6px 24px rgba(245,197,0,.28);flex-shrink:0}
-.brand-text strong{display:block;font:400 clamp(1.9rem,3.8vw,2.5rem)/.9 'Bebas Neue',sans-serif;letter-spacing:.1em}
-.brand-text span{display:block;font:700 .68rem/1 'Barlow Condensed',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--mu)}
+.brand-mark{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--y),#ffd84d);color:#080808;font:800 26px/1 'Changa',sans-serif;letter-spacing:.06em;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 6px 24px rgba(245,197,0,.28);flex-shrink:0}
+.brand-text strong{display:block;font:800 clamp(1.6rem,3.4vw,2.1rem)/.95 'Changa',sans-serif;letter-spacing:.04em;letter-spacing:.1em}
+.brand-text span{display:block;font:700 .68rem/1 'Changa',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--mu)}
 /* search */
 .search-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:1;max-width:340px}
 .search-box{width:100%;display:flex;align-items:center;gap:9px;padding:10px 15px;border-radius:999px;border:1px solid var(--ln);background:rgba(255,255,255,.04);transition:.2s}
 .search-box:focus-within{border-color:var(--ln2)}
 .search-box svg{width:18px;height:18px;stroke:var(--mu);flex-shrink:0}
-.search-box input{flex:1;background:none;border:none;outline:none;color:var(--tx);font:600 .92rem/1 'Cairo',sans-serif}
+.search-box input{flex:1;background:none;border:none;outline:none;color:var(--tx);font:600 .92rem/1 'Changa',sans-serif}
 .search-box input::placeholder{color:var(--mu)}
-.search-sub{font:700 .72rem/1 'Cairo',sans-serif;color:var(--y);letter-spacing:.02em;padding-left:6px}
+.search-sub{font:700 .72rem/1 'Changa',sans-serif;color:var(--y);letter-spacing:.02em;padding-left:6px}
 
 /* ── HERO / SOCIAL PROOF ── */
 .hero{position:relative;z-index:1;padding:38px 0 20px;text-align:center}
-.hero h1{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(1.9rem,6vw,4rem);line-height:1.02;letter-spacing:.01em;text-transform:uppercase;direction:ltr}
+.hero h1{font-family:'Changa',sans-serif;font-weight:800;font-size:clamp(1.7rem,5.4vw,3.4rem);line-height:1.02;letter-spacing:.01em;text-transform:uppercase;direction:ltr}
 .hero h1 .hl{color:var(--y)}
 .hero .sub{margin-top:14px;color:var(--mu);font-size:1rem;line-height:1.9;max-width:38rem;margin-inline:auto}
 
@@ -68,12 +67,12 @@ img{display:block;max-width:100%}
 /* ── SECTION HEADINGS ── */
 .sec{position:relative;z-index:1;padding:44px 0}
 .sec-title-wrap{text-align:center;margin-bottom:30px}
-.sec-title{display:inline-block;position:relative;font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(2.2rem,6vw,3.8rem);letter-spacing:.02em;text-transform:uppercase;color:var(--tx)}
+.sec-title{display:inline-block;position:relative;font-family:'Changa',sans-serif;font-weight:800;font-size:clamp(1.9rem,5vw,3rem);letter-spacing:.02em;text-transform:uppercase;color:var(--tx)}
 /* tape accents on titles */
 .sec-title::before,.sec-title::after{content:"";position:absolute;width:42px;height:13px;background:var(--y);opacity:.85;border-radius:2px}
 .sec-title::before{top:-4px;left:-14px;transform:rotate(-34deg)}
 .sec-title::after{bottom:2px;right:-12px;transform:rotate(-32deg)}
-.sec-sub{display:block;margin-top:10px;font:700 .8rem/1.4 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--mu)}
+.sec-sub{display:block;margin-top:10px;font:700 .8rem/1.4 'Changa',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--mu)}
 
 /* ── COLLECTIONS CIRCLES ── */
 .col-scroll{display:flex;gap:20px;overflow-x:auto;padding:6px 2px 18px;scrollbar-width:none}
@@ -82,8 +81,8 @@ img{display:block;max-width:100%}
 .col-circle{width:108px;height:108px;border-radius:50%;overflow:hidden;background:linear-gradient(160deg,rgba(245,197,0,.14),var(--dk2));border:2px solid var(--ln);display:grid;place-items:center;transition:.26s}
 .col-item:hover .col-circle{border-color:var(--y);transform:translateY(-5px);box-shadow:0 16px 36px rgba(245,197,0,.22)}
 .col-circle img{width:100%;height:100%;object-fit:cover}
-.col-circle .ph{font:400 2.6rem/1 'Bebas Neue',sans-serif;color:var(--y)}
-.col-name{font:700 .98rem/1.2 'Cairo',sans-serif;text-align:center;color:var(--tx)}
+.col-circle .ph{font:800 2rem/1 'Changa',sans-serif;color:var(--y)}
+.col-name{font:700 .98rem/1.2 'Changa',sans-serif;text-align:center;color:var(--tx)}
 
 /* ── CUSTOM UPLOAD SECTION ── */
 .custom-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
@@ -91,9 +90,9 @@ img{display:block;max-width:100%}
 .custom-card:hover{border-color:var(--y);transform:translateY(-4px)}
 .custom-card .cc-inner{display:grid;gap:10px;justify-items:center}
 .custom-card .cc-icon{width:60px;height:60px;border-radius:16px;display:grid;place-items:center;background:rgba(245,197,0,.12);border:1px solid var(--ln2);font-size:26px}
-.custom-card h3{font:400 1.7rem/.95 'Bebas Neue',sans-serif;letter-spacing:.03em}
+.custom-card h3{font:700 1.3rem/1.1 'Changa',sans-serif;letter-spacing:.03em}
 .custom-card p{color:var(--mu);font-size:.85rem;line-height:1.6}
-.custom-card .cc-btn{margin-top:6px;padding:9px 18px;border-radius:999px;background:var(--y);color:#080808;font:800 .8rem/1 'Barlow Condensed',sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.custom-card .cc-btn{margin-top:6px;padding:9px 18px;border-radius:999px;background:var(--y);color:#080808;font:800 .8rem/1 'Changa',sans-serif;letter-spacing:.1em;text-transform:uppercase}
 
 /* ── PRODUCT RAILS ── */
 .rail{display:flex;gap:18px;overflow-x:auto;padding:4px 2px 20px;scrollbar-width:none;scroll-snap-type:x mandatory}
@@ -103,18 +102,18 @@ img{display:block;max-width:100%}
 .pthumb{position:relative;aspect-ratio:4/4.8;background:var(--dk2);overflow:hidden}
 .pthumb img{width:100%;height:100%;object-fit:cover;transition:transform .45s}
 .pcard:hover .pthumb img{transform:scale(1.05)}
-.ppill{position:absolute;top:12px;right:12px;padding:5px 11px;border-radius:999px;background:rgba(8,8,8,.72);border:1px solid rgba(255,255,255,.09);color:var(--y);font:700 .7rem/1 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.ppill{position:absolute;top:12px;right:12px;padding:5px 11px;border-radius:999px;background:rgba(8,8,8,.72);border:1px solid rgba(255,255,255,.09);color:var(--y);font:700 .7rem/1 'Changa',sans-serif;letter-spacing:.08em;text-transform:uppercase}
 .ppill.hot{background:rgba(225,29,72,.18);border-color:rgba(225,29,72,.32);color:#ff7090}
 .ppill.sale{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.3);color:#5ef0a0}
 .pbody{padding:16px;display:grid;gap:9px;flex:1;direction:ltr;text-align:left}
-.pname{font:400 1.55rem/.95 'Bebas Neue',sans-serif;letter-spacing:.03em}
+.pname{font:700 1.15rem/1.2 'Changa',sans-serif;letter-spacing:.03em}
 .pbottom{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
-.pprice{font:400 1.7rem/.88 'Bebas Neue',sans-serif;letter-spacing:.04em;color:var(--y)}
-.pprice .old{display:block;font:700 .8rem/1 'Barlow Condensed',sans-serif;color:var(--mu);text-decoration:line-through}
-.porder{min-height:40px;padding:0 15px;border-radius:999px;background:var(--y);color:#080808;font:800 .78rem/1 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+.pprice{font:800 1.35rem/1 'Changa',sans-serif;letter-spacing:.04em;color:var(--y)}
+.pprice .old{display:block;font:700 .8rem/1 'Changa',sans-serif;color:var(--mu);text-decoration:line-through}
+.porder{min-height:40px;padding:0 15px;border-radius:999px;background:var(--y);color:#080808;font:800 .78rem/1 'Changa',sans-serif;letter-spacing:.08em;text-transform:uppercase;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
 .rail-loader,.rail-empty{flex-shrink:0;width:100%;min-height:160px;display:grid;place-items:center;color:var(--mu);font-size:.92rem;border:1px dashed var(--ln);border-radius:var(--r)}
 .viewall{display:flex;justify-content:center;margin-top:6px}
-.viewall a{padding:13px 34px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--ln);font:800 .84rem/1 'Barlow Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase;transition:.2s}
+.viewall a{padding:13px 34px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--ln);font:800 .84rem/1 'Changa',sans-serif;letter-spacing:.12em;text-transform:uppercase;transition:.2s}
 .viewall a:hover{border-color:var(--y);color:var(--y)}
 
 /* ── WHY US ── */
@@ -122,13 +121,13 @@ img{display:block;max-width:100%}
 .why-card{padding:26px 20px;border-radius:var(--r);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(13,13,13,.94));border:1px solid var(--ln);text-align:center;transition:.24s}
 .why-card:hover{border-color:var(--ln2);transform:translateY(-4px)}
 .why-ic{width:62px;height:62px;margin:0 auto 16px;border-radius:17px;display:grid;place-items:center;background:rgba(245,197,0,.1);border:1px solid rgba(245,197,0,.15);font-size:28px}
-.why-card h3{font:900 1.15rem/1.2 'Cairo',sans-serif;margin-bottom:8px}
+.why-card h3{font:900 1.15rem/1.2 'Changa',sans-serif;margin-bottom:8px}
 .why-card p{color:var(--mu);line-height:1.75;font-size:.88rem}
 
 /* ── FAQ ── */
 .faq-wrap{max-width:760px;margin:0 auto;display:grid;gap:12px}
 .faq-item{border:1px solid var(--ln);border-radius:16px;background:rgba(255,255,255,.02);overflow:hidden}
-.faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px;background:none;border:none;color:var(--tx);font:800 1.02rem/1.4 'Cairo',sans-serif;cursor:pointer;text-align:right}
+.faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 20px;background:none;border:none;color:var(--tx);font:800 1.02rem/1.4 'Changa',sans-serif;cursor:pointer;text-align:right}
 .faq-q .chev{flex-shrink:0;width:22px;height:22px;stroke:var(--y);transition:transform .25s}
 .faq-item.open .chev{transform:rotate(180deg)}
 .faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;color:var(--mu);line-height:1.9;font-size:.94rem}
@@ -138,11 +137,11 @@ img{display:block;max-width:100%}
 /* ── FOOTER ── */
 .footer{position:relative;z-index:1;padding:30px 0 60px}
 .footer-inner{border:1px solid var(--ln);background:rgba(255,255,255,.02);border-radius:26px;padding:26px 28px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
-.footer-brand strong{font:400 2.2rem/.88 'Bebas Neue',sans-serif;letter-spacing:.1em}
+.footer-brand strong{font:800 1.8rem/1 'Changa',sans-serif;letter-spacing:.1em}
 .footer-brand p{color:var(--mu);font-size:.86rem;margin-top:4px}
 .footer-brand small{color:#5a5a5a;font-size:.8rem;display:block;margin-top:6px}
 .footer-links{display:flex;gap:10px;flex-wrap:wrap}
-.footer-link{padding:9px 18px;border-radius:999px;border:1px solid var(--ln);background:rgba(8,8,8,.5);font:700 .82rem/1 'Barlow Condensed',sans-serif;letter-spacing:.1em;text-transform:uppercase;transition:.2s}
+.footer-link{padding:9px 18px;border-radius:999px;border:1px solid var(--ln);background:rgba(8,8,8,.5);font:700 .82rem/1 'Changa',sans-serif;letter-spacing:.1em;text-transform:uppercase;transition:.2s}
 .footer-link:hover{border-color:var(--y);color:var(--y)}
 
 /* ── WHATSAPP FAB ── */
@@ -402,14 +401,28 @@ function cardHTML(p){
     </div>
   </article>`;
 }
-async function loadRail(id,query,emptyMsg){
+/* ---- PRODUCT RAILS (batched: one request, split in JS) ---- */
+function fillRail(id,items,emptyMsg){
   const box=document.getElementById(id);
+  if(!box)return;
+  if(!items.length){box.innerHTML=`<div class="rail-empty">${emptyMsg}</div>`;return;}
+  box.innerHTML=items.map(cardHTML).join('');
+}
+async function loadAllRails(){
   try{
-    const r=await fetch(`${SB_URL}/products?${query}`,{headers:H});
-    const items=await r.json();
-    if(!Array.isArray(items)||!items.length){box.innerHTML=`<div class="rail-empty">${emptyMsg}</div>`;return;}
-    box.innerHTML=items.map(cardHTML).join('');
-  }catch(e){box.innerHTML='<div class="rail-empty">تعذر التحميل</div>';}
+    // single fetch of all active products, then split client-side
+    const r=await fetch(`${SB_URL}/products?select=*&active=eq.true&order=created_at.desc&limit=60`,{headers:H});
+    const all=await r.json();
+    if(!Array.isArray(all)){throw new Error('bad');}
+    fillRail('railLatest', all.slice(0,10), 'قريباً تصاميم جديدة');
+    fillRail('railBest', all.filter(p=>p.is_bestseller).slice(0,10), 'قريباً');
+    fillRail('railSales', all.filter(p=>p.original_price&&p.original_price>minPrice(p)).slice(0,10), 'لا توجد تخفيضات حالياً');
+    fillRail('railBundle', all.filter(p=>p.collection==='bundle').slice(0,10), 'قريباً باقات جديدة');
+  }catch(e){
+    ['railLatest','railBest','railSales','railBundle'].forEach(id=>{
+      const b=document.getElementById(id);if(b)b.innerHTML='<div class="rail-empty">تعذر التحميل</div>';
+    });
+  }
 }
 
 /* ---- CUSTOMER PHOTO MARQUEE ---- */
@@ -461,10 +474,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
 loadMarquee();
 loadCollections();
 loadFAQ();
-loadRail('railLatest','select=*&active=eq.true&order=created_at.desc&limit=10','قريباً تصاميم جديدة');
-loadRail('railBest','select=*&active=eq.true&is_bestseller=eq.true&limit=10','قريباً');
-loadRail('railSales','select=*&active=eq.true&original_price=not.is.null&limit=10','لا توجد تخفيضات حالياً');
-loadRail('railBundle','select=*&active=eq.true&collection=eq.bundle&limit=10','قريباً باقات جديدة');
+loadAllRails();
 </script>
 </body>
 </html>
