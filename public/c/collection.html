@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCO | المجموعة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Changa:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --y:#F5C500;--yd:#c49a00;--bk:#080808;--dk:#111111;--dk2:#0d0d0d;
+  --rd:#e11d48;--gn:#22c55e;--tx:#f4f4f4;--mu:#9a9a9a;
+  --ln:rgba(255,255,255,.07);--ln2:rgba(245,197,0,.22);
+  --sh2:0 8px 32px rgba(0,0,0,.32);--r:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{min-height:100vh;background:#080808;color:var(--tx);font-family:'Changa',sans-serif;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+.wrap{width:min(1240px,calc(100% - 32px));margin:0 auto}
+
+.orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(70px)}
+.orb-1{width:500px;height:500px;background:rgba(245,197,0,.05);top:-200px;left:-150px}
+
+/* ANNOUNCE + TOPBAR */
+.announce{position:relative;z-index:30;background:var(--bk);border-bottom:1px solid var(--ln);text-align:center;padding:9px 12px}
+.announce span{font:600 .82rem/1 'Changa',sans-serif;letter-spacing:.06em;color:var(--y)}
+.topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(24px);background:rgba(8,8,8,.84);border-bottom:1px solid var(--ln)}
+.topbar-inner{position:relative;z-index:1;min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--y),#ffd84d);color:#080808;font:800 22px/1 'Changa',sans-serif;flex-shrink:0}
+.brand-text strong{display:block;font:800 1.5rem/.95 'Changa',sans-serif;letter-spacing:.04em}
+.brand-text span{display:block;font:600 .62rem/1 'Changa',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mu)}
+.back-link{font:600 .82rem/1 'Changa',sans-serif;color:var(--mu);padding:9px 15px;border:1px solid var(--ln);border-radius:999px;transition:.2s}
+.back-link:hover{border-color:var(--y);color:var(--y)}
+
+/* HEADER */
+.col-head{position:relative;z-index:1;padding:30px 0 14px;text-align:center}
+.col-head h1{font:800 clamp(2rem,6vw,3.2rem)/1 'Changa',sans-serif;letter-spacing:.01em}
+.col-head .en{display:block;margin-top:8px;font:600 .8rem/1 'Changa',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--mu)}
+
+/* SUBCOLLECTION FILTER BAR */
+.subbar{position:relative;z-index:1;display:flex;gap:9px;overflow-x:auto;padding:14px 0 8px;scrollbar-width:none}
+.subbar::-webkit-scrollbar{display:none}
+.subchip{flex-shrink:0;padding:9px 18px;border-radius:999px;border:1.5px solid var(--ln);background:rgba(255,255,255,.03);color:var(--tx);font:600 .88rem/1 'Changa',sans-serif;cursor:pointer;transition:.2s;white-space:nowrap}
+.subchip:hover{border-color:var(--ln2)}
+.subchip.active{background:var(--y);color:#080808;border-color:var(--y)}
+
+/* PRODUCT GRID */
+.grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;padding:18px 0 10px}
+.pcard{display:flex;flex-direction:column;border-radius:var(--r);overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(13,13,13,.96));border:1px solid var(--ln);box-shadow:var(--sh2);transition:.28s}
+.pcard:hover{transform:translateY(-6px);border-color:rgba(245,197,0,.4)}
+.pthumb{position:relative;aspect-ratio:4/4.8;background:var(--dk2);overflow:hidden}
+.pthumb img{width:100%;height:100%;object-fit:cover;transition:transform .45s}
+.pcard:hover .pthumb img{transform:scale(1.05)}
+.ppill{position:absolute;top:10px;right:10px;padding:5px 11px;border-radius:999px;background:rgba(8,8,8,.72);border:1px solid rgba(255,255,255,.09);color:var(--y);font:600 .68rem/1 'Changa',sans-serif;letter-spacing:.04em}
+.ppill.hot{background:rgba(225,29,72,.18);border-color:rgba(225,29,72,.32);color:#ff7090}
+.ppill.sale{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.3);color:#5ef0a0}
+.pbody{padding:12px;display:grid;gap:7px;flex:1;direction:ltr;text-align:left}
+.pname{font:700 1.05rem/1.2 'Changa',sans-serif}
+.pbottom{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto}
+.pprice{font:800 1.25rem/1 'Changa',sans-serif;color:var(--y)}
+.pprice .old{display:block;font:600 .72rem/1 'Changa',sans-serif;color:var(--mu);text-decoration:line-through}
+.porder{min-height:38px;padding:0 14px;border-radius:999px;background:var(--y);color:#080808;font:700 .76rem/1 'Changa',sans-serif;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+
+.state{position:relative;z-index:1;min-height:40vh;display:grid;place-items:center;text-align:center;color:var(--mu);font-size:1rem}
+
+/* PAGINATION */
+.pager{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:14px;padding:18px 0 50px}
+.pager button{padding:11px 22px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--ln);color:var(--tx);font:600 .85rem/1 'Changa',sans-serif;cursor:pointer;transition:.2s}
+.pager button:hover:not(:disabled){border-color:var(--y);color:var(--y)}
+.pager button:disabled{opacity:.35;cursor:not-allowed}
+.pager .info{font:600 .85rem/1 'Changa',sans-serif;color:var(--mu)}
+
+.wa-fab{position:fixed;bottom:20px;left:20px;z-index:50;width:54px;height:54px;border-radius:50%;background:#25D366;display:grid;place-items:center;box-shadow:0 10px 30px rgba(37,211,102,.4);transition:.2s}
+.wa-fab:hover{transform:scale(1.08)}
+.wa-fab svg{width:28px;height:28px;fill:#fff}
+
+@media(max-width:640px){
+  .grid{grid-template-columns:1fr 1fr;gap:11px}
+  .col-head{padding:22px 0 10px}
+  .pbody{padding:10px}
+}
+</style>
+<script src="/meta-pixel.js"></script>
+<script src="/tiktok-pixel.js"></script>
+</head>
+<body>
+
+<div class="orbs" aria-hidden="true"><div class="orb orb-1"></div></div>
+
+<div class="announce"><span>الدفع عند الاستلام ✓ توصيل لكل ولايات الجزائر</span></div>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="/" aria-label="ARCO">
+      <div class="brand-mark">A</div>
+      <div class="brand-text"><strong>ARCO</strong><span>Premium Wall Art</span></div>
+    </a>
+    <a class="back-link" href="/">← الرئيسية</a>
+  </div>
+</header>
+
+<section class="col-head wrap">
+  <h1 id="col-title">المجموعة</h1>
+  <span class="en" id="col-en"></span>
+</section>
+
+<div class="wrap">
+  <div class="subbar" id="subbar"></div>
+</div>
+
+<div class="wrap">
+  <div class="grid" id="grid"><div class="state">جاري التحميل...</div></div>
+  <div class="pager" id="pager"></div>
+</div>
+
+<a class="wa-fab" href="https://wa.me/213000000000" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"/></svg>
+</a>
+
+<script>
+const SB_URL='https://mpkpehuatqsubohltssi.supabase.co/rest/v1';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
+const H={apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`};
+const PAGE_SIZE=16;
+
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function money(v){return Number(v||0).toLocaleString('fr-DZ')+' DZD';}
+function productUrl(slug){
+  if(slug==='liquid-football')return '/p/liquid-football.html';
+  if(slug==='barber-shop')return '/p/barber-shop.html';
+  return '/p/'+encodeURIComponent(slug);
+}
+function pImages(p){
+  const base=Array.isArray(p.images)?p.images:(p.images?[p.images]:[]);
+  const v=Array.isArray(p.variants)?p.variants.map(x=>x.image).filter(Boolean):[];
+  return[...new Set([...base,...v])];
+}
+function minPrice(p){
+  const pr=Array.isArray(p.variants)?p.variants.map(v=>Number(v.price||0)).filter(v=>v>0):[];
+  return pr.length?Math.min(...pr):Number(p.price||0);
+}
+
+// ── STATE ──
+const collectionSlug=new URLSearchParams(location.search).get('slug')||
+  (location.pathname.split('/').filter(Boolean)[1]||'');
+let collection=null;
+let allItems=[];
+let activeSub='all';
+let page=1;
+
+function cardHTML(p){
+  const img=pImages(p)[0];
+  const hot=p.is_bestseller, sale=p.original_price&&p.original_price>minPrice(p);
+  let pill='Disponible',cls='';
+  if(hot){pill='★ Best Seller';cls=' hot';}
+  else if(sale){pill='Sale';cls=' sale';}
+  return`<article class="pcard">
+    <a class="pthumb" href="${productUrl(p.slug)}">
+      ${img?`<img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy">`:''}
+      <span class="ppill${cls}">${pill}</span>
+    </a>
+    <div class="pbody">
+      <h3 class="pname">${esc(p.name)}</h3>
+      <div class="pbottom">
+        <div class="pprice">${money(minPrice(p))}${sale?`<span class="old">${money(p.original_price)}</span>`:''}</div>
+        <a class="porder" href="${productUrl(p.slug)}">اطلب</a>
+      </div>
+    </div>
+  </article>`;
+}
+
+function filteredItems(){
+  if(activeSub==='all')return allItems;
+  return allItems.filter(p=>(p.subcollection||'')===activeSub);
+}
+
+function renderSubbar(){
+  const bar=document.getElementById('subbar');
+  const subs=(collection&&Array.isArray(collection.subs))?collection.subs:[];
+  if(!subs.length){bar.style.display='none';return;}
+  // ensure an "all" chip exists first
+  const hasAll=subs.some(s=>s.slug==='all');
+  const chips=[];
+  if(!hasAll)chips.push({slug:'all',name_ar:'الكل'});
+  chips.push(...subs);
+  bar.innerHTML=chips.map(s=>
+    `<button class="subchip ${activeSub===s.slug?'active':''}" onclick="selectSub('${esc(s.slug)}')">${esc(s.name_ar||s.name_en||s.slug)}</button>`
+  ).join('');
+}
+
+function selectSub(slug){
+  activeSub=slug;page=1;
+  renderSubbar();renderGrid();
+}
+
+function renderGrid(){
+  const grid=document.getElementById('grid');
+  const pager=document.getElementById('pager');
+  const list=filteredItems();
+  const total=list.length;
+  if(!total){
+    grid.innerHTML='<div class="state">لا توجد تصاميم في هذا القسم حالياً</div>';
+    pager.innerHTML='';
+    return;
+  }
+  const totalPages=Math.ceil(total/PAGE_SIZE);
+  if(page>totalPages)page=totalPages;
+  const start=(page-1)*PAGE_SIZE;
+  grid.innerHTML=list.slice(start,start+PAGE_SIZE).map(cardHTML).join('');
+  pager.innerHTML=totalPages<=1?'':`
+    <button onclick="goPage(${page-1})" ${page===1?'disabled':''}>← السابق</button>
+    <span class="info">${page} / ${totalPages}</span>
+    <button onclick="goPage(${page+1})" ${page===totalPages?'disabled':''}>التالي →</button>`;
+}
+function goPage(p){page=p;renderGrid();window.scrollTo({top:0,behavior:'smooth'});}
+
+async function load(){
+  if(!collectionSlug){document.getElementById('grid').innerHTML='<div class="state">المجموعة غير موجودة</div>';return;}
+
+  // 1) fetch collection meta (title + subs)
+  try{
+    const r=await fetch(`${SB_URL}/collections?select=*&slug=eq.${encodeURIComponent(collectionSlug)}&limit=1`,{headers:H});
+    const data=await r.json();
+    collection=data[0]||null;
+  }catch(e){collection=null;}
+
+  if(collection){
+    document.getElementById('col-title').textContent=collection.name_ar||collectionSlug;
+    document.getElementById('col-en').textContent=collection.name_en||'';
+    document.title='ARCO | '+(collection.name_ar||collectionSlug);
+  }else{
+    document.getElementById('col-title').textContent=collectionSlug;
+  }
+  renderSubbar();
+
+  // 2) fetch products in this collection
+  try{
+    const r=await fetch(`${SB_URL}/products?select=*&active=eq.true&collection=eq.${encodeURIComponent(collectionSlug)}&order=sort_order.asc,created_at.desc`,{headers:H});
+    const data=await r.json();
+    allItems=Array.isArray(data)?data:[];
+  }catch(e){allItems=[];}
+
+  renderGrid();
+}
+
+load();
+</script>
+</body>
+</html>
