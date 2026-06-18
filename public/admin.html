@@ -135,7 +135,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 
 /* PRODUCTS GRID */
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
-.product-card{background:var(--glass);border:1px solid var(--glass-b);border-radius:22px;overflow:hidden;transition:transform 0.2s,border-color 0.2s}
+.product-card{position:relative;background:var(--glass);border:1px solid var(--glass-b);border-radius:22px;overflow:hidden;transition:transform 0.2s,border-color 0.2s}
 .product-card:hover{transform:translateY(-3px);border-color:rgba(245,197,0,0.18)}
 .product-img{width:100%;height:190px;object-fit:cover;display:block;background:var(--dark2)}
 .product-body{padding:16px}
@@ -537,9 +537,22 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           <button class="btn btn-primary" onclick="openAddProduct()">+ Add Product</button>
         </div>
       </div>
-      <div class="filters-bar" style="border:none;padding:0 0 16px 0">
+      <div class="filters-bar" style="border:none;padding:0 0 12px 0">
         <input class="filter-input" id="product-search" placeholder="Search products by name or slug..." oninput="onProductSearch()"/>
         <span class="orders-count" id="products-count"></span>
+      </div>
+      <div id="bulk-bar" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(245,197,0,0.06);border:1px solid rgba(245,197,0,0.2);border-radius:14px;padding:10px 14px;margin-bottom:14px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.5px;color:var(--white)">
+          <input type="checkbox" id="bulk-select-all" onchange="toggleSelectAllPage(this.checked)" style="width:18px;height:18px;cursor:pointer"/>
+          Select all on page
+        </label>
+        <span id="bulk-count" style="font-size:13px;color:var(--gray)">0 selected</span>
+        <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="bulkSetActive(true)">✓ Activate</button>
+          <button class="btn btn-ghost btn-sm" onclick="bulkSetActive(false)">✕ Deactivate</button>
+          <button class="btn btn-danger btn-sm" onclick="bulkDelete()">🗑 Delete</button>
+          <button class="btn btn-ghost btn-sm" onclick="clearSelection()">Clear</button>
+        </div>
       </div>
       <div class="products-grid" id="products-grid"></div>
       <div class="pagination" id="products-pagination"></div>
@@ -1050,6 +1063,7 @@ const CONFIRMATION_FLOW_STATUSES=new Set(['confirmed','shipped','rescheduled','d
 let currentUser=null,currentRole=null,allOrders=[],filteredOrders=[],allProducts=[],allOperators=[];
 let currentPage=1;const PAGE_SIZE=30;let editingProductId=null;
 let productPage=1;const PRODUCT_PAGE_SIZE=16;let productSearch='';
+let selectedProductIds=new Set();
 let currentAdminPage='dashboard';
 const ADMIN_PAGE_KEY='arco_admin_page';
 
@@ -1528,10 +1542,15 @@ function renderProducts(){
   const pageItems=list.slice(start,start+PRODUCT_PAGE_SIZE);
 
   if(countEl)countEl.textContent=`${total} product${total===1?'':'s'} · page ${productPage}/${totalPages}`;
+  updateBulkBar();
 
   grid.innerHTML=pageItems.map(p=>{
     const img=Array.isArray(p.images)?p.images[0]:(p.images||'');
-    return `<div class="product-card">
+    const checked=selectedProductIds.has(p.id);
+    return `<div class="product-card" style="${checked?'border-color:var(--yellow);box-shadow:0 0 0 1px var(--yellow)':''}">
+      <label style="position:absolute;top:10px;left:10px;z-index:2;background:rgba(6,6,8,0.7);border-radius:8px;padding:5px;cursor:pointer;display:flex">
+        <input type="checkbox" ${checked?'checked':''} onchange="toggleProductSelect(${p.id},this.checked)" style="width:18px;height:18px;cursor:pointer"/>
+      </label>
       ${img?`<img class="product-img" src="${esc(img)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none'"/>`:
         '<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.3">🖼️</div>'}
       <div class="product-body">
@@ -1662,6 +1681,60 @@ async function saveProduct(){
   else{await sb.from('products').insert(data);toast('Product added ✓');}
   closeModal('product-modal');await loadProducts();renderProducts();
 }
+function updateBulkBar(){
+  const bar=document.getElementById('bulk-bar');
+  const countEl=document.getElementById('bulk-count');
+  const selAll=document.getElementById('bulk-select-all');
+  if(!bar)return;
+  const n=selectedProductIds.size;
+  bar.style.display=allProducts.length?'flex':'none';
+  if(countEl)countEl.textContent=`${n} selected`;
+  // reflect whether all on current page are selected
+  if(selAll){
+    const list=getFilteredProducts();
+    const start=(productPage-1)*PRODUCT_PAGE_SIZE;
+    const pageItems=list.slice(start,start+PRODUCT_PAGE_SIZE);
+    selAll.checked=pageItems.length>0&&pageItems.every(p=>selectedProductIds.has(p.id));
+  }
+}
+function toggleProductSelect(id,checked){
+  if(checked)selectedProductIds.add(id);else selectedProductIds.delete(id);
+  updateBulkBar();
+  // update just the card border without full re-render
+  renderProducts();
+}
+function toggleSelectAllPage(checked){
+  const list=getFilteredProducts();
+  const start=(productPage-1)*PRODUCT_PAGE_SIZE;
+  const pageItems=list.slice(start,start+PRODUCT_PAGE_SIZE);
+  pageItems.forEach(p=>{if(checked)selectedProductIds.add(p.id);else selectedProductIds.delete(p.id);});
+  renderProducts();
+}
+function clearSelection(){
+  selectedProductIds.clear();
+  renderProducts();
+}
+async function bulkSetActive(active){
+  if(!selectedProductIds.size){toast('No products selected',true);return;}
+  const ids=[...selectedProductIds];
+  if(!confirm(`${active?'Activate':'Deactivate'} ${ids.length} product(s)?`))return;
+  const {error}=await sb.from('products').update({active}).in('id',ids);
+  if(error){toast(error.message||'Bulk update failed',true);return;}
+  toast(`${ids.length} product(s) ${active?'activated':'deactivated'} ✓`);
+  selectedProductIds.clear();
+  await loadProducts();renderProducts();
+}
+async function bulkDelete(){
+  if(!selectedProductIds.size){toast('No products selected',true);return;}
+  const ids=[...selectedProductIds];
+  if(!confirm(`Permanently DELETE ${ids.length} product(s)? This cannot be undone.`))return;
+  const {error}=await sb.from('products').delete().in('id',ids);
+  if(error){toast(error.message||'Bulk delete failed',true);return;}
+  toast(`${ids.length} product(s) deleted`);
+  selectedProductIds.clear();
+  await loadProducts();renderProducts();
+}
+
 async function deleteProduct(id){
   if(!confirm('Delete this product?'))return;
   await sb.from('products').delete().eq('id',id);
