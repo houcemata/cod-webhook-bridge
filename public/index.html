@@ -49,16 +49,14 @@ img{display:block;max-width:100%}
 .search-sub{font:700 .72rem/1 'Changa',sans-serif;color:var(--y);letter-spacing:.02em;padding-left:6px}
 
 /* ── HERO / SOCIAL PROOF ── */
-.hero{position:relative;z-index:1;padding:24px 0 12px;text-align:center}
-.hero h1{font-family:'Changa',sans-serif;font-weight:800;font-size:clamp(1.7rem,5.4vw,3.4rem);line-height:1.02;letter-spacing:.01em;text-transform:uppercase;direction:ltr}
-.hero h1 .hl{color:var(--y)}
-.hero .sub{margin-top:9px;color:var(--mu);font-size:.92rem;line-height:1.7;max-width:34rem;margin-inline:auto}
+/* hero banner — one wide image looping seamlessly */
+.hero-banner{position:relative;z-index:1;overflow:hidden;width:100%;margin:0;padding:10px 0 4px}
+.hero-track{display:flex;width:max-content;animation:scroll-x 30s linear infinite}
+.hero-img{height:clamp(150px,26vw,340px);width:auto;display:block;flex-shrink:0}
+.hero-banner:hover .hero-track{animation-play-state:paused}
 
-/* customer photo marquee */
-.marquee-sec{position:relative;z-index:1;padding:14px 0 6px;overflow:hidden}
+/* (legacy marquee class kept harmless) */
 .marquee{display:flex;gap:10px;width:max-content;animation:scroll-x 42s linear infinite}
-.marquee.rev{animation-direction:reverse;animation-duration:50px;margin-top:10px}
-.marquee:hover{animation-play-state:paused}
 @keyframes scroll-x{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .mq-card{width:175px;aspect-ratio:4/3;border-radius:12px;overflow:hidden;flex-shrink:0;border:1px solid var(--ln);background:var(--dk2)}
 .mq-card img{width:100%;height:100%;object-fit:cover}
@@ -190,7 +188,7 @@ img{display:block;max-width:100%}
     <div class="search-wrap">
       <div class="search-box">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="searchInput" type="search" placeholder="ابحث عن تصميم..." aria-label="بحث">
+        <input id="searchInput" type="search" placeholder="ابحث باسم المنتج..." aria-label="بحث">
       </div>
       <span class="search-sub">حوس وش راك حاب 👀</span>
     </div>
@@ -198,15 +196,12 @@ img{display:block;max-width:100%}
 </header>
 
 <!-- HERO / SOCIAL PROOF -->
-<section class="hero wrap">
-  <h1>WE TRANSFORMED OVER <span class="hl">6,000+</span> WALLS.</h1>
-  <p class="sub">آلاف الزبائن السعداء في كامل الجزائر زينوا جدرانهم مع ARCO. دورك توا.</p>
-</section>
-
-<!-- CUSTOMER PHOTO MARQUEE (two rows) -->
-<section class="marquee-sec" aria-label="صور زبائننا">
-  <div class="marquee" id="mqTop"></div>
-  <div class="marquee rev" id="mqBot"></div>
+<!-- HERO BANNER — one wide image, loops seamlessly left→right -->
+<section class="hero-banner" aria-label="ARCO">
+  <div class="hero-track">
+    <img src="/hero-banner.jpg" alt="ARCO" class="hero-img">
+    <img src="/hero-banner.jpg" alt="" aria-hidden="true" class="hero-img">
+  </div>
 </section>
 
 <hr class="divider">
@@ -222,83 +217,47 @@ img{display:block;max-width:100%}
   </div>
 </section>
 
+
+
 <hr class="divider">
 
-<!-- CUSTOM UPLOAD -->
-<section class="sec wrap" id="custom">
-  <div class="sec-title-wrap">
-    <span class="sec-title">ارسل صورة من عندك</span>
-    <span class="sec-sub">صورتك ، تصميمك ، على بوستر أو لوحة فاخرة</span>
-  </div>
-  <div class="custom-grid">
-    <a class="custom-card" href="/custom">
-      <div class="cc-inner">
-        <div class="cc-icon">🖼️</div>
-        <h3>Custom Poster</h3>
-        <p>بوستر واحد بصورتك الخاصة</p>
-        <span class="cc-btn">ابدأ الآن</span>
-      </div>
-    </a>
-    <a class="custom-card" href="/custom?type=split">
-      <div class="cc-inner">
-        <div class="cc-icon">🔲</div>
-        <h3>Split Poster</h3>
-        <p>صورتك مقسمة على عدة قطع</p>
-        <span class="cc-btn">ابدأ الآن</span>
-      </div>
-    </a>
-    <a class="custom-card" href="/custom?type=split2x2">
-      <div class="cc-inner">
-        <div class="cc-icon">⬜</div>
-        <h3>Split 2×2</h3>
-        <p>تقسيم احترافي 2×2</p>
-        <span class="cc-btn">ابدأ الآن</span>
-      </div>
-    </a>
-    <a class="custom-card" href="/custom?type=retro">
-      <div class="cc-inner">
-        <div class="cc-icon">📸</div>
-        <h3>Retro Prints</h3>
-        <p>صور صغيرة بطابع ريترو</p>
-        <span class="cc-btn">ابدأ الآن</span>
-      </div>
-    </a>
-  </div>
+<!-- PER-COLLECTION RAILS -->
+<section class="sec wrap collection-rail" data-collection="football">
+  <div class="sec-title-wrap"><span class="sec-title">كرة القدم</span><span class="sec-sub">Football</span></div>
+  <div class="rail"><div class="rail-loader">جاري التحميل...</div></div>
+  <div class="viewall"><a href="/c/football">عرض الكل ←</a></div>
 </section>
 
 <hr class="divider">
 
-<!-- LATEST DESIGNS -->
-<section class="sec wrap" id="latest">
-  <div class="sec-title-wrap"><span class="sec-title">اخر التصاميم</span><span class="sec-sub">New Arrivals</span></div>
-  <div class="rail" id="railLatest"><div class="rail-loader">جاري التحميل...</div></div>
-  <div class="viewall"><a href="/c/all?sort=new">عرض الكل ←</a></div>
+<section class="sec wrap collection-rail" data-collection="cars">
+  <div class="sec-title-wrap"><span class="sec-title">السيارات</span><span class="sec-sub">Cars</span></div>
+  <div class="rail"><div class="rail-loader">جاري التحميل...</div></div>
+  <div class="viewall"><a href="/c/cars">عرض الكل ←</a></div>
 </section>
 
 <hr class="divider">
 
-<!-- BEST SELLERS -->
-<section class="sec wrap" id="best">
-  <div class="sec-title-wrap"><span class="sec-title">الأكثر مبيعا</span><span class="sec-sub">Best Sellers</span></div>
-  <div class="rail" id="railBest"><div class="rail-loader">جاري التحميل...</div></div>
-  <div class="viewall"><a href="/c/all?sort=best">عرض الكل ←</a></div>
+<section class="sec wrap collection-rail" data-collection="tv">
+  <div class="sec-title-wrap"><span class="sec-title">المسلسلات</span><span class="sec-sub">TV Shows</span></div>
+  <div class="rail"><div class="rail-loader">جاري التحميل...</div></div>
+  <div class="viewall"><a href="/c/tv">عرض الكل ←</a></div>
 </section>
 
 <hr class="divider">
 
-<!-- SALES -->
-<section class="sec wrap" id="sales">
-  <div class="sec-title-wrap"><span class="sec-title">تخفيضات</span><span class="sec-sub">Promotions</span></div>
-  <div class="rail" id="railSales"><div class="rail-loader">جاري التحميل...</div></div>
-  <div class="viewall"><a href="/c/all?sort=sale">عرض الكل ←</a></div>
+<section class="sec wrap collection-rail" data-collection="games">
+  <div class="sec-title-wrap"><span class="sec-title">ألعاب الفيديو</span><span class="sec-sub">Video Games</span></div>
+  <div class="rail"><div class="rail-loader">جاري التحميل...</div></div>
+  <div class="viewall"><a href="/c/games">عرض الكل ←</a></div>
 </section>
 
 <hr class="divider">
 
-<!-- 50 POSTER BUNDLE -->
-<section class="sec wrap" id="bundle">
-  <div class="sec-title-wrap"><span class="sec-title">باقة 50 بوستر</span><span class="sec-sub">The Ultimate Poster Kit</span></div>
-  <div class="rail" id="railBundle"><div class="rail-loader">جاري التحميل...</div></div>
+<section class="sec wrap collection-rail" data-collection="anime">
+  <div class="sec-title-wrap"><span class="sec-title">أنمي</span><span class="sec-sub">Anime</span></div>
+  <div class="rail"><div class="rail-loader">جاري التحميل...</div></div>
+  <div class="viewall"><a href="/c/anime">عرض الكل ←</a></div>
 </section>
 
 <hr class="divider">
@@ -408,43 +367,71 @@ function fillRail(id,items,emptyMsg){
   if(!items.length){box.innerHTML=`<div class="rail-empty">${emptyMsg}</div>`;return;}
   box.innerHTML=items.map(cardHTML).join('');
 }
+let ALL_PRODUCTS=[];
+
+// load every active product once, then fill each collection rail from it
 async function loadAllRails(){
+  const rails=[...document.querySelectorAll('.collection-rail')];
   try{
-    // single fetch of all active products, then split client-side
-    const r=await fetch(`${SB_URL}/products?select=*&active=eq.true&order=created_at.desc&limit=60`,{headers:H});
+    const r=await fetch(`${SB_URL}/products?select=*&active=eq.true&order=sort_order.asc,created_at.desc`,{headers:H});
     const all=await r.json();
-    if(!Array.isArray(all)){throw new Error('bad');}
-    fillRail('railLatest', all.slice(0,10), 'قريباً تصاميم جديدة');
-    fillRail('railBest', all.filter(p=>p.is_bestseller).slice(0,10), 'قريباً');
-    fillRail('railSales', all.filter(p=>p.original_price&&p.original_price>minPrice(p)).slice(0,10), 'لا توجد تخفيضات حالياً');
-    fillRail('railBundle', all.filter(p=>p.collection==='bundle').slice(0,10), 'قريباً باقات جديدة');
-  }catch(e){
-    ['railLatest','railBest','railSales','railBundle'].forEach(id=>{
-      const b=document.getElementById(id);if(b)b.innerHTML='<div class="rail-empty">تعذر التحميل</div>';
+    if(!Array.isArray(all))throw new Error('bad');
+    ALL_PRODUCTS=all;
+    rails.forEach(sec=>{
+      const slug=sec.dataset.collection;
+      const box=sec.querySelector('.rail');
+      const items=all.filter(p=>(p.collection||'')===slug).slice(0,12);
+      if(!items.length){
+        // hide empty collection sections (and the divider after) to keep homepage clean
+        sec.style.display='none';
+        const nx=sec.nextElementSibling;if(nx&&nx.classList.contains('divider'))nx.style.display='none';
+        return;
+      }
+      box.innerHTML=items.map(cardHTML).join('');
     });
+  }catch(e){
+    rails.forEach(sec=>{const b=sec.querySelector('.rail');if(b)b.innerHTML='<div class="rail-empty">تعذر التحميل</div>';});
   }
 }
 
-/* ---- CUSTOMER PHOTO MARQUEE ---- */
-function loadMarquee(){
-  // placeholder customer photos — swap with your real review photos later
-  const photos=[
-    'https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=400&q=70',
-    'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=400&q=70',
-    'https://images.unsplash.com/photo-1567016376408-0226e4d0c1ea?w=400&q=70',
-    'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=400&q=70',
-    'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=400&q=70',
-    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&q=70'
-  ];
-  const row=arr=>arr.concat(arr).map(u=>`<div class="mq-card"><img src="${u}" alt="زبون ARCO" loading="lazy"></div>`).join('');
-  document.getElementById('mqTop').innerHTML=row(photos);
-  document.getElementById('mqBot').innerHTML=row([...photos].reverse());
+/* ---- LIVE SEARCH (filter products by name) ---- */
+function runSearch(q){
+  const query=(q||'').trim().toLowerCase();
+  const rails=[...document.querySelectorAll('.collection-rail')];
+  let resultsBox=document.getElementById('searchResults');
+
+  if(!query){
+    // restore normal homepage
+    if(resultsBox)resultsBox.style.display='none';
+    rails.forEach(sec=>{
+      const has=sec.querySelector('.rail')&&!sec.querySelector('.rail-empty');
+      sec.style.display=has?'':'none';
+      const nx=sec.nextElementSibling;if(nx&&nx.classList.contains('divider'))nx.style.display=has?'':'none';
+    });
+    return;
+  }
+
+  // hide all collection rails + their dividers while searching
+  rails.forEach(sec=>{sec.style.display='none';const nx=sec.nextElementSibling;if(nx&&nx.classList.contains('divider'))nx.style.display='none';});
+
+  // build/show a results section
+  if(!resultsBox){
+    resultsBox=document.createElement('section');
+    resultsBox.id='searchResults';
+    resultsBox.className='sec wrap';
+    const collections=document.getElementById('collections');
+    collections.parentNode.insertBefore(resultsBox,collections.nextSibling);
+  }
+  resultsBox.style.display='';
+  const matches=ALL_PRODUCTS.filter(p=>(p.name||'').toLowerCase().includes(query)).slice(0,40);
+  resultsBox.innerHTML=`
+    <div class="sec-title-wrap"><span class="sec-title">نتائج البحث</span><span class="sec-sub">${matches.length} نتيجة</span></div>
+    ${matches.length?`<div class="rail" style="flex-wrap:wrap">${matches.map(cardHTML).join('')}</div>`:'<div class="rail-empty">لا توجد نتائج</div>'}`;
 }
 
 /* ---- FAQ ---- */
 const FAQ=[
   {q:'هل التوصيل متوفر لكل الولايات؟',a:'نعم، نوصلو لكل ولايات الجزائر الـ58، إلى باب دارك أو لأقرب مكتب توصيل، مع الدفع عند الاستلام.'},
-  {q:'كيفاش نطلب تصميم خاص بصورتي؟',a:'كل ما عليك هو الدخول لقسم "ارسل صورة من عندك"، ترفع صورتك، تختار المقاس، وتأكد الطلب. واحنا نطبعوهولك بأعلى جودة ونوصلوهولك.'},
   {q:'قداش ياخد التوصيل من وقت؟',a:'عادةً التوصيل ياخد من 2 إلى 5 أيام حسب ولايتك.'},
   {q:'كيفاش نتبع حالة طلبي؟',a:'بمجرد ما تطلب، تتلقى تأكيد عبر الهاتف، ومنبعد نخبروك كي يخرج طلبك مع شركة التوصيل. تقدر زادة تتبع طلبك من خلال صفحة "تتبع طلبك".'},
   {q:'هل تقبلو الطلبات بالجملة؟',a:'نعم، نوفرو أسعار خاصة للطلبات بالجملة والمحلات. تواصل معانا عبر WhatsApp وناقشو التفاصيل.'}
@@ -464,14 +451,16 @@ function toggleFaq(i){
   el.classList.toggle('open');
 }
 
-/* ---- SEARCH ---- */
-document.getElementById('searchInput').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){const q=e.target.value.trim();if(q)location.href='/c/all?q='+encodeURIComponent(q);}
+/* ---- SEARCH (live) ---- */
+let _searchTimer;
+document.getElementById('searchInput').addEventListener('input',e=>{
+  const q=e.target.value;
+  clearTimeout(_searchTimer);
+  _searchTimer=setTimeout(()=>runSearch(q),180);
 });
 
 /* ---- INIT ---- */
 document.getElementById('yr').textContent=new Date().getFullYear();
-loadMarquee();
 loadCollections();
 loadFAQ();
 loadAllRails();
