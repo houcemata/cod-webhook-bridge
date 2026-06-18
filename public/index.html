@@ -51,9 +51,12 @@ img{display:block;max-width:100%}
 /* ── HERO / SOCIAL PROOF ── */
 /* hero banner — one wide image looping seamlessly */
 .hero-banner{position:relative;z-index:1;overflow:hidden;width:100%;margin:0;padding:10px 0 4px}
-.hero-track{display:flex;width:max-content;animation:scroll-x 30s linear infinite}
+.hero-track{display:flex;width:max-content;animation:hero-scroll 28s linear infinite}
 .hero-img{height:clamp(150px,26vw,340px);width:auto;display:block;flex-shrink:0}
 .hero-banner:hover .hero-track{animation-play-state:paused}
+/* 4 identical copies; shifting by exactly one copy (25%) = seamless, no gap */
+@keyframes hero-scroll{from{transform:translateX(0)}to{transform:translateX(-25%)}}
+@media(prefers-reduced-motion:reduce){.hero-track{animation:none}}
 
 /* (legacy marquee class kept harmless) */
 .marquee{display:flex;gap:10px;width:max-content;animation:scroll-x 42s linear infinite}
@@ -199,8 +202,10 @@ img{display:block;max-width:100%}
 <!-- HERO BANNER — one wide image, loops seamlessly left→right -->
 <section class="hero-banner" aria-label="ARCO">
   <div class="hero-track">
-    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/imports/hero-banner_0001_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="ARCO" class="hero-img">
-    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/imports/hero-banner_0001_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img">
+    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner.jpg" alt="ARCO" class="hero-img">
+    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner.jpg" alt="" aria-hidden="true" class="hero-img">
+    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner.jpg" alt="" aria-hidden="true" class="hero-img">
+    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner.jpg" alt="" aria-hidden="true" class="hero-img">
   </div>
 </section>
 
