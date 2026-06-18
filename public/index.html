@@ -50,13 +50,8 @@ img{display:block;max-width:100%}
 
 /* ── HERO / SOCIAL PROOF ── */
 /* hero banner — one wide image looping seamlessly */
-.hero-banner{position:relative;z-index:1;overflow:hidden;width:100%;margin:0;padding:10px 0 4px}
-.hero-track{display:flex;width:fit-content;animation:hero-scroll 40s linear infinite;will-change:transform}
-.hero-group{display:flex;flex:0 0 auto}
-.hero-img{height:clamp(150px,26vw,340px);width:auto;display:block;flex:0 0 auto}
-.hero-banner:hover .hero-track{animation-play-state:paused}
-@keyframes hero-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-@media(prefers-reduced-motion:reduce){.hero-track{animation:none}}
+.hero-banner{position:relative;z-index:1;width:100%;margin:0;padding:12px 0 6px;text-align:center}
+.hero-banner img{max-width:min(1100px,100%);width:100%;height:auto;display:block;margin:0 auto}
 
 /* (legacy marquee class kept harmless) */
 .marquee{display:flex;gap:10px;width:max-content;animation:scroll-x 42s linear infinite}
@@ -201,10 +196,7 @@ img{display:block;max-width:100%}
 <!-- HERO / SOCIAL PROOF -->
 <!-- HERO BANNER — one wide image, loops seamlessly left→right -->
 <section class="hero-banner" aria-label="ARCO">
-  <div class="hero-track">
-    <div class="hero-group"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="ARCO" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"></div>
-    <div class="hero-group" aria-hidden="true"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"></div>
-  </div>
+  <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="ARCO — أكثر من 6000 زبون راضي">
 </section>
 
 <hr class="divider">
