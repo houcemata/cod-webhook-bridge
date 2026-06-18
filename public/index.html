@@ -51,11 +51,11 @@ img{display:block;max-width:100%}
 /* ── HERO / SOCIAL PROOF ── */
 /* hero banner — one wide image looping seamlessly */
 .hero-banner{position:relative;z-index:1;overflow:hidden;width:100%;margin:0;padding:10px 0 4px}
-.hero-track{display:flex;width:max-content;gap:0;animation:hero-scroll 45s linear infinite;will-change:transform}
-.hero-img{height:clamp(150px,26vw,340px);width:auto;display:block;flex-shrink:0}
+.hero-track{display:flex;width:fit-content;animation:hero-scroll 40s linear infinite;will-change:transform}
+.hero-group{display:flex;flex:0 0 auto}
+.hero-img{height:clamp(150px,26vw,340px);width:auto;display:block;flex:0 0 auto}
 .hero-banner:hover .hero-track{animation-play-state:paused}
-/* exactly TWO identical copies; -50% of the track == one copy width == seamless */
-@keyframes hero-scroll{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-50%,0,0)}}
+@keyframes hero-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 @media(prefers-reduced-motion:reduce){.hero-track{animation:none}}
 
 /* (legacy marquee class kept harmless) */
@@ -202,12 +202,8 @@ img{display:block;max-width:100%}
 <!-- HERO BANNER — one wide image, loops seamlessly left→right -->
 <section class="hero-banner" aria-label="ARCO">
   <div class="hero-track">
-    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="ARCO" class="hero-img">
-    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img">
-    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img">
-    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img">
-    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img">
-    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img">
+    <div class="hero-group"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="ARCO" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"></div>
+    <div class="hero-group" aria-hidden="true"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="" aria-hidden="true" class="hero-img"></div>
   </div>
 </section>
 
