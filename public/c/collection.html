@@ -31,6 +31,7 @@ img{display:block;max-width:100%}
 .topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(24px);background:rgba(8,8,8,.84);border-bottom:1px solid var(--ln)}
 .topbar-inner{position:relative;z-index:1;min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .brand{display:flex;align-items:center;gap:12px}
+.brand-logo{height:40px;width:auto;display:block;object-fit:contain}
 .brand-mark{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--y),#ffd84d);color:#080808;font:800 22px/1 'Changa',sans-serif;flex-shrink:0}
 .brand-text strong{display:block;font:800 1.5rem/.95 'Changa',sans-serif;letter-spacing:.04em}
 .brand-text span{display:block;font:600 .62rem/1 'Changa',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mu)}
@@ -41,6 +42,18 @@ img{display:block;max-width:100%}
 .col-head{position:relative;z-index:1;padding:30px 0 14px;text-align:center}
 .col-head h1{font:800 clamp(2rem,6vw,3.2rem)/1 'Changa',sans-serif;letter-spacing:.01em}
 .col-head .en{display:block;margin-top:8px;font:600 .8rem/1 'Changa',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--mu)}
+
+/* COLLECTION ICON BAR (sticky, swaps page content in place) */
+.col-icon-bar{position:sticky;top:70px;z-index:35;background:rgba(8,8,8,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--ln);padding:10px 0}
+.col-icon-scroll{display:flex;gap:14px;overflow-x:auto;padding:2px 2px 2px;scrollbar-width:none}
+.col-icon-scroll::-webkit-scrollbar{display:none}
+.col-icon-item{flex-shrink:0;width:62px;display:grid;justify-items:center;gap:5px;cursor:pointer;background:none;border:none;font-family:'Changa',sans-serif}
+.col-icon-circle{width:54px;height:54px;border-radius:50%;overflow:hidden;background:linear-gradient(160deg,rgba(245,197,0,.14),var(--dk2));border:2px solid var(--ln);display:grid;place-items:center;transition:.2s}
+.col-icon-circle img{width:100%;height:100%;object-fit:cover}
+.col-icon-circle .ph{font:800 1.2rem/1 'Changa',sans-serif;color:var(--y)}
+.col-icon-name{font:600 .66rem/1.1 'Changa',sans-serif;color:var(--mu);max-width:62px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.col-icon-item.active .col-icon-circle{border-color:var(--y);box-shadow:0 0 0 2px rgba(245,197,0,.18)}
+.col-icon-item.active .col-icon-name{color:var(--y);font-weight:700}
 
 /* SUBCOLLECTION FILTER BAR */
 .subbar{position:relative;z-index:1;display:flex;gap:9px;overflow-x:auto;padding:14px 0 8px;scrollbar-width:none}
@@ -84,6 +97,13 @@ img{display:block;max-width:100%}
   .col-head{padding:22px 0 10px}
   .pbody{padding:10px}
 }
+/* ── TOUCH DEVICES: kill movement-hovers so the first tap always lands ── */
+@media (hover: none), (pointer: coarse){
+  .pcard:hover{transform:none}
+  .pcard:hover .pthumb img{transform:none}
+  .wa-fab:hover{transform:none}
+  a,button{-webkit-tap-highlight-color:transparent}
+}
 </style>
 <script src="/meta-pixel.js"></script>
 <script src="/tiktok-pixel.js"></script>
@@ -97,12 +117,15 @@ img{display:block;max-width:100%}
 <header class="topbar">
   <div class="wrap topbar-inner">
     <a class="brand" href="/" aria-label="ARCO">
-      <div class="brand-mark">A</div>
-      <div class="brand-text"><strong>ARCO</strong><span>Premium Wall Art</span></div>
+      <img class="brand-logo" src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/ACRO%20logo%20shopiy-03.png" alt="ARCO">
     </a>
     <a class="back-link" href="/">← الرئيسية</a>
   </div>
 </header>
+
+<div class="col-icon-bar">
+  <div class="wrap"><div class="col-icon-scroll" id="colIconScroll"><div class="state" style="padding:10px">...</div></div></div>
+</div>
 
 <section class="col-head wrap">
   <h1 id="col-title">المجموعة</h1>
@@ -146,7 +169,7 @@ function minPrice(p){
 }
 
 // ── STATE ──
-const collectionSlug=new URLSearchParams(location.search).get('slug')||
+let collectionSlug=new URLSearchParams(location.search).get('slug')||
   (location.pathname.split('/').filter(Boolean)[1]||'');
 let collection=null;
 let allItems=[];
@@ -222,6 +245,9 @@ function goPage(p){page=p;renderGrid();window.scrollTo({top:0,behavior:'smooth'}
 async function load(){
   if(!collectionSlug){document.getElementById('grid').innerHTML='<div class="state">المجموعة غير موجودة</div>';return;}
 
+  try{localStorage.setItem('arco_last_collection',collectionSlug);}catch(e){}
+  highlightIconBar();
+
   // 1) fetch collection meta (title + subs)
   try{
     const r=await fetch(`${SB_URL}/collections?select=*&slug=eq.${encodeURIComponent(collectionSlug)}&limit=1`,{headers:H});
@@ -236,6 +262,7 @@ async function load(){
   }else{
     document.getElementById('col-title').textContent=collectionSlug;
   }
+  activeSub='all';page=1;
   renderSubbar();
 
   // 2) fetch products in this collection
@@ -246,9 +273,52 @@ async function load(){
   }catch(e){allItems=[];}
 
   renderGrid();
+  window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
 }
 
+// ── COLLECTION ICON BAR: sticky row, swaps the whole page in place ──
+let allCollectionsCache=null;
+async function loadIconBar(){
+  const box=document.getElementById('colIconScroll');
+  try{
+    if(!allCollectionsCache){
+      const r=await fetch(`${SB_URL}/collections?select=*&active=eq.true&order=sort_order.asc`,{headers:H});
+      allCollectionsCache=await r.json();
+    }
+    const cols=Array.isArray(allCollectionsCache)?allCollectionsCache:[];
+    if(!cols.length){box.innerHTML='';return;}
+    box.innerHTML=cols.map(c=>`
+      <button class="col-icon-item" data-collection-slug="${esc(c.slug)}" onclick="switchCollection('${esc(c.slug)}')">
+        <div class="col-icon-circle">${c.icon_url?`<img src="${esc(c.icon_url)}" alt="${esc(c.name_ar)}">`:`<span class="ph">${esc((c.name_en||'A')[0])}</span>`}</div>
+        <span class="col-icon-name">${esc(c.name_ar)}</span>
+      </button>`).join('');
+    highlightIconBar();
+  }catch(e){box.innerHTML='';}
+}
+function highlightIconBar(){
+  document.querySelectorAll('.col-icon-item').forEach(el=>{
+    const active=el.dataset.collectionSlug===collectionSlug;
+    el.classList.toggle('active',active);
+    if(active)el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+  });
+}
+// Swaps to a different collection IN PLACE (no full page reload). URL still
+// updates via pushState so back/forward and sharing links keep working.
+function switchCollection(slug){
+  if(!slug||slug===collectionSlug)return;
+  collectionSlug=slug;
+  history.pushState({collectionSlug:slug},'',`/c/${encodeURIComponent(slug)}`);
+  load();
+}
+window.addEventListener('popstate',(e)=>{
+  const fromState=e.state&&e.state.collectionSlug;
+  const fromUrl=location.pathname.split('/').filter(Boolean)[1];
+  const slug=fromState||fromUrl;
+  if(slug&&slug!==collectionSlug){collectionSlug=slug;load();}
+});
+
 load();
+loadIconBar();
 </script>
 </body>
 </html>
