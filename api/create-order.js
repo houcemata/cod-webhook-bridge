@@ -115,6 +115,150 @@ async function sendOrderNotification(orderData) {
   }
 }
 
+// ════════════════════════════════════════════════════════════════
+// CART ORDER HANDLER (multi-item, buy-2-get-1-free)
+// Only runs when body.items is a non-empty array. Single-product
+// orders below are completely unaffected.
+// ════════════════════════════════════════════════════════════════
+async function handleCartOrder(req, res, supabase, body) {
+  const name = normalizeText(body.name);
+  const phone = normalizePhone(body.phone);
+  const wilaya = normalizeText(body.wilaya);
+  const commune = normalizeText(body.commune);
+  const notes = normalizeText(body.notes);
+  const deliveryType = body.delivery_type === "pickup" ? "pickup" : "home";
+  const stationCode = deliveryType === "pickup" ? normalizeText(body.station_code) : null;
+  const wilayaId = Number(body.wilaya_id);
+  const items = Array.isArray(body.items) ? body.items : [];
+
+  if (!name) return res.status(400).json({ error: "Name is required" });
+  if (!/^0[567]\d{8}$/.test(phone)) return res.status(400).json({ error: "Invalid phone number" });
+  if (!wilaya || !Number.isInteger(wilayaId) || wilayaId < 1) {
+    return res.status(400).json({ error: "Wilaya is required" });
+  }
+  if (deliveryType === "home" && !commune) {
+    return res.status(400).json({ error: "Commune is required for home delivery" });
+  }
+  if (deliveryType === "pickup" && !stationCode) {
+    return res.status(400).json({ error: "Station code is required for pickup" });
+  }
+  if (!items.length) return res.status(400).json({ error: "Cart is empty" });
+
+  // Resolve each cart item against the DB (never trust browser prices)
+  const resolved = [];
+  for (const it of items) {
+    const slug = normalizeText(it.product_slug).toLowerCase();
+    if (!slug) continue;
+    const { data: productRow } = await supabase
+      .from("products")
+      .select("name, slug, price, active, variants, type")
+      .eq("slug", slug)
+      .eq("active", true)
+      .limit(1)
+      .maybeSingle();
+    const product = productRow || getCustomCatalogProduct(slug);
+    if (!product) return res.status(404).json({ error: `Product not found: ${slug}` });
+
+    const variant = resolveVariant(product, it);
+    if (!variant || !Number.isFinite(variant.price) || variant.price <= 0) {
+      return res.status(400).json({ error: `Invalid variant for ${product.name}` });
+    }
+    resolved.push({
+      product_slug: product.slug,
+      product: product.name,
+      variant: variant.label || variant.name,
+      options: variant.options || null,
+      price: Number(variant.price),
+    });
+  }
+
+  if (!resolved.length) return res.status(400).json({ error: "No valid items" });
+
+  // every-3rd-free: the CHEAPEST in each group of 3 becomes free
+  const sortedAsc = [...resolved].sort((a, b) => a.price - b.price);
+  const freeCount = Math.floor(resolved.length / 3);
+  const freeSet = new Set();
+  for (let i = 0; i < freeCount; i++) freeSet.add(sortedAsc[i]);
+  let itemsTotal = 0;
+  const itemsForStore = resolved.map((it) => {
+    const isFree = freeSet.has(it);
+    const linePrice = isFree ? 0 : it.price;
+    itemsTotal += linePrice;
+    return { ...it, is_free: isFree, line_price: linePrice };
+  });
+
+  const { data: shippingRow } = await supabase
+    .from("shipping_rates")
+    .select("home_delivery, stop_desk")
+    .eq("wilaya_id", wilayaId)
+    .limit(1)
+    .maybeSingle();
+  if (!shippingRow) return res.status(400).json({ error: "Shipping is unavailable for this wilaya" });
+  const shippingCost = deliveryType === "pickup"
+    ? Number(shippingRow.stop_desk || 0)
+    : Number(shippingRow.home_delivery || 0);
+  if (!Number.isFinite(shippingCost) || shippingCost <= 0) {
+    return res.status(400).json({ error: "Shipping price is unavailable" });
+  }
+
+  const total = itemsTotal + shippingCost;
+  const orderId = createOrderId();
+
+  const summaryLines = itemsForStore.map((it, i) =>
+    `${i + 1}. ${it.product} — ${it.variant}${it.is_free ? " (مجانية 🎁)" : ` — ${it.line_price} DZD`}`
+  );
+  const freeNote = freeCount > 0 ? `\n🎁 ${freeCount} قطعة مجانية (اشترِ 2 والثالثة مجاناً)` : "";
+  const composedNotes = [
+    `🛒 سلة (${itemsForStore.length} قطع):`,
+    ...summaryLines,
+    freeNote,
+    notes ? `\nملاحظة الزبون: ${notes}` : "",
+  ].filter(Boolean).join("\n");
+
+  const productSummary = `سلة ${itemsForStore.length} قطع`;
+  const variableSummary = itemsForStore.map((it) => it.variant).join(" + ").slice(0, 250);
+
+  const finalOrderData = {
+    name,
+    phone,
+    wilaya,
+    commune: deliveryType === "home" ? commune : "",
+    type_livraison: deliveryType,
+    station_code: stationCode,
+    product: productSummary,
+    variable: variableSummary,
+    prix_total: total,
+    shipping_cost: shippingCost,
+    status: "pending",
+    notes: composedNotes,
+    items: itemsForStore,
+    order_id: orderId,
+  };
+
+  const { error: insertError } = await supabase.from("orders").insert(finalOrderData);
+  if (insertError) {
+    console.error("[create-order] cart insert failed:", insertError);
+    return res.status(500).json({ error: "Failed to save order" });
+  }
+
+  await sendOrderNotification(finalOrderData);
+  await sendAllAnalytics({
+    event_name: "Purchase",
+    order_id: orderId,
+    value: total,
+    currency: "DZD",
+    product: productSummary,
+    variant: variableSummary,
+    phone,
+    name,
+    event_source_url: normalizeText(body.event_source_url) || req.headers.referer || "",
+    client_ip_address: clientIpFromRequest(req),
+    client_user_agent: req.headers["user-agent"] || "",
+  });
+
+  return res.status(200).json({ ok: true, order_id: orderId, cart: true, free_count: freeCount });
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -126,6 +270,11 @@ export default async function handler(req, res) {
 
     if (!isSameOriginRequest(req)) {
       return res.status(403).json({ error: "Forbidden origin" });
+    }
+
+    // NEW: cart checkout path (multi-item). Single-product logic below is untouched.
+    if (Array.isArray(body.items) && body.items.length) {
+      return await handleCartOrder(req, res, supabase, body);
     }
 
     const productSlug = normalizeText(body.product_slug).toLowerCase();
