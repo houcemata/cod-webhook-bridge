@@ -95,9 +95,22 @@
       .arco-added .b2{background:rgba(255,255,255,.08);color:#fff}
       .arco-success{position:fixed;inset:0;background:rgba(8,8,8,.97);z-index:100;display:none;place-items:center;text-align:center;padding:24px;direction:rtl;font-family:'Cairo',sans-serif}
       .arco-success.show{display:grid}
+      .arco-success-icon{font-size:52px;margin-bottom:6px}
       .arco-success h2{color:#F5C500;font-size:2rem;margin-bottom:10px}
       .arco-success p{color:#ddd;line-height:1.8}
-      .arco-success button{margin-top:18px;background:#F5C500;color:#080808;border:none;border-radius:10px;padding:12px 24px;font-weight:800;cursor:pointer}
+      .arco-success-call-note{color:#999;font-size:13px;margin-top:14px}
+      .arco-success-phone-wrap{margin-top:10px;display:grid;justify-items:center;gap:6px}
+      .arco-success-phone-btn{background:#F5C500;color:#080808;border:0;border-radius:8px;padding:13px 22px;font-weight:900;font-size:18px;letter-spacing:1px;cursor:pointer;font-family:'Cairo',sans-serif}
+      .arco-success-copy-hint{color:#999;font-size:12px}
+      .arco-success button.arco-home-btn{margin-top:18px;background:#F5C500;color:#080808;border:none;border-radius:10px;padding:12px 24px;font-weight:800;cursor:pointer}
+      .arco-success-copy-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#181818;color:#fff;border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:10px 18px;z-index:110;opacity:0;pointer-events:none;transition:.2s}
+      .arco-success-copy-toast.show{opacity:1}
+      @media(max-width:640px){
+        .arco-added{left:14px;right:14px;bottom:84px;max-width:none;padding:18px 20px;border-radius:18px}
+        .arco-added .t{font-size:1.05rem;margin-bottom:10px}
+        .arco-added div[style]{font-size:.95rem !important}
+        .arco-added .btns button{padding:13px;font-size:.92rem;border-radius:10px}
+      }
     `;
     document.head.appendChild(style);
 
@@ -110,6 +123,8 @@
     document.body.appendChild(added);
     const success = document.createElement('div'); success.className = 'arco-success'; success.id = 'arco-success';
     document.body.appendChild(success);
+    const copyToast = document.createElement('div'); copyToast.className = 'arco-success-copy-toast'; copyToast.id = 'arco-success-copy-toast'; copyToast.textContent = 'تم نسخ الرقم';
+    document.body.appendChild(copyToast);
 
     renderBadge();
   }
@@ -181,11 +196,28 @@
         ${t.discount > 0 ? `<div class="arco-sum disc"><span>الخصم (قطع مجانية)</span><span>- ${money(t.discount)}</span></div>` : ''}
         <div class="arco-sum tot"><span>المجموع (بدون توصيل)</span><span>${money(t.total)}</span></div>
         <button class="arco-cta" onclick="ARCOCart_checkout()">إتمام الطلب</button>
-        <button class="arco-browse" onclick="document.getElementById('arco-drawer').classList.remove('show');document.getElementById('arco-ov').classList.remove('show')">تصفح المزيد</button>
+        <button class="arco-browse" onclick="ARCOCart_browseMore()">تصفح المزيد</button>
       </div>`;
   }
 
   window.ARCOCart_remove = function (i) { const c = read(); c.splice(i, 1); write(c); renderDrawer(); };
+
+  // "Browse more" jumps to the homepage collection-icon row, defaulting to
+  // whichever collection the customer last added an item from (set by
+  // product.html on add-to-cart). Falls back to plain #collections if none.
+  window.ARCOCart_browseMore = function () {
+    closeDrawer();
+    let last = '';
+    try { last = localStorage.getItem('arco_last_collection') || ''; } catch {}
+    const dest = last ? `/?c=${encodeURIComponent(last)}#collections` : '/#collections';
+    if (location.pathname === '/' || location.pathname === '/index.html') {
+      location.hash = '';
+      location.href = dest;
+      if (window.ARCOSelectCollection) window.ARCOSelectCollection(last);
+    } else {
+      location.href = dest;
+    }
+  };
 
   // ---- checkout form (inside drawer) ----
   const WILAYAS = [['01','Adrar'],['02','Chlef'],['03','Laghouat'],['04','Oum El Bouaghi'],['05','Batna'],['06','Bejaia'],['07','Biskra'],['08','Bechar'],['09','Blida'],['10','Bouira'],['11','Tamanrasset'],['12','Tebessa'],['13','Tlemcen'],['14','Tiaret'],['15','Tizi Ouzou'],['16','Algiers'],['17','Djelfa'],['18','Jijel'],['19','Setif'],['20','Saida'],['21','Skikda'],['22','Sidi Bel Abbes'],['23','Annaba'],['24','Guelma'],['25','Constantine'],['26','Medea'],['27','Mostaganem'],['28',"M'Sila"],['29','Mascara'],['30','Ouargla'],['31','Oran'],['32','El Bayadh'],['33','Illizi'],['34','Bordj Bou Arreridj'],['35','Boumerdes'],['36','El Tarf'],['37','Tindouf'],['38','Tissemsilt'],['39','El Oued'],['40','Khenchela'],['41','Souk Ahras'],['42','Tipaza'],['43','Mila'],['44','Ain Defla'],['45','Naama'],['46','Ain Temouchent'],['47','Ghardaia'],['48','Relizane'],['49','Timimoun'],['50','Bordj Badji Mokhtar'],['51','Ouled Djellal'],['52','Beni Abbes'],['53','In Salah'],['54','In Guezzam'],['55','Touggourt'],['56','Djanet'],['57',"El M'Ghair"],['58','El Menia']];
@@ -320,8 +352,38 @@
       localStorage.removeItem(KEY); renderBadge();
       closeDrawer();
       const sx = document.getElementById('arco-success');
-      sx.innerHTML = `<div><h2>تم استلام الطلب! 🎉</h2><p>شكراً ${esc(name)}!<br>طلبك (#${esc(result.order_id)}) تم بنجاح.<br>سيتصل بك فريق ARCO قريباً لتأكيده.</p><button onclick="location.href='/'">العودة للرئيسية</button></div>`;
+      sx.innerHTML = `<div>
+        <div class="arco-success-icon">🎉</div>
+        <h2>تم استلام الطلب!</h2>
+        <p>شكراً ${esc(name)}!<br>طلبك تم بنجاح. سيتواصل معك فريق ARCO قريباً لتأكيد الطلب.</p>
+        <p>#${esc(result.order_id)}</p>
+        <div class="arco-success-call-note">احفظ هذا الرقم حتى نعاود الاتصال بك لاحقاً.</div>
+        <div class="arco-success-phone-wrap">
+          <button class="arco-success-phone-btn" id="arco-success-phone-btn" type="button">0550374607</button>
+          <div class="arco-success-copy-hint">اضغط لنسخ الرقم</div>
+        </div>
+        <button class="arco-home-btn" onclick="location.href='/'">العودة للرئيسية</button>
+      </div>`;
       sx.classList.add('show');
+      const phoneBtn = document.getElementById('arco-success-phone-btn');
+      const copyToast = document.getElementById('arco-success-copy-toast');
+      if (phoneBtn && copyToast) {
+        phoneBtn.onclick = async () => {
+          const ph = '0550374607';
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(ph);
+            else throw new Error('clipboard unavailable');
+          } catch (err) {
+            const ta = document.createElement('textarea');
+            ta.value = ph; ta.style.position = 'fixed'; ta.style.opacity = '0'; ta.setAttribute('readonly', '');
+            document.body.appendChild(ta); ta.focus(); ta.select();
+            document.execCommand('copy'); ta.remove();
+          }
+          copyToast.classList.add('show');
+          clearTimeout(window.__arcoCartCopyToastT);
+          window.__arcoCartCopyToastT = setTimeout(() => copyToast.classList.remove('show'), 1800);
+        };
+      }
     } catch (e) { btn.textContent = 'تأكيد الطلب (الدفع عند الاستلام)'; btn.disabled = false; alert('حدث خطأ. حاول مرة أخرى'); }
   };
 
