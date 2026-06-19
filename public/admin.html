@@ -135,7 +135,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 
 /* PRODUCTS GRID */
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
-.product-card{position:relative;background:var(--glass);border:1px solid var(--glass-b);border-radius:22px;overflow:hidden;transition:transform 0.2s,border-color 0.2s}
+.product-card{background:var(--glass);border:1px solid var(--glass-b);border-radius:22px;overflow:hidden;transition:transform 0.2s,border-color 0.2s}
 .product-card:hover{transform:translateY(-3px);border-color:rgba(245,197,0,0.18)}
 .product-img{width:100%;height:190px;object-fit:cover;display:block;background:var(--dark2)}
 .product-body{padding:16px}
@@ -532,31 +532,9 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     <div class="page" id="page-products">
       <div class="page-header">
         <div><div class="page-title">PRODUCTS</div><div class="page-subtitle">Manage your catalogue</div></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-ghost" onclick="openCategories()">&#128193; Categories</button>
-          <button class="btn btn-primary" onclick="openAddProduct()">+ Add Product</button>
-        </div>
-      </div>
-      <div class="filters-bar" style="border:none;padding:0 0 12px 0">
-        <input class="filter-input" id="product-search" placeholder="Search products by name or slug..." oninput="onProductSearch()"/>
-        <span class="orders-count" id="products-count"></span>
-      </div>
-      <div id="bulk-bar" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(245,197,0,0.06);border:1px solid rgba(245,197,0,0.2);border-radius:14px;padding:10px 14px;margin-bottom:14px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.5px;color:var(--white)">
-          <input type="checkbox" id="bulk-select-all" onchange="toggleSelectAllPage(this.checked)" style="width:18px;height:18px;cursor:pointer"/>
-          Select all on page
-        </label>
-        <span id="bulk-count" style="font-size:13px;color:var(--gray)">0 selected</span>
-        <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
-          <button class="btn btn-primary btn-sm" onclick="openBulkEdit()">✏️ Edit</button>
-          <button class="btn btn-ghost btn-sm" onclick="bulkSetActive(true)">✓ Activate</button>
-          <button class="btn btn-ghost btn-sm" onclick="bulkSetActive(false)">✕ Deactivate</button>
-          <button class="btn btn-danger btn-sm" onclick="bulkDelete()">🗑 Delete</button>
-          <button class="btn btn-ghost btn-sm" onclick="clearSelection()">Clear</button>
-        </div>
+        <button class="btn btn-primary" onclick="openAddProduct()">+ Add Product</button>
       </div>
       <div class="products-grid" id="products-grid"></div>
-      <div class="pagination" id="products-pagination"></div>
     </div>
 
     <!-- OPERATORS -->
@@ -928,108 +906,6 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     </div>
   </div>
 </div>
-<div class="modal-overlay" id="bulk-edit-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">BULK EDIT</div>
-      <button class="modal-close" onclick="closeModal('bulk-edit-modal')">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div style="background:rgba(245,197,0,0.06);border:1px solid rgba(245,197,0,0.2);border-radius:12px;padding:12px;margin-bottom:18px;font-size:13px;color:var(--gray)">
-        Editing <b id="bulk-edit-count" style="color:var(--yellow)">0</b> selected products. Only the sections you <b>turn ON</b> will be changed. Everything else stays exactly as it is on each product.
-      </div>
-
-      <!-- COLLECTION -->
-      <div style="border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;margin-bottom:12px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0">
-          <input type="checkbox" id="be-collection-on" onchange="syncBulkEditToggles()" style="width:18px;height:18px;cursor:pointer"/>
-          <span class="form-label" style="margin:0">Change Collection</span>
-        </label>
-        <div id="be-collection-fields" style="display:none;margin-top:12px">
-          <div class="form-row">
-            <div class="form-field"><label class="form-label">Collection</label>
-              <select class="form-select" id="be-collection" onchange="onBulkCollectionChange()"><option value="">— None —</option></select>
-            </div>
-            <div class="form-field"><label class="form-label">Subcollection</label>
-              <select class="form-select" id="be-subcollection"><option value="">— None —</option></select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ORIGINAL PRICE -->
-      <div style="border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;margin-bottom:12px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0">
-          <input type="checkbox" id="be-oprice-on" onchange="syncBulkEditToggles()" style="width:18px;height:18px;cursor:pointer"/>
-          <span class="form-label" style="margin:0">Change Original (crossed-out) Price</span>
-        </label>
-        <div id="be-oprice-fields" style="display:none;margin-top:12px">
-          <div class="form-field"><label class="form-label">Original Price (DZD)</label><input class="form-input" id="be-oprice" type="number" placeholder="3900"/></div>
-        </div>
-      </div>
-
-      <!-- PER-SIZE VARIANT PRICES -->
-      <div style="border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;margin-bottom:12px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0">
-          <input type="checkbox" id="be-variants-on" onchange="syncBulkEditToggles()" style="width:18px;height:18px;cursor:pointer"/>
-          <span class="form-label" style="margin:0">Change Variant Prices (per size)</span>
-        </label>
-        <div id="be-variants-fields" style="display:none;margin-top:12px">
-          <div style="font-size:12px;color:var(--gray);margin-bottom:10px">Sizes found across the selected products. Fill only the ones you want to change — blank = leave that size's price alone. Products that don't have a size are skipped for it.</div>
-          <div id="be-variant-rows" style="display:grid;gap:8px"></div>
-        </div>
-      </div>
-
-      <!-- DESCRIPTIONS -->
-      <div style="border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;margin-bottom:12px">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:0">
-          <input type="checkbox" id="be-desc-on" onchange="syncBulkEditToggles()" style="width:18px;height:18px;cursor:pointer"/>
-          <span class="form-label" style="margin:0">Change Descriptions</span>
-        </label>
-        <div id="be-desc-fields" style="display:none;margin-top:12px">
-          <div class="form-field"><label class="form-label">Description (Arabic)</label><textarea class="form-textarea" id="be-desc-ar" placeholder="الوصف..." style="direction:rtl"></textarea></div>
-          <div class="form-field"><label class="form-label">Description (French)</label><textarea class="form-textarea" id="be-desc-fr" placeholder="Description..."></textarea></div>
-        </div>
-      </div>
-
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('bulk-edit-modal')">Cancel</button>
-      <button class="btn btn-primary" onclick="applyBulkEdit()">Apply to Selected</button>
-    </div>
-  </div>
-</div>
-<div class="modal-overlay" id="categories-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">CATEGORIES</div>
-      <button class="modal-close" onclick="closeModal('categories-modal')">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div id="cat-list" style="display:grid;gap:10px;margin-bottom:18px"></div>
-      <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:14px 0">
-      <div class="form-label" id="cat-form-title">ADD NEW COLLECTION</div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Slug (english, url)</label><input class="form-input" id="cat-slug" placeholder="football"/></div>
-        <div class="form-field"><label class="form-label">Sort order</label><input class="form-input" id="cat-sort" type="number" placeholder="0"/></div>
-      </div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Name (Arabic)</label><input class="form-input" id="cat-name-ar" placeholder="&#1603;&#1585;&#1577; &#1575;&#1604;&#1602;&#1583;&#1605;" style="direction:rtl"/></div>
-        <div class="form-field"><label class="form-label">Name (English)</label><input class="form-input" id="cat-name-en" placeholder="Football"/></div>
-      </div>
-      <div class="form-field"><label class="form-label">Icon URL (circle image)</label><input class="form-input" id="cat-icon" placeholder="https://..."/></div>
-      <div class="form-field">
-        <label class="form-label">Subcollections (one per line: slug | arabic | english)</label>
-        <textarea class="form-textarea" id="cat-subs" rows="6" placeholder="rma | &#1585;&#1610;&#1575;&#1604; &#1605;&#1583;&#1585;&#1610;&#1583; | Real Madrid&#10;fcb | &#1576;&#1585;&#1588;&#1604;&#1608;&#1606;&#1577; | Barcelona&#10;all | &#1603;&#1604; &#1575;&#1604;&#1578;&#1589;&#1575;&#1605;&#1610;&#1605; | All"></textarea>
-        <div style="font-size:11px;color:var(--gray);margin-top:4px">Leave empty for collections without subcollections (Music, Motivation).</div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="resetCatForm()">Clear</button>
-      <button class="btn btn-primary" onclick="saveCategory()">Save Collection</button>
-    </div>
-  </div>
-</div>
 <div class="modal-overlay" id="product-modal">
   <div class="modal">
     <div class="modal-header">
@@ -1039,21 +915,10 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     <div class="modal-body">
       <div class="form-field"><label class="form-label">Product Name</label><input class="form-input" id="p-name" placeholder="e.g. Liquid Football"/></div>
       <div class="form-field"><label class="form-label">URL Slug</label><input class="form-input" id="p-slug" placeholder="e.g. liquid-football"/></div>
+      <div class="form-field"><label class="form-label">Product Type</label><select class="form-input" id="p-type"><option value="set">Set (3-piece — direct order only)</option><option value="poster">Poster (single — cart eligible: buy 2 get 1 free)</option></select></div>
       <div class="form-row">
         <div class="form-field"><label class="form-label">Price (DZD)</label><input class="form-input" id="p-price" type="number" placeholder="2900"/></div>
         <div class="form-field"><label class="form-label">Original Price (DZD)</label><input class="form-input" id="p-oprice" type="number" placeholder="3600"/></div>
-      </div>
-      <div class="form-row">
-        <div class="form-field"><label class="form-label">Collection</label>
-          <select class="form-select" id="p-collection" onchange="onAdminCollectionChange()"><option value="">— None —</option></select>
-        </div>
-        <div class="form-field"><label class="form-label">Subcollection</label>
-          <select class="form-select" id="p-subcollection"><option value="">— None —</option></select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-field" style="flex-direction:row;align-items:center;gap:8px;display:flex"><input type="checkbox" id="p-bestseller" style="width:auto"/><label class="form-label" for="p-bestseller" style="margin:0">Best Seller &#11088;</label></div>
-        <div class="form-field" style="flex-direction:row;align-items:center;gap:8px;display:flex"><input type="checkbox" id="p-isnew" style="width:auto"/><label class="form-label" for="p-isnew" style="margin:0">New &#127381;</label></div>
       </div>
       <div class="form-field"><label class="form-label">Description (Arabic)</label><textarea class="form-textarea" id="p-desc-ar" placeholder="الوصف..." style="direction:rtl"></textarea></div>
       <div class="form-field"><label class="form-label">Description (French)</label><textarea class="form-textarea" id="p-desc-fr" placeholder="Description..."></textarea></div>
@@ -1134,8 +999,6 @@ const CONFIRMATION_FLOW_STATUSES=new Set(['confirmed','shipped','rescheduled','d
 
 let currentUser=null,currentRole=null,allOrders=[],filteredOrders=[],allProducts=[],allOperators=[];
 let currentPage=1;const PAGE_SIZE=30;let editingProductId=null;
-let productPage=1;const PRODUCT_PAGE_SIZE=16;let productSearch='';
-let selectedProductIds=new Set();
 let currentAdminPage='dashboard';
 const ADMIN_PAGE_KEY='arco_admin_page';
 
@@ -1205,7 +1068,7 @@ async function doLogout(){
   currentUser=null;currentRole=null;
 }
 async function refreshAll(){
-  await Promise.all([loadOrders(),loadProducts(),loadOperators(),loadHistory(),loadCollections()]);
+  await Promise.all([loadOrders(),loadProducts(),loadOperators(),loadHistory()]);
   renderCurrentAdminPage();
 }
 
@@ -1261,26 +1124,6 @@ async function loadOrders(){
 async function loadProducts(){
   const{data}=await sb.from('products').select('*').order('created_at',{ascending:false});
   allProducts=data||[];
-}
-let allCollections=[];
-async function loadCollections(){
-  const{data}=await sb.from('collections').select('*').order('sort_order',{ascending:true});
-  allCollections=data||[];
-  populateCollectionDropdown();
-}
-function populateCollectionDropdown(){
-  const sel=document.getElementById('p-collection');
-  if(!sel)return;
-  const cur=sel.value;
-  sel.innerHTML='<option value="">— None —</option>'+allCollections.map(c=>`<option value="${esc(c.slug)}">${esc(c.name_ar)} (${esc(c.name_en)})</option>`).join('');
-  sel.value=cur;
-}
-function onAdminCollectionChange(){
-  const colSlug=document.getElementById('p-collection').value;
-  const subSel=document.getElementById('p-subcollection');
-  const col=allCollections.find(c=>c.slug===colSlug);
-  const subs=(col&&Array.isArray(col.subs))?col.subs:[];
-  subSel.innerHTML='<option value="">— None —</option>'+subs.map(s=>`<option value="${esc(s.slug)}">${esc(s.name_ar||s.name_en||s.slug)}</option>`).join('');
 }
 async function loadOperators(){
   const{data}=await sb.from('user_roles').select('*').eq('role','operator');
@@ -1573,57 +1416,13 @@ function exportOrders(){
 }
 
 // ── PRODUCTS ──
-function getFilteredProducts(){
-  const q=productSearch.trim().toLowerCase();
-  if(!q)return allProducts;
-  return allProducts.filter(p=>
-    (p.name||'').toLowerCase().includes(q)||
-    (p.slug||'').toLowerCase().includes(q)||
-    (p.collection||'').toLowerCase().includes(q)||
-    (p.subcollection||'').toLowerCase().includes(q)
-  );
-}
-function onProductSearch(){
-  productSearch=document.getElementById('product-search').value||'';
-  productPage=1;
-  renderProducts();
-}
-function goProductPage(p){
-  productPage=p;
-  renderProducts();
-  document.getElementById('page-products').scrollIntoView({behavior:'smooth',block:'start'});
-}
 function renderProducts(){
   const grid=document.getElementById('products-grid');
-  const countEl=document.getElementById('products-count');
-  const pgEl=document.getElementById('products-pagination');
-  const list=getFilteredProducts();
-  const total=list.length;
-
-  if(!total){
-    grid.innerHTML=`<div class="empty-state"><div class="empty-icon">🛍️</div><div class="empty-text">${allProducts.length?'No products match your search':'No products yet'}</div></div>`;
-    if(countEl)countEl.textContent='';
-    if(pgEl)pgEl.innerHTML='';
-    return;
-  }
-
-  const totalPages=Math.ceil(total/PRODUCT_PAGE_SIZE);
-  if(productPage>totalPages)productPage=totalPages;
-  if(productPage<1)productPage=1;
-  const start=(productPage-1)*PRODUCT_PAGE_SIZE;
-  const pageItems=list.slice(start,start+PRODUCT_PAGE_SIZE);
-
-  if(countEl)countEl.textContent=`${total} product${total===1?'':'s'} · page ${productPage}/${totalPages}`;
-  updateBulkBar();
-
-  grid.innerHTML=pageItems.map(p=>{
+  if(!allProducts.length){grid.innerHTML=`<div class="empty-state"><div class="empty-icon">🛍️</div><div class="empty-text">No products yet</div></div>`;return;}
+  grid.innerHTML=allProducts.map(p=>{
     const img=Array.isArray(p.images)?p.images[0]:(p.images||'');
-    const checked=selectedProductIds.has(p.id);
-    return `<div class="product-card" style="${checked?'border-color:var(--yellow);box-shadow:0 0 0 1px var(--yellow)':''}">
-      <label style="position:absolute;top:10px;left:10px;z-index:2;background:rgba(6,6,8,0.7);border-radius:8px;padding:5px;cursor:pointer;display:flex">
-        <input type="checkbox" ${checked?'checked':''} onchange="toggleProductSelect(${p.id},this.checked)" style="width:18px;height:18px;cursor:pointer"/>
-      </label>
-      ${img?`<img class="product-img" src="${esc(img)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none'"/>`:
+    return `<div class="product-card">
+      ${img?`<img class="product-img" src="${esc(img)}" alt="${esc(p.name)}" onerror="this.style.display='none'"/>`:
         '<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.3">🖼️</div>'}
       <div class="product-body">
         <div class="product-name">${esc(p.name)}</div>
@@ -1640,26 +1439,13 @@ function renderProducts(){
       </div>
     </div>`;
   }).join('');
-
-  if(pgEl){
-    if(totalPages<=1){pgEl.innerHTML='';}
-    else{
-      pgEl.innerHTML=`
-        <button class="page-btn" onclick="goProductPage(${productPage-1})" ${productPage===1?'disabled':''}>← Prev</button>
-        <span class="page-info">${productPage} / ${totalPages}</span>
-        <button class="page-btn" onclick="goProductPage(${productPage+1})" ${productPage===totalPages?'disabled':''}>Next →</button>`;
-    }
-  }
 }
 function openAddProduct(){
   editingProductId=null;
   document.getElementById('product-modal-title').textContent='ADD PRODUCT';
   ['p-name','p-slug','p-price','p-oprice','p-desc-ar','p-desc-fr','p-image','p-opt1-name','p-opt1-values','p-opt2-name','p-opt2-values'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('p-type').value='set';
   document.getElementById('variant-table').innerHTML='<div class="variant-empty">Add option values, then generate variants.</div>';
-  document.getElementById('p-collection').value='';
-  document.getElementById('p-subcollection').innerHTML='<option value="">— None —</option>';
-  document.getElementById('p-bestseller').checked=false;
-  document.getElementById('p-isnew').checked=true;
   document.getElementById('product-modal').classList.add('open');
 }
 function openEditProduct(id){
@@ -1673,12 +1459,8 @@ function openEditProduct(id){
   document.getElementById('p-desc-ar').value=p.description_ar||'';
   document.getElementById('p-desc-fr').value=p.description_fr||'';
   document.getElementById('p-image').value=Array.isArray(p.images)?p.images[0]:(p.images||'');
+  document.getElementById('p-type').value=(p.type==='poster')?'poster':'set';
   fillVariantBuilder(p.variants);
-  document.getElementById('p-collection').value=p.collection||'';
-  onAdminCollectionChange();
-  document.getElementById('p-subcollection').value=p.subcollection||'';
-  document.getElementById('p-bestseller').checked=!!p.is_bestseller;
-  document.getElementById('p-isnew').checked=!!p.is_new;
   document.getElementById('product-modal').classList.add('open');
 }
 function splitValues(value){return String(value||'').split(',').map(v=>v.trim()).filter(Boolean);}
@@ -1742,181 +1524,14 @@ async function saveProduct(){
   const descAr=document.getElementById('p-desc-ar').value.trim();
   const descFr=document.getElementById('p-desc-fr').value.trim();
   const image=document.getElementById('p-image').value.trim();
+  const type=document.getElementById('p-type').value==='poster'?'poster':'set';
   const variants=collectVariants();
   if(!name||!slug||!price){toast('Name, slug and price required',true);return;}
-  const collection=document.getElementById('p-collection').value||null;
-  const subcollection=document.getElementById('p-subcollection').value||null;
-  const is_bestseller=document.getElementById('p-bestseller').checked;
-  const is_new=document.getElementById('p-isnew').checked;
-  const data={name,slug,price,original_price:oprice,description_ar:descAr,description_fr:descFr,images:image?[image]:[],variants,active:true,collection,subcollection,is_bestseller,is_new};
+  const data={name,slug,price,original_price:oprice,description_ar:descAr,description_fr:descFr,images:image?[image]:[],variants,active:true,type};
   if(editingProductId){await sb.from('products').update(data).eq('id',editingProductId);toast('Product updated ✓');}
   else{await sb.from('products').insert(data);toast('Product added ✓');}
   closeModal('product-modal');await loadProducts();renderProducts();
 }
-function updateBulkBar(){
-  const bar=document.getElementById('bulk-bar');
-  const countEl=document.getElementById('bulk-count');
-  const selAll=document.getElementById('bulk-select-all');
-  if(!bar)return;
-  const n=selectedProductIds.size;
-  bar.style.display=allProducts.length?'flex':'none';
-  if(countEl)countEl.textContent=`${n} selected`;
-  // reflect whether all on current page are selected
-  if(selAll){
-    const list=getFilteredProducts();
-    const start=(productPage-1)*PRODUCT_PAGE_SIZE;
-    const pageItems=list.slice(start,start+PRODUCT_PAGE_SIZE);
-    selAll.checked=pageItems.length>0&&pageItems.every(p=>selectedProductIds.has(p.id));
-  }
-}
-function toggleProductSelect(id,checked){
-  if(checked)selectedProductIds.add(id);else selectedProductIds.delete(id);
-  updateBulkBar();
-  // update just the card border without full re-render
-  renderProducts();
-}
-function toggleSelectAllPage(checked){
-  const list=getFilteredProducts();
-  const start=(productPage-1)*PRODUCT_PAGE_SIZE;
-  const pageItems=list.slice(start,start+PRODUCT_PAGE_SIZE);
-  pageItems.forEach(p=>{if(checked)selectedProductIds.add(p.id);else selectedProductIds.delete(p.id);});
-  renderProducts();
-}
-function clearSelection(){
-  selectedProductIds.clear();
-  renderProducts();
-}
-async function bulkSetActive(active){
-  if(!selectedProductIds.size){toast('No products selected',true);return;}
-  const ids=[...selectedProductIds];
-  if(!confirm(`${active?'Activate':'Deactivate'} ${ids.length} product(s)?`))return;
-  const {error}=await sb.from('products').update({active}).in('id',ids);
-  if(error){toast(error.message||'Bulk update failed',true);return;}
-  toast(`${ids.length} product(s) ${active?'activated':'deactivated'} ✓`);
-  selectedProductIds.clear();
-  await loadProducts();renderProducts();
-}
-// ── BULK EDIT ──
-function openBulkEdit(){
-  if(!selectedProductIds.size){toast('No products selected',true);return;}
-  document.getElementById('bulk-edit-count').textContent=selectedProductIds.size;
-  // reset all toggles + fields
-  ['be-collection-on','be-oprice-on','be-variants-on','be-desc-on'].forEach(id=>document.getElementById(id).checked=false);
-  ['be-oprice','be-desc-ar','be-desc-fr'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('be-collection').value='';
-  document.getElementById('be-subcollection').innerHTML='<option value="">— None —</option>';
-  // fill collection dropdown (reuse allCollections)
-  const cs=document.getElementById('be-collection');
-  cs.innerHTML='<option value="">— None —</option>'+allCollections.map(c=>`<option value="${esc(c.slug)}">${esc(c.name_ar)} (${esc(c.name_en)})</option>`).join('');
-  // gather distinct sizes from the selected products' variants
-  buildBulkVariantRows();
-  syncBulkEditToggles();
-  document.getElementById('bulk-edit-modal').classList.add('open');
-}
-function getSelectedProductObjects(){
-  return allProducts.filter(p=>selectedProductIds.has(p.id));
-}
-function buildBulkVariantRows(){
-  const box=document.getElementById('be-variant-rows');
-  const sizes=new Set();
-  getSelectedProductObjects().forEach(p=>{
-    const vs=normalizeVariants(p.variants);
-    vs.forEach(v=>{
-      // prefer the "Taille"/size option if present, else the full label
-      const size=(v.options&&(v.options.Taille||v.options.taille||v.options.Size||v.options.size))||v.label||v.name;
-      if(size)sizes.add(String(size).trim());
-    });
-  });
-  if(!sizes.size){
-    box.innerHTML='<div style="font-size:12px;color:var(--gray)">No variant sizes found in the selected products.</div>';
-    return;
-  }
-  box.innerHTML=[...sizes].map(s=>`
-    <div style="display:grid;grid-template-columns:1fr 130px;gap:8px;align-items:center">
-      <div style="font-size:13px;font-weight:700">${esc(s)}</div>
-      <input class="form-input be-size-price" data-size="${esc(s)}" type="number" min="0" placeholder="leave blank"/>
-    </div>`).join('');
-}
-function onBulkCollectionChange(){
-  const slug=document.getElementById('be-collection').value;
-  const sub=document.getElementById('be-subcollection');
-  const col=allCollections.find(c=>c.slug===slug);
-  const subs=(col&&Array.isArray(col.subs))?col.subs:[];
-  sub.innerHTML='<option value="">— None —</option>'+subs.map(s=>`<option value="${esc(s.slug)}">${esc(s.name_ar||s.name_en||s.slug)}</option>`).join('');
-}
-function syncBulkEditToggles(){
-  const map={'be-collection-on':'be-collection-fields','be-oprice-on':'be-oprice-fields','be-variants-on':'be-variants-fields','be-desc-on':'be-desc-fields'};
-  Object.entries(map).forEach(([t,f])=>{
-    document.getElementById(f).style.display=document.getElementById(t).checked?'block':'none';
-  });
-}
-async function applyBulkEdit(){
-  const products=getSelectedProductObjects();
-  if(!products.length){toast('No products selected',true);return;}
-
-  const doCollection=document.getElementById('be-collection-on').checked;
-  const doOprice=document.getElementById('be-oprice-on').checked;
-  const doVariants=document.getElementById('be-variants-on').checked;
-  const doDesc=document.getElementById('be-desc-on').checked;
-
-  if(!doCollection&&!doOprice&&!doVariants&&!doDesc){toast('Turn on at least one section to change',true);return;}
-
-  // shared values
-  const collection=document.getElementById('be-collection').value||null;
-  const subcollection=document.getElementById('be-subcollection').value||null;
-  const opriceRaw=document.getElementById('be-oprice').value;
-  const oprice=opriceRaw===''?null:Number(opriceRaw);
-  const descAr=document.getElementById('be-desc-ar').value;
-  const descFr=document.getElementById('be-desc-fr').value;
-  // size -> price map (only filled ones)
-  const sizePrices={};
-  if(doVariants){
-    document.querySelectorAll('.be-size-price').forEach(inp=>{
-      if(inp.value!==''){sizePrices[inp.dataset.size]=Number(inp.value);}
-    });
-  }
-
-  if(!confirm(`Apply changes to ${products.length} product(s)?`))return;
-
-  let ok=0,fail=0;
-  for(const p of products){
-    const patch={};
-    if(doCollection){patch.collection=collection;patch.subcollection=subcollection;}
-    if(doOprice){patch.original_price=oprice;}
-    if(doDesc){patch.description_ar=descAr;patch.description_fr=descFr;}
-    if(doVariants&&Object.keys(sizePrices).length){
-      const vs=normalizeVariants(p.variants).map(v=>{
-        const size=(v.options&&(v.options.Taille||v.options.taille||v.options.Size||v.options.size))||v.label||v.name;
-        const key=String(size||'').trim();
-        if(key in sizePrices){return {...v,price:sizePrices[key]};}
-        return v;
-      });
-      patch.variants=vs;
-      // if product-level price should track the cheapest variant, update it too
-      const prices=vs.map(v=>Number(v.price||0)).filter(x=>x>0);
-      if(prices.length)patch.price=Math.min(...prices);
-    }
-    if(!Object.keys(patch).length)continue;
-    const {error}=await sb.from('products').update(patch).eq('id',p.id);
-    if(error){fail++;}else{ok++;}
-  }
-  closeModal('bulk-edit-modal');
-  toast(`Updated ${ok} product(s)${fail?`, ${fail} failed`:''} ${fail?'':'✓'}`,fail>0);
-  selectedProductIds.clear();
-  await loadProducts();renderProducts();
-}
-
-async function bulkDelete(){
-  if(!selectedProductIds.size){toast('No products selected',true);return;}
-  const ids=[...selectedProductIds];
-  if(!confirm(`Permanently DELETE ${ids.length} product(s)? This cannot be undone.`))return;
-  const {error}=await sb.from('products').delete().in('id',ids);
-  if(error){toast(error.message||'Bulk delete failed',true);return;}
-  toast(`${ids.length} product(s) deleted`);
-  selectedProductIds.clear();
-  await loadProducts();renderProducts();
-}
-
 async function deleteProduct(id){
   if(!confirm('Delete this product?'))return;
   await sb.from('products').delete().eq('id',id);
@@ -3256,62 +2871,6 @@ async function renderPerformance(){
       </div>
     </div>`).join('')||
     '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">No operator data yet</div></div>';
-}
-
-// ── CATEGORIES MANAGER ──
-let editingCatId=null;
-function openCategories(){editingCatId=null;resetCatForm();renderCatList();document.getElementById('categories-modal').classList.add('open');}
-function renderCatList(){
-  const box=document.getElementById('cat-list');
-  if(!allCollections.length){box.innerHTML='<div style="color:var(--gray)">No collections yet.</div>';return;}
-  box.innerHTML=allCollections.map(c=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 12px">
-      <div><strong>${esc(c.name_ar)}</strong><span style="color:var(--gray);font-size:12px"> &#183; ${esc(c.slug)} &#183; ${(Array.isArray(c.subs)?c.subs.length:0)} subs</span></div>
-      <div style="display:flex;gap:6px">
-        <button class="btn btn-ghost btn-sm" onclick="editCategory(${c.id})">Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteCategory(${c.id})">&#128465;</button>
-      </div>
-    </div>`).join('');
-}
-function resetCatForm(){
-  editingCatId=null;
-  document.getElementById('cat-form-title').textContent='ADD NEW COLLECTION';
-  ['cat-slug','cat-name-ar','cat-name-en','cat-icon','cat-sort','cat-subs'].forEach(id=>document.getElementById(id).value='');
-}
-function editCategory(id){
-  const c=allCollections.find(x=>x.id===id);if(!c)return;
-  editingCatId=id;
-  document.getElementById('cat-form-title').textContent='EDIT COLLECTION';
-  document.getElementById('cat-slug').value=c.slug||'';
-  document.getElementById('cat-name-ar').value=c.name_ar||'';
-  document.getElementById('cat-name-en').value=c.name_en||'';
-  document.getElementById('cat-icon').value=c.icon_url||'';
-  document.getElementById('cat-sort').value=c.sort_order||0;
-  document.getElementById('cat-subs').value=(Array.isArray(c.subs)?c.subs:[]).map(s=>`${s.slug} | ${s.name_ar||''} | ${s.name_en||''}`).join('\n');
-}
-function parseSubs(text){
-  return String(text||'').split('\n').map(l=>l.trim()).filter(Boolean).map(line=>{
-    const[slug,ar,en]=line.split('|').map(p=>(p||'').trim());
-    return slug?{slug,name_ar:ar||slug,name_en:en||slug}:null;
-  }).filter(Boolean);
-}
-async function saveCategory(){
-  const slug=document.getElementById('cat-slug').value.trim().toLowerCase().replace(/\s+/g,'-');
-  const name_ar=document.getElementById('cat-name-ar').value.trim();
-  const name_en=document.getElementById('cat-name-en').value.trim();
-  const icon_url=document.getElementById('cat-icon').value.trim()||null;
-  const sort_order=parseInt(document.getElementById('cat-sort').value)||0;
-  const subs=parseSubs(document.getElementById('cat-subs').value);
-  if(!slug||!name_ar||!name_en){toast('Slug, Arabic and English name required',true);return;}
-  const data={slug,name_ar,name_en,icon_url,sort_order,subs,has_subs:subs.length>0,active:true};
-  if(editingCatId){await sb.from('collections').update(data).eq('id',editingCatId);toast('Collection updated &#10003;');}
-  else{await sb.from('collections').insert(data);toast('Collection added &#10003;');}
-  await loadCollections();renderCatList();resetCatForm();
-}
-async function deleteCategory(id){
-  if(!confirm('Delete this collection?'))return;
-  await sb.from('collections').delete().eq('id',id);
-  await loadCollections();renderCatList();toast('Collection deleted');
 }
 
 function esc(v){if(v==null)return'';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
