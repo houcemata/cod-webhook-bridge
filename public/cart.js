@@ -86,8 +86,8 @@
       .arco-deliv{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
       .arco-deliv button{background:#111;border:1px solid rgba(255,255,255,.12);color:#fff;border-radius:8px;padding:11px;cursor:pointer;font-family:'Cairo',sans-serif;font-weight:700}
       .arco-deliv button.active{border-color:#F5C500;background:rgba(245,197,0,.08)}
-      .arco-added{position:fixed;bottom:90px;right:20px;z-index:90;background:#0d0d0d;border:1px solid #F5C500;border-radius:14px;padding:14px 16px;color:#fff;font-family:'Cairo',sans-serif;max-width:300px;direction:rtl;transform:translateY(20px);opacity:0;transition:.25s;box-shadow:0 12px 30px rgba(0,0,0,.5)}
-      .arco-added.show{transform:translateY(0);opacity:1}
+      .arco-added{position:fixed;bottom:90px;right:20px;z-index:90;background:#0d0d0d;border:1px solid #F5C500;border-radius:14px;padding:14px 16px;color:#fff;font-family:'Cairo',sans-serif;max-width:300px;direction:rtl;transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;box-shadow:0 12px 30px rgba(0,0,0,.5)}
+      .arco-added.show{transform:translateY(0);opacity:1;pointer-events:auto}
       .arco-added .t{font-weight:800;color:#F5C500;margin-bottom:8px}
       .arco-added .btns{display:flex;gap:8px;margin-top:10px}
       .arco-added .btns button{flex:1;border:none;border-radius:8px;padding:9px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif;font-size:.82rem}
