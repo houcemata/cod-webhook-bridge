@@ -1054,6 +1054,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       </div>
       <div class="form-row">
         <div class="form-field" style="flex-direction:row;align-items:center;gap:8px;display:flex"><input type="checkbox" id="p-bestseller" style="width:auto"/><label class="form-label" for="p-bestseller" style="margin:0">Best Seller &#11088;</label></div>
+        <div class="form-field" style="flex-direction:row;align-items:center;gap:8px;display:flex"><input type="checkbox" id="p-featured" style="width:auto"/><label class="form-label" for="p-featured" style="margin:0">Featured on homepage &#127968;</label></div>
         <div class="form-field" style="flex-direction:row;align-items:center;gap:8px;display:flex"><input type="checkbox" id="p-isnew" style="width:auto"/><label class="form-label" for="p-isnew" style="margin:0">New &#127381;</label></div>
       </div>
       <div class="form-field"><label class="form-label">Description (Arabic)</label><textarea class="form-textarea" id="p-desc-ar" placeholder="الوصف..." style="direction:rtl"></textarea></div>
@@ -1260,7 +1261,7 @@ async function loadOrders(){
   if(pending>0){badge.textContent=pending;badge.style.display='inline';}else badge.style.display='none';
 }
 async function loadProducts(){
-  const{data}=await sb.from('products').select('*').order('created_at',{ascending:false});
+  const{data}=await sb.from('products').select('*').order('sort_order',{ascending:true}).order('created_at',{ascending:false});
   allProducts=data||[];
 }
 let allCollections=[];
@@ -1626,12 +1627,18 @@ function renderProducts(){
       </label>
       ${img?`<img class="product-img" src="${esc(img)}" alt="${esc(p.name)}" loading="lazy" onerror="this.style.display='none'"/>`:
         '<div class="product-img" style="display:flex;align-items:center;justify-content:center;font-size:48px;opacity:0.3">🖼️</div>'}
+      ${p.featured?'<div style="position:absolute;top:10px;right:10px;z-index:2;background:var(--yellow);color:#080808;border-radius:8px;padding:3px 8px;font-size:11px;font-weight:800">🏠 Home</div>':''}
       <div class="product-body">
         <div class="product-name">${esc(p.name)}</div>
         <div class="product-slug">/p/${esc(p.slug)}</div>
         <div class="product-price-row">
           <div class="product-price">${Number(p.price).toLocaleString()} DZD</div>
           ${p.original_price?`<div class="product-old-price">${Number(p.original_price).toLocaleString()}</div>`:''}
+        </div>
+        <div class="product-actions" style="margin-bottom:6px">
+          <button class="btn btn-ghost btn-sm" onclick="moveProduct(${p.id},-1)" title="Move up" style="padding:6px 10px">▲</button>
+          <button class="btn btn-ghost btn-sm" onclick="moveProduct(${p.id},1)" title="Move down" style="padding:6px 10px">▼</button>
+          <span style="flex:1;text-align:center;font-size:11px;color:var(--muted,#888)">#${Number(p.sort_order||0)}</span>
         </div>
         <div class="product-actions">
           <button class="btn btn-ghost btn-sm" onclick="openEditProduct(${p.id})" style="flex:1">✏️ Edit</button>
@@ -1652,6 +1659,28 @@ function renderProducts(){
     }
   }
 }
+// Move a product up/down within its own collection by swapping sort_order
+// with the adjacent product. dir=-1 (up/earlier), dir=1 (down/later).
+async function moveProduct(id,dir){
+  const p=allProducts.find(x=>x.id===id);if(!p)return;
+  // siblings in the same collection, ordered the same way the storefront orders them
+  const sibs=allProducts
+    .filter(x=>(x.collection||'')===(p.collection||''))
+    .sort((a,b)=>(Number(a.sort_order||0)-Number(b.sort_order||0))
+      || (new Date(b.created_at||0)-new Date(a.created_at||0)));
+  const idx=sibs.findIndex(x=>x.id===id);
+  const swapIdx=idx+dir;
+  if(idx<0||swapIdx<0||swapIdx>=sibs.length)return; // already at an edge
+  const other=sibs[swapIdx];
+  // ensure distinct sort_order values to swap; if equal, assign spaced values
+  let a=Number(p.sort_order||0), b=Number(other.sort_order||0);
+  if(a===b){ a=(idx+1)*10; b=(swapIdx+1)*10; }
+  await Promise.all([
+    sb.from('products').update({sort_order:b}).eq('id',p.id),
+    sb.from('products').update({sort_order:a}).eq('id',other.id),
+  ]);
+  await loadProducts();renderProducts();
+}
 function openAddProduct(){
   editingProductId=null;
   document.getElementById('product-modal-title').textContent='ADD PRODUCT';
@@ -1661,6 +1690,7 @@ function openAddProduct(){
   document.getElementById('p-collection').value='';
   document.getElementById('p-subcollection').innerHTML='<option value="">— None —</option>';
   document.getElementById('p-bestseller').checked=false;
+  document.getElementById('p-featured').checked=false;
   document.getElementById('p-isnew').checked=true;
   document.getElementById('product-modal').classList.add('open');
 }
@@ -1681,6 +1711,7 @@ function openEditProduct(id){
   onAdminCollectionChange();
   document.getElementById('p-subcollection').value=p.subcollection||'';
   document.getElementById('p-bestseller').checked=!!p.is_bestseller;
+  document.getElementById('p-featured').checked=!!p.featured;
   document.getElementById('p-isnew').checked=!!p.is_new;
   document.getElementById('product-modal').classList.add('open');
 }
@@ -1751,8 +1782,9 @@ async function saveProduct(){
   const collection=document.getElementById('p-collection').value||null;
   const subcollection=document.getElementById('p-subcollection').value||null;
   const is_bestseller=document.getElementById('p-bestseller').checked;
+  const featured=document.getElementById('p-featured').checked;
   const is_new=document.getElementById('p-isnew').checked;
-  const data={name,slug,price,original_price:oprice,description_ar:descAr,description_fr:descFr,images:image?[image]:[],variants,active:true,collection,subcollection,is_bestseller,is_new,type};
+  const data={name,slug,price,original_price:oprice,description_ar:descAr,description_fr:descFr,images:image?[image]:[],variants,active:true,collection,subcollection,is_bestseller,featured,is_new,type};
   if(editingProductId){await sb.from('products').update(data).eq('id',editingProductId);toast('Product updated ✓');}
   else{await sb.from('products').insert(data);toast('Product added ✓');}
   closeModal('product-modal');await loadProducts();renderProducts();
