@@ -147,12 +147,15 @@ async function handleCartOrder(req, res, supabase, body) {
   // Resolve each cart item against the DB (never trust browser prices)
   const resolved = [];
   for (const it of items) {
-    const slug = normalizeText(it.product_slug).toLowerCase();
+    // Match on the exact stored slug, case-insensitively (ilike with no wildcards
+    // = case-insensitive equality). Avoids "Product not found" when a slug has
+    // any uppercase letters. Single-product path below is unchanged.
+    const slug = normalizeText(it.product_slug);
     if (!slug) continue;
     const { data: productRow } = await supabase
       .from("products")
       .select("name, slug, price, active, variants, type")
-      .eq("slug", slug)
+      .ilike("slug", slug)
       .eq("active", true)
       .limit(1)
       .maybeSingle();
