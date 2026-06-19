@@ -77,6 +77,8 @@ img{display:block;max-width:100%}
 .col-item{flex-shrink:0;width:90px;display:grid;justify-items:center;gap:8px;cursor:pointer}
 .col-circle{width:84px;height:84px;border-radius:50%;overflow:hidden;background:linear-gradient(160deg,rgba(245,197,0,.14),var(--dk2));border:2px solid var(--ln);display:grid;place-items:center;transition:.26s}
 .col-item:hover .col-circle{border-color:var(--y);transform:translateY(-5px);box-shadow:0 16px 36px rgba(245,197,0,.22)}
+.col-item.active .col-circle{border-color:var(--y);box-shadow:0 0 0 3px rgba(245,197,0,.18),0 16px 36px rgba(245,197,0,.22)}
+.col-item.active .col-name{color:var(--y);font-weight:700}
 .col-circle img{width:100%;height:100%;object-fit:cover}
 .col-circle .ph{font:800 2rem/1 'Changa',sans-serif;color:var(--y)}
 .col-name{font:600 .82rem/1.2 'Changa',sans-serif;text-align:center;color:var(--tx)}
@@ -387,12 +389,33 @@ async function loadCollections(){
     const cols=await r.json();
     if(!Array.isArray(cols)||!cols.length){box.innerHTML='<div class="rail-empty">قريباً</div>';return;}
     box.innerHTML=cols.map(c=>`
-      <a class="col-item" href="/c/${esc(c.slug)}">
+      <a class="col-item" href="/c/${esc(c.slug)}" data-collection-slug="${esc(c.slug)}">
         <div class="col-circle">${c.icon_url?`<img src="${esc(c.icon_url)}" alt="${esc(c.name_ar)}">`:`<span class="ph">${esc((c.name_en||'A')[0])}</span>`}</div>
         <span class="col-name">${esc(c.name_ar)}</span>
       </a>`).join('');
+    highlightSelectedCollection();
   }catch(e){box.innerHTML='<div class="rail-empty">تعذر التحميل</div>';}
 }
+
+/* Highlights whichever collection the customer last ordered from (passed via
+   ?c=slug from the cart's "browse more" button, or remembered in
+   localStorage), and scrolls it into view. Re-runs live if the selection
+   changes via ARCOSelectCollection. */
+function highlightSelectedCollection(){
+  let slug=new URLSearchParams(location.search).get('c')||'';
+  if(!slug){try{slug=localStorage.getItem('arco_last_collection')||'';}catch(e){}}
+  if(!slug)return;
+  const box=document.getElementById('colScroll');
+  const items=[...box.querySelectorAll('.col-item')];
+  items.forEach(el=>el.classList.toggle('active',el.dataset.collectionSlug===slug));
+  const match=items.find(el=>el.dataset.collectionSlug===slug);
+  if(match)match.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+}
+window.ARCOSelectCollection=function(slug){
+  try{if(slug)localStorage.setItem('arco_last_collection',slug);}catch(e){}
+  highlightSelectedCollection();
+  document.getElementById('collections')?.scrollIntoView({behavior:'smooth'});
+};
 
 /* ---- PRODUCT RAILS ---- */
 function cardHTML(p){
