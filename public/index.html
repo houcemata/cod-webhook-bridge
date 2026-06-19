@@ -36,6 +36,7 @@ img{display:block;max-width:100%}
 .topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(24px);background:rgba(8,8,8,.84);border-bottom:1px solid var(--ln)}
 .topbar-inner{position:relative;z-index:1;min-height:74px;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .brand{display:flex;align-items:center;gap:13px}
+.brand-logo{height:46px;width:auto;display:block;object-fit:contain}
 .brand-mark{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--y),#ffd84d);color:#080808;font:800 26px/1 'Changa',sans-serif;letter-spacing:.06em;box-shadow:0 0 0 1px rgba(255,255,255,.1),0 6px 24px rgba(245,197,0,.28);flex-shrink:0}
 .brand-text strong{display:block;font:800 clamp(1.6rem,3.4vw,2.1rem)/.95 'Changa',sans-serif;letter-spacing:.04em;letter-spacing:.1em}
 .brand-text span{display:block;font:700 .68rem/1 'Changa',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--mu)}
@@ -162,6 +163,7 @@ img{display:block;max-width:100%}
 @media(max-width:640px){
   .topbar-inner{flex-wrap:wrap;min-height:0;padding:12px 0;gap:12px}
   .brand-mark{width:40px;height:40px;font-size:26px}
+  .brand-logo{height:38px}
   .search-wrap{max-width:100%;align-items:stretch}
   .search-sub{align-self:flex-end}
   .sec{padding:22px 0}
@@ -188,8 +190,7 @@ img{display:block;max-width:100%}
 <header class="topbar">
   <div class="wrap topbar-inner">
     <a class="brand" href="/" aria-label="ARCO">
-      <div class="brand-mark">A</div>
-      <div class="brand-text"><strong>ARCO</strong><span>Premium Wall Art</span></div>
+      <img class="brand-logo" src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/ACRO%20logo%20shopiy-03.png" alt="ARCO" width="150" height="46">
     </a>
     <div class="search-wrap">
       <div class="search-box">
