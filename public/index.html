@@ -413,14 +413,17 @@ let ALL_PRODUCTS=[];
 async function loadAllRails(){
   const rails=[...document.querySelectorAll('.collection-rail')];
   try{
+    // fetch ALL active products (search needs the full catalogue)...
     const r=await fetch(`${SB_URL}/products?select=*&active=eq.true&order=sort_order.asc,created_at.desc`,{headers:H});
     const all=await r.json();
     if(!Array.isArray(all))throw new Error('bad');
     ALL_PRODUCTS=all;
+    // ...but homepage rails show only products flagged "featured"
+    const featured=all.filter(p=>p.featured===true);
     rails.forEach(sec=>{
       const slug=sec.dataset.collection;
       const box=sec.querySelector('.rail');
-      const items=all.filter(p=>(p.collection||'')===slug).slice(0,12);
+      const items=featured.filter(p=>(p.collection||'')===slug).slice(0,12);
       if(!items.length){
         // hide empty collection sections (and the divider after) to keep homepage clean
         sec.style.display='none';
