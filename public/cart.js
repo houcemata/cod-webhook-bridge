@@ -151,7 +151,7 @@
       ${promo ? `<div style="margin-top:8px;color:#5ef0a0;font-weight:700;font-size:.85rem">${promo}</div>` : ''}
       <div class="btns">
         <button class="b1" onclick="ARCOCart.open()">عرض السلة (${n})</button>
-        <button class="b2" onclick="document.getElementById('arco-added').classList.remove('show')">تصفح المزيد</button>
+        <button class="b2" onclick="ARCOCart_browseMore()">تصفح المزيد</button>
       </div>`;
     el.classList.add('show');
     clearTimeout(window.__arcoAddedT);
@@ -202,21 +202,15 @@
 
   window.ARCOCart_remove = function (i) { const c = read(); c.splice(i, 1); write(c); renderDrawer(); };
 
-  // "Browse more" jumps to the homepage collection-icon row, defaulting to
-  // whichever collection the customer last added an item from (set by
-  // product.html on add-to-cart). Falls back to plain #collections if none.
+  // "Browse more" sends the customer straight to the collection page of
+  // whichever collection they last added a poster from (set by
+  // product.html on add-to-cart). Used by both the toast and the drawer.
   window.ARCOCart_browseMore = function () {
+    document.getElementById('arco-added').classList.remove('show');
     closeDrawer();
     let last = '';
     try { last = localStorage.getItem('arco_last_collection') || ''; } catch {}
-    const dest = last ? `/?c=${encodeURIComponent(last)}#collections` : '/#collections';
-    if (location.pathname === '/' || location.pathname === '/index.html') {
-      location.hash = '';
-      location.href = dest;
-      if (window.ARCOSelectCollection) window.ARCOSelectCollection(last);
-    } else {
-      location.href = dest;
-    }
+    location.href = last ? `/c/${encodeURIComponent(last)}` : '/';
   };
 
   // ---- checkout form (inside drawer) ----
