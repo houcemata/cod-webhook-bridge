@@ -45,6 +45,17 @@ function sameOptions(a, b) {
   return leftKeys.every((key) => left[key] === right[key]);
 }
 
+function sizeCode(label) {
+  const norm = String(label || "")
+    .toLowerCase()
+    .replace(/سم|cm/g, "")
+    .replace(/[×*]/g, "x")
+    .replace(/\s+/g, "");
+  if (norm.includes("30x40")) return "M";
+  if (norm.includes("40x60")) return "L";
+  return label || "";
+}
+
 function resolveVariant(product, payload) {
   const variants = normalizeVariants(product.variants);
   if (!variants.length) {
@@ -187,7 +198,7 @@ async function handleCartOrder(req, res, supabase, body) {
     const isFree = freeSet.has(it);
     const linePrice = isFree ? 0 : it.price;
     itemsTotal += linePrice;
-    return { ...it, is_free: isFree, line_price: linePrice };
+    return { ...it, size: sizeCode(it.variant), is_free: isFree, line_price: linePrice };
   });
 
   const { data: shippingRow } = await supabase
@@ -211,12 +222,7 @@ async function handleCartOrder(req, res, supabase, body) {
     `${i + 1}. ${it.product} — ${it.variant}${it.is_free ? " (مجانية 🎁)" : ` — ${it.line_price} DZD`}`
   );
   const freeNote = freeCount > 0 ? `\n🎁 ${freeCount} قطعة مجانية (اشترِ 2 والثالثة مجاناً)` : "";
-  const composedNotes = [
-    `🛒 سلة (${itemsForStore.length} قطع):`,
-    ...summaryLines,
-    freeNote,
-    notes ? `\nملاحظة الزبون: ${notes}` : "",
-  ].filter(Boolean).join("\n");
+  const composedNotes = notes || "";
 
   const productSummary = `سلة ${itemsForStore.length} قطع`;
   const variableSummary = itemsForStore.map((it) => it.variant).join(" + ").slice(0, 250);
