@@ -286,7 +286,7 @@ export default async function handler(req, res) {
       return await handleCartOrder(req, res, supabase, body);
     }
 
-    const productSlug = normalizeText(body.product_slug).toLowerCase();
+    const productSlug = normalizeText(body.product_slug);
     const name = normalizeText(body.name);
     const phone = normalizePhone(body.phone);
     const wilaya = normalizeText(body.wilaya);
@@ -313,7 +313,7 @@ export default async function handler(req, res) {
     const { data: productRow, error: productError } = await supabase
       .from("products")
       .select("name, slug, price, active, variants")
-      .eq("slug", productSlug)
+      .ilike("slug", productSlug)
       .eq("active", true)
       .limit(1)
       .maybeSingle();
@@ -326,7 +326,7 @@ export default async function handler(req, res) {
 
     const variant = resolveVariant(product, body);
     const fallbackVariantLabel = normalizeText(body.variant_label) || normalizeText(body.selected_options?.MODEL) || normalizeText(body.selected_options?.Model) || "Standard";
-    const resolvedVariant = variant || (productSlug === "barber-shop"
+    const resolvedVariant = variant || (productSlug.toLowerCase() === "barber-shop"
       ? {
           name: fallbackVariantLabel,
           label: fallbackVariantLabel,
