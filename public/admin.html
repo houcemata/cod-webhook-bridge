@@ -549,6 +549,8 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         <span id="bulk-count" style="font-size:13px;color:var(--gray)">0 selected</span>
         <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
           <button class="btn btn-primary btn-sm" onclick="openBulkEdit()">✏️ Edit</button>
+          <button class="btn btn-ghost btn-sm" onclick="bulkSetFeatured(true)">🏠 Feature</button>
+          <button class="btn btn-ghost btn-sm" onclick="bulkSetFeatured(false)">🏠✕ Unfeature</button>
           <button class="btn btn-ghost btn-sm" onclick="bulkSetActive(true)">✓ Activate</button>
           <button class="btn btn-ghost btn-sm" onclick="bulkSetActive(false)">✕ Deactivate</button>
           <button class="btn btn-danger btn-sm" onclick="bulkDelete()">🗑 Delete</button>
@@ -1829,6 +1831,16 @@ async function bulkSetActive(active){
   const {error}=await sb.from('products').update({active}).in('id',ids);
   if(error){toast(error.message||'Bulk update failed',true);return;}
   toast(`${ids.length} product(s) ${active?'activated':'deactivated'} ✓`);
+  selectedProductIds.clear();
+  await loadProducts();renderProducts();
+}
+async function bulkSetFeatured(featured){
+  if(!selectedProductIds.size){toast('No products selected',true);return;}
+  const ids=[...selectedProductIds];
+  if(!confirm(`${featured?'Add to':'Remove from'} homepage — ${ids.length} product(s)?`))return;
+  const {error}=await sb.from('products').update({featured}).in('id',ids);
+  if(error){toast(error.message||'Bulk update failed',true);return;}
+  toast(`${ids.length} product(s) ${featured?'featured on homepage':'unfeatured'} ✓`);
   selectedProductIds.clear();
   await loadProducts();renderProducts();
 }
