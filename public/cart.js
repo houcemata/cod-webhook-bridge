@@ -378,7 +378,7 @@
           window.__arcoCartCopyToastT = setTimeout(() => copyToast.classList.remove('show'), 1800);
         };
       }
-    } catch (e) { btn.textContent = 'تأكيد الطلب (الدفع عند الاستلام)'; btn.disabled = false; alert('حدث خطأ. حاول مرة أخرى'); }
+    } catch (e) { btn.textContent = 'تأكيد الطلب (الدفع عند الاستلام)'; btn.disabled = false; const m = (e && e.message && e.message !== 'failed' && e.message !== 'Failed') ? e.message : 'حدث خطأ. حاول مرة أخرى'; alert(m); }
   };
 
   // init on load
