@@ -1047,7 +1047,7 @@ async function submitOrder(){
         window.__kidsSuccessCopyToastTimer = setTimeout(() => copyToast.classList.remove('show'), 1800);
       };
     }
-  }catch(e){btn.classList.remove('loading');restoreButton();toast('حدث خطأ. حاول مرة أخرى',true);}
+  }catch(e){btn.classList.remove('loading');restoreButton();const m=(e&&e.message&&e.message!=='failed'&&e.message!=='Failed')?e.message:'حدث خطأ. حاول مرة أخرى';toast(m,true);}
 }
 let tt;function toast(msg,err=false){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(err?' err':'');clearTimeout(tt);tt=setTimeout(()=>el.className='toast',2600);}
 loadProduct();
