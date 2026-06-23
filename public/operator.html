@@ -880,7 +880,7 @@ function renderOrdersList(){
             <div class="order-price">${Number(o.prix_total||0).toLocaleString()} DZD</div>
           </div>
           <div class="order-meta">
-            <b>${(Array.isArray(o.items)&&o.items.length)?esc(o.items.map(it=>(it.product_slug||it.slug||'')+' '+sizeLabel(it)).join('، ')):esc(o.product)+(o.variable?' - '+esc(o.variable):'')}</b><br/>
+            <b>${(Array.isArray(o.items)&&o.items.length)?esc(o.items.map(it=>(it.product||it.product_slug||it.slug||'')+' '+sizeLabel(it)).join('، ')):esc(o.product)+(o.variable?' - '+esc(o.variable):'')}</b><br/>
             Location: ${o.type_livraison==='pickup'?'Stop Desk - '+esc(o.station_code||'?'):esc(o.commune)+', '+esc(o.wilaya)}<br/>
             Phone: ${esc(o.phone)}<br/>
             Date: ${dateStr}
@@ -1066,7 +1066,7 @@ function renderDetail(dups=[]){
     <div class="detail-section">
       <div class="detail-section-title">Order</div>
       ${(Array.isArray(o.items)&&o.items.length)
-        ? o.items.map(it=>`<div class="price-row"><span class="price-label">${esc((it.product_slug||it.slug||'')+' '+sizeLabel(it))}${it.is_free?' 🎁':''}</span><span>${it.is_free?'مجانية':Number(it.line_price||it.price||0).toLocaleString()+' DZD'}</span></div>`).join('')
+        ? o.items.map(it=>`<div class="price-row"><span class="price-label">${esc((it.product||it.product_slug||it.slug||'')+' '+sizeLabel(it))}${it.is_free?' 🎁':''}</span><span>${it.is_free?'مجانية':Number(it.line_price||it.price||0).toLocaleString()+' DZD'}</span></div>`).join('')
         : `<div class="price-row"><span class="price-label">${esc(o.product)}${o.variable?' - '+esc(o.variable):''}</span><span></span></div>`}
       <div class="price-row"><span class="price-label">Product Price</span><span>${Number((o.prix_total||0)-(o.shipping_cost||0)).toLocaleString()} DZD</span></div>
       <div class="price-row"><span class="price-label">Shipping</span><span>${Number(o.shipping_cost||0).toLocaleString()} DZD</span></div>
