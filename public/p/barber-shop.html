@@ -1399,7 +1399,8 @@ if (!phoneClean || phoneClean.length !== 10 || !/^0[567]/.test(phoneClean)) {
   } catch(e) {
     btn.classList.remove('loading');
     btn.querySelector('.order-btn-ar').textContent = 'اطلب الآن';
-    toast('Erreur. Réessayez — حاول مجددًا', true);
+    const m = (e && e.message && e.message !== 'failed' && e.message !== 'Failed') ? e.message : 'Erreur. Réessayez — حاول مجددًا';
+    toast(m, true);
   }
 }
 
