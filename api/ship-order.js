@@ -1,4 +1,4 @@
-﻿import { requireRole } from "./_auth.js";
+import { requireRole } from "./_auth.js";
 
 const NOEST_BASE = "https://app.noest-dz.com/api/public";
 
@@ -165,6 +165,27 @@ function isCommuneValidationError(data) {
   return text.includes("commune") && (text.includes("invalid") || text.includes("invalide"));
 }
 
+// Build the "produit" text sent to the shipping agency.
+// Cart orders: list each item as "name size" so the agency sees real
+// product detail instead of just "basket of N pieces" + sizes.
+// Single-product orders: unchanged (product - variant).
+function buildProduitText(order) {
+  if (Array.isArray(order.items) && order.items.length) {
+    const parts = order.items
+      .map((it) => {
+        const name = it.product || it.product_slug || it.slug || "";
+        const size = it.size || it.variant || "";
+        return [name, size].filter(Boolean).join(" ");
+      })
+      .filter(Boolean);
+    if (parts.length) {
+      const list = parts.join(", ").slice(0, 220);
+      return `${order.items.length} قطع - ${list}`;
+    }
+  }
+  return order.product + (order.variable ? ` - ${order.variable}` : "");
+}
+
 function buildNoestPayload({ noestGuid, orderId, order, wilayaId, phone, clientName, address, commune, isStopDesk, normalizedStationCode }) {
   return {
     user_guid: noestGuid,
@@ -175,10 +196,7 @@ function buildNoestPayload({ noestGuid, orderId, order, wilayaId, phone, clientN
     wilaya_id: wilayaId,
     ...(commune ? { commune } : {}),
     montant: parseFloat(order.prix_total || 0),
-    produit: sanitizeNoestText(
-      order.product + (order.variable ? ` - ${order.variable}` : ""),
-      "Commande ARCO"
-    ),
+    produit: sanitizeNoestText(buildProduitText(order), "Commande ARCO"),
     type_id: 1,
     stop_desk: isStopDesk ? 1 : 0,
     can_open: 1,
