@@ -109,6 +109,47 @@ function clientIpFromRequest(req) {
   return "";
 }
 
+// ── Daily per-IP order limit ─────────────────────────────────────
+// Each IP may place at most this many real (non-draft) orders per
+// calendar day (Algeria time, UTC+1, no DST). Resets at midnight.
+const DAILY_IP_ORDER_LIMIT = 2;
+const IP_LIMIT_MESSAGE =
+  "لقد وصلت إلى الحد الأقصى للطلبات اليوم (طلبان). جرّب غداً أو تواصل معنا عبر واتساب.";
+
+function startOfTodayAlgiersUtc() {
+  const offsetMs = 60 * 60 * 1000; // Algeria = UTC+1, no daylight saving
+  const algiers = new Date(Date.now() + offsetMs);
+  const midnightAlgiers = Date.UTC(
+    algiers.getUTCFullYear(),
+    algiers.getUTCMonth(),
+    algiers.getUTCDate()
+  );
+  return new Date(midnightAlgiers - offsetMs).toISOString();
+}
+
+// Returns how many non-draft orders this IP already placed today.
+// Fails OPEN: any error (e.g. column missing) returns 0 so real
+// customers are never blocked by an infrastructure problem.
+async function ipOrderCountToday(supabase, ip) {
+  if (!ip) return 0; // can't identify the client -> don't block
+  try {
+    const { count, error } = await supabase
+      .from("orders")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_address", ip)
+      .neq("status", "draft")
+      .gte("created_at", startOfTodayAlgiersUtc());
+    if (error) {
+      console.error("[create-order] ip rate-limit query failed (allowing):", error.message || error);
+      return 0;
+    }
+    return count || 0;
+  } catch (err) {
+    console.error("[create-order] ip rate-limit threw (allowing):", err.message);
+    return 0;
+  }
+}
+
 async function sendOrderNotification(orderData) {
   const topic = process.env.NTFY_TOPIC || "arco-new-orders";
   try {
@@ -141,6 +182,7 @@ async function handleCartOrder(req, res, supabase, body) {
   const stationCode = deliveryType === "pickup" ? normalizeText(body.station_code) : null;
   const wilayaId = Number(body.wilaya_id);
   const items = Array.isArray(body.items) ? body.items : [];
+  const clientIp = clientIpFromRequest(req);
 
   if (!name) return res.status(400).json({ error: "Name is required" });
   if (!/^0[567]\d{8}$/.test(phone)) return res.status(400).json({ error: "Invalid phone number" });
@@ -154,6 +196,11 @@ async function handleCartOrder(req, res, supabase, body) {
     return res.status(400).json({ error: "Station code is required for pickup" });
   }
   if (!items.length) return res.status(400).json({ error: "Cart is empty" });
+
+  // Daily per-IP order limit
+  if (await ipOrderCountToday(supabase, clientIp) >= DAILY_IP_ORDER_LIMIT) {
+    return res.status(429).json({ error: IP_LIMIT_MESSAGE });
+  }
 
   // Resolve each cart item against the DB (never trust browser prices)
   const resolved = [];
@@ -242,6 +289,7 @@ async function handleCartOrder(req, res, supabase, body) {
     notes: composedNotes,
     items: itemsForStore,
     order_id: orderId,
+    ip_address: clientIp || null,
   };
 
   const { error: insertError } = await supabase.from("orders").insert(finalOrderData);
@@ -361,6 +409,13 @@ export default async function handler(req, res) {
 
     const total = Number(resolvedVariant.price) + shippingCost;
     const orderId = createOrderId();
+    const clientIp = clientIpFromRequest(req);
+
+    // Daily per-IP order limit
+    if (await ipOrderCountToday(supabase, clientIp) >= DAILY_IP_ORDER_LIMIT) {
+      return res.status(429).json({ error: IP_LIMIT_MESSAGE });
+    }
+
     const orderData = {
       name,
       phone,
@@ -374,6 +429,7 @@ export default async function handler(req, res) {
       shipping_cost: shippingCost,
       status: "pending",
       notes,
+      ip_address: clientIp || null,
     };
     const finalOrderData = { ...orderData, order_id: orderId };
 
@@ -414,6 +470,7 @@ export default async function handler(req, res) {
           shipping_cost: shippingCost,
           status: "pending",
           notes,
+          ip_address: clientIp || null,
         })
         .eq("id", draftRow.id);
 
