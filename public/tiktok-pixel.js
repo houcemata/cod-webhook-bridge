@@ -1,5 +1,5 @@
 (function () {
-  const PIXEL_ID = "D4U9PFBC77U3NA785K50";
+  const PIXEL_ID = "https://github.com/houcemata/cod-webhook-bridge/blob/main/public/tiktok-pixel.js";
 
   if (window.ttq) {
     return;
