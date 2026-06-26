@@ -1217,10 +1217,10 @@ async function openEdit(){
             <option value="M"${sizeLabel(it)==='M'?' selected':''}>M</option>
             <option value="L"${sizeLabel(it)==='L'?' selected':''}>L</option>
           </select>
-          <button onclick="(function(){const m=document.getElementById('edit-modal').__editItems[${i}];m.is_free=!m.is_free;m.line_price=m.is_free?0:(m.price||0);window.__rerenderCartRows&&window.__rerenderCartRows();calcTotal()})()"
-            style="background:${it.is_free?'#16a34a':'#222'};border:1px solid ${it.is_free?'#16a34a':'#333'};color:#fff;border-radius:8px;padding:5px 8px;font-size:13px;cursor:pointer;white-space:nowrap">
-            ${it.is_free?'🎁 Free':'Paid'}
-          </button>
+          <input type="number" class="edit-input" style="width:80px;font-size:13px;padding:7px 8px;text-align:right" min="0"
+            value="${it.is_free?0:Number(it.line_price||it.price||0)}"
+            placeholder="0"
+            oninput="(function(el){const m=document.getElementById('edit-modal').__editItems[${i}];const v=parseFloat(el.value)||0;m.line_price=v;m.price=v;m.is_free=(v===0);calcTotal()})(this)"/>
           <button onclick="(function(){document.getElementById('edit-modal').__editItems.splice(${i},1);window.__rerenderCartRows&&window.__rerenderCartRows();calcTotal()})()"
             style="background:#1a0a0a;border:1px solid #3a1a1a;color:#e11d48;border-radius:8px;width:30px;height:30px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">
             ×
@@ -1334,7 +1334,7 @@ function calcTotal(){
   const editItems=document.getElementById('edit-modal').__editItems;
   if(editItems){
     // For cart orders: product price = sum of line_prices; update the field so operator can still override
-    const itemsTotal=editItems.reduce((s,it)=>s+(it.is_free?0:Number(it.price||0)),0);
+    const itemsTotal=editItems.reduce((s,it)=>s+Number(it.line_price||0),0);
     const pEl=document.getElementById('edit-product-price');
     // Only auto-fill if it hasn't been manually changed (compare to last auto value)
     if(!pEl._manualEdit) pEl.value=itemsTotal;
