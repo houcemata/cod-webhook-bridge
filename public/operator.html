@@ -512,7 +512,7 @@ button,input,select,textarea{font:inherit}
     <div class="price-fields">
       <div class="edit-field">
         <div class="edit-label">Product Price</div>
-        <input class="edit-input" id="edit-product-price" type="number" oninput="calcTotal()" placeholder="0"/>
+        <input class="edit-input" id="edit-product-price" type="number" oninput="this._manualEdit=true;calcTotal()" placeholder="0"/>
       </div>
       <div class="edit-field">
         <div class="edit-label">Shipping</div>
@@ -1187,15 +1187,37 @@ async function openEdit(){
   const prodSec=document.getElementById('edit-product-section');
   const isCart=Array.isArray(o.items)&&o.items.length>0;
   if(isCart){
+    // Build editable items — we keep a working copy on the modal itself
+    const editItems=o.items.map(it=>({...it})); // shallow copy
+    document.getElementById('edit-modal').__editItems=editItems;
+
+    function renderCartRows(){
+      const wrap=document.getElementById('edit-cart-rows');
+      if(!wrap)return;
+      wrap.innerHTML=editItems.map((it,i)=>`
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #1a1a1a">
+          <input class="edit-input" style="flex:1;font-size:13px;padding:7px 8px"
+            value="${esc(it.product||it.product_slug||it.slug||'')}"
+            placeholder="Product name"
+            oninput="(function(el){document.getElementById('edit-modal').__editItems[${i}].product=el.value})(this)"/>
+          <select class="edit-select" style="width:62px;font-size:13px;padding:7px 6px"
+            onchange="(function(el){const m=document.getElementById('edit-modal').__editItems[${i}];m.size=el.value;m.variant=el.value==='M'?'30×40 cm':'40×60 cm'})(this)">
+            <option value="M"${sizeLabel(it)==='M'?' selected':''}>M</option>
+            <option value="L"${sizeLabel(it)==='L'?' selected':''}>L</option>
+          </select>
+          <button onclick="(function(){const m=document.getElementById('edit-modal').__editItems[${i}];m.is_free=!m.is_free;m.line_price=m.is_free?0:(m.price||0);window.__rerenderCartRows&&window.__rerenderCartRows();calcTotal()})()"
+            style="background:${it.is_free?'#16a34a':'#222'};border:1px solid ${it.is_free?'#16a34a':'#333'};color:#fff;border-radius:8px;padding:5px 8px;font-size:13px;cursor:pointer;white-space:nowrap">
+            ${it.is_free?'🎁 Free':'Paid'}
+          </button>
+        </div>`).join('');
+    }
+    window.__rerenderCartRows=renderCartRows;
+
     prodSec.innerHTML=`
-      <div class="edit-label" style="margin-bottom:8px">ORDER</div>
-      <div class="detail-section" style="margin-bottom:12px;padding:10px 12px">
-        ${o.items.map(it=>`
-          <div class="price-row">
-            <span class="price-label">${esc((it.product||it.product_slug||it.slug||'')+' '+sizeLabel(it))}${it.is_free?' 🎁':''}</span>
-            <span style="white-space:nowrap">${it.is_free?'مجانية':Number(it.line_price||it.price||0).toLocaleString()+' DZD'}</span>
-          </div>`).join('')}
-      </div>`;
+      <div class="edit-label" style="margin-bottom:8px">ORDER ITEMS</div>
+      <div id="edit-cart-rows" style="margin-bottom:12px"></div>`;
+    renderCartRows();
+
   } else {
     prodSec.innerHTML=`
       <div class="edit-field">
@@ -1208,7 +1230,9 @@ async function openEdit(){
       </div>`;
   }
   const shipping=o.shipping_cost||0;
-  document.getElementById('edit-product-price').value=(o.prix_total||0)-shipping;
+  const priceEl=document.getElementById('edit-product-price');
+  priceEl._manualEdit=false;
+  priceEl.value=(o.prix_total||0)-shipping;
   document.getElementById('edit-shipping-price').value=shipping;
   calcTotal();
   const matchedWilaya=WILAYA_NAMES.find(w=>{
@@ -1280,6 +1304,14 @@ function populateEditDesks(selectedCode){
 }
 
 function calcTotal(){
+  const editItems=document.getElementById('edit-modal').__editItems;
+  if(editItems){
+    // For cart orders: product price = sum of line_prices; update the field so operator can still override
+    const itemsTotal=editItems.reduce((s,it)=>s+(it.is_free?0:Number(it.price||0)),0);
+    const pEl=document.getElementById('edit-product-price');
+    // Only auto-fill if it hasn't been manually changed (compare to last auto value)
+    if(!pEl._manualEdit) pEl.value=itemsTotal;
+  }
   const p=parseFloat(document.getElementById('edit-product-price').value)||0;
   const s=parseFloat(document.getElementById('edit-shipping-price').value)||0;
   document.getElementById('edit-total-display').textContent=`Total: ${(p+s).toLocaleString()} DZD`;
@@ -1304,6 +1336,9 @@ async function saveEdit(){
     return;
   }
 
+  const isCartEdit=Array.isArray(o.items)&&o.items.length>0;
+  const editedItems=document.getElementById('edit-modal').__editItems;
+
   const newData={
     name:document.getElementById('edit-name').value,
     phone:document.getElementById('edit-phone').value,
@@ -1315,6 +1350,7 @@ async function saveEdit(){
     variable:document.getElementById('edit-variable')?document.getElementById('edit-variable').value:(currentOrder.variable||''),
     shipping_cost:shippingPrice,
     prix_total:productPrice+shippingPrice,
+    ...(isCartEdit&&editedItems?{items:editedItems}:{}),
   };
 
   // Log field changes to history
