@@ -505,13 +505,8 @@ button,input,select,textarea{font:inherit}
           <option value="">Loading desks...</option>
       </select>
     </div>
-    <div class="edit-field">
-      <div class="edit-label">Product</div>
-      <input class="edit-input" id="edit-product"/>
-    </div>
-    <div class="edit-field">
-      <div class="edit-label">Variant</div>
-      <input class="edit-input" id="edit-variable"/>
+    <div id="edit-product-section">
+      <!-- populated by openEdit(): itemized list for cart orders, text inputs for single orders -->
     </div>
     <div class="edit-label" style="margin-bottom:6px">Price Breakdown</div>
     <div class="price-fields">
@@ -1189,8 +1184,29 @@ async function openEdit(){
   document.getElementById('edit-name').value=o.name||'';
   document.getElementById('edit-phone').value=o.phone||'';
   document.getElementById('edit-type').value=o.type_livraison||'home';
-  document.getElementById('edit-product').value=o.product||'';
-  document.getElementById('edit-variable').value=o.variable||'';
+  const prodSec=document.getElementById('edit-product-section');
+  const isCart=Array.isArray(o.items)&&o.items.length>0;
+  if(isCart){
+    prodSec.innerHTML=`
+      <div class="edit-label" style="margin-bottom:8px">ORDER</div>
+      <div class="detail-section" style="margin-bottom:12px;padding:10px 12px">
+        ${o.items.map(it=>`
+          <div class="price-row">
+            <span class="price-label">${esc((it.product||it.product_slug||it.slug||'')+' '+sizeLabel(it))}${it.is_free?' 🎁':''}</span>
+            <span style="white-space:nowrap">${it.is_free?'مجانية':Number(it.line_price||it.price||0).toLocaleString()+' DZD'}</span>
+          </div>`).join('')}
+      </div>`;
+  } else {
+    prodSec.innerHTML=`
+      <div class="edit-field">
+        <div class="edit-label">Product</div>
+        <input class="edit-input" id="edit-product" value="${esc(o.product||'')}"/>
+      </div>
+      <div class="edit-field">
+        <div class="edit-label">Variant</div>
+        <input class="edit-input" id="edit-variable" value="${esc(o.variable||'')}"/>
+      </div>`;
+  }
   const shipping=o.shipping_cost||0;
   document.getElementById('edit-product-price').value=(o.prix_total||0)-shipping;
   document.getElementById('edit-shipping-price').value=shipping;
@@ -1295,8 +1311,8 @@ async function saveEdit(){
     commune,
     type_livraison:type,
     station_code:stationCode,
-    product:document.getElementById('edit-product').value,
-    variable:document.getElementById('edit-variable').value,
+    product:document.getElementById('edit-product')?document.getElementById('edit-product').value:(currentOrder.product||''),
+    variable:document.getElementById('edit-variable')?document.getElementById('edit-variable').value:(currentOrder.variable||''),
     shipping_cost:shippingPrice,
     prix_total:productPrice+shippingPrice,
   };
