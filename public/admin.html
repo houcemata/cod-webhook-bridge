@@ -1253,8 +1253,16 @@ function showPage(name,persist=true){
 
 // ── DATA ──
 async function loadOrders(){
-  const{data}=await sb.from('orders').select('*').order('created_at',{ascending:false});
-  allOrders=data||[];filteredOrders=[...allOrders];
+  // Paginate: Supabase returns max 1000 rows per request, so loop until all are fetched.
+  let all=[],start=0;const PAGE=1000;
+  while(true){
+    const{data,error}=await sb.from('orders').select('*').order('created_at',{ascending:false}).range(start,start+PAGE-1);
+    if(error){console.error('loadOrders error:',error);break;}
+    all=all.concat(data||[]);
+    if(!data||data.length<PAGE)break;
+    start+=PAGE;
+  }
+  allOrders=all;filteredOrders=[...allOrders];
   const prods=[...new Set(allOrders.map(o=>o.product).filter(Boolean))];
   const sel=document.getElementById('order-product');
   sel.innerHTML='<option value="">All Products</option>'+prods.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('');
@@ -1297,8 +1305,15 @@ let dashPeriod='all';   // 'all'|'today'|'yesterday'|'7days'|'30days'|'month'|'c
 let allHistory=[];
 
 async function loadHistory(){
-  const{data}=await sb.from('order_history').select('order_id,new_status,changed_at').order('changed_at',{ascending:false});
-  allHistory=data||[];
+  let all=[],start=0;const PAGE=1000;
+  while(true){
+    const{data,error}=await sb.from('order_history').select('order_id,new_status,changed_at').order('changed_at',{ascending:false}).range(start,start+PAGE-1);
+    if(error){console.error('loadHistory error:',error);break;}
+    all=all.concat(data||[]);
+    if(!data||data.length<PAGE)break;
+    start+=PAGE;
+  }
+  allHistory=all;
 }
 
 function setDashMode(mode){
