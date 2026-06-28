@@ -25,51 +25,49 @@ const NOEST_BASE = "https://app.noest-dz.com/api/public";
  * keys depending on carrier, language, or API version.
  */
 const EVENT_STATUS_MAP = {
+  // ── In transit / out for delivery ──
+  validation_collect_colis: "shipping",
+  validation_reception_admin: "shipping",
   validation_reception: "shipping",
-  reception_validation: "shipping",
-  picked_up: "shipping",
-  pickup: "shipping",
-  collected: "shipping",
   fdr_activated: "shipping",
+  sent_to_redispatch: "shipping",
+  nouvel_tentative_asked_by_customer: "shipping",
+  mise_a_jour: "shipping",
+  return_redispatched_to_livraison: "shipping", // return put back out for delivery
   out_for_delivery: "shipping",
-  en_livraison: "shipping",
-  transit: "shipping",
-  in_transit: "shipping",
+  picked_up_by_driver: "shipping",
 
+  // ── Delivered ── (COD cash-collection events only happen AFTER delivery,
+  // so they count as proof of delivery)
   livre: "delivered",
   livred: "delivered",
   delivered: "delivered",
-  delivery_delivered: "delivered",
-  livraison_terminee: "delivered",
-  livraison_termine: "delivered",
-  colis_livre: "delivered",
-  parcel_delivered: "delivered",
-  shipment_delivered: "delivered",
-  delivered_to_address: "delivered",
-  delivered_to_customer: "delivered",
-  closed: "delivered",
+  verssement_admin_cust: "delivered",
+  validation_reception_cash_by_partener: "delivered",
+  amount_transmitted_to_partner: "delivered",
+  amount_received_by_partner: "delivered",
+  echange_valide: "delivered",
+  echange_valid_by_hub: "delivered",
 
+  // ── Suspended ──
   colis_suspendu: "suspended",
   suspended: "suspended",
-  suspendu: "suspended",
 
-  // A shipped parcel that comes back = a RETURN (goods re-enter stock),
-  // not a pre-ship cancellation. This tracker only runs on shipped orders,
-  // so every comeback event maps to "returned".
+  // ── Returned ── (parcel coming back / received by partner)
   return_asked_by_customer: "returned",
   return_asked_by_hub: "returned",
   retour_dispatched_to_partenaires: "returned",
+  return_dispatched_to_partenaire: "returned",
+  return_dispatched_to_partner: "returned",
+  colis_retour_transmit_to_partner: "returned",
   livraison_echoue_recu: "returned",
-  returned: "returned",
-  return_to_sender: "returned",
-  cancelled: "returned",
-  cancelled_by_customer: "returned",
-  cancelled_by_hub: "returned",
-  cancelled_to_sender: "returned",
-  return: "returned",
-  retour: "returned",
-  retour_to_sender: "returned",
-  retour_au_sender: "returned",
+  return_validated_by_partener: "returned",
+  return_validated_by_partner: "returned",
+  return_dispatched_to_warehouse: "returned",
+  return_received_by_partner: "returned",
+  return_requested_by_partner: "returned",
+  return_in_transit: "returned",
+  return_package_transmitted_to_partner: "returned",
 };
 
 /**
@@ -258,9 +256,9 @@ async function getLatestNoestEvent(trackingNumber) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
+        user_guid: noestGuid,   // REQUIRED by Noest — was missing, caused empty results
         trackings: [trackingNumber],
       }),
-      timeout: 5000,
     });
 
     if (!response.ok) {
@@ -271,33 +269,33 @@ async function getLatestNoestEvent(trackingNumber) {
     const data = await response.json();
     const orderData = data[trackingNumber];
 
-    if (!orderData || !orderData.activity || orderData.activity.length === 0) {
+    if (!orderData || !Array.isArray(orderData.activity) || orderData.activity.length === 0) {
       console.warn(`[getLatestNoestEvent] No activity for ${trackingNumber}`);
       return null;
     }
 
-    // Noest payloads are not always consistently ordered across carriers,
-    // so sort by the event timestamp when available and fall back to the
-    // original order if parsing fails.
-    const activity = [...orderData.activity].sort((a, b) => {
-      const aTime = parseNoestDate(a?.date || a?.created_at || a?.datetime);
-      const bTime = parseNoestDate(b?.date || b?.created_at || b?.datetime);
-      return bTime - aTime;
-    });
+    // Sort the full activity history newest-first.
+    const activity = [...orderData.activity].sort(
+      (a, b) => parseNoestDate(b?.date) - parseNoestDate(a?.date)
+    );
 
-    const latestActivity = activity[0];
+    // Walk newest → oldest and return the most recent event that maps to a
+    // status we track. This skips post-delivery noise (e.g. "Amount
+    // transmitted to partner") that would otherwise hide the real
+    // delivered/returned outcome sitting one line below it.
+    let newest = null;
+    for (const act of activity) {
+      const key = normalizeNoestEventKey(
+        act.event_key || act.event || act.status || act.label || ""
+      );
+      if (!newest) newest = { event_key: key, event_name: act.event, date: act.date };
+      if (EVENT_STATUS_MAP[key]) {
+        return { event_key: key, event_name: act.event, date: act.date };
+      }
+    }
 
-    return {
-      event_key: normalizeNoestEventKey(
-        latestActivity.event_key ||
-        latestActivity.event ||
-        latestActivity.status ||
-        latestActivity.label ||
-        ""
-      ),
-      event_name: latestActivity.event,
-      date: latestActivity.date,
-    };
+    // No mapped event found — return the newest raw event (handler ignores it).
+    return newest;
   } catch (err) {
     console.error(`[getLatestNoestEvent] Error for ${trackingNumber}:`, err.message);
     return null;
