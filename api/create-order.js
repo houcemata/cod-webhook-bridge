@@ -469,6 +469,7 @@ export default async function handler(req, res) {
           prix_total: total,
           shipping_cost: shippingCost,
           status: "pending",
+          from_draft: true,
           notes,
           ip_address: clientIp || null,
         })
