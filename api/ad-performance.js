@@ -2,6 +2,7 @@ import { requireRole } from "./_auth.js";
 
 const META_GRAPH_VERSION = "v20.0";
 const TIKTOK_API_BASE = "https://business-api.tiktok.com";
+const USD_TO_DZD = 255;
 
 function toDateOnly(value) {
   const d = new Date(value);
@@ -32,7 +33,7 @@ function makeDailyBucket(map, date) {
   return map.get(date);
 }
 
-function normalizeDailyRows(rows, source) {
+function normalizeDailyRows(rows, source, fxRate = 1) {
   return rows
     .map((row) => {
       const metrics = row.metrics || row.metric || row.metrics_data || row.values || row;
@@ -51,9 +52,10 @@ function normalizeDailyRows(rows, source) {
         row.reporting_start_time ||
         row.report_date ||
         "";
+      const rawSpend = money(metrics.spend || metrics.cost || metrics.amount_spent || row.spend || row.cost || row.amount_spent || 0);
       return {
         date: toDateOnly(date) || String(date || "").slice(0, 10),
-        spend: money(metrics.spend || metrics.cost || metrics.amount_spent || row.spend || row.cost || row.amount_spent || 0),
+        spend: rawSpend * fxRate,
         impressions: money(metrics.impressions || metrics.impression || row.impressions || row.impression || 0),
         clicks: money(metrics.clicks || metrics.click || row.clicks || row.click || 0),
         source,
@@ -82,7 +84,7 @@ async function fetchMetaSummary(from, to) {
   const response = await fetch(url);
   const data = await response.json().catch(() => ({}));
   const rows = Array.isArray(data?.data) ? data.data : [];
-  const daily = normalizeDailyRows(rows, "meta");
+  const daily = normalizeDailyRows(rows, "meta", USD_TO_DZD);
 
   return {
     provider: "meta",
@@ -130,7 +132,8 @@ async function fetchTikTokSummary(from, to) {
   });
   const data = await response.json().catch(() => ({}));
   const rows = extractTikTokRows(data);
-  const daily = normalizeDailyRows(rows, "tiktok");
+  // TikTok accounts are usually in USD too — apply same rate
+  const daily = normalizeDailyRows(rows, "tiktok", USD_TO_DZD);
 
   return {
     provider: "tiktok",
@@ -195,18 +198,12 @@ export default async function handler(req, res) {
     });
 
     const daily = [...bucket.values()].sort((a, b) => a.date.localeCompare(b.date));
-    const total_spend = daily.reduce((sumTotal, row) => sumTotal + row.meta_spend + row.tiktok_spend, 0);
+    const total_spend = daily.reduce((s, row) => s + row.meta_spend + row.tiktok_spend, 0);
 
     return res.status(200).json({
       period: { from, to },
-      meta: {
-        ...meta,
-        total_spend: meta.total_spend || 0,
-      },
-      tiktok: {
-        ...tiktok,
-        total_spend: tiktok.total_spend || 0,
-      },
+      meta: { ...meta, total_spend: meta.total_spend || 0 },
+      tiktok: { ...tiktok, total_spend: tiktok.total_spend || 0 },
       daily,
       total_spend,
     });
