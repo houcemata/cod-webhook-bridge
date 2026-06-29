@@ -1138,7 +1138,7 @@ const STATUSES=[
   {k:'delivered',l:'Delivered',c:'#22c55e'},{k:'canceled',l:'Canceled',c:'#e11d48'},
   {k:'not_delivered',l:'Not Delivered',c:'#ef4444'},{k:'returned',l:'Returned',c:'#f59e0b'},{k:'duplicated',l:'Duplicated',c:'#71717a'},
 ];
-const CONFIRMATION_FLOW_STATUSES=new Set(['confirmed','shipped','rescheduled','delivered','not_delivered']);
+const CONFIRMATION_FLOW_STATUSES=new Set(['confirmed','shipped','shipping','rescheduled','delivered','not_delivered','returned','attempt_1','attempt_2','attempt_3','suspended']);
 
 let currentUser=null,currentRole=null,allOrders=[],filteredOrders=[],allProducts=[],allOperators=[];
 let currentPage=1;const PAGE_SIZE=30;let editingProductId=null;
@@ -1394,12 +1394,15 @@ function updateDashboard(){
     const shipped=orders.filter(o=>o.status==='shipped'||o.status==='shipping').length;
     const canceled=orders.filter(o=>o.status==='canceled').length;
     const returned=orders.filter(o=>o.status==='returned').length;
-    const delRate=total?(delivered/total*100).toFixed(1):'0.0';
-    const confRateAll=total?(confirmedFlow/total*100).toFixed(1):'0.0';
-    const nonDraft=orders.filter(o=>o.status!=='draft').length;
-    const confRateNonDraft=nonDraft?(confirmedFlow/nonDraft*100).toFixed(1):'0.0';
-    const delRateConfirmed=confirmedFlow?(delivered/confirmedFlow*100).toFixed(1):'0.0';
-    const delRateAll=total?(delivered/total*100).toFixed(1):'0.0';
+    // ── Rate formulas (per spec) ──  "shipped" includes out-for-delivery (shipping).
+    const nonDraft=orders.filter(o=>o.status!=='draft'&&!o.from_draft).length;   // total minus draft leads
+    const confirmedNum=confirmed+shipped+delivered+returned;       // = confirmed orders
+    const delConfDenom=confirmed+shipped+delivered+returned;      // delivery-rate (confirmed) denominator
+    const confRateAll=total?(confirmedNum/total*100).toFixed(1):'0.0';          // confirmed / all leads
+    const confRateNonDraft=nonDraft?(confirmedNum/nonDraft*100).toFixed(1):'0.0'; // confirmed / non-draft
+    const delRateConfirmed=delConfDenom?(delivered/delConfDenom*100).toFixed(1):'0.0'; // delivered / (confirmed+shipped+returned)
+    const delRateAll=nonDraft?(delivered/nonDraft*100).toFixed(1):'0.0';        // delivered / non-draft leads
+    const delRate=delRateAll;
     document.getElementById('kpi-total').textContent=total;
     document.getElementById('kpi-delivered').textContent=delivered;
     document.getElementById('kpi-del-rate').textContent=`${delRate}% rate`;
@@ -1428,7 +1431,7 @@ function updateDashboard(){
     hist.forEach(h=>{if(countByStatus.hasOwnProperty(h.new_status))countByStatus[h.new_status]++;});
     const delivered=countByStatus['delivered']||0;
     const confirmed=countByStatus['confirmed']||0;
-    const confirmedFlow=['confirmed','shipped','rescheduled','delivered','not_delivered'].reduce((sum,status)=>sum+(countByStatus[status]||0),0);
+    const confirmedFlow=['confirmed','shipped','shipping','rescheduled','delivered','not_delivered','returned','attempt_1','attempt_2','attempt_3','suspended'].reduce((sum,status)=>sum+(countByStatus[status]||0),0);
     const shipped=(countByStatus['shipped']||0)+(countByStatus['shipping']||0);
     const canceled=countByStatus['canceled']||0;
     const returned=countByStatus['returned']||0;
@@ -1439,11 +1442,20 @@ function updateDashboard(){
     document.getElementById('kpi-del-rate').textContent='deliveries';
     document.getElementById('kpi-confirmed').textContent=confirmed;
     document.getElementById('kpi-conf-rate').textContent='confirmations';
-    const nonDraft=allOrders.filter(o=>o.status!=='draft').length;
-    const confRateAll=total?(confirmedFlow/total*100).toFixed(1):'0.0';
-    const confRateNonDraft=nonDraft?(confirmedFlow/nonDraft*100).toFixed(1):'0.0';
-    const delRateConfirmed=confirmedFlow?(delivered/confirmedFlow*100).toFixed(1):'0.0';
-    const delRateAll=total?(delivered/total*100).toFixed(1):'0.0';
+    const nonDraft=allOrders.filter(o=>o.status!=='draft'&&!o.from_draft).length;
+    // Confirmation/delivery rates are overall funnel metrics — always compute from
+    // current order statuses (not date-filtered events) so they stay correct in any mode.
+    const rConfirmed=allOrders.filter(o=>o.status==='confirmed').length;
+    const rShipped=allOrders.filter(o=>o.status==='shipped'||o.status==='shipping').length;
+    const rDelivered=allOrders.filter(o=>o.status==='delivered').length;
+    const rReturned=allOrders.filter(o=>o.status==='returned').length;
+    const rTotal=allOrders.length;
+    const rConfirmedNum=rConfirmed+rShipped+rDelivered+rReturned;
+    const rDelConfDenom=rConfirmed+rShipped+rDelivered+rReturned;
+    const confRateAll=rTotal?(rConfirmedNum/rTotal*100).toFixed(1):'0.0';
+    const confRateNonDraft=nonDraft?(rConfirmedNum/nonDraft*100).toFixed(1):'0.0';
+    const delRateConfirmed=rDelConfDenom?(rDelivered/rDelConfDenom*100).toFixed(1):'0.0';
+    const delRateAll=nonDraft?(rDelivered/nonDraft*100).toFixed(1):'0.0';
     document.getElementById('kpi-conf-all').textContent=`${confRateAll}%`;
     document.getElementById('kpi-conf-nondraft').textContent=`${confRateNonDraft}%`;
     document.getElementById('kpi-del-confirmed').textContent=`${delRateConfirmed}%`;
