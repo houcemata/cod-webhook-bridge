@@ -1,1461 +1,316 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<title>ARCO CRM</title>
-<script>document.title='ARCO CRM';</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#000;color:#fff;min-height:100vh;overflow-x:hidden}
+/**
+ * api/track-orders.js
+ * 
+ * Auto-tracking system for ARCO COD CRM
+ * Polls Noest Express API every 30 minutes (via pg_cron)
+ * Tracks: picked up by driver, out for delivery, delivered, suspended, returned
+ * Updates order statuses + logs changes to order_history
+ */
 
-/* LOGIN */
-#login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:18px;padding:32px}
-.login-card{width:min(360px,100%);background:#0a0a0a;border:1px solid #1a1a1a;border-radius:18px;padding:24px;display:grid;gap:14px}
-.login-logo{font-size:32px;font-weight:900;letter-spacing:-1px;text-align:center}
-.login-logo span{color:#e11d48}
-.login-subtitle{font-size:13px;color:#555;letter-spacing:1px;text-transform:uppercase;text-align:center;margin-bottom:6px}
-.login-input{width:100%;background:#111;border:1px solid #222;color:#fff;font-size:15px;padding:13px 14px;border-radius:12px;outline:none}
-.login-input:focus{border-color:#e11d48}
-.login-btn{background:#e11d48;border:none;color:#fff;padding:13px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer}
-.login-btn.loading{opacity:.7;pointer-events:none}
-.login-error{min-height:18px;color:#e11d48;font-size:13px;text-align:center}
+import { createClient } from "@supabase/supabase-js";
+import { isAuthorizedCronRequest, requireRole } from "./_auth.js";
 
-/* APP */
-#app{display:none;flex-direction:column;min-height:100vh}
-.app-header{background:#000;border-bottom:1px solid #1a1a1a;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.logo{font-size:20px;font-weight:900;letter-spacing:-0.5px}
-.logo span{color:#e11d48}
-.header-actions{display:flex;align-items:center;gap:8px}
-.refresh-btn{background:#111;border:1px solid #222;color:#888;width:34px;height:34px;border-radius:10px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.refresh-btn:active{background:#222}
-.logout-btn{background:#111;border:1px solid #222;color:#888;height:34px;border-radius:10px;padding:0 12px;font-size:12px;font-weight:700;cursor:pointer}
-.logout-btn:active{background:#222}
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const noestApiKey = process.env.NOEST_API_KEY;
+const noestGuid = process.env.NOEST_GUID;
 
-/* Screens */
-.screen{display:none;flex-direction:column;flex:1}
-.screen.active{display:flex}
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-/* Stats */
-.stats-section{padding:14px 14px 0}
-.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-.kpi-card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:14px;padding:14px}
-.kpi-card.total{grid-column:1/-1;border-color:#e11d48}
-.kpi-card.rate{border-color:#e11d4855}
-.kpi-label{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.kpi-label .dot{width:6px;height:6px;border-radius:50%;background:#e11d48}
-.kpi-value{font-size:28px;font-weight:800;color:#fff;line-height:1}
-.kpi-card.total .kpi-value{font-size:32px;color:#e11d48}
-.kpi-card.rate .kpi-value{font-size:22px;color:#e11d48}
-.chart-wrap{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:14px;padding:16px;margin-bottom:16px}
-.chart-title{font-size:12px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
-.chart-inner{display:flex;align-items:center;gap:16px}
-#donut-svg{flex-shrink:0}
-.chart-legend{display:flex;flex-direction:column;gap:7px;flex:1}
-.legend-item{display:flex;align-items:center;gap:8px;font-size:12px}
-.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.legend-label{color:#888;flex:1}
-.legend-val{color:#fff;font-weight:600}
+const NOEST_BASE = "https://app.noest-dz.com/api/public";
 
-/* Filters — always visible */
-.filters-bar{padding:10px 14px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid #1a1a1a;background:#000}
-.search-bar{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:12px;padding:11px 14px;color:#fff;font-size:14px;width:100%;outline:none}
-.search-bar::placeholder{color:#444}
-.search-bar:focus{border-color:#e11d48}
-.filters-row{display:flex;gap:8px}
-.filter-select{flex:1;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:12px;padding:10px 12px;color:#fff;font-size:13px;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-.filter-select:focus{border-color:#e11d48}
-.custom-date-row{display:none;gap:8px}
-.custom-date-row.show{display:flex}
-.date-input{flex:1;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:12px;padding:10px 12px;color:#fff;font-size:13px;outline:none;color-scheme:dark}
-.date-input:focus{border-color:#e11d48}
+/**
+ * Map Noest event keys to ARCO order statuses.
+ * We keep the map broad because Noest can return slightly different
+ * keys depending on carrier, language, or API version.
+ */
+const EVENT_STATUS_MAP = {
+  // ── In transit / out for delivery ──
+  validation_collect_colis: "shipping",
+  validation_reception_admin: "shipping",
+  validation_reception: "shipping",
+  fdr_activated: "shipping",
+  sent_to_redispatch: "shipping",
+  nouvel_tentative_asked_by_customer: "shipping",
+  mise_a_jour: "shipping",
+  return_redispatched_to_livraison: "shipping", // return put back out for delivery
+  out_for_delivery: "shipping",
+  picked_up_by_driver: "shipping",
 
-/* Tab Bar */
-.tab-bar{position:fixed;bottom:0;left:0;right:0;background:#000;border-top:1px solid #1a1a1a;display:flex;overflow-x:auto;padding:8px 8px 20px;gap:6px;z-index:100;scrollbar-width:none}
-.tab-bar::-webkit-scrollbar{display:none}
-.tab-btn{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1px solid #222;background:#0a0a0a;color:#555;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s}
-.tab-btn.active{background:#e11d48;border-color:#e11d48;color:#fff}
-.tab-count{background:rgba(255,255,255,.15);border-radius:10px;padding:1px 6px;margin-left:4px;font-size:10px}
-.tab-btn.active .tab-count{background:rgba(0,0,0,.25)}
+  // ── Delivered ── (COD cash-collection events only happen AFTER delivery,
+  // so they count as proof of delivery)
+  livre: "delivered",
+  livred: "delivered",
+  delivered: "delivered",
+  verssement_admin_cust: "delivered",
+  validation_reception_cash_by_partener: "delivered",
+  amount_transmitted_to_partner: "delivered",
+  amount_received_by_partner: "delivered",
+  echange_valide: "delivered",
+  echange_valid_by_hub: "delivered",
 
-/* Orders */
-.orders-toolbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 6px;gap:8px;flex-wrap:wrap}
-.toolbar-left{display:flex;align-items:center;gap:8px}
-.sort-btn{background:#111;border:1px solid #222;color:#ccc;padding:7px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
-.sort-btn:active{background:#222}
-.orders-count{font-size:12px;color:#555}
-.page-size-select{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:7px 10px;color:#fff;font-size:12px;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer}
-.page-size-select:focus{border-color:#e11d48}
+  // ── Suspended ──
+  colis_suspendu: "suspended",
+  suspended: "suspended",
 
-.bulk-bar{display:none;padding:10px 14px;background:#0a0a0a;border-bottom:1px solid #1a1a1a;align-items:center;gap:10px}
-.bulk-bar.show{display:flex}
-.select-all-btn{background:#111;border:1px solid #333;color:#fff;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
-.bulk-ship-btn{flex:1;background:#3b82f6;border:none;color:#fff;padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer}
-.bulk-ship-btn:active{opacity:.8}
-.bulk-count{font-size:12px;color:#888}
-.orders-scroll{flex:1;overflow-y:auto;padding:6px 14px 0}
-
-/* Pagination */
-.pagination{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;border-top:1px solid #1a1a1a;margin-bottom:80px}
-.page-btn{background:#111;border:1px solid #222;color:#fff;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
-.page-btn:disabled{opacity:.3;cursor:not-allowed}
-.page-btn.active{background:#e11d48;border-color:#e11d48}
-.page-info{font-size:12px;color:#555}
-
-/* Order Card */
-.order-card{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:14px;padding:14px;margin-bottom:10px}
-.order-card.selected{border-color:#e11d48}
-.card-top-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
-.card-checkbox{width:20px;height:20px;border-radius:6px;border:2px solid #333;background:#111;cursor:pointer;flex-shrink:0;display:none;align-items:center;justify-content:center;margin-top:2px}
-.card-checkbox.visible{display:flex}
-.card-checkbox.checked{background:#e11d48;border-color:#e11d48}
-.card-checkbox.checked::after{content:'?';font-size:12px;color:#fff;font-weight:800}
-.card-main{flex:1;cursor:pointer}
-.card-name-price{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
-.order-name{font-size:15px;font-weight:700}
-.order-price{font-size:15px;font-weight:800;color:#e11d48}
-.order-meta{font-size:12px;color:#555;line-height:1.8}
-.order-meta b{color:#888}
-.status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:6px}
-.card-actions{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
-.btn-call-sm{background:#e11d48;color:#fff;border:none;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap}
-.btn-call-sm:active{opacity:.8}
-.btn-wa-sm{background:#25d366;color:#fff;border:none;width:38px;height:38px;border-radius:10px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.btn-wa-sm:active{opacity:.8}
-.card-status-select{flex:1;min-width:120px;background:#111;border:1px solid #333;color:#fff;font-size:13px;font-weight:600;padding:9px 10px;border-radius:10px;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer}
-.card-status-select:focus{border-color:#e11d48}
-.btn-ship-sm{background:#3b82f6;color:#fff;border:none;padding:9px 14px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
-.btn-ship-sm:active{opacity:.8}
-.btn-detail{background:#111;border:1px solid #222;color:#555;padding:9px 12px;border-radius:10px;font-size:13px;cursor:pointer}
-
-/* Status colors */
- .s-draft{background:#14161f;color:#c4b5fd;border:1px solid #8b5cf633}
- .s-pending{background:#1a1200;color:#f59e0b;border:1px solid #f59e0b33}
-.s-to_recall{background:#1a0f00;color:#fb923c;border:1px solid #fb923c33}
-.s-attempt_1{background:#1a0800;color:#f97316;border:1px solid #f9731633}
-.s-attempt_2{background:#1a0500;color:#ea580c;border:1px solid #ea580c33}
-.s-attempt_3{background:#150000;color:#dc2626;border:1px solid #dc262633}
-.s-rescheduled{background:#001a1a;color:#06b6d4;border:1px solid #06b6d433}
-.s-confirmed{background:#00051a;color:#3b82f6;border:1px solid #3b82f633}
-.s-shipped{background:#0a001a;color:#8b5cf6;border:1px solid #8b5cf633}
-.s-delivered{background:#001a08;color:#22c55e;border:1px solid #22c55e33}
-.s-canceled{background:#1a0000;color:#e11d48;border:1px solid #e11d4833}
-.s-not_delivered{background:#1a0000;color:#ef4444;border:1px solid #ef444433}
-.s-duplicated{background:#111;color:#71717a;border:1px solid #71717a33}
-
-/* Detail */
-.detail-scroll{flex:1;overflow-y:auto;padding:14px 14px 100px}
-.back-btn{background:none;border:none;color:#e11d48;font-size:15px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px;display:flex;align-items:center;gap:6px}
-.detail-section{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:14px;padding:14px;margin-bottom:12px}
-.detail-section-title{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
-.customer-name-big{font-size:22px;font-weight:800;margin-bottom:4px}
-.customer-location{font-size:14px;color:#888;margin-bottom:12px}
-.phone-row{display:flex;align-items:center;gap:10px}
-.phone-number{font-size:16px;font-weight:600;flex:1}
-.btn-call{background:#e11d48;color:#fff;border:none;padding:10px 18px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer}
-.btn-call:active{opacity:.8}
-.btn-whatsapp{background:#25d366;color:#fff;border:none;width:42px;height:42px;border-radius:12px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.btn-whatsapp:active{opacity:.8}
-.price-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #111;font-size:14px}
-.price-row:last-child{border-bottom:none;font-weight:800;font-size:16px;color:#e11d48}
-.price-label{color:#888}
-.status-dropdown{width:100%;background:#111;border:1px solid #333;color:#fff;font-size:15px;font-weight:600;padding:12px 14px;border-radius:12px;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer}
-.status-dropdown:focus{border-color:#e11d48}
-.note-field{width:100%;background:#111;border:1px solid #222;color:#fff;font-size:14px;padding:12px;border-radius:12px;outline:none;resize:none;min-height:90px;font-family:inherit}
-.note-field:focus{border-color:#e11d48}
-.save-note-btn{width:100%;background:#e11d48;color:#fff;border:none;padding:12px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px}
-.save-note-btn:active{opacity:.8}
-.ship-btn{width:100%;background:#3b82f6;color:#fff;border:none;padding:13px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px}
-.ship-btn:active{opacity:.8}
-.track-btn{width:100%;background:#8b5cf6;color:#fff;border:none;padding:13px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px}
-.track-btn:active{opacity:.8}
-.action-row{display:flex;gap:10px;margin-top:4px}
-.btn-delete{flex:1;background:#1a0000;border:1px solid #e11d4855;color:#e11d48;padding:13px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
-.btn-delete:active{background:#e11d48;color:#fff}
-.btn-edit{flex:1;background:#111;border:1px solid #333;color:#fff;padding:13px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer}
-.btn-edit:active{background:#222}
-.detail-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
-.order-num{font-size:13px;color:#444;font-weight:600}
-.history-btn{background:#111;border:1px solid #222;color:#888;padding:9px 16px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer}
-
-/* Modals */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:none;align-items:flex-end}
-.modal-overlay.open{display:flex}
-.modal{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:20px 20px 0 0;width:100%;max-height:75vh;overflow-y:auto;padding:20px}
-.modal-title{font-size:16px;font-weight:800;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
-.modal-close{background:none;border:none;color:#555;font-size:22px;cursor:pointer;line-height:1}
-.history-item{padding:12px 0;border-bottom:1px solid #111;font-size:13px}
-.history-item:last-child{border-bottom:none}
-.history-arrow{color:#e11d48;font-weight:700;margin:0 6px}
-.history-time{color:#444;font-size:11px;margin-top:4px}
-.history-type{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;text-transform:uppercase;margin-bottom:4px}
-.history-type.status{background:#e11d4822;color:#e11d48}
-.history-type.field{background:#3b82f622;color:#3b82f6}
-
-/* Edit Modal */
-.edit-modal{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:20px}
-.edit-field{margin-bottom:12px}
-.edit-label{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.edit-input,.edit-select{width:100%;background:#111;border:1px solid #222;color:#fff;font-size:14px;padding:11px 12px;border-radius:12px;outline:none;font-family:inherit;appearance:none;-webkit-appearance:none}
-.edit-input:focus,.edit-select:focus{border-color:#e11d48}
-.price-fields{display:flex;gap:8px}
-.price-fields .edit-field{flex:1;margin-bottom:0}
-.total-display{background:#111;border:1px solid #333;border-radius:12px;padding:11px 12px;font-size:15px;font-weight:800;color:#e11d48;text-align:center;margin-bottom:12px}
-.edit-save-btn{width:100%;background:#e11d48;color:#fff;border:none;padding:13px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
-
-/* Toast */
-#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#111;border:1px solid #333;color:#fff;padding:10px 22px;border-radius:99px;font-size:13px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:300;white-space:nowrap}
-#toast.show{opacity:1}
-#toast.err{background:#1a0000;border-color:#e11d48;color:#e11d48}
-.empty-wrap{display:flex;align-items:center;justify-content:center;padding:60px;color:#333;font-size:14px;flex-direction:column;gap:8px}
-/* Duplicate warning banner */
-.dup-banner{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:12px;padding:10px 14px;margin:0 14px 8px;font-size:12px;color:#f59e0b;display:flex;align-items:flex-start;gap:8px}
-.dup-banner b{font-weight:700}
-.dup-banner-icon{font-size:15px;flex-shrink:0;margin-top:1px}
-</style>
-<style>
-:root{
-  --arco-yellow:#F5C500;
-  --arco-black:#080808;
-  --arco-dark:#111111;
-  --arco-red:#e11d48;
-  --arco-green:#22c55e;
-  --arco-line:rgba(255,255,255,.08);
-  --arco-line-strong:rgba(245,197,0,.24);
-  --arco-panel:linear-gradient(180deg, rgba(255,255,255,.04), rgba(17,17,17,.95));
-  --arco-shadow:0 18px 44px rgba(0,0,0,.34);
-}
-body{
-  font-family:'Cairo',sans-serif;
-  background:
-    radial-gradient(circle at top left, rgba(245,197,0,.12), transparent 24%),
-    radial-gradient(circle at 100% 12%, rgba(225,29,72,.08), transparent 22%),
-    linear-gradient(180deg, #080808 0%, #0b0b0b 38%, #111111 100%);
-  color:#f8f8f8;
-}
-button,input,select,textarea{font:inherit}
-#login-screen{position:relative}
-#login-screen:before{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    radial-gradient(circle at 24% 18%, rgba(245,197,0,.12), transparent 18%),
-    radial-gradient(circle at 80% 26%, rgba(245,197,0,.08), transparent 14%);
-}
-.login-card,.kpi-card,.chart-wrap,.order-card,.detail-section,.modal,.edit-modal{
-  background:var(--arco-panel);
-  border-color:var(--arco-line);
-  box-shadow:var(--arco-shadow);
-}
-.login-card{
-  width:min(400px,100%);
-  border-radius:28px;
-  padding:30px 24px 24px;
-}
-.login-logo,.logo{
-  font-family:'Bebas Neue',sans-serif;
-  letter-spacing:.08em;
-}
-.login-logo{font-size:3rem;line-height:.92}
-.logo{font-size:2rem;line-height:.9}
-.login-logo span,.logo span,.kpi-card.total .kpi-value,.kpi-card.rate .kpi-value,.order-price,.price-row:last-child,.total-display,.history-arrow,.back-btn{color:var(--arco-yellow)}
-.login-subtitle{
-  font-family:'Barlow Condensed',sans-serif;
-  color:#a3a3a3;
-  letter-spacing:.18em;
-  margin-bottom:10px;
-}
-.login-input,.search-bar,.filter-select,.date-input,.page-size-select,.card-status-select,.status-dropdown,.note-field,.edit-input,.edit-select,.total-display{
-  background:rgba(255,255,255,.04);
-  border-color:var(--arco-line);
-  border-radius:14px;
-}
-.login-input,.search-bar,.note-field,.edit-input{padding:14px 15px}
-.filter-select,.date-input,.page-size-select,.card-status-select,.status-dropdown,.edit-select{padding:10px 12px}
-.login-input:focus,.search-bar:focus,.filter-select:focus,.date-input:focus,.page-size-select:focus,.card-status-select:focus,.status-dropdown:focus,.note-field:focus,.edit-input:focus,.edit-select:focus{
-  border-color:var(--arco-line-strong);
-  box-shadow:0 0 0 3px rgba(245,197,0,.08);
-}
-.login-btn,.btn-call-sm,.btn-call,.save-note-btn,.ship-btn,.bulk-ship-btn,.edit-save-btn,.tab-btn.active,.page-btn.active{
-  background:linear-gradient(135deg, var(--arco-yellow), #ffd84d);
-  border-color:var(--arco-yellow);
-  color:#080808;
-}
-.login-btn,.btn-call-sm,.btn-call,.save-note-btn,.ship-btn,.bulk-ship-btn,.edit-save-btn,.logout-btn,.tab-btn,.sort-btn{
-  font-family:'Barlow Condensed',sans-serif;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-}
-.app-header,.filters-bar,.tab-bar{
-  background:rgba(8,8,8,.84);
-  backdrop-filter:blur(16px);
-  border-color:var(--arco-line);
-}
-.refresh-btn,.logout-btn,.sort-btn,.select-all-btn,.page-btn,.history-btn,.btn-detail,.btn-edit{
-  background:rgba(255,255,255,.04);
-  border:1px solid var(--arco-line);
-  color:#ddd;
-}
-.refresh-btn,.logout-btn,.sort-btn,.select-all-btn,.page-btn,.history-btn,.btn-detail,.btn-edit,.btn-wa-sm,.btn-call-sm,.btn-ship-sm,.btn-delete,.save-note-btn,.ship-btn,.track-btn,.edit-save-btn,.login-btn{
-  border-radius:14px;
-}
-.refresh-btn,.logout-btn{height:38px}
-.refresh-btn{width:38px}
-.logout-btn{padding:0 14px}
-.filters-bar,.pagination{border-color:var(--arco-line)}
-.tab-btn{
-  border-radius:999px;
-  background:rgba(255,255,255,.04);
-  border-color:var(--arco-line);
-  color:#8f8f8f;
-}
-.tab-btn.active .tab-count{background:rgba(8,8,8,.18)}
-.orders-count,.page-info,.kpi-label,.chart-title,.edit-label{color:#9f9f9f}
-.bulk-bar{background:rgba(255,255,255,.03);border-color:var(--arco-line)}
-.select-all-btn{border-radius:12px}
-.bulk-count,.customer-location,.price-label,.legend-label,.order-meta{color:#b7b7b7}
-.btn-ship-sm{
-  background:#1a1a1a;
-  border:1px solid rgba(245,197,0,.25);
-  color:var(--arco-yellow);
-}
-.btn-detail,.history-btn{color:#c7c7c7}
-.btn-whatsapp,.btn-wa-sm{background:var(--arco-green)}
-.btn-delete{
-  background:#1a0000;
-  border:1px solid rgba(225,29,72,.35);
-  color:#ff7899;
-}
-.history-type.status{
-  background:rgba(245,197,0,.14);
-  color:var(--arco-yellow);
-}
-.history-type.field{background:#3b82f622;color:#8db2ff}
-#toast{
-  background:#161616;
-  border-color:var(--arco-line-strong);
-  box-shadow:var(--arco-shadow);
-}
-#toast.err{background:#1a0000;border-color:rgba(225,29,72,.45);color:#ff7f9f}
-.empty-wrap{color:#5e5e5e}
-</style>
-</head>
-<body>
-
-<!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-card">
-  <div class="login-logo">ARCO <span>CRM</span></div>
-  <div class="login-subtitle">Operator Access</div>
-  <input class="login-input" id="login-email" type="email" autocomplete="email" placeholder="Email">
-  <input class="login-input" id="login-password" type="password" autocomplete="current-password" placeholder="Password">
-  <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
-  <div class="login-error" id="login-error"></div>
-  <div id="pin-dots" style="display:none" hidden>
-    <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
-    <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
-  </div>
-  <div class="pin-error" id="pin-error" hidden></div>
-  <div class="pin-pad" style="display:none" hidden>
-    <button class="pin-key" onclick="pinPress('1')">1</button>
-    <button class="pin-key" onclick="pinPress('2')">2</button>
-    <button class="pin-key" onclick="pinPress('3')">3</button>
-    <button class="pin-key" onclick="pinPress('4')">4</button>
-    <button class="pin-key" onclick="pinPress('5')">5</button>
-    <button class="pin-key" onclick="pinPress('6')">6</button>
-    <button class="pin-key" onclick="pinPress('7')">7</button>
-    <button class="pin-key" onclick="pinPress('8')">8</button>
-    <button class="pin-key" onclick="pinPress('9')">9</button>
-    <button class="pin-key" onclick="pinPress('0')" style="grid-column:2">0</button>
-    <button class="pin-key del" onclick="pinDel()">Del</button>
-  </div>
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app">
-  <div class="app-header">
-    <div class="logo">ARCO <span>CRM</span></div>
-    <div class="header-actions">
-    <button class="refresh-btn" onclick="refreshAll()">R</button>
-      <button class="logout-btn" onclick="doLogout()">Logout</button>
-    </div>
-  </div>
-
-  <!-- Main screen (stats + orders) -->
-  <div class="screen active" id="screen-main">
-
-    <!-- Stats — only visible on "all" tab -->
-    <div id="stats-section" class="stats-section">
-      <div class="kpi-grid" id="kpi-grid"></div>
-      <div class="chart-wrap">
-        <div class="chart-title">Order Distribution</div>
-        <div class="chart-inner">
-          <svg id="donut-svg" width="120" height="120" viewBox="0 0 120 120"></svg>
-          <div class="chart-legend" id="chart-legend"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filters — ALWAYS visible -->
-    <div class="filters-bar">
-      <input class="search-bar" id="search-input" placeholder="Search by name or phone..." oninput="onFilterChange()"/>
-      <div class="filters-row">
-        <select class="filter-select" id="filter-product" onchange="onFilterChange()">
-          <option value="">All Products</option>
-        </select>
-        <select class="filter-select" id="filter-period" onchange="onPeriodChange()">
-          <option value="all" selected>All Time</option>
-          <option value="today">Today</option>
-          <option value="7days">Last 7 Days</option>
-          <option value="30days">Last 30 Days</option>
-          <option value="month">This Month</option>
-          <option value="custom">Custom Date</option>
-        </select>
-      </div>
-      <div class="custom-date-row" id="custom-date-row">
-        <input class="date-input" type="date" id="date-from" onchange="onFilterChange()"/>
-        <input class="date-input" type="date" id="date-to" onchange="onFilterChange()"/>
-      </div>
-    </div>
-
-    <!-- Orders toolbar -->
-    <div class="orders-toolbar">
-      <div class="toolbar-left">
-        <button class="sort-btn" id="sort-btn" onclick="toggleSort()">Newest</button>
-        <select class="page-size-select" id="page-size-select" onchange="onPageSizeChange()">
-          <option value="30">30 / page</option>
-          <option value="all">Show All</option>
-        </select>
-      </div>
-      <span class="orders-count" id="orders-count"></span>
-    </div>
-
-    <!-- Bulk bar (confirmed tab only) -->
-    <div class="bulk-bar" id="bulk-bar">
-      <button class="select-all-btn" onclick="toggleSelectAll()">Select All</button>
-      <span class="bulk-count" id="bulk-count">0 selected</span>
-      <button class="bulk-ship-btn" onclick="bulkShip()">Bulk Ship</button>
-    </div>
-
-    <!-- Orders list -->
-    <div class="orders-scroll" id="orders-list"></div>
-
-    <!-- Pagination -->
-    <div class="pagination" id="pagination"></div>
-
-  </div>
-
-  <!-- Detail -->
-  <div class="screen" id="screen-detail">
-    <div class="detail-scroll" id="detail-content"></div>
-  </div>
-
-  <div class="tab-bar" id="tab-bar"></div>
-</div>
-
-<!-- History Modal -->
-<div class="modal-overlay" id="history-modal">
-  <div class="modal">
-    <div class="modal-title">Order History <button class="modal-close" onclick="closeModal('history-modal')">×</button></div>
-    <div id="history-list"></div>
-  </div>
-</div>
-
-<!-- Edit Modal -->
-<div class="modal-overlay" id="edit-modal">
-  <div class="edit-modal">
-    <div class="modal-title">Edit Order <button class="modal-close" onclick="closeModal('edit-modal')">×</button></div>
-    <div class="edit-field">
-      <div class="edit-label">Name</div>
-      <input class="edit-input" id="edit-name"/>
-    </div>
-    <div class="edit-field">
-      <div class="edit-label">Phone</div>
-      <input class="edit-input" id="edit-phone" type="tel"/>
-    </div>
-    <div class="edit-field">
-      <div class="edit-label">Delivery Type</div>
-      <select class="edit-select" id="edit-type" onchange="onEditTypeChange()">
-        <option value="home">Home Delivery</option>
-        <option value="pickup">Stop Desk</option>
-      </select>
-    </div>
-    <div class="edit-field">
-      <div class="edit-label">Wilaya</div>
-      <select class="edit-select" id="edit-wilaya" onchange="onEditWilayaChange()">
-        <option value="">Select Wilaya</option>
-      </select>
-    </div>
-    <div class="edit-field" id="edit-commune-wrap">
-      <div class="edit-label">Commune</div>
-      <select class="edit-select" id="edit-commune">
-        <option value="">Select Commune</option>
-      </select>
-    </div>
-    <div class="edit-field" id="edit-desk-wrap" style="display:none">
-      <div class="edit-label">Stop Desk</div>
-      <select class="edit-select" id="edit-desk">
-          <option value="">Loading desks...</option>
-      </select>
-    </div>
-    <div id="edit-product-section">
-      <!-- populated by openEdit(): itemized list for cart orders, text inputs for single orders -->
-    </div>
-    <div class="edit-label" style="margin-bottom:6px">Price Breakdown</div>
-    <div class="price-fields">
-      <div class="edit-field">
-        <div class="edit-label">Product Price</div>
-        <input class="edit-input" id="edit-product-price" type="number" oninput="this._manualEdit=true;calcTotal()" placeholder="0"/>
-      </div>
-      <div class="edit-field">
-        <div class="edit-label">Shipping</div>
-        <input class="edit-input" id="edit-shipping-price" type="number" oninput="calcTotal()" placeholder="0"/>
-      </div>
-    </div>
-    <div class="total-display" id="edit-total-display">Total: 0 DZD</div>
-    <button class="edit-save-btn" onclick="saveEdit()">Save Changes</button>
-  </div>
-</div>
-
-<div id="toast"></div>
-
-<script>
-const SB_URL = 'https://mpkpehuatqsubohltssi.supabase.co/rest/v1';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
-const SB_PROJECT = 'https://mpkpehuatqsubohltssi.supabase.co';
-const { createClient } = supabase;
-const sb = createClient(SB_PROJECT, SB_KEY);
-
-const STATUSES = [
-  {k:'draft',        l:'Draft',         c:'#8b5cf6'},
-  {k:'pending',       l:'Pending',       c:'#f59e0b'},
-  {k:'to_recall',     l:'To Recall',     c:'#fb923c'},
-  {k:'attempt_1',     l:'Attempt 1',     c:'#f97316'},
-  {k:'attempt_2',     l:'Attempt 2',     c:'#ea580c'},
-  {k:'attempt_3',     l:'Attempt 3',     c:'#dc2626'},
-  {k:'rescheduled',   l:'Rescheduled',   c:'#06b6d4'},
-  {k:'confirmed',     l:'Confirmed',     c:'#3b82f6'},
-  {k:'shipped',       l:'Shipped',       c:'#8b5cf6'},
-  {k:'delivered',     l:'Delivered',     c:'#22c55e'},
-  {k:'canceled',      l:'Canceled',      c:'#e11d48'},
-  {k:'not_delivered', l:'Not Delivered', c:'#ef4444'},
-  {k:'duplicated',    l:'Duplicated',    c:'#71717a'},
-];
-const CONFIRMATION_FLOW_STATUSES = new Set(['confirmed','shipped','rescheduled','delivered','not_delivered']);
-
-const WILAYA_DATA = {"01 - Adrar":["Adrar","Akabli","Aougrout","Aoulef","Bordj Badji Mokhtar","Bouda","Charouine","Deldoul","Fenoughil","In Zghmir","Ksar Kaddour","Metarfa","Ouled Ahmed Tammi","Ouled Aissa","Ouled Said","Reggane","Sali","Sbaa","Talmine","Tamentit","Tamest","Timiaouine","Timimoun","Timokten","Tinerkouk","Tit","Tsabit","Zaouiet Kounta"],"02 - Chlef":["Abou El Hassen","Ain Merane","Benairia","Beni Bouateb","Beni Haoua","Beni Rached","Boukadir","Bouzghaia","Breira","Chettia","Chlef","Dahra","El Hadjadj","El Karimia","El Marsa","Harchoun","Herenfa","Labiod Medjadja","Moussadek","Oued Fodda","Oued Goussine","Oued Sly","Ouled Abbes","Ouled Ben Abdelkader","Ouled Fares","Oum Drou","Sendjas","Sidi Abderrahmane","Sidi Akacha","Sobha","Tadjna","Talassa","Taougrite","Tenes","Zeboudja"],"03 - Laghouat":["Aflou","Ain Mahdi","Ain Sidi Ali","Beidha","Benacer Ben Chohra","Brida","El Assafia","El Ghicha","El Haouaita","El Kheneg","Gueltat Sidi Saad","Hadj Mechri","Hassi Delaa","Hassi R'Mel","Ksar El Hirane","Laghouat","Oued M'Zi","Oued Morra","Sebgag","Sidi Bouzid","Sidi Makhlouf","Tadjmout","Tadjrouna","Taouiala"],"04 - Oum El Bouaghi":["Ain Babouche","Ain Beida","Ain Diss","Ain Fekroune","Ain Kercha","Ain M'lila","Ain Zitoun","Behir Chergui","Berriche","Bir Chouhada","Dhala","El Amiria","El Belala","El Djazia","El Fedjoudj Boughrara Saoudi","El Harmilia","Fkirina","Hanchir Toumghani","Ksar Sbahi","Meskiana","Oued Nini","Ouled Gacem","Ouled Hamla","Ouled Zouai","Oum El Bouaghi","Rahia","Sigus","Souk Naamane","Zorg"],"05 - Batna":["Ain Djasser","Ain Touta","Ain Yagout","Arris","Barika","Batna","Beni Foudhala El Hakania","Bitam","Boulhilat","Boumagueur","Boumia","Bouzina","Chemora","Chir","Djerma","Djezzar","El Hassi","El Madher","Fesdis","Foum Toub","Ghassira","Gosbat","Guigba","Hidoussa","Ichmoul","Inoughissen","Kimmel","Ksar Belezma","Larbaa","Lazrou","Lemsane","M'doukel","Maafa","Menaa","Merouana","Metkaouak","N Gaous","Oued Chaaba","Oued El Ma","Oued Taga","Ouled Ammar","Ouled Aouf","Ouled Fadel","Ouled Selam","Ouled Si Slimane","Ouyoun El Assafir","Rahbat","Ras El Aioun","Sefiane","Seggana","Seriana","Talkhamt","Taxlent","Tazoult","Teniet El Abed","Tighanimine","Tigherghar","Tilatou","Timgad","Tkout","Zanat El Beida"],"06 - Bejaia":["Adekar","Ait Djellil","Ait R'zine","Ait Smail","Akbou","Akfadou","Amalou","Amizour","Aokas","Barbacha","Bejaia","Beni Ksila","Beni Melikeche","Benimaouch","Boudjellil","Bouhamza","Boukhelifa","Chelata","Chemini","Darguina","Draa Kaid","El Kseur","Feraoun","Ifelain Ilmathen","Ighil Ali","Ighram","Kendira","Kherrata","Leflaye","M'cisna","Melbou","Oued Ghir","Ouzallaguen","Seddouk","Semaoun","Sidi Aich","Sidi Ayad","Souk El Thenine","Souk Oufella","Tala Hamza","Tamokra","Tamridjet","Taourirt Ighil","Taskriout","Tazmalt","Thinabdher","Tibane","Tichi","Tifra","Timzrit","Tizi N'berber","Toudja"],"07 - Biskra":["Ain Naga","Ain Zaatout","Besbes","Biskra","Bordj Ben Azzouz","Bouchagroun","Branis","Chetma","Djemorah","Doucen","Ech Chaiba","El Feidh","El Ghrous","El Hadjab","El Haouch","El Kantara","El Outaya","Foughala","Khanguet Sidinadji","Lichana","Lioua","M'lili","M'ziraa","Mchouneche","Mekhadma","Ouled Djellal","Oumache","Ourlal","Ras El Miaad","Sidi Khaled","Sidi Okba","Tolga","Zeribet El Oued"],"08 - Bechar":["Abadla","Bechar","Beni Abbes","Beni Ikhlef","Beni Ounif","Boukais","El Ouata","Erg Ferradj","Igli","Kenedsa","Kerzaz","Ksabi","Lahmar","Mechraa Houari Boumedienne","Meridja","Mogheul","Ouled Khoudir","Tabalbala","Taghit","Tamtert","Timoudi"],"09 - Blida":["Ain Romana","Beni Mered","Beni Tamou","BenKhlil","Blida","Bouarfa","Boufarik","Bougara","Bouinan","Chebli","Chiffa","Chrea","Djebabra","El Affroun","Guerrouaou","Hammam Melouane","Larbaa","Meftah","Mouzaia","Oued Djer","Oued El Alleug","Ouled Selama","Ouled Yaich","Souhane","Soumaa"],"10 - Bouira":["Aghbalou","Ahl El Ksar","Ain Bessem","Ain El Hadjar","Ain Laloui","Ain Turk","Ait Laaziz","Aomar","Ath Mansour","Bechloul","Bir Ghbalou","Bordj Oukhriss","Bouderbala","Bouira","Boukram","Chorfa","Dechmia","Dirah","Djebahia","El Adjiba","El Asnam","El Hachimia","El Hakimia","El Khebouzia","El Mokrani","Guerrouma","Hadjera Zerga","Haizer","Hanif","Kadiria","Lakhdaria","Maala","Maamora","Mchedallah","Mezdour","Oued El Berdi","Ouled Rached","Raouraoua","Ridane","Saharidj","Souk El Khemis","Sour El Ghozlane","Taghzout","Taguedit","Zbarbar"],"11 - Tamanrasset":["Abalessa","Foggaret Ezzaouia","Idles","In Amguel","In Ghar","In Guezzam","In Salah","Tamanrasset","Tazouk","Tinzaouatine"],"12 - Tebessa":["Ain Zerga","Bedjene","Bekkaria","Bir Dheb","Bir El Ater","Bir El Mokadem","Boukhadra","Boulhaf Dyr","Cheria","El Aouinet","El Kouif","El Ma El Biodh","El Mazeraa","El Meridj","El Ogla","Ferkane","Gorriguer","Hammamet","Lahouidjbet","Morsot","Negrine","Ouenza","Oum Ali","Sef saf El Ouesra","Stah Guentis","Tebessa","Tlidjene"],"13 - Tlemcen":["Ain Fetah","Ain Fezza","Ain Ghoraba","Ain Kebira","Ain Nehala","Ain Tallout","Ain Youcef","Amieur","Azails","Bab El Assa","Beni Bahdel","Beni Boussaid","Beni Mester","Beni Ouarsous","Beni Semiel","Beni Snous","Bensekrane","Bouhlou","Chetouane","Dar Yaghmouracene","Djebala","El Aricha","El Bouihi","El Fehoul","El Gor","Fellaoucene","Ghazaouet","Hammam Boughrara","Hennaya","Honaine","Maghnia","Mansourah","Marsa Ben Mhidi","Msirda Fouaga","Nedroma","Oued Chouly","Ouled Mimoun","Ouled Riyah","Remchi","Sabra","Sebbaa Chioukh","Sebdou","Sidi Abdelli","Sidi Djillali","Sidi Medjahed","Souahlia","Souani","Souk El Khemis","Souk Thlata","Terni Beni Hediel","Tianet","Tlemcen","Zenata"],"14 - Tiaret":["Ain Bouchekif","Ain Deheb","Ain El Hadid","Ain Kermes","Ain Zarit","Bougara","Chehaima","Dahmouni","Djillali Ben Amar","Faidja","Frenda","Guertoufa","Hamadia","Ksar Chellala","Madna","Mahdia","Mechraa Safa","Medrissa","Medroussa","Meghila","Mellakou","Nadorah","Naima","Oued Lilli","Ouled Djerad","Rahouia","Rechaiga","Sebaine","Sebt","Serghine","Sidi Abdelghani","Sidi Abderrahmane","Sidi Ali Mellal","Sidi Bakhti","Sidi Hosni","Sougueur","Tagdemt","Takhemaret","Tiaret","Tidda","Tousnina","Zmalet El Emir Abdelkade"],"15 - Tizi Ouzou":["Abi Youcef","Aghrib","Agouni Gueghrane","Ain El Hammam","Ain Zaouia","Ait Aggouacha","Ait Aissa Mimoun","Ait Bouadou","Ait Boumehdi","Ait Chaffaa","Ait Khelil","Ait Mahmoud","Ait Oumalou","Ait Toudert","Ait Yahia","Ait Yahia Moussa","Akbil","Akerrou","Assi Youcef","Azazga","Azzefoun","Beni Aissi","Beni Douala","Beni Yenni","Beni Ziki","Beni Zmenzer","Boghni","Boudjima","Bounouh","Bouzguene","Draa Ben Khedda","Draa El Mizan","Freha","Frikat","Iboudraren","Idjeur","Iferhounene","Ifigha","Iflissen","Illilten","Iloula Oumalou","Imsouhal","Irdjen","Larba Nath Irathen","Maatkas","Makouda","Mechtrass","Mekla","Mizrana","Mkira","Ouacif","Ouadhia","Ouaguenoun","Sidi Naamane","Souamaa","Souk El Thenine","Tadmait","Tigzirt","Timizart","Tirmitine","Tizi Ghenif","Tizi Nthlata","Tizi Ouzou","Tizi Rached","Yakourene","Yatafen","Zekri"],"16 - Algiers":["Ain Benian","Ain Taya","Alger Centre","Bab El Oued","Bab Ezzouar","Baba Hesen","Bachedjerah","Bains Romains","Baraki","Ben Aknoun","Beni Messous","Bir Mourad Rais","Bir Touta","Birkhadem","Bologhine Ibnou Ziri","Bordj El Bahri","Bordj El Kiffan","Bourouba","Bouzareah","Casbah","Cheraga","Dar El Beida","Dely Ibrahim","Djasr Kasentina","Douira","Draria","El Achour","El Biar","El Harrach","El Madania","El Magharia","El Mouradia","Herraoua","Hussein Dey","Hydra","Kheraisia","Kouba","Les Eucalyptus","Maalma","Marsa","Mohamed Belouzdad","Mohammadia","Oued Koriche","Oued Smar","Ouled Chebel","Ouled Fayet","Rahmania","Rais Hamidou","Reghaia","Rouiba","Sehaoula","Setaouali","Sidi M'hamed","Sidi Moussa","Souidania","Tessala el Merdja","Zeralda"],"17 - Djelfa":["Ain Chouhada","Ain El Ibel","Ain Fekka","Ain Maabed","Ain Oussera","Amourah","Benhar","Beni Yacoub","Birine","Bouira Lahdeb","Charef","Dar Chouikh","Deldoul","Djelfa","Douis","El Guedid","El Idrissia","El Khemis","Feidh El Botma","Guernini","Guettara","Had Sahary","Hassi Bahbah","Hassi El Euch","Hassi Fedoul","M'Liliha","Messaad","Moudjebara","Oum Laadham","Sed Rahal","Selmana","Sidi Baizid","Sidi Ladjel","Tadmit","Zaafrane","Zaccar"],"18 - Jijel":["Bordj T'her","Boudria Beni Yadjis","Bouraoui Belhadef","Boussif Ouled Askeur","Chahna","Chekfa","Djemaa Beni Habibi","Djmila","El Ancer","El Aouana","El Kennar Nouchfi","El Milia","Emir Abdelkader","Erraguene","Ghebala","Jijel","Kaous","Kemir Oued Adjoul","Ouadjana","Ouled Rabah","Ouled Yahia Khadrouch","Selma Benziada","Settara","Sidi Abdelaziz","Sidi Maarouf","Taher","Texena","Ziamma Mansouriah"],"19 - Setif":["Ain Abessa","Ain Arnat","Ain Azal","Ain El Kebira","Ain Lahdjar","Ain Legraj","Ain Oulmane","Ain Roua","Ain Sebt","Ait Naoual Mezada","Ait Tizi","Amoucha","Babor","Bazer Sakhra","Beidha Bordj","Belaa","Beni Aziz","Beni Chebana","Beni Fouda","Beni Mouhli","Beni Ouartilane","Beni Oussine","Bir El Arch","Bir Haddada","Bouandas","Bougaa","Bousselam","Boutaleb","Dehamcha","Djemila","Draa Kebila","El Eulma","El Ouldja","El Ouricia","Guellal","Guelta Zerka","Guenzet","Guidjel","Hamma","Hammam Essokhna","Hammam Guergour","Harbil","Ksar El Abtal","Maaouia","Maouklane","Mezloug","Oued El Barad","Ouled Addouane","Ouled Sabor","Ouled Sidi Ahmed","Ouled Tebben","Rosfa","Salah Bey","Serdj El Ghoul","Setif","Tachouda","Talaifacene","Taya","Tella","Tizi Nbechar"],"20 - Saida":["Ain El Hadjar","Ain Sekhouna","Ain Soltane","Doui Thabet","El Hassasna","Hounet","Maamora","Moulay Larbi","Ouled Brahim","Ouled Khaled","Saida","Sidi Ahmed","Sidi Amar","Sidi Boubekeur","Tircine","Youb"],"21 - Skikda":["Ain Bouziane","Ain Cherchar","Ain Kechra","Ain Zouit","Azzaba","Bein El Ouiden","Bekkouche Lakhdar","Ben Azzouz","Beni Bachir","Beni Oulbane","Beni Zid","Bouchtata","Cheraia","Collo","Djendel","El Ghedir","El Hadeaik","El Harrouch","El Marsa","Emdjez Edchich","Es Sebt","Filfila","Hamadi Krouma","Kanoua","Kerkera","Kheneg Mayoum","Oued Zehour","Ouldja Boulbalout","Ouled Attia","Ouled Hebaba","Oum Toub","Ramdane Djamel","Salah Bouchaour","Sidi Mezghiche","Skikda","Tamalous","Zerdazas","Zitouna"],"22 - Sidi Bel Abbes":["Ain Adden","Ain El Berd","Ain Kada","Ain Thrid","Ain Tindamine","Amarnas","Badredine El Mokrani","Belarbi","Ben Badis","Benachiba Chelia","Bir El Hammam","Boudjebaa El Bordj","Boukhanafis","Chetouane Belaila","Dhaya","El Hacaiba","Hassi Dahou","Hassi Zehana","Lamtar","Makedra","Marhoum","Mcid","Merine","Mezaourou","Mostefa Ben Brahim","Moulay Slissen","Oued Sbaa","Oued Sefioun","Oued Taourira","Ras El Ma","Redjem Demouche","Sehala Thaoura","Sfissef","Sidi Ali Benyoub","Sidi Ali Boussidi","Sidi Bel Abbes","Sidi Brahim","Sidi Chaib","Sidi Dahou","Sidi Hamadouche","Sidi Khaled","Sidi Lahcene","Sidi Yacoub","Tabia","Tafissour","Taoudmout","Teghalimet","Telagh","Tenira","Tessala","Tilmouni","Zerouala"],"23 - Annaba":["Ain Berda","Annaba","Berrahel","Chetaibi","Cheurfa","El Bouni","El Hadjar","Eulma","Oued El Aneb","Seraidi","Sidi Amer","Treat"],"24 - Guelma":["Ain Ben Beida","Ain Larbi","Ain Makhlouf","Ain Reggada","Ain Sandel","Belkhir","Ben Djarah","Beni Mezline","Bordj Sabat","Bou Hachana","Bou Hamdane","Bouati Mahmoud","Bouchegouf","Bouhamra Ahmed","Dahouara","Djeballah Khemissi","El Fedjoudj","Guelaat Bou Sbaa","Guelma","Hammam Maskhoutine","Hamman Nbail","Heliopolis","Houari Boumediene","Khezara","Medjez Amar","Medjez Sfa","Nechmaya","Oued Cheham","Oued Fragha","Oued Zenati","Ras El Agba","Roknia","Salaoua Announa","Tamlouka"],"25 - Constantine":["Ain Abid","Ain Smara","Beni Hamiden","Constantine","Didouche Mourad","El Khroub","Hamma Bouziane","Ibn Badis","Ibn Ziad","Mesaoud Boujeriou","Ouled Rahmoune","Zighoud Youcef"],"26 - Medea":["Ain Boucif","Ain Ouksir","Aissaouia","Aziz","Baata","Benchicao","Beni Slimane","Berrouaghia","Bir Ben Laabed","Boghar","Bouaiche","Bouaichoune","Bouchrahil","Boughezoul","Bouskene","Chahbounia","Chelalet El Adhaoura","Cheniguel","Derrag","Deux Bassins","Djouab","Draa Essamar","El Azizia","El Guelbelkebir","El Hamdania","El Omaria","El Ouinet","Hannacha","Kef Lakhdar","Khams Djouamaa","Ksar El Boukhari","Medea","Medjebar","Meftaha","Meghraoua","Mezerena","Mihoub","Ouamri","Oued Harbil","Ouled Antar","Ouled Bouachra","Ouled Brahim","Ouled Deide","Ouled Hellal","Ouled Maaref","Oum El Djalil","Ouzera","Rebaia","Saneg","Sedraia","Seghouane","Si Mahdjoub","Sidi Damed","Sidi Errabia","Sidi Naamane","Sidi Zahar","Sidi Ziane","Souagui","Tablat","Tafraout","Tamesguida","Tizi Mahdi","Tlatet Eddouair","Zoubiria"],"27 - Mostaganem":["Abdelmalek Ramdane","Achaacha","Ain Boudinar","Ain Nouissy","Ain Sidi Cherif","Ain Tadles","Bouguirat","El Hassiane","Fornaka","Hadjadj","Hassi Mameche","Khadra","Kheiredine","Mansourah","Mesra","Mezghrane","Mostaganem","Nekmaria","Oued El Kheir","Ouled Boughalem","Ouled Maallah","Safsaf","Sayada","Sidi Ali","Sidi Bellater","Sidi Lakhdar","Sirat","Souaflia","Sour","Stidia","Tazgait","Touahria"],"28 - M'Sila":["Ain El Hadjel","Ain El Melh","Ain Errich","Ain Fares","Ain Khadra","Belaiba","Ben Srour","Beni Ilmane","Benzouh","Berhoum","Bir Foda","Bou Saada","Bouti Sayah","Chellal","Dehahna","Djebel Messaad","El Hamel","El Houamed","Hammam Dhalaa","Khettouti Sed Djir","Khoubana","M'cif","M'sila","Maadid","Maarif","Magra","Medjedel","Mtarfa","Ouanougha","Oued Chair","Ouled Addi Guebala","Ouled Atia","Ouled Derradj","Ouled Madhi","Ouled Mansour","Ouled Sidi Brahim","Ouled Slimane","Oultene","Sidi Aissa","Sidi Ameur","Sidi Hadjeres","Sidi M'Hamed","Slim","Souamaa","Tamsa","Tarmount","Zarzour"],"29 - Mascara":["Ain Fares","Ain Fekan","Ain Ferah","Ain Frass","Alaimia","Aouf","Benian","Bou Hanifia","Bou Henni","Chorfa","El Bordj","El Gaada","El Ghomri","El Hachem","El Keurt","El Mamounia","El Menaouer","Ferraguig","Froha","Gharrous","Gherdjoum","Ghriss","Guettena","Hacine","Khalouia","Makdha","Maoussa","Mascara","Matemore","Moctadouz","Mohammadia","Nesmot","Oggaz","Oued El Abtal","Oued Taria","Ras Ain Amirouche","Sedjerara","Sehailia","Sidi Abdeldjebar","Sidi Abdelmoumene","Sidi Boussaid","Sidi Kada","Sig","Teghennif","Tizi","Zahana","Zelmata"],"30 - Ouargla":["Ain Beida","Balidat Ameur","Benaceur","El Allia","El Borma","El Hadjira","Hassi Ben Abdellah","Hassi Messaoud","Megarine","Mnaguer","Nezla","Ngoussa","Ouargla","Rouissat","Sidi Khouiled","Sidi Slimane","Taibet","Tamacine","Tebesbest","Touggourt","Zaouia El Abidia"],"31 - Oran":["Ain Biya","Ain Kerma","Ain Turk","Arzew","Ben Freha","Bethioua","Bir El Djir","Boufatis","Bousfer","Boutlelis","El Ancar","El Braya","El Karma","Es Senia","Gdyel","Hassi Ben Okba","Hassi Bounif","Hassi Mefsoukh","Marsat El Hadjadj","Mers El Kebir","Messerghin","Oran","Oued Tlelat","Sidi Ben Yebka","Sidi Chami","Tafraoui"],"32 - El Bayadh":["Ain El Orak","Arbaouat","Boualem","Bougtoub","Boussemghoun","Brezina","Cheguig","Chellala","El Abiodh Sidi Cheikh","El Bayadh","El Bnoud","El Kheither","El Mehara","Ghassoul","Kef El Ahmar","Krakda","Rogassa","Sidi Ameur","Sidi Slimane","Sidi Tifour","Stitten","Tousmouline"],"33 - Illizi":["Bordj El Haouasse","Bordj Omar Driss","Debdeb","Djanet","Illizi","In Amenas"],"34 - Bordj Bou Arreridj":["Ain Taghrout","Ain Tesra","Belimour","Ben Daoud","Bir Kasdali","Bordj Bou Arreridj","Bordj Ghdir","Bordj Zemoura","Colla","Djaafra","El Ach","El Achir","El Anseur","El Hamadia","El Main","El Mhir","Ghilassa","Haraza","Hasnaoua","Khelil","Ksour","Mansoura","Medjana","Ouled Brahem","Ouled Dahmane","Ouled Sidi Brahim","Rabta","Ras El Oued","Sidi Embarek","Tafreg","Taglait","Teniet En Nasr","Tesmart","Tixter"],"35 - Boumerdes":["Afir","Ammal","Baghlia","Ben Choud","Beni Amrane","Bordj Menaiel","Boudouaou","Boudouaou El Bahri","Boumerdes","Bouzegza Keddara","Chabet El Ameur","Corso","Dellys","Djinet","El Kharrouba","Hammedi","Isser","Khemis El Khechna","Laghata","Larbatache","Naciria","Ouled Aissa","Ouled Hedadj","Ouled Moussa","Si Mustapha","Sidi Daoud","Souk El Had","Taourga","Thenia","Tidjelabine","Timezrit","Zemmouri"],"36 - El Tarf":["Ain El Assel","Ain Kerma","Asfour","Ben M Hidi","Berrihane","Besbes","Bougous","Bouhadjar","Bouteldja","Chebaita Mokhtar","Chefia","Chihani","Drean","Echatt","El Aioun","El Kala","El Tarf","Hammam Beni Salah","Lac Des Oiseaux","Oued Zitoun","Raml Souk","Souarekh","Zerizer","Zitouna"],"37 - Tindouf":["Oum El Assel","Tindouf"],"38 - Tissemsilt":["Ammari","Beni Chaib","Beni Lahcene","Bordj Bou Naama","Bordj El Emir Abdelkader","Boucaid","Khemisti","Larbaa","Lardjem","Layoune","Lazharia","Maasem","Melaab","Ouled Bessem","Sidi Abed","Sidi Boutouchent","Sidi Lantri","Sidi Slimane","Tamalaht","Theniet El Had","Tissemsilt","Youssoufia"],"39 - El Oued":["Bayadha","Beni Guecha","Debila","Djamaa","Douar El Ma","El Mghair","El Ogla","El Oued","Guemar","Hamraia","Hassani Abdelkrim","Hassi Khelifa","Kouinine","Magrane","Mih Ouansa","Mrara","Nakhla","Oued El Alenda","Oum Touyour","Ourmas","Reguiba","Robbah","Sidi Amrane","Sidi Aoun","Sidi Khellil","Still","Taghzout","Taleb Larbi","Tendla","Trifaoui"],"40 - Khenchela":["Ain Touila","Babar","Baghai","Bouhmama","Chelia","Cherchar","Djellal","El Hamma","El Mahmal","El Oueldja","Ensigha","Kais","Khenchela","Khirane","Msara","Mtoussa","Ouled Rechache","Remila","Tamza","Taouzianat","Yabous"],"41 - Souk Ahras":["Ain Soltane","Ain Zana","Bir Bouhouche","Drea","Haddada","Hanancha","Khedara","Khemissa","M'daourouche","Mechroha","Merahna","Oued Keberit","Ouled Driss","Ouled Moumen","Oum El Adhaim","Quillen","Ragouba","Safel El Ouiden","Sedrata","Sidi Fredj","Souk Ahras","Taoura","Terraguelt","Tiffech","Zaarouria","Zouabi"],"42 - Tipaza":["Aghabal","Ahmer El Ain","Ain Tagourait","Attatba","Beni Milleuk","Bou Haroun","Bou Ismail","Bourkika","Chaiba","Cherchell","Damous","Douaouda","Fouka","Gouraya","Hadjerat Ennous","Hadjout","Khemisti","Kolea","Larhat","Menaceur","Messelmoun","Meurad","Nodor","Sidi Amar","Sidi Ghiles","Sidi Rached","Sidi Semiane","Tipaza"],"43 - Mila":["Ahmed Rachedi","Ain Beida Harriche","Ain Mellouk","Ain Tine","Amira Arras","Benyahia Abderrahmane","Bouhatem","Chelghoum Laid","Chigara","Derradji Bousselah","El Mechira","Elayadi Barbes","Ferdjioua","Grarem Gouga","Hamala","Mila","Minar Zarza","Oued Athmenia","Oued Endja","Oued Seguen","Ouled Khalouf","Rouached","Sidi Khelifa","Sidi Merouane","Tadjenanet","Tassadane Haddada","Telerghma","Terrai Bainen","Tessala Lamatai","Tiberguent","Yahia Beniguecha","Zeghaia"],"44 - Ain Defla":["Ain Benian","Ain Bouyahia","Ain Defla","Ain Lechiakh","Ain Soltane","Ain Torki","Arib","Barbouche","Bathia","Belaas","Ben Allal","Bir Ouled Khelifa","Bordj Emir Khaled","Boumedfaa","Bourached","Djelida","Djemaa Ouled Chikh","Djendel","El Abadia","El Amra","El Attaf","El Hassania","El Maine","Hammam Righa","Hoceinia","Khemis Miliana","Mekhatria","Miliana","Oued Chorfa","Oued Djemaa","Rouina","Sidi Lakhdar","Tachta Zegagha","Tarik Ibn Ziad","Tiberkanine","Zeddine"],"45 - Naama":["Ain Ben Khelil","Ain Sefra","Assela","Djeniane Bourzeg","El Biod","Kasdir","Makman Ben Amer","Mechria","Moghrar","Naama","Sfissifa","Tiout"],"46 - Ain Temouchent":["Aghlal","Ain El Arbaa","Ain Kihal","Ain Temouchent","Ain Tolba","Aoubellil","Beni Saf","Bou Zedjar","Chaabet El Ham","Chentouf","El Amria","El Emir Abdelkader","El Malah","El Messaid","Hammam Bouhadjar","Hassasna","Hassi El Ghella","Oued Berkeche","Oued Sabah","Ouled Boudjemaa","Ouled Kihal","Oulhaca El Gheraba","Sidi Ben Adda","Sidi Boumediene","Sidi Ouriache","Sidi Safi","Tamzoura","Terga"],"47 - Ghardaia":["Berriane","Bounoura","Dhayet Bendhahoua","El Atteuf","El Guerrara","El Meniaa","Ghardaia","Hassi Fehal","Hassi Gara","Mansoura","Metlili","Sebseb","Zelfana"],"48 - Relizane":["Ain Rahma","Ain Tarek","Ammi Moussa","Belaassel Bouzagza","Bendaoud","Beni Dergoun","Beni Zentis","Dar Ben Abdellah","Djidiouia","El Guettar","El Hamadna","El Hassi","El Matmar","El Ouldja","Had Echkalla","Hamri","Kalaa","Lahlef","Mazouna","Mediouna","Mendes","Merdja Sidi Abed","Ouarizane","Oued El Djemaa","Oued Essalem","Oued Rhiou","Ouled Aiche","Ouled Sidi Mihoub","Ramka","Relizane","Sidi Khettab","Sidi Lazreg","Sidi M'hamed Benali","Sidi M'hamed Benaouda","Sidi Saada","Souk El Had","Yellel","Zemmoura"],"49 - Timimoun":["Aougrout","Charouine","Deldoul","Ksar Kaddour","Metarfa","Ouled Aissa","Ouled Said","Talmine","Timimoun","Tinerkouk"],"50 - Bordj Baji Mokhtar":["Bordj Badji Mokhtar","Timiaouine"],"51 - Ouled Djellal":["Besbes","Chaiba","Doucen","Ouled Djellal","Ras El Miad","Sidi Khaled"],"52 - Beni Abbes":["Beni-Abbes","Beni-Ikhlef","El Ouata","Igli","Kerzaz","Ksabi","Ouled-Khodeir","Tamtert","Timoudi"],"53 - In Salah":["Ain Salah","Foggaret Ezzoua","Inghar"],"54 - In Guezzam":["Ain Guezzam","Tin Zouatine"],"55 - Touggourt":["Benaceur","Blidet Amor","El Alia","El-Hadjira","M'naguer","Megarine","Nezla","Sidi Slimane","Taibet","Tebesbest","Temacine","Touggourt","Zaouia El Abidia"],"56 - Djanet":["Bordj El Haouass","Djanet"],"57 - El M'Ghair":["Djamaa","El-M'ghaier","M'rara","Oum Touyour","Sidi Amrane","Sidi Khelil","Still","Tenedla"],"58 - El Menia":["El Meniaa","Hassi Fehal","Hassi Gara"]};
-const WILAYA_NAMES = Object.keys(WILAYA_DATA);
-
-const SB_H = {
-  'apikey': SB_KEY,
-  'Authorization': `Bearer ${SB_KEY}`,
-  'Content-Type': 'application/json',
-  'Prefer': 'return=minimal'
+  // ── Returned ── (parcel coming back / received by partner)
+  return_asked_by_customer: "returned",
+  return_asked_by_hub: "returned",
+  retour_dispatched_to_partenaires: "returned",
+  return_dispatched_to_partenaire: "returned",
+  return_dispatched_to_partner: "returned",
+  colis_retour_transmit_to_partner: "returned",
+  livraison_echoue_recu: "returned",
+  return_validated_by_partener: "returned",
+  return_validated_by_partner: "returned",
+  return_dispatched_to_warehouse: "returned",
+  return_received_by_partner: "returned",
+  return_requested_by_partner: "returned",
+  return_in_transit: "returned",
+  return_package_transmitted_to_partner: "returned",
 };
 
-const OPERATOR_TAB_KEY='arco_operator_tab';
-let allOrders=[], filteredOrders=[], currentTab=localStorage.getItem(OPERATOR_TAB_KEY)||'all', currentOrder=null;
-let sortAsc=false, selectedIds=new Set(), currentUser=null, currentRole=null;
-let noestDesks=null;
+/**
+ * Statuses that are terminal (don't need tracking anymore)
+ */
+const TERMINAL_STATUSES = [
+  "delivered",
+  "canceled",
+  "returned",
+  "suspended",
+  "not_delivered",
+  "duplicated",
+];
 
-function normalizeDeskCode(code){
-  const raw=String(code||'').trim().toUpperCase();
-  if(!raw)return '';
-  const m=raw.match(/^0*(\d+)([A-Z]+)$/);
-  if(!m)return raw;
-  return `${Number(m[1])}${m[2]}`;
-}
-let currentPage=1, pageSize=30;
+export default async function handler(req, res) {
+  const startTime = Date.now();
+  const timestamp = new Date().toISOString();
+  
+  console.log(`[track-orders] ${timestamp} — Starting batch tracking...`);
 
-// ── PIN ──
-async function doLogin(){
-  const email=document.getElementById('login-email').value.trim();
-  const password=document.getElementById('login-password').value;
-  const errEl=document.getElementById('login-error');
-  const btn=document.getElementById('login-btn');
-  if(!email||!password){errEl.textContent='Please enter email and password';return;}
-  btn.classList.add('loading');btn.textContent='Signing in...';errEl.textContent='';
-  const{data,error}=await sb.auth.signInWithPassword({email,password});
-  if(error){errEl.textContent='Invalid email or password';btn.classList.remove('loading');btn.textContent='Sign In';return;}
-  currentUser=data.user;
-  const allowed=await ensureOperatorAccess();
-  if(!allowed){btn.classList.remove('loading');btn.textContent='Sign In';return;}
-  await showApp();
-}
-async function ensureOperatorAccess(){
-  const errEl=document.getElementById('login-error');
-  const{data:roleData,error}=await sb.from('user_roles').select('*').eq('user_id',currentUser.id).in('role',['operator','admin']).single();
-  if(error||!roleData){
-    await sb.auth.signOut();
-    currentUser=null;currentRole=null;
-    document.getElementById('app').style.display='none';
-    document.getElementById('login-screen').style.display='flex';
-    errEl.textContent='This account is not an operator account.';
-    return false;
-  }
-  currentRole=roleData;
-  return true;
-}
-async function showApp(){
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('app').style.display='flex';
-  await init();
-}
-async function doLogout(){
-  await sb.auth.signOut();
-  currentUser=null;currentRole=null;
-  document.getElementById('app').style.display='none';
-  document.getElementById('login-screen').style.display='flex';
-}
-window.addEventListener('DOMContentLoaded',async()=>{
-  const{data:{session}}=await sb.auth.getSession();
-  if(session){currentUser=session.user;if(await ensureOperatorAccess())await showApp();}
-  document.getElementById('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-});
-
-// ── INIT ──
-async function init(){ buildTabs(); syncTabChrome(); await loadOrders(); }
-async function refreshAll(){ await loadOrders(); toast('Refreshed'); }
-
-// ── SUPABASE ──
-async function sbFetch(path,opts={}){
-  const { data: { session } } = await sb.auth.getSession();
-  const token = session?.access_token;
-  const headers = {
-    ...SB_H,
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    ...(opts.headers || {})
-  };
-  return fetch(`${SB_URL}/${path}`, { ...opts, headers });
-}
-async function loadOrders(){
-  const r=await sbFetch('orders?select=*&order=created_at.desc');
-  allOrders=await r.json();
-  buildProductFilter();
-  applyFilters();
-  updateKPIs();
-  drawDonut();
-}
-
-// ── PERIOD ──
-function onPeriodChange(){
-  const v=document.getElementById('filter-period').value;
-  document.getElementById('custom-date-row').classList.toggle('show',v==='custom');
-  onFilterChange();
-}
-
-// FIX: timezone-safe date comparison using Algeria UTC+1
-function toAlgeriaDate(utcString){
-  const d = new Date(utcString);
-  // Algeria is UTC+1
-  d.setTime(d.getTime() + 60*60*1000);
-  return d;
-}
-
-function inPeriod(o){
-  const p=document.getElementById('filter-period').value;
-  if(p==='all')return true;
-  if(!o.created_at)return true;
-
-  const d = toAlgeriaDate(o.created_at);
-  const now = new Date();
-  // now in Algeria time
-  const nowDZ = new Date(now.getTime() + 60*60*1000);
-
-  if(p==='today'){
-    return d.getUTCFullYear()===nowDZ.getUTCFullYear()
-      && d.getUTCMonth()===nowDZ.getUTCMonth()
-      && d.getUTCDate()===nowDZ.getUTCDate();
-  }
-  if(p==='7days'){
-    const w=new Date(nowDZ);w.setUTCDate(nowDZ.getUTCDate()-7);return d>=w;
-  }
-  if(p==='30days'){
-    const m=new Date(nowDZ);m.setUTCDate(nowDZ.getUTCDate()-30);return d>=m;
-  }
-  if(p==='month'){
-    return d.getUTCMonth()===nowDZ.getUTCMonth()
-      && d.getUTCFullYear()===nowDZ.getUTCFullYear();
-  }
-  if(p==='custom'){
-    const from=document.getElementById('date-from').value;
-    const to=document.getElementById('date-to').value;
-    if(from&&d<new Date(from))return false;
-    if(to&&d>new Date(to+'T23:59:59'))return false;
-    return true;
-  }
-  return true;
-}
-
-// ── FILTERS ──
-function buildProductFilter(){
-  const prods=[...new Set(allOrders.map(o=>o.product).filter(Boolean))];
-  const sel=document.getElementById('filter-product');
-  const cur=sel.value;
-  sel.innerHTML='<option value="">All Products</option>'+
-    prods.map(p=>`<option value="${esc(p)}"${cur===p?' selected':''}>${esc(p)}</option>`).join('');
-}
-
-function onFilterChange(){
-  currentPage=1;
-  applyFilters();
-}
-
-function applyFilters(){
-  const q=(document.getElementById('search-input').value||'').trim().toLowerCase();
-  const prod=document.getElementById('filter-product').value;
-
-  filteredOrders=allOrders.filter(o=>{
-    // Tab filter
-    if(currentTab!=='all'&&o.status!==currentTab)return false;
-    // Product filter
-    if(prod&&o.product!==prod)return false;
-    // Search — name OR phone
-    if(q){
-      const nameMatch=(o.name||'').toLowerCase().includes(q);
-      const phoneMatch=(o.phone||'').includes(q);
-      if(!nameMatch&&!phoneMatch)return false;
-    }
-    // Period filter
-    if(!inPeriod(o))return false;
-    return true;
-  });
-
-  // FIX: sort AFTER filtering, using reliable timestamp comparison
-  filteredOrders.sort((a,b)=>{
-    const da=new Date(a.created_at||0).getTime();
-    const db=new Date(b.created_at||0).getTime();
-    return sortAsc ? da-db : db-da;
-  });
-
-  renderOrdersList();
-  updateTabCounts();
-  updateKPIs();
-  drawDonut();
-}
-
-// ── SORT ──
-function toggleSort(){
-  sortAsc=!sortAsc;
-  currentPage=1;
-  document.getElementById('sort-btn').textContent=sortAsc?'Oldest':'Newest';
-  applyFilters();
-}
-
-// ── PAGE SIZE ──
-function onPageSizeChange(){
-  const val=document.getElementById('page-size-select').value;
-  pageSize=val==='all'?'all':parseInt(val);
-  currentPage=1;
-  renderOrdersList();
-}
-
-// ── TABS ──
-function buildTabs(){
-  const tabs=[{k:'all',l:'All'},...STATUSES];
-  document.getElementById('tab-bar').innerHTML=tabs.map(t=>
-    `<button class="tab-btn${t.k===currentTab?' active':''}" id="tab-${t.k}" onclick="switchTab('${t.k}')">
-      ${t.l}<span class="tab-count" id="tc-${t.k}">0</span>
-    </button>`
-  ).join('');
-}
-
-function syncTabChrome(){
-  document.getElementById('stats-section').style.display=currentTab==='all'?'block':'none';
-  document.getElementById('bulk-bar').classList.toggle('show',currentTab==='confirmed');
-}
-
-function switchTab(k){
-  currentTab=k;
-  localStorage.setItem(OPERATOR_TAB_KEY,k);
-  currentPage=1;
-  selectedIds.clear();
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById(`tab-${k}`).classList.add('active');
-  syncTabChrome();
-  applyFilters();
-}
-
-function updateTabCounts(){
-  const el=document.getElementById('tc-all');
-  if(el)el.textContent=allOrders.length;
-  STATUSES.forEach(s=>{
-    const e=document.getElementById(`tc-${s.k}`);
-    if(e)e.textContent=allOrders.filter(o=>o.status===s.k).length;
-  });
-  const cnt=document.getElementById('orders-count');
-  if(cnt)cnt.textContent=`${filteredOrders.length} orders`;
-}
-
-// ── KPIs ──
-function updateKPIs(){
-  const orders=allOrders.filter(o=>inPeriod(o));
-  const total=orders.length;
-  const delivered=orders.filter(o=>o.status==='delivered').length;
-  const confirmed=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
-  const nonDraft=orders.filter(o=>o.status!=='draft').length;
-  const confRateAll=total?(confirmed/total*100).toFixed(1):'0.0';
-  const confRateNonDraft=nonDraft?(confirmed/nonDraft*100).toFixed(1):'0.0';
-  const delRateConfirmed=confirmed?(delivered/confirmed*100).toFixed(1):'0.0';
-  const delRateAll=total?(delivered/total*100).toFixed(1):'0.0';
-  let html=`<div class="kpi-card total"><div class="kpi-label"><span class="dot"></span>Total Orders</div><div class="kpi-value">${total}</div></div>`;
-  STATUSES.forEach(s=>{
-    html+=`<div class="kpi-card"><div class="kpi-label"><span class="dot" style="background:${s.c}"></span>${s.l}</div><div class="kpi-value">${orders.filter(o=>o.status===s.k).length}</div></div>`;
-  });
-  html+=`<div class="kpi-card rate"><div class="kpi-label"><span class="dot"></span>Confirmation Rate</div><div class="kpi-value">${confRateAll}%</div><div class="kpi-sub">Confirmed / all leads</div></div>
-         <div class="kpi-card rate"><div class="kpi-label"><span class="dot"></span>Confirmation Rate</div><div class="kpi-value">${confRateNonDraft}%</div><div class="kpi-sub">Confirmed / non-draft orders</div></div>
-         <div class="kpi-card rate"><div class="kpi-label"><span class="dot"></span>Delivery Rate</div><div class="kpi-value">${delRateConfirmed}%</div><div class="kpi-sub">Delivered / confirmed orders</div></div>
-         <div class="kpi-card rate"><div class="kpi-label"><span class="dot"></span>Delivery Rate</div><div class="kpi-value">${delRateAll}%</div><div class="kpi-sub">Delivered / all leads</div></div>`;
-  document.getElementById('kpi-grid').innerHTML=html;
-}
-
-// ── DONUT ──
-function drawDonut(){
-  const orders=allOrders.filter(o=>inPeriod(o));
-  const counts=STATUSES.map(s=>({...s,n:orders.filter(o=>o.status===s.k).length})).filter(s=>s.n>0);
-  const total=counts.reduce((a,b)=>a+b.n,0)||1;
-  const cx=60,cy=60,r=48,stroke=16;
-  let angle=-Math.PI/2,paths='';
-  counts.forEach(s=>{
-    const slice=(s.n/total)*2*Math.PI;
-    const x1=cx+r*Math.cos(angle),y1=cy+r*Math.sin(angle);
-    angle+=slice;
-    const x2=cx+r*Math.cos(angle),y2=cy+r*Math.sin(angle);
-    paths+=`<path d="M${cx} ${cy} L${x1} ${y1} A${r} ${r} 0 ${slice>Math.PI?1:0} 1 ${x2} ${y2} Z" fill="${s.c}" opacity="0.85"/>`;
-  });
-  paths+=`<circle cx="${cx}" cy="${cy}" r="${r-stroke}" fill="#0a0a0a"/>`;
-  paths+=`<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="13" font-weight="800">${total}</text>`;
-  document.getElementById('donut-svg').innerHTML=paths;
-  document.getElementById('chart-legend').innerHTML=counts.slice(0,6).map(s=>
-    `<div class="legend-item"><div class="legend-dot" style="background:${s.c}"></div><div class="legend-label">${s.l}</div><div class="legend-val">${s.n}</div></div>`
-  ).join('');
-}
-
-// ── ORDERS LIST ──
-function renderOrdersList(){
-  const el=document.getElementById('orders-list');
-  if(!filteredOrders.length){
-    el.innerHTML=`<div class="empty-wrap"><span>No orders found</span></div>`;
-    document.getElementById('pagination').innerHTML='';
-    return;
-  }
-
-  const isConf=currentTab==='confirmed';
-
-  // Pagination
-  let pageOrders;
-  if(pageSize==='all'){
-    pageOrders=filteredOrders;
-    document.getElementById('pagination').innerHTML='';
-  } else {
-    const total=filteredOrders.length;
-    const totalPages=Math.ceil(total/pageSize);
-    if(currentPage>totalPages)currentPage=1;
-    const start=(currentPage-1)*pageSize;
-    pageOrders=filteredOrders.slice(start,start+pageSize);
-    renderPagination(totalPages);
-  }
-
-  el.innerHTML=pageOrders.map(o=>{
-    const checked=selectedIds.has(o.id);
-    const dateStr=o.created_at ? toAlgeriaDate(o.created_at).toLocaleDateString('fr-DZ') : '';
-    return `<div class="order-card${checked?' selected':''}" id="card-${o.id}">
-      <div class="card-top-row">
-        <div class="card-checkbox${isConf?' visible':''}${checked?' checked':''}" onclick="toggleSelect(${o.id})"></div>
-        <div class="card-main" onclick="openDetail(${o.id})">
-          <div class="card-name-price">
-            <div class="order-name">${esc(o.name)}</div>
-            <div class="order-price">${Number(o.prix_total||0).toLocaleString()} DZD</div>
-          </div>
-          <div class="order-meta">
-            <b>${(Array.isArray(o.items)&&o.items.length)?esc(o.items.map(it=>(it.product||it.product_slug||it.slug||'')+' '+sizeLabel(it)).join('، ')):esc(o.product)+(o.variable?' - '+esc(o.variable):'')}</b><br/>
-            Location: ${o.type_livraison==='pickup'?'Stop Desk - '+esc(o.station_code||'?'):esc(o.commune)+', '+esc(o.wilaya)}<br/>
-            Phone: ${esc(o.phone)}<br/>
-            Date: ${dateStr}
-          </div>
-          <span class="status-badge s-${o.status}">${statusLabel(o.status)}</span>
-        </div>
-      </div>
-      <div class="card-actions">
-        <button class="btn-wa-sm" onclick="openWhatsApp('${esc(o.phone)}')">${waIcon()}</button>
-        <button class="btn-call-sm" onclick="callCustomer('${esc(o.phone)}')">Call</button>
-        <select class="card-status-select" onchange="updateStatusCard(this,${o.id})">
-          ${STATUSES.map(s=>`<option value="${s.k}"${o.status===s.k?' selected':''}>${s.l}</option>`).join('')}
-        </select>
-        ${o.status==='confirmed'?`<button class="btn-ship-sm" onclick="shipSingle(${o.id})">Ship</button>`:''}
-        <button class="btn-detail" onclick="openDetail(${o.id})">Details</button>
-      </div>
-    </div>`;
-  }).join('');
-
-  updateBulkCount();
-}
-
-function renderPagination(totalPages){
-  const pg=document.getElementById('pagination');
-  if(totalPages<=1){pg.innerHTML='';return;}
-  let html=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>Prev</button>`;
-  // Show max 5 page buttons
-  let start=Math.max(1,currentPage-2);
-  let end=Math.min(totalPages,start+4);
-  if(end-start<4)start=Math.max(1,end-4);
-  for(let i=start;i<=end;i++){
-    html+=`<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`;
-  }
-  html+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>Next</button>`;
-  html+=`<span class="page-info">${currentPage}/${totalPages}</span>`;
-  pg.innerHTML=html;
-}
-
-function goPage(p){
-  currentPage=p;
-  renderOrdersList();
-  document.getElementById('orders-list').scrollIntoView({behavior:'smooth'});
-}
-
-// ── BULK SHIP ──
-function toggleSelect(id){
-  selectedIds.has(id)?selectedIds.delete(id):selectedIds.add(id);
-  const card=document.getElementById(`card-${id}`);
-  if(!card)return;
-  const cb=card.querySelector('.card-checkbox');
-  card.classList.toggle('selected',selectedIds.has(id));
-  cb.classList.toggle('checked',selectedIds.has(id));
-  updateBulkCount();
-}
-function toggleSelectAll(){
-  const ids=filteredOrders.filter(o=>o.status==='confirmed').map(o=>o.id);
-  const allSel=ids.every(id=>selectedIds.has(id));
-  ids.forEach(id=>allSel?selectedIds.delete(id):selectedIds.add(id));
-  renderOrdersList();
-}
-function updateBulkCount(){document.getElementById('bulk-count').textContent=`${selectedIds.size} selected`;}
-
-// FIX: Stop desk shipping — properly pass station_code
-async function shipSingle(id){
-  const o=allOrders.find(x=>x.id===id);
-  if(!o)return;
-  if(o.type_livraison==='pickup'&&!o.station_code){
-    toast('Edit order and select a stop desk first',true);
-    return;
-  }
-  toast('Shipping...');
-  try{
-    const{data:{session}}=await sb.auth.getSession();
-    const payload={
-      orderId: o.id,
-      order: o,
-      stationCode: o.station_code || null
-    };
-    const r=await fetch('/api/ship-order',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${session?.access_token||''}`},
-      body:JSON.stringify(payload)
-    });
-    const data=await r.json();
-    if(!r.ok)throw new Error(data.error||'Failed');
-    o.status='shipped';
-    o.tracking_number=data.tracking_number;
-    o.shipping_agency='noest';
-    await loadOrders();
-    toast('Shipped! #'+data.tracking_number);
-  }catch(e){toast('Error: '+e.message,true);}
-}
-
-async function bulkShip(){
-  if(!selectedIds.size)return;
-  const ids=[...selectedIds];
-  const missing=ids.filter(id=>{
-    const o=allOrders.find(x=>x.id===id);
-    return o&&o.type_livraison==='pickup'&&!o.station_code;
-  });
-  if(missing.length){
-    toast(`${missing.length} orders missing stop desk`,true);
-    return;
-  }
-  toast(`Shipping ${ids.length} orders...`);
-  const{data:{session}}=await sb.auth.getSession();
-  const payloadOrders=ids.map(id=>{const o=allOrders.find(x=>x.id===id);return o?{orderId:o.id,order:o,stationCode:o.station_code||null}:null;}).filter(Boolean);
-  try{
-    const r=await fetch('/api/ship-orders-bulk',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${session?.access_token||''}`},
-      body:JSON.stringify({orders:payloadOrders})
-    });
-    const data=await r.json();
-    if(!r.ok)throw new Error(data.error||'Bulk ship failed');
-    const results=data.results||{};
-    let ok=0,fail=0;
-    for(const o of allOrders){
-      const res=results[o.id];
-      if(res&&res.success){o.status='shipped';o.tracking_number=res.tracking_number;ok++;}
-      else if(res&&res.error){fail++;}
-    }
-    selectedIds.clear();
-    await loadOrders();
-    toast(`${ok} shipped${fail?`, ${fail} failed`:''}`,fail>0);
-  }catch(e){toast('Error: '+e.message,true);}
-}
-
-// ── INLINE STATUS UPDATE ──
-async function updateStatusCard(sel,id){
-  const newStatus=sel.value;
-  const o=allOrders.find(x=>x.id===id);
-  if(!o)return;
-  // Duplicate check on confirm
-  if(newStatus==='confirmed'){
-    const dups=getDuplicatesForOrder(o);
-    if(dups.length){
-      const names=dups.map(d=>`${d.name} [${d.status}]`).join(', ');
-      if(!confirm(`?? Duplicate phone detected!\nSame number found in: ${names}\n\nStill confirm this order?`)){
-        sel.value=o.status;
-        return;
+  try {
+    if (!isAuthorizedCronRequest(req)) {
+      const auth = await requireRole(req, ["operator", "admin"]);
+      if (!auth.ok) {
+        return res.status(auth.status).json({ error: auth.error });
       }
     }
-  }
-  const old=o.status;
-  sel.disabled=true;
-  await sbFetch(`orders?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({status:newStatus})});
-  await sbFetch('order_history',{method:'POST',
-    body:JSON.stringify({order_id:o.order_id,old_status:old,new_status:newStatus,changed_by:'operator'})});
-  o.status=newStatus;
-  sel.disabled=false;
-  await loadOrders();
-  toast('Status updated');
-}
 
-// ── DETAIL ──
-function openDetail(id){
-  currentOrder=allOrders.find(o=>o.id===id);
-  if(!currentOrder)return;
-  // Show duplicate warning in detail view
-  const dups=getDuplicatesForOrder(currentOrder);
-  renderDetail(dups);
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-detail').classList.add('active');
-  document.getElementById('tab-bar').style.display='none';
-}
+    if (!supabaseUrl || !supabaseServiceKey || !noestApiKey || !noestGuid) {
+      console.error("[track-orders] Missing required environment variables");
+      return res.status(500).json({ error: "Configuration error: missing env vars" });
+    }
 
-function renderDetail(dups=[]){
-  const o=currentOrder;
-  const dateStr=o.created_at?toAlgeriaDate(o.created_at).toLocaleString('fr-DZ'):'';
-  const dupHtml=dups.length?`<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:#f59e0b;display:flex;gap:8px"><span style="font-size:15px">&#x26A0;&#xFE0F;</span><div><b>Duplicate phone!</b> Same number in: ${dups.map(d=>`${esc(d.name)} [${esc(d.status)}]`).join(', ')}</div></div>`:'';
-  document.getElementById('detail-content').innerHTML=`
-    <button class="back-btn" onclick="closeDetail()">< Back</button>
-    ${dupHtml}
-    <div class="detail-section">
-      <div class="detail-section-title">Customer</div>
-      <div class="customer-name-big">${esc(o.name)}</div>
-      <div class="customer-location">Location: ${o.type_livraison==='pickup'?`Stop Desk - ${esc(o.station_code||'Not set')}`:esc(o.commune)+', '+esc(o.wilaya)}</div>
-      <div class="phone-row">
-        <div class="phone-number">${esc(o.phone)}</div>
-        <button class="btn-whatsapp" onclick="openWhatsApp('${esc(o.phone)}')">${waIcon()}</button>
-        <button class="btn-call" onclick="callCustomer('${esc(o.phone)}')">Call</button>
-      </div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Order</div>
-      ${(Array.isArray(o.items)&&o.items.length)
-        ? o.items.map(it=>`<div class="price-row"><span class="price-label">${esc((it.product||it.product_slug||it.slug||'')+' '+sizeLabel(it))}${it.is_free?' 🎁':''}</span><span>${it.is_free?'مجانية':Number(it.line_price||it.price||0).toLocaleString()+' DZD'}</span></div>`).join('')
-        : `<div class="price-row"><span class="price-label">${esc(o.product)}${o.variable?' - '+esc(o.variable):''}</span><span></span></div>`}
-      <div class="price-row"><span class="price-label">Product Price</span><span>${Number((o.prix_total||0)-(o.shipping_cost||0)).toLocaleString()} DZD</span></div>
-      <div class="price-row"><span class="price-label">Shipping</span><span>${Number(o.shipping_cost||0).toLocaleString()} DZD</span></div>
-      <div class="price-row"><span class="price-label">Total</span><span>${Number(o.prix_total||0).toLocaleString()} DZD</span></div>
-      <div style="font-size:11px;color:#444;margin-top:8px">Date: ${dateStr} - #${esc(o.order_id)}</div>
-    </div>
-    <div class="detail-section">
-      <div class="detail-section-title">Status</div>
-      <select class="status-dropdown" onchange="updateStatusDetail(this.value)">
-        ${STATUSES.map(s=>`<option value="${s.k}"${o.status===s.k?' selected':''}>${s.l}</option>`).join('')}
-      </select>
-    </div>
-    ${o.status==='confirmed'?`<div class="detail-section"><div class="detail-section-title">Ship Order</div>
-      ${o.type_livraison==='pickup'&&!o.station_code?`<div style="color:#f59e0b;font-size:13px;margin-bottom:8px">Warning: no stop desk selected. Tap Edit first.</div>`:''}
-      <button class="ship-btn" onclick="shipSingle(${o.id})">Send to Noest Express</button>
-    </div>`:''}
-    ${o.status==='shipped'&&o.tracking_number?`<div class="detail-section"><div class="detail-section-title">Tracking</div>
-      <div style="font-size:13px;color:#888;margin-bottom:8px">Noest - <b style="color:#fff">${esc(o.tracking_number)}</b></div>
-      <button class="track-btn" onclick="openTracking()">Track Shipment</button>
-    </div>`:''}
-    <div class="detail-section">
-      <div class="detail-section-title">Operator Note</div>
-      <textarea class="note-field" id="note-field" placeholder="Write a note...">${esc(o.notes||'')}</textarea>
-      <button class="save-note-btn" onclick="saveNote()">Save Note</button>
-    </div>
-    <div class="action-row">
-      <button class="btn-delete" onclick="deleteOrder()">Delete</button>
-      <button class="btn-edit" onclick="openEdit()">Edit</button>
-    </div>
-    <div class="detail-bottom" style="margin-top:14px">
-      <div class="order-num"># ${esc(o.order_id)}</div>
-      <button class="history-btn" onclick="openHistory()">History</button>
-    </div>`;
-}
+    // Fetch all orders that need tracking (non-terminal, with tracking numbers)
+    const { data: orders, error: fetchError } = await supabase
+      .from("orders")
+      .select("id, order_id, tracking_number, status, name, phone, product, variable, prix_total")
+      .not("tracking_number", "is", null)
+      .not("status", "in", `(${TERMINAL_STATUSES.map(s => `"${s}"`).join(",")})`);
 
-function closeDetail(){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-main').classList.add('active');
-  document.getElementById('tab-bar').style.display='flex';
-  currentOrder=null;
-}
+    if (fetchError) {
+      console.error("[track-orders] Fetch error:", fetchError);
+      return res.status(500).json({ error: "Failed to fetch orders", details: fetchError.message });
+    }
 
-// ── ACTIONS ──
-function callCustomer(phone){window.location.href=`tel:${phone}`;}
-function openWhatsApp(phone){
-  const p=phone.replace(/\D/g,'');
-  window.open(`https://wa.me/213${p.replace(/^0/,'')}`, '_blank');
-}
-function openTracking(){
-  if(!currentOrder?.tracking_number)return;
-  window.open(`https://app.noest-dz.com/track/${currentOrder.tracking_number}`,'_blank');
-}
-async function updateStatusDetail(newStatus){
-  const o=currentOrder,old=o.status;
-  await sbFetch(`orders?id=eq.${o.id}`,{method:'PATCH',body:JSON.stringify({status:newStatus})});
-  await sbFetch('order_history',{method:'POST',
-    body:JSON.stringify({order_id:o.order_id,old_status:old,new_status:newStatus,changed_by:'operator'})});
-  o.status=newStatus;
-  await loadOrders();
-  renderDetail();
-  toast('Status updated');
-}
-async function saveNote(){
-  const note=document.getElementById('note-field').value;
-  await sbFetch(`orders?id=eq.${currentOrder.id}`,{method:'PATCH',body:JSON.stringify({notes:note})});
-  currentOrder.notes=note;
-  toast('Note saved');
-}
-async function deleteOrder(){
-  if(!confirm('Delete this order? Cannot be undone.'))return;
-  await sbFetch(`orders?id=eq.${currentOrder.id}`,{method:'DELETE'});
-  allOrders=allOrders.filter(o=>o.id!==currentOrder.id);
-  closeDetail();
-  applyFilters();
-  toast('Order deleted');
-}
+    const totalOrders = orders?.length || 0;
+    console.log(`[track-orders] Found ${totalOrders} orders to track`);
 
-// ── HISTORY ──
-async function openHistory(){
-  const r=await sbFetch(`order_history?order_id=eq.${currentOrder.order_id}&order=changed_at.desc`);
-  const rows=await r.json();
-  document.getElementById('history-list').innerHTML=rows.length
-    ?rows.map(h=>{
-      const time=new Date(h.changed_at).toLocaleString('fr-DZ');
-      if(h.field_name){
-        // Field change
-        return `<div class="history-item">
-          <span class="history-type field">EDIT</span><br/>
-          <b style="color:#888">${esc(h.field_name)}</b>: 
-          <span style="color:#555">${esc(h.old_status||'-')}</span>
-          <span class="history-arrow">-></span>
-          <span style="color:#fff;font-weight:700">${esc(h.new_status||'-')}</span>
-          <div class="history-time">By ${esc(h.changed_by||'operator')} - ${time}</div>
-        </div>`;
+    if (totalOrders === 0) {
+      return res.status(200).json({
+        message: "Tracking complete",
+        timestamp,
+        orders_checked: 0,
+        orders_updated: 0,
+        errors: 0,
+        duration_ms: Date.now() - startTime,
+      });
+    }
+
+    let updated = 0;
+    let errors = 0;
+    const updates = [];
+
+    // 1) Ask Noest about every parcel in a handful of batched requests.
+    const trackingNumbers = [...new Set(orders.map(o => o.tracking_number).filter(Boolean))];
+    const eventMap = await getNoestEventsBatch(trackingNumbers);
+    console.log(`[track-orders] Got Noest data for ${eventMap.size}/${trackingNumbers.length} trackings`);
+
+    // 2) Decide the new status for each order; collect writes (no DB call yet).
+    const idsByStatus = {};       // newStatus -> [order.id]
+    const historyRows = [];       // single bulk insert
+    const deliveredOrders = [];   // for notifications
+
+    for (const order of orders) {
+      const latestEvent = eventMap.get(order.tracking_number);
+      if (!latestEvent) continue;
+
+      const newStatus = EVENT_STATUS_MAP[latestEvent.event_key];
+      if (!newStatus || newStatus === order.status) continue;
+
+      (idsByStatus[newStatus] = idsByStatus[newStatus] || []).push(order.id);
+      historyRows.push({
+        order_id: order.order_id,
+        old_status: order.status,
+        new_status: newStatus,
+        field_name: null,
+        changed_by: "auto_tracker",
+        changed_at: timestamp,
+      });
+      updates.push({ order_id: order.order_id, from: order.status, to: newStatus, event: latestEvent.event_key });
+      if (newStatus === "delivered") deliveredOrders.push(order);
+    }
+
+    // 3) Apply status changes grouped by target status — a few queries, not hundreds.
+    for (const [newStatus, ids] of Object.entries(idsByStatus)) {
+      const { error: updateError } = await supabase
+        .from("orders")
+        .update({ status: newStatus, updated_at: timestamp })
+        .in("id", ids);
+      if (updateError) {
+        console.error(`[track-orders] bulk update failed for "${newStatus}":`, updateError);
+        errors += ids.length;
+      } else {
+        updated += ids.length;
       }
-      return `<div class="history-item">
-        <span class="history-type status">STATUS</span><br/>
-        <span style="color:#888">${esc(h.old_status||'-')}</span>
-        <span class="history-arrow">-></span>
-        <span style="color:#fff;font-weight:700">${esc(h.new_status||'-')}</span>
-        <div class="history-time">By ${esc(h.changed_by||'operator')} - ${time}</div>
-      </div>`;
-    }).join('')
-    :'<div style="color:#444;font-size:13px">No history yet.</div>';
-  document.getElementById('history-modal').classList.add('open');
-}
-
-// ── EDIT MODAL ──
-async function openEdit(){
-  const o=currentOrder;
-  if(!noestDesks){
-    try{
-      const r=await fetch('/api/noest-desks');
-      if(r.ok)noestDesks=await r.json();
-    }catch{}
-  }
-  const wSel=document.getElementById('edit-wilaya');
-  wSel.innerHTML='<option value="">Select Wilaya</option>'+
-    WILAYA_NAMES.map(w=>`<option value="${esc(w)}">${esc(w)}</option>`).join('');
-  document.getElementById('edit-name').value=o.name||'';
-  document.getElementById('edit-phone').value=o.phone||'';
-  document.getElementById('edit-type').value=o.type_livraison||'home';
-  const prodSec=document.getElementById('edit-product-section');
-  const isCart=Array.isArray(o.items)&&o.items.length>0;
-  if(isCart){
-    // Fetch product list for dropdowns (cached)
-    if(!window.__productList){
-      try{
-        const r=await sbFetch('products?select=name,slug&active=eq.true&order=sort_order.asc,name.asc');
-        if(r.ok) window.__productList=await r.json();
-      }catch{}
-      if(!window.__productList) window.__productList=[];
     }
 
-    const editItems=o.items.map(it=>({...it}));
-    document.getElementById('edit-modal').__editItems=editItems;
-
-    function renderCartRows(){
-      const wrap=document.getElementById('edit-cart-rows');
-      if(!wrap)return;
-      wrap.innerHTML=editItems.map((it,i)=>{
-        const currentName=it.product||it.product_slug||it.slug||'';
-        const matched=window.__productList.find(p=>p.name===currentName||p.slug===(it.product_slug||it.slug));
-        const unknownOpt=!matched?`<option value="${esc(currentName)}">${esc(currentName)||'Unknown'}</option>`:'';
-        const opts=window.__productList.map(p=>`<option value="${esc(p.name)}"${(matched?p.name===currentName:false)||p.slug===(it.product_slug||it.slug)?' selected':''}>${esc(p.name)}</option>`).join('');
-        return `<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #1a1a1a">
-          <select class="edit-select" style="flex:1;font-size:13px;padding:7px 8px"
-            onchange="(function(el){document.getElementById('edit-modal').__editItems[${i}].product=el.value})(this)">
-            ${unknownOpt}${opts}
-          </select>
-          <select class="edit-select" style="width:62px;font-size:13px;padding:7px 6px"
-            onchange="(function(el){const m=document.getElementById('edit-modal').__editItems[${i}];m.size=el.value;m.variant=el.value==='M'?'30×40 cm':'40×60 cm'})(this)">
-            <option value="M"${sizeLabel(it)==='M'?' selected':''}>M</option>
-            <option value="L"${sizeLabel(it)==='L'?' selected':''}>L</option>
-          </select>
-          <input type="number" class="edit-input" style="width:80px;font-size:13px;padding:7px 8px;text-align:right" min="0"
-            value="${it.is_free?0:Number(it.line_price||it.price||0)}"
-            placeholder="0"
-            oninput="(function(el){const m=document.getElementById('edit-modal').__editItems[${i}];const v=parseFloat(el.value)||0;m.line_price=v;m.price=v;m.is_free=(v===0);calcTotal()})(this)"/>
-          <button onclick="(function(){document.getElementById('edit-modal').__editItems.splice(${i},1);window.__rerenderCartRows&&window.__rerenderCartRows();calcTotal()})()"
-            style="background:#1a0a0a;border:1px solid #3a1a1a;color:#e11d48;border-radius:8px;width:30px;height:30px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">
-            ×
-          </button>
-        </div>`;
-      }).join('')+
-      `<button onclick="(function(){
-          const pl=window.__productList;
-          const firstName=pl&&pl.length?pl[0].name:'';
-          document.getElementById('edit-modal').__editItems.push({product:firstName,size:'M',variant:'30×40 cm',is_free:false,line_price:0,price:0});
-          window.__rerenderCartRows&&window.__rerenderCartRows();
-          calcTotal();
-        })()"
-        style="width:100%;margin-top:10px;background:#0a0a0a;border:1px dashed #333;color:#888;border-radius:10px;padding:9px;font-size:13px;cursor:pointer">
-        + Add Item
-      </button>`;
+    // 4) Log all status changes to history in one insert.
+    if (historyRows.length) {
+      const { error: historyError } = await supabase.from("order_history").insert(historyRows);
+      if (historyError) {
+        console.error(`[track-orders] bulk history insert failed:`, historyError);
+        errors++;
+      }
     }
-    window.__rerenderCartRows=renderCartRows;
 
-    prodSec.innerHTML=`
-      <div class="edit-label" style="margin-bottom:8px">ORDER ITEMS</div>
-      <div id="edit-cart-rows" style="margin-bottom:12px"></div>`;
-    renderCartRows();
-
-  } else {
-    prodSec.innerHTML=`
-      <div class="edit-field">
-        <div class="edit-label">Product</div>
-        <input class="edit-input" id="edit-product" value="${esc(o.product||'')}"/>
-      </div>
-      <div class="edit-field">
-        <div class="edit-label">Variant</div>
-        <input class="edit-input" id="edit-variable" value="${esc(o.variable||'')}"/>
-      </div>`;
-  }
-  const shipping=o.shipping_cost||0;
-  const priceEl=document.getElementById('edit-product-price');
-  priceEl._manualEdit=false;
-  priceEl.value=(o.prix_total||0)-shipping;
-  document.getElementById('edit-shipping-price').value=shipping;
-  calcTotal();
-  const matchedWilaya=WILAYA_NAMES.find(w=>{
-    const clean=w.replace(/^\d+\s*-\s*/,'').trim().toLowerCase();
-    return clean===(o.wilaya||'').toLowerCase();
-  })||'';
-  wSel.value=matchedWilaya;
-  onEditTypeChange(o.commune,o.station_code);
-  document.getElementById('edit-modal').classList.add('open');
-}
-
-function onEditTypeChange(selectedCommune='',selectedDesk=''){
-  const type=document.getElementById('edit-type').value;
-  const communeWrap=document.getElementById('edit-commune-wrap');
-  const deskWrap=document.getElementById('edit-desk-wrap');
-  if(type==='pickup'){
-    communeWrap.style.display='none';
-    deskWrap.style.display='block';
-    populateEditDesks(selectedDesk);
-  } else {
-    communeWrap.style.display='block';
-    deskWrap.style.display='none';
-    const wilaya=document.getElementById('edit-wilaya').value;
-    populateEditCommunes(wilaya,selectedCommune);
-  }
-}
-
-function onEditWilayaChange(){
-  const type=document.getElementById('edit-type').value;
-  if(type==='home'){
-    const wilaya=document.getElementById('edit-wilaya').value;
-    populateEditCommunes(wilaya,'');
-  } else {
-    populateEditDesks('');
-  }
-}
-
-function populateEditCommunes(wilaya,selected){
-  const sel=document.getElementById('edit-commune');
-  const communes=WILAYA_DATA[wilaya]||[];
-  sel.innerHTML='<option value="">Select Commune</option>'+
-    communes.map(c=>`<option value="${esc(c)}"${c===selected?' selected':''}>${esc(c)}</option>`).join('');
-}
-
-function populateEditDesks(selectedCode){
-  const sel=document.getElementById('edit-desk');
-  if(!noestDesks){
-    sel.innerHTML='<option value="">Could not load desks - try again</option>';
-    return;
-  }
-  const wilayaKey=document.getElementById('edit-wilaya').value;
-  const num=(wilayaKey.match(/^(\d+)/)||[])[1]||'';
-  const entries=Object.entries(noestDesks);
-  const matching=entries.filter(([code])=>num&&new RegExp(`^${num}[A-Z]`).test(code));
-  const others=entries.filter(([code])=>!matching.find(([mc])=>mc===code));
-  const selectedNorm=normalizeDeskCode(selectedCode);
-  const optionHtml=([code,d])=>{
-    const optionValue=normalizeDeskCode(d?.code||code);
-    const isSelected=optionValue===selectedNorm;
-    return `<option value="${esc(optionValue)}"${isSelected?' selected':''}>${esc(d.name||optionValue)}</option>`;
-  };
-  sel.innerHTML='<option value="">Select Stop Desk</option>'+
-    (matching.length?'<optgroup label="This Wilaya">'+
-      matching.map(optionHtml).join('')+
-    '</optgroup>':'')+
-    '<optgroup label="All Desks">'+
-      others.map(optionHtml).join('')+
-    '</optgroup>';
-}
-
-function calcTotal(){
-  const editItems=document.getElementById('edit-modal').__editItems;
-  if(editItems){
-    // For cart orders: product price = sum of line_prices; update the field so operator can still override
-    const itemsTotal=editItems.reduce((s,it)=>s+Number(it.line_price||0),0);
-    const pEl=document.getElementById('edit-product-price');
-    // Only auto-fill if it hasn't been manually changed (compare to last auto value)
-    if(!pEl._manualEdit) pEl.value=itemsTotal;
-  }
-  const p=parseFloat(document.getElementById('edit-product-price').value)||0;
-  const s=parseFloat(document.getElementById('edit-shipping-price').value)||0;
-  document.getElementById('edit-total-display').textContent=`Total: ${(p+s).toLocaleString()} DZD`;
-}
-
-async function saveEdit(){
-  const o=currentOrder;
-  const type=document.getElementById('edit-type').value;
-  const wilayaKey=document.getElementById('edit-wilaya').value;
-  const wilayaClean=wilayaKey.replace(/^\d+\s*-\s*/,'').trim();
-  const commune=type==='home'?document.getElementById('edit-commune').value:'';
-  const stationCode=type==='pickup'?document.getElementById('edit-desk').value:'';
-  const productPrice=parseFloat(document.getElementById('edit-product-price').value)||0;
-  const shippingPrice=parseFloat(document.getElementById('edit-shipping-price').value)||0;
-
-  if(!wilayaClean){
-    toast('Wilaya is required',true);
-    return;
-  }
-  if(type==='home'&&!commune){
-    toast('Commune is required for home delivery',true);
-    return;
-  }
-
-  const isCartEdit=Array.isArray(o.items)&&o.items.length>0;
-  const editedItems=document.getElementById('edit-modal').__editItems;
-
-  const newData={
-    name:document.getElementById('edit-name').value,
-    phone:document.getElementById('edit-phone').value,
-    wilaya:wilayaClean,
-    commune,
-    type_livraison:type,
-    station_code:stationCode,
-    product:document.getElementById('edit-product')?document.getElementById('edit-product').value:(currentOrder.product||''),
-    variable:document.getElementById('edit-variable')?document.getElementById('edit-variable').value:(currentOrder.variable||''),
-    shipping_cost:shippingPrice,
-    prix_total:productPrice+shippingPrice,
-    ...(isCartEdit&&editedItems?{items:editedItems}:{}),
-  };
-
-  // Log field changes to history
-  const fields=['name','phone','wilaya','commune','product','variable','station_code'];
-  for(const field of fields){
-    const oldVal=o[field]||'';
-    const newVal=newData[field]||'';
-    if(String(oldVal).trim()!==String(newVal).trim()){
-      await sbFetch('order_history',{method:'POST',
-        body:JSON.stringify({
-          order_id:o.order_id,
-          old_status:String(oldVal),
-          new_status:String(newVal),
-          field_name:field,
-          changed_by:'operator'
-      })});
+    // 5) Fire delivered notifications (best-effort, don't block the response).
+    for (const order of deliveredOrders) {
+      try {
+        await sendNtfyNotification(
+          "arco-delivered",
+          `✅ Order Delivered`,
+          `${order.order_id} — ${order.prix_total || ''} DZD`
+        );
+      } catch (err) {
+        console.warn(`[track-orders] notify failed for ${order.order_id}:`, err.message);
+      }
     }
-  }
 
-  const listScrollTop=document.getElementById('orders-list')?.scrollTop||0;
-  await sbFetch(`orders?id=eq.${o.id}`,{method:'PATCH',body:JSON.stringify(newData)});
-  Object.assign(currentOrder,newData);
-  closeModal('edit-modal');
-  renderDetail();
-  await loadOrders();
-  const ordersList=document.getElementById('orders-list');
-  if(ordersList)ordersList.scrollTop=listScrollTop;
-  toast('Order updated');
+    const duration = Date.now() - startTime;
+    console.log(
+      `[track-orders] ✅ Complete: checked=${totalOrders}, updated=${updated}, errors=${errors}, took=${duration}ms`
+    );
+
+    return res.status(200).json({
+      message: "Tracking complete",
+      timestamp,
+      orders_checked: totalOrders,
+      orders_updated: updated,
+      errors,
+      duration_ms: duration,
+      updates,
+    });
+
+  } catch (err) {
+    console.error("[track-orders] Fatal error:", err.message);
+    return res.status(500).json({
+      error: "Tracking failed",
+      message: err.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
 }
 
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-
-// -- DUPLICATE DETECTION --
-function getDuplicatesForOrder(order){
-  if(!order||!order.phone)return[];
-  const cleaned=(order.phone||'').replace(/\s/g,'');
-  return allOrders.filter(o=>
-    o.id!==order.id &&
-    (o.phone||'').replace(/\s/g,'')===cleaned &&
-    !['canceled','duplicated'].includes(o.status)
+/**
+ * Get the latest event from Noest for a tracking number
+ * Calls /api/public/get/trackings/info and returns the most recent activity
+ */
+// Resolve one parcel's activity history into its most recent meaningful status.
+function resolveActivityToEvent(orderData) {
+  if (!orderData || !Array.isArray(orderData.activity) || orderData.activity.length === 0) {
+    return null;
+  }
+  const activity = [...orderData.activity].sort(
+    (a, b) => parseNoestDate(b?.date) - parseNoestDate(a?.date)
   );
-}
-function checkAndShowDupBanner(orderId){
-  const existing=document.getElementById('dup-banner-global');
-  if(existing)existing.remove();
-  if(!orderId)return;
-  const order=allOrders.find(o=>o.id===orderId);
-  if(!order)return;
-  const dups=getDuplicatesForOrder(order);
-  if(!dups.length)return;
-  const names=dups.map(d=>`${esc(d.name)} [${esc(d.status)}]`).join(', ');
-  const banner=document.createElement('div');
-  banner.id='dup-banner-global';
-  banner.className='dup-banner';
-  banner.innerHTML=`<span class="dup-banner-icon">??</span><div><b>Duplicate phone detected!</b> ${esc(order.name)}'s number also found in: ${names}. Consider marking as Duplicated.</div>`;
-  const list=document.getElementById('orders-list');
-  if(list)list.insertAdjacentElement('beforebegin',banner);
+  let newest = null;
+  for (const act of activity) {
+    const key = normalizeNoestEventKey(
+      act.event_key || act.event || act.status || act.label || ""
+    );
+    if (!newest) newest = { event_key: key, event_name: act.event, date: act.date };
+    if (EVENT_STATUS_MAP[key]) {
+      return { event_key: key, event_name: act.event, date: act.date };
+    }
+  }
+  return newest;
 }
 
-// ── HELPERS ──
-function statusLabel(k){return STATUSES.find(s=>s.k===k)?.l||k;}
-function waIcon(){return `<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;}
-function esc(v){if(v==null)return '';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function sizeLabel(it){
-  if(it&&it.size&&/^(M|L)$/i.test(it.size))return it.size.toUpperCase();
-  const norm=String((it&&(it.size||it.variant))||'').toLowerCase().replace(/سم|cm/g,'').replace(/[×*]/g,'x').replace(/\s+/g,'');
-  if(norm.includes('30x40'))return 'M';
-  if(norm.includes('40x60'))return 'L';
-  return (it&&(it.size||it.variant))||'';
+// Ask Noest about MANY parcels at once. get/trackings/info accepts an array,
+// so we request in chunks (≈6 calls for 300 orders) instead of one call each.
+// Returns Map<tracking_number, resolvedEvent>.
+async function getNoestEventsBatch(trackingNumbers) {
+  const out = new Map();
+  const CHUNK = 50; // well under Noest's 60 req/min limit even for thousands of orders
+  for (let i = 0; i < trackingNumbers.length; i += CHUNK) {
+    const batch = trackingNumbers.slice(i, i + CHUNK);
+    try {
+      const response = await fetch(`${NOEST_BASE}/get/trackings/info`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${noestApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user_guid: noestGuid, trackings: batch }),
+      });
+      if (!response.ok) {
+        console.warn(`[track-orders] batch HTTP ${response.status} for ${batch.length} trackings`);
+        continue;
+      }
+      const data = await response.json();
+      for (const t of batch) {
+        const ev = resolveActivityToEvent(data?.[t]);
+        if (ev) out.set(t, ev);
+      }
+    } catch (err) {
+      console.error(`[track-orders] batch error:`, err.message);
+    }
+  }
+  return out;
 }
-let _tt;
-function toast(msg,isErr=false){
-  const el=document.getElementById('toast');
-  el.textContent=msg;el.className='show'+(isErr?' err':'');
-  clearTimeout(_tt);_tt=setTimeout(()=>el.className='',2500);
+
+function parseNoestDate(value) {
+  if (!value) return 0;
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
-</script>
-</body>
-</html>
+
+function normalizeNoestEventKey(value) {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[ÃÂ]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[\s\-\/]+/g, "_")
+    .replace(/[^\p{L}\p{N}_]+/gu, "")
+    .replace(/_+/g, "_")
+    .replace(/^_|_$/g, "");
+}
+async function sendNtfyNotification(topic, title, message) {
+  try {
+    await fetch(`https://ntfy.sh/${topic}`, {
+      method: "POST",
+      headers: {
+        "Title": title,
+        "Priority": "high",
+        "Tags": "white_check_mark",
+      },
+      body: message,
+    });
+    console.log(`[ntfy] Sent to ${topic}: ${title}`);
+  } catch (err) {
+    console.error(`[ntfy] Failed:`, err.message);
+  }
+}
