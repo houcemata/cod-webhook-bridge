@@ -1385,16 +1385,19 @@ function updateDashboard(){
     const orders=range?allOrders.filter(o=>inRange(o.created_at,range)):allOrders;
     const total=orders.length;
     const delivered=orders.filter(o=>o.status==='delivered').length;
-    const confirmed=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
-    // Pending + total = always based on creation date
+    // "Confirmed" = orders currently in the 'confirmed' status (awaiting shipment), NOT the whole funnel.
+    const confirmed=orders.filter(o=>o.status==='confirmed').length;
+    // Funnel count (everything that ever passed confirmation) — used only for the % rates below.
+    const confirmedFlow=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
     const pending=orders.filter(o=>o.status==='pending').length;
+    const shipped=orders.filter(o=>o.status==='shipped').length;
     const canceled=orders.filter(o=>o.status==='canceled').length;
     const returned=orders.filter(o=>o.status==='returned').length;
     const delRate=total?(delivered/total*100).toFixed(1):'0.0';
-    const confRateAll=total?(confirmed/total*100).toFixed(1):'0.0';
+    const confRateAll=total?(confirmedFlow/total*100).toFixed(1):'0.0';
     const nonDraft=orders.filter(o=>o.status!=='draft').length;
-    const confRateNonDraft=nonDraft?(confirmed/nonDraft*100).toFixed(1):'0.0';
-    const delRateConfirmed=confirmed?(delivered/confirmed*100).toFixed(1):'0.0';
+    const confRateNonDraft=nonDraft?(confirmedFlow/nonDraft*100).toFixed(1):'0.0';
+    const delRateConfirmed=confirmedFlow?(delivered/confirmedFlow*100).toFixed(1):'0.0';
     const delRateAll=total?(delivered/total*100).toFixed(1):'0.0';
     document.getElementById('kpi-total').textContent=total;
     document.getElementById('kpi-delivered').textContent=delivered;
@@ -1406,6 +1409,8 @@ function updateDashboard(){
     document.getElementById('kpi-del-confirmed').textContent=`${delRateConfirmed}%`;
     document.getElementById('kpi-del-all').textContent=`${delRateAll}%`;
     document.getElementById('kpi-canceled').textContent=canceled;
+    document.getElementById('kpi-pending').textContent=pending;
+    document.getElementById('kpi-shipped').textContent=shipped;
     document.getElementById('kpi-total-sub').textContent=range?periodLabel():'All time';
     document.getElementById('kpi-pending-sub').textContent='Need attention';
     document.getElementById('kpi-shipped-sub').textContent='In transit';
@@ -1421,7 +1426,8 @@ function updateDashboard(){
     // count all status-change events in period grouped by new_status
     hist.forEach(h=>{if(countByStatus.hasOwnProperty(h.new_status))countByStatus[h.new_status]++;});
     const delivered=countByStatus['delivered']||0;
-    const confirmed=['confirmed','shipped','rescheduled','delivered','not_delivered'].reduce((sum,status)=>sum+(countByStatus[status]||0),0);
+    const confirmed=countByStatus['confirmed']||0;
+    const confirmedFlow=['confirmed','shipped','rescheduled','delivered','not_delivered'].reduce((sum,status)=>sum+(countByStatus[status]||0),0);
     const shipped=countByStatus['shipped']||0;
     const canceled=countByStatus['canceled']||0;
     const returned=countByStatus['returned']||0;
@@ -1433,9 +1439,9 @@ function updateDashboard(){
     document.getElementById('kpi-confirmed').textContent=confirmed;
     document.getElementById('kpi-conf-rate').textContent='confirmations';
     const nonDraft=allOrders.filter(o=>o.status!=='draft').length;
-    const confRateAll=total?(confirmed/total*100).toFixed(1):'0.0';
-    const confRateNonDraft=nonDraft?(confirmed/nonDraft*100).toFixed(1):'0.0';
-    const delRateConfirmed=confirmed?(delivered/confirmed*100).toFixed(1):'0.0';
+    const confRateAll=total?(confirmedFlow/total*100).toFixed(1):'0.0';
+    const confRateNonDraft=nonDraft?(confirmedFlow/nonDraft*100).toFixed(1):'0.0';
+    const delRateConfirmed=confirmedFlow?(delivered/confirmedFlow*100).toFixed(1):'0.0';
     const delRateAll=total?(delivered/total*100).toFixed(1):'0.0';
     document.getElementById('kpi-conf-all').textContent=`${confRateAll}%`;
     document.getElementById('kpi-conf-nondraft').textContent=`${confRateNonDraft}%`;
