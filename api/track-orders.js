@@ -131,90 +131,69 @@ export default async function handler(req, res) {
     let errors = 0;
     const updates = [];
 
-    // Track each order
+    // 1) Ask Noest about every parcel in a handful of batched requests.
+    const trackingNumbers = [...new Set(orders.map(o => o.tracking_number).filter(Boolean))];
+    const eventMap = await getNoestEventsBatch(trackingNumbers);
+    console.log(`[track-orders] Got Noest data for ${eventMap.size}/${trackingNumbers.length} trackings`);
+
+    // 2) Decide the new status for each order; collect writes (no DB call yet).
+    const idsByStatus = {};       // newStatus -> [order.id]
+    const historyRows = [];       // single bulk insert
+    const deliveredOrders = [];   // for notifications
+
     for (const order of orders) {
-      try {
-        const latestEvent = await getLatestNoestEvent(order.tracking_number);
+      const latestEvent = eventMap.get(order.tracking_number);
+      if (!latestEvent) continue;
 
-        if (!latestEvent) {
-          console.warn(
-            `[track-orders] No event from Noest for ${order.tracking_number} (${order.order_id})`
-          );
-          continue;
-        }
+      const newStatus = EVENT_STATUS_MAP[latestEvent.event_key];
+      if (!newStatus || newStatus === order.status) continue;
 
-        const newStatus = EVENT_STATUS_MAP[latestEvent.event_key];
+      (idsByStatus[newStatus] = idsByStatus[newStatus] || []).push(order.id);
+      historyRows.push({
+        order_id: order.order_id,
+        old_status: order.status,
+        new_status: newStatus,
+        field_name: null,
+        changed_by: "auto_tracker",
+        changed_at: timestamp,
+      });
+      updates.push({ order_id: order.order_id, from: order.status, to: newStatus, event: latestEvent.event_key });
+      if (newStatus === "delivered") deliveredOrders.push(order);
+    }
 
-        // Only update if we care about this event
-        if (!newStatus) {
-          console.log(
-            `[track-orders] ~ ${order.order_id}: ignoring event "${latestEvent.event_key}"`
-          );
-          continue;
-        }
+    // 3) Apply status changes grouped by target status — a few queries, not hundreds.
+    for (const [newStatus, ids] of Object.entries(idsByStatus)) {
+      const { error: updateError } = await supabase
+        .from("orders")
+        .update({ status: newStatus, updated_at: timestamp })
+        .in("id", ids);
+      if (updateError) {
+        console.error(`[track-orders] bulk update failed for "${newStatus}":`, updateError);
+        errors += ids.length;
+      } else {
+        updated += ids.length;
+      }
+    }
 
-        // Only update if status actually changed
-        if (newStatus !== order.status) {
-          console.log(
-            `[track-orders] ✓ ${order.order_id}: "${order.status}" → "${newStatus}" (event: ${latestEvent.event_key})`
-          );
-
-          // Update orders table
-          const { error: updateError } = await supabase
-            .from("orders")
-            .update({
-              status: newStatus,
-              updated_at: timestamp,
-            })
-            .eq("id", order.id);
-
-          if (updateError) {
-            console.error(`[track-orders] Update failed for ${order.order_id}:`, updateError);
-            errors++;
-            continue;
-          }
-
-          // Log to order_history
-          const { error: historyError } = await supabase
-            .from("order_history")
-            .insert({
-              order_id: order.order_id,
-              old_status: order.status,
-              new_status: newStatus,
-              field_name: null,
-              changed_by: "auto_tracker",
-              changed_at: timestamp,
-            });
-
-          if (historyError) {
-            console.error(`[track-orders] History log failed for ${order.order_id}:`, historyError);
-            errors++;
-            continue;
-          }
-
-          updated++;
-          updates.push({
-            order_id: order.order_id,
-            from: order.status,
-            to: newStatus,
-            event: latestEvent.event_key,
-          });
-
-          // Log special events
-          if (newStatus === "delivered") {
-            console.log(`[track-orders] 💰 Order ${order.order_id} delivered — Employee 3 eligible for 150 DZD`);
-            await sendNtfyNotification(
-              "arco-delivered",
-              `✅ Order Delivered`,
-              `${order.order_id} — ${order.prix_total || ''} DZD`
-            );
-          } else if (newStatus === "canceled") {
-            console.log(`[track-orders] ⚠️ Order ${order.order_id} returned/canceled`);
-          }
-        }
-      } catch (err) {
-        console.error(`[track-orders] Error processing ${order.order_id}:`, err.message);
+    // 4) Log all status changes to history in one insert.
+    if (historyRows.length) {
+      const { error: historyError } = await supabase.from("order_history").insert(historyRows);
+      if (historyError) {
+        console.error(`[track-orders] bulk history insert failed:`, historyError);
         errors++;
+      }
+    }
+
+    // 5) Fire delivered notifications (best-effort, don't block the response).
+    for (const order of deliveredOrders) {
+      try {
+        await sendNtfyNotification(
+          "arco-delivered",
+          `✅ Order Delivered`,
+          `${order.order_id} — ${order.prix_total || ''} DZD`
+        );
+      } catch (err) {
+        console.warn(`[track-orders] notify failed for ${order.order_id}:`, err.message);
       }
     }
 
@@ -247,59 +226,58 @@ export default async function handler(req, res) {
  * Get the latest event from Noest for a tracking number
  * Calls /api/public/get/trackings/info and returns the most recent activity
  */
-async function getLatestNoestEvent(trackingNumber) {
-  try {
-    const response = await fetch(`${NOEST_BASE}/get/trackings/info`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${noestApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_guid: noestGuid,   // REQUIRED by Noest — was missing, caused empty results
-        trackings: [trackingNumber],
-      }),
-    });
-
-    if (!response.ok) {
-      console.warn(`[getLatestNoestEvent] HTTP ${response.status} for ${trackingNumber}`);
-      return null;
-    }
-
-    const data = await response.json();
-    const orderData = data[trackingNumber];
-
-    if (!orderData || !Array.isArray(orderData.activity) || orderData.activity.length === 0) {
-      console.warn(`[getLatestNoestEvent] No activity for ${trackingNumber}`);
-      return null;
-    }
-
-    // Sort the full activity history newest-first.
-    const activity = [...orderData.activity].sort(
-      (a, b) => parseNoestDate(b?.date) - parseNoestDate(a?.date)
-    );
-
-    // Walk newest → oldest and return the most recent event that maps to a
-    // status we track. This skips post-delivery noise (e.g. "Amount
-    // transmitted to partner") that would otherwise hide the real
-    // delivered/returned outcome sitting one line below it.
-    let newest = null;
-    for (const act of activity) {
-      const key = normalizeNoestEventKey(
-        act.event_key || act.event || act.status || act.label || ""
-      );
-      if (!newest) newest = { event_key: key, event_name: act.event, date: act.date };
-      if (EVENT_STATUS_MAP[key]) {
-        return { event_key: key, event_name: act.event, date: act.date };
-      }
-    }
-
-    // No mapped event found — return the newest raw event (handler ignores it).
-    return newest;
-  } catch (err) {
-    console.error(`[getLatestNoestEvent] Error for ${trackingNumber}:`, err.message);
+// Resolve one parcel's activity history into its most recent meaningful status.
+function resolveActivityToEvent(orderData) {
+  if (!orderData || !Array.isArray(orderData.activity) || orderData.activity.length === 0) {
     return null;
   }
+  const activity = [...orderData.activity].sort(
+    (a, b) => parseNoestDate(b?.date) - parseNoestDate(a?.date)
+  );
+  let newest = null;
+  for (const act of activity) {
+    const key = normalizeNoestEventKey(
+      act.event_key || act.event || act.status || act.label || ""
+    );
+    if (!newest) newest = { event_key: key, event_name: act.event, date: act.date };
+    if (EVENT_STATUS_MAP[key]) {
+      return { event_key: key, event_name: act.event, date: act.date };
+    }
+  }
+  return newest;
+}
+
+// Ask Noest about MANY parcels at once. get/trackings/info accepts an array,
+// so we request in chunks (≈6 calls for 300 orders) instead of one call each.
+// Returns Map<tracking_number, resolvedEvent>.
+async function getNoestEventsBatch(trackingNumbers) {
+  const out = new Map();
+  const CHUNK = 50; // well under Noest's 60 req/min limit even for thousands of orders
+  for (let i = 0; i < trackingNumbers.length; i += CHUNK) {
+    const batch = trackingNumbers.slice(i, i + CHUNK);
+    try {
+      const response = await fetch(`${NOEST_BASE}/get/trackings/info`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${noestApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ user_guid: noestGuid, trackings: batch }),
+      });
+      if (!response.ok) {
+        console.warn(`[track-orders] batch HTTP ${response.status} for ${batch.length} trackings`);
+        continue;
+      }
+      const data = await response.json();
+      for (const t of batch) {
+        const ev = resolveActivityToEvent(data?.[t]);
+        if (ev) out.set(t, ev);
+      }
+    } catch (err) {
+      console.error(`[track-orders] batch error:`, err.message);
+    }
+  }
+  return out;
 }
 
 function parseNoestDate(value) {
