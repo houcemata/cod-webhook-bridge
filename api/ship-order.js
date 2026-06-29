@@ -240,6 +240,29 @@ async function logHistory(orderRef, oldStatus, newStatus, changedBy) {
   });
 }
 
+// Build (and validate) a Noest payload for one order without sending it.
+// Returns { ok:true, payload, fallbackPayload, isStopDesk } or { ok:false, error }.
+export function prepareNoestPayload({ order, orderId, stationCode, noestGuid }) {
+  const wilayaId = getWilayaId(order.wilaya);
+  if (!wilayaId) {
+    return { ok: false, error: `Unknown wilaya: "${order.wilaya}". Edit the order and fix the wilaya first.` };
+  }
+  const phone = normalizePhone(order.phone);
+  if (phone.length < 8) {
+    return { ok: false, error: `Invalid phone number: "${order.phone}". Use digits only.` };
+  }
+  const isStopDesk = order.type_livraison === "pickup";
+  const normalizedStationCode = normalizeStationCode(stationCode || order.station_code);
+  const clientName = sanitizeNoestText(order.name, `Client ${orderId}`);
+  const address = sanitizeNoestText(order.commune || order.wilaya, order.wilaya || "Algerie");
+  const commune = normalizeCommuneForNoest(wilayaId, order.commune || "");
+  const payload = buildNoestPayload({ noestGuid, orderId, order, wilayaId, phone, clientName, address, commune, isStopDesk, normalizedStationCode });
+  const fallbackPayload = buildNoestPayload({ noestGuid, orderId, order, wilayaId, phone, clientName, address, commune: "", isStopDesk, normalizedStationCode });
+  return { ok: true, payload, fallbackPayload, isStopDesk };
+}
+
+export { noestPost, formatNoestError, isCommuneValidationError, updateSupabase, logHistory };
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
