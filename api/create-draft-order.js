@@ -59,7 +59,7 @@ export default async function handler(req, res) {
 
     const supabase = getServiceClient();
     const body = req.body || {};
-    const productSlug = normalizeText(body.product_slug).toLowerCase();
+    const productSlug = normalizeText(body.product_slug);
     const phone = normalizePhone(body.phone);
 
     if (!productSlug) return res.status(400).json({ error: "Product is required" });
@@ -68,12 +68,14 @@ export default async function handler(req, res) {
     const { data: productRow, error: productError } = await supabase
       .from("products")
       .select("name, slug, price, active, variants")
-      .eq("slug", productSlug)
+      .ilike("slug", productSlug)
       .eq("active", true)
       .limit(1)
       .maybeSingle();
 
-    const product = productRow || getCustomCatalogProduct(productSlug);
+    const product = productRow
+      || getCustomCatalogProduct(productSlug)
+      || getCustomCatalogProduct(productSlug.toLowerCase());
 
     if (productError || !product) {
       return res.status(404).json({ error: "Product not found" });
@@ -94,6 +96,7 @@ export default async function handler(req, res) {
       prix_total: Number(variant.price || product.price || 0) + shippingCost,
       shipping_cost: shippingCost,
       status: "draft",
+      from_draft: true,
       notes: normalizeText(body.notes) || "draft lead",
     };
     const orderData = { order_id: createOrderId(), ...draftData };
