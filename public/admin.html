@@ -110,6 +110,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 .badge-delivered{background:#001a08;color:#22c55e;border:1px solid #22c55e33}
 .badge-canceled{background:#1a0000;color:#e11d48;border:1px solid #e11d4833}
 .badge-not_delivered{background:#1a0000;color:#ef4444;border:1px solid #ef444433}
+.badge-returned{background:#1a1200;color:#f59e0b;border:1px solid #f59e0b33}
 .badge-duplicated{background:#111;color:#71717a;border:1px solid #71717a33}
 
 /* FILTERS */
@@ -448,6 +449,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         <div class="kpi-card"><div class="kpi-icon">PND</div><div class="kpi-label">Pending</div><div class="kpi-value" id="kpi-pending">—</div><div class="kpi-sub" id="kpi-pending-sub">Need attention</div></div>
         <div class="kpi-card"><div class="kpi-icon">SHP</div><div class="kpi-label">Shipped</div><div class="kpi-value" id="kpi-shipped">—</div><div class="kpi-sub" id="kpi-shipped-sub">In transit</div></div>
         <div class="kpi-card"><div class="kpi-icon">CXL</div><div class="kpi-label">Canceled</div><div class="kpi-value" id="kpi-canceled">—</div><div class="kpi-sub" id="kpi-canceled-sub">Lost orders</div></div>
+        <div class="kpi-card"><div class="kpi-icon">RET</div><div class="kpi-label">Returned</div><div class="kpi-value" id="kpi-returned">—</div><div class="kpi-sub">Shipped, came back</div></div>
         <div class="kpi-card rate"><div class="kpi-icon">CA</div><div class="kpi-label">Conf Rate</div><div class="kpi-value" id="kpi-conf-all">—</div><div class="kpi-sub">Confirmed / all leads</div></div>
         <div class="kpi-card rate"><div class="kpi-icon">CD</div><div class="kpi-label">Conf Rate</div><div class="kpi-value" id="kpi-conf-nondraft">—</div><div class="kpi-sub">Confirmed / non-draft orders</div></div>
         <div class="kpi-card rate"><div class="kpi-icon">DC</div><div class="kpi-label">Del Rate</div><div class="kpi-value" id="kpi-del-confirmed">—</div><div class="kpi-sub">Delivered / confirmed orders</div></div>
@@ -493,6 +495,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
             <option value="shipped">Shipped</option>
             <option value="delivered">Delivered</option>
             <option value="canceled">Canceled</option>
+            <option value="returned">Returned</option>
             <option value="not_delivered">Not Delivered</option>
             <option value="duplicated">Duplicated</option>
           </select>
@@ -1132,7 +1135,7 @@ const STATUSES=[
   {k:'attempt_3',l:'Attempt 3',c:'#dc2626'},{k:'rescheduled',l:'Rescheduled',c:'#06b6d4'},
   {k:'confirmed',l:'Confirmed',c:'#3b82f6'},{k:'shipped',l:'Shipped',c:'#8b5cf6'},
   {k:'delivered',l:'Delivered',c:'#22c55e'},{k:'canceled',l:'Canceled',c:'#e11d48'},
-  {k:'not_delivered',l:'Not Delivered',c:'#ef4444'},{k:'duplicated',l:'Duplicated',c:'#71717a'},
+  {k:'not_delivered',l:'Not Delivered',c:'#ef4444'},{k:'returned',l:'Returned',c:'#f59e0b'},{k:'duplicated',l:'Duplicated',c:'#71717a'},
 ];
 const CONFIRMATION_FLOW_STATUSES=new Set(['confirmed','shipped','rescheduled','delivered','not_delivered']);
 
@@ -1386,6 +1389,7 @@ function updateDashboard(){
     // Pending + total = always based on creation date
     const pending=orders.filter(o=>o.status==='pending').length;
     const canceled=orders.filter(o=>o.status==='canceled').length;
+    const returned=orders.filter(o=>o.status==='returned').length;
     const delRate=total?(delivered/total*100).toFixed(1):'0.0';
     const confRateAll=total?(confirmed/total*100).toFixed(1):'0.0';
     const nonDraft=orders.filter(o=>o.status!=='draft').length;
@@ -1405,6 +1409,7 @@ function updateDashboard(){
     document.getElementById('kpi-total-sub').textContent=range?periodLabel():'All time';
     document.getElementById('kpi-pending-sub').textContent='Need attention';
     document.getElementById('kpi-shipped-sub').textContent='In transit';
+    document.getElementById('kpi-returned').textContent=returned;
     document.getElementById('kpi-canceled-sub').textContent='Lost orders';
     drawDonut(orders.map(o=>o.status));
   } else {
@@ -1419,6 +1424,7 @@ function updateDashboard(){
     const confirmed=['confirmed','shipped','rescheduled','delivered','not_delivered'].reduce((sum,status)=>sum+(countByStatus[status]||0),0);
     const shipped=countByStatus['shipped']||0;
     const canceled=countByStatus['canceled']||0;
+    const returned=countByStatus['returned']||0;
     const pending=countByStatus['pending']||0;
     const total=hist.length;
     document.getElementById('kpi-total').textContent=total;
@@ -1439,6 +1445,7 @@ function updateDashboard(){
     document.getElementById('kpi-shipped').textContent=shipped;
     document.getElementById('kpi-canceled').textContent=canceled;
     document.getElementById('kpi-total-sub').textContent=range?periodLabel():'All time';
+    document.getElementById('kpi-returned').textContent=returned;
     document.getElementById('kpi-pending-sub').textContent='moved to pending';
     document.getElementById('kpi-shipped-sub').textContent='shipped today';
     document.getElementById('kpi-canceled-sub').textContent='cancellations';
