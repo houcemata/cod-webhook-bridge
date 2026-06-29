@@ -982,24 +982,26 @@ async function bulkShip(){
   }
   toast(`Shipping ${ids.length} orders...`);
   const{data:{session}}=await sb.auth.getSession();
-  let ok=0,fail=0;
-  for(const id of ids){
-    const o=allOrders.find(x=>x.id===id);
-    if(!o)continue;
-    try{
-      const r=await fetch('/api/ship-order',{
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':`Bearer ${session?.access_token||''}`},
-        body:JSON.stringify({orderId:o.id,order:o,stationCode:o.station_code||null})
-      });
-      const data=await r.json();
-      if(r.ok){o.status='shipped';o.tracking_number=data.tracking_number;ok++;}
-      else fail++;
-    }catch{fail++;}
-  }
-  selectedIds.clear();
-  await loadOrders();
-  toast(`${ok} shipped${fail?`, ${fail} failed`:''}`,fail>0);
+  const payloadOrders=ids.map(id=>{const o=allOrders.find(x=>x.id===id);return o?{orderId:o.id,order:o,stationCode:o.station_code||null}:null;}).filter(Boolean);
+  try{
+    const r=await fetch('/api/ship-orders-bulk',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${session?.access_token||''}`},
+      body:JSON.stringify({orders:payloadOrders})
+    });
+    const data=await r.json();
+    if(!r.ok)throw new Error(data.error||'Bulk ship failed');
+    const results=data.results||{};
+    let ok=0,fail=0;
+    for(const o of allOrders){
+      const res=results[o.id];
+      if(res&&res.success){o.status='shipped';o.tracking_number=res.tracking_number;ok++;}
+      else if(res&&res.error){fail++;}
+    }
+    selectedIds.clear();
+    await loadOrders();
+    toast(`${ok} shipped${fail?`, ${fail} failed`:''}`,fail>0);
+  }catch(e){toast('Error: '+e.message,true);}
 }
 
 // ── INLINE STATUS UPDATE ──
