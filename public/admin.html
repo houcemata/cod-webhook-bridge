@@ -107,6 +107,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 .badge-rescheduled{background:#001a1a;color:#06b6d4;border:1px solid #06b6d433}
 .badge-confirmed{background:#00051a;color:#3b82f6;border:1px solid #3b82f633}
 .badge-shipped{background:#0a001a;color:#8b5cf6;border:1px solid #8b5cf633}
+.badge-shipping{background:#0a0018;color:#a78bfa;border:1px solid #a78bfa33}
 .badge-delivered{background:#001a08;color:#22c55e;border:1px solid #22c55e33}
 .badge-canceled{background:#1a0000;color:#e11d48;border:1px solid #e11d4833}
 .badge-not_delivered{background:#1a0000;color:#ef4444;border:1px solid #ef444433}
@@ -1133,7 +1134,7 @@ const STATUSES=[
   {k:'pending',l:'Pending',c:'#f59e0b'},{k:'to_recall',l:'To Recall',c:'#fb923c'},
   {k:'attempt_1',l:'Attempt 1',c:'#f97316'},{k:'attempt_2',l:'Attempt 2',c:'#ea580c'},
   {k:'attempt_3',l:'Attempt 3',c:'#dc2626'},{k:'rescheduled',l:'Rescheduled',c:'#06b6d4'},
-  {k:'confirmed',l:'Confirmed',c:'#3b82f6'},{k:'shipped',l:'Shipped',c:'#8b5cf6'},
+  {k:'confirmed',l:'Confirmed',c:'#3b82f6'},{k:'shipped',l:'Shipped',c:'#8b5cf6'},{k:'shipping',l:'Out for Delivery',c:'#a78bfa'},
   {k:'delivered',l:'Delivered',c:'#22c55e'},{k:'canceled',l:'Canceled',c:'#e11d48'},
   {k:'not_delivered',l:'Not Delivered',c:'#ef4444'},{k:'returned',l:'Returned',c:'#f59e0b'},{k:'duplicated',l:'Duplicated',c:'#71717a'},
 ];
@@ -1390,7 +1391,7 @@ function updateDashboard(){
     // Funnel count (everything that ever passed confirmation) — used only for the % rates below.
     const confirmedFlow=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
     const pending=orders.filter(o=>o.status==='pending').length;
-    const shipped=orders.filter(o=>o.status==='shipped').length;
+    const shipped=orders.filter(o=>o.status==='shipped'||o.status==='shipping').length;
     const canceled=orders.filter(o=>o.status==='canceled').length;
     const returned=orders.filter(o=>o.status==='returned').length;
     const delRate=total?(delivered/total*100).toFixed(1):'0.0';
@@ -1428,7 +1429,7 @@ function updateDashboard(){
     const delivered=countByStatus['delivered']||0;
     const confirmed=countByStatus['confirmed']||0;
     const confirmedFlow=['confirmed','shipped','rescheduled','delivered','not_delivered'].reduce((sum,status)=>sum+(countByStatus[status]||0),0);
-    const shipped=countByStatus['shipped']||0;
+    const shipped=(countByStatus['shipped']||0)+(countByStatus['shipping']||0);
     const canceled=countByStatus['canceled']||0;
     const returned=countByStatus['returned']||0;
     const pending=countByStatus['pending']||0;
