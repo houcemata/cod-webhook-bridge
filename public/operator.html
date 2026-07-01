@@ -66,7 +66,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .search-bar{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:12px;padding:11px 14px;color:#fff;font-size:14px;width:100%;outline:none}
 .search-bar::placeholder{color:#444}
 .search-bar:focus{border-color:#e11d48}
-.filters-row{display:flex;gap:8px}
+.filters-row{display:flex;flex-direction:column;gap:8px}
 .filter-select{flex:1;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:12px;padding:10px 12px;color:#fff;font-size:13px;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
 .filter-select:focus{border-color:#e11d48}
 .custom-date-row{display:none;gap:8px}
@@ -371,25 +371,26 @@ button,input,select,textarea{font:inherit}
 /* Headings font upgrade */
 .customer-name-big,.modal-title,.total-display{font-family:'Barlow Condensed',sans-serif;letter-spacing:.01em}
 
-/* ---- Compact KPI grid ---- */
-.stats-section{padding:12px 12px 0}
-.kpi-grid{grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.kpi-card{padding:12px 8px;border-radius:14px;aspect-ratio:1/1;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px}
-.kpi-card.total{grid-column:1/-1;aspect-ratio:auto;padding:14px 16px;flex-direction:row;justify-content:space-between;
+/* ---- Compact KPI grid : 4 per line, small squares, big numbers ---- */
+.stats-section{padding:10px 10px 0}
+.kpi-grid{grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.kpi-card{padding:6px 4px;border-radius:12px;aspect-ratio:1/1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;overflow:hidden}
+.kpi-card.total{grid-column:1/-1;aspect-ratio:auto;padding:12px 16px;flex-direction:row;justify-content:space-between;
   border:1px solid transparent;
   background:linear-gradient(180deg,rgba(255,45,142,.10),rgba(139,92,246,.06)) padding-box,var(--arco-grad) border-box;}
-.kpi-label{font-size:9px;letter-spacing:.4px;margin-bottom:0;gap:4px;justify-content:center;text-align:center;line-height:1.15;color:#9a9aab}
-.kpi-card.total .kpi-label{justify-content:flex-start}
-.kpi-label .dot{width:5px;height:5px;flex-shrink:0}
-.kpi-value{font-size:24px;font-weight:800;font-family:'Barlow Condensed',sans-serif;line-height:1}
-/* Total card: solid white number so it stays visible on the pink-tinted card (no gradient-clip) */
+.kpi-label{font-size:7.5px;letter-spacing:.2px;margin-bottom:0;gap:3px;justify-content:center;text-align:center;line-height:1.1;color:#9a9aab;text-transform:uppercase;font-weight:700}
+.kpi-card.total .kpi-label{justify-content:flex-start;font-size:10px}
+.kpi-label .dot{width:4px;height:4px;flex-shrink:0}
+/* Big number that fills the square */
+.kpi-value{font-size:30px;font-weight:800;font-family:'Fredoka',sans-serif;line-height:.9}
 .kpi-card.total .kpi-value{font-size:34px;color:#ffffff!important;background:none!important;-webkit-background-clip:initial!important;background-clip:initial!important}
 .kpi-card.rate{grid-column:auto}
-.kpi-card.rate .kpi-value{font-size:19px}
+.kpi-card.rate .kpi-value{font-size:20px}
 .kpi-sub{display:none}
-.kpi-card.rate .kpi-sub{display:block;font-size:8px;color:#8f8f9f;margin-top:1px;line-height:1.1}
-@media(max-width:360px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi-card.rate .kpi-sub{display:none}
+/* very narrow phones: keep 4 but shrink number a touch */
+@media(max-width:340px){.kpi-value{font-size:25px}.kpi-card.rate .kpi-value{font-size:17px}}
 
 /* ---- Order card polish ---- */
 .order-card{border-radius:16px;transition:border-color .18s,transform .18s}
@@ -512,6 +513,66 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
 /* chart card */
 .chart-wrap{background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(20,20,30,.95))}
 .chart-title{font-family:'Fredoka',sans-serif;font-weight:600;letter-spacing:.02em;color:#c9c9d6}
+
+/* ============================================================
+   DETAIL AS POPUP MODAL (sticky always-visible close button)
+   ============================================================ */
+#screen-detail{position:fixed;inset:0;z-index:250;display:none;
+  align-items:flex-end;justify-content:center;
+  background:rgba(4,4,10,.66);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  padding:0}
+#screen-detail.active{display:flex;animation:detailFade .18s ease}
+@keyframes detailFade{from{opacity:0}to{opacity:1}}
+.detail-sheet{width:100%;max-width:640px;max-height:92vh;display:flex;flex-direction:column;
+  background:linear-gradient(180deg,#14141d,#0c0c14);
+  border:1px solid rgba(255,255,255,.09);border-bottom:none;
+  border-radius:26px 26px 0 0;overflow:hidden;
+  box-shadow:0 -18px 60px rgba(255,45,142,.18),0 -2px 0 rgba(255,255,255,.05) inset;
+  animation:sheetUp .26s cubic-bezier(.2,.9,.25,1)}
+@keyframes sheetUp{from{transform:translateY(40px)}to{transform:translateY(0)}}
+/* Sticky header — always visible, never hidden by Chrome bar (it's inside the sheet, at its top) */
+.detail-header{position:sticky;top:0;z-index:2;flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:14px 16px;
+  background:linear-gradient(180deg,rgba(20,20,30,.98),rgba(20,20,30,.86));
+  backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.07)}
+.detail-back{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  color:#fff;font-family:'Fredoka',sans-serif;font-weight:600;font-size:15px;
+  padding:9px 16px;border-radius:13px;cursor:pointer;display:flex;align-items:center;gap:4px;
+  transition:transform .14s}
+.detail-back span{font-size:20px;line-height:1;margin-top:-1px}
+.detail-back:active{transform:scale(.92)}
+.detail-x{width:40px;height:40px;flex-shrink:0;border-radius:13px;cursor:pointer;
+  background:var(--arco-grad);border:none;color:#fff;font-size:22px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 16px rgba(255,45,142,.4);transition:transform .14s}
+.detail-x:active{transform:scale(.9)}
+/* body scrolls inside the sheet, header stays put */
+#screen-detail .detail-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;padding:14px 14px 40px}
+
+/* ============================================================
+   EDIT / HISTORY MODAL FIXES (sticky X, no scroll-behind, above detail)
+   ============================================================ */
+/* sit above the detail popup (z-index 250) so Edit opens on top */
+.modal-overlay{z-index:400;align-items:flex-end;justify-content:center}
+.modal-overlay .modal,.modal-overlay .edit-modal{
+  max-width:640px;
+  border-radius:26px 26px 0 0;
+  /* leave a safe gap at the very top so the sheet never sits under the Chrome bar */
+  max-height:88vh;
+  overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  padding:0 20px 24px}
+/* Sticky title bar with the X — stays pinned at the sheet's top while the body scrolls */
+.modal-overlay .modal-title,.modal-overlay .edit-modal .modal-title{
+  position:sticky;top:0;z-index:3;margin:0 -20px 14px;padding:16px 20px;
+  background:linear-gradient(180deg,rgba(20,20,30,.99),rgba(20,20,30,.9));
+  backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08);
+  font-family:'Fredoka',sans-serif}
+.modal-close{background:var(--arco-grad);color:#fff;width:36px;height:36px;border-radius:11px;
+  font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 6px 16px rgba(255,45,142,.4);transition:transform .14s}
+.modal-close:active{transform:scale(.9)}
 </style>
 </head>
 <body>
@@ -621,9 +682,15 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
 
   </div>
 
-  <!-- Detail -->
+  <!-- Detail (popup modal) -->
   <div class="screen" id="screen-detail">
-    <div class="detail-scroll" id="detail-content"></div>
+    <div class="detail-sheet">
+      <div class="detail-header">
+        <button class="detail-back" onclick="closeDetail()"><span>‹</span> Back</button>
+        <button class="detail-x" onclick="closeDetail()">×</button>
+      </div>
+      <div class="detail-scroll" id="detail-content"></div>
+    </div>
   </div>
 
   <div class="tab-bar" id="tab-bar"></div>
@@ -1265,15 +1332,17 @@ let _listScrollY=0;
 function openDetail(id){
   currentOrder=allOrders.find(o=>o.id===id);
   if(!currentOrder)return;
-  // Remember where the list was scrolled so we can restore it when we come back.
+  // Remember where the list was scrolled so we can restore it when we close the popup.
   _listScrollY=window.scrollY||window.pageYOffset||0;
-  // Show duplicate warning in detail view
   const dups=getDuplicatesForOrder(currentOrder);
   renderDetail(dups);
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-detail').classList.add('active');
   document.getElementById('tab-bar').style.display='none';
-  window.scrollTo(0,0); // detail always starts at the top
+  // lock the background list from scrolling behind the popup
+  document.body.style.overflow='hidden';
+  // detail body starts at the top (it scrolls internally, not the window)
+  const ds=document.querySelector('#screen-detail .detail-scroll');
+  if(ds)ds.scrollTop=0;
 }
 
 function renderDetail(dups=[]){
@@ -1281,7 +1350,6 @@ function renderDetail(dups=[]){
   const dateStr=o.created_at?toAlgeriaDate(o.created_at).toLocaleString('fr-DZ'):'';
   const dupHtml=dups.length?`<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:12px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:#f59e0b;display:flex;gap:8px"><span style="font-size:15px">&#x26A0;&#xFE0F;</span><div><b>Duplicate phone!</b> Same number in: ${dups.map(d=>`${esc(d.name)} [${esc(d.status)}]`).join(', ')}</div></div>`:'';
   document.getElementById('detail-content').innerHTML=`
-    <button class="back-btn" onclick="closeDetail()">< Back</button>
     ${dupHtml}
     <div class="detail-section">
       <div class="detail-section-title">Customer</div>
@@ -1333,12 +1401,12 @@ function renderDetail(dups=[]){
 }
 
 function closeDetail(){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-main').classList.add('active');
+  // Just hide the popup — the main list screen stayed active underneath.
+  document.getElementById('screen-detail').classList.remove('active');
   document.getElementById('tab-bar').style.display='flex';
+  document.body.style.overflow=''; // unlock background scroll
   currentOrder=null;
-  // Restore the list scroll position (screens use display:none which forgets it).
-  // rAF ensures the layout is back before we scroll.
+  // Restore the list scroll position (body was locked while popup was open).
   requestAnimationFrame(()=>window.scrollTo(0,_listScrollY));
 }
 
