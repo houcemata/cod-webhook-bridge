@@ -2163,11 +2163,12 @@ function safeRate(n,d){
 }
 
 function buildOrderDailyRows(orders){
-  // Uses the same day-bucketing (toAlgeriaDate) and same status logic as the
-  // dashboard's updateDashboard()/'created' mode, so finance numbers match the dashboard exactly.
+  // Matches dashboard behavior exactly: only literal 'draft' status is excluded from counts.
+  // from_draft=true orders that have progressed (confirmed/shipped/delivered/etc.) DO count here,
+  // same as they count in the dashboard's total/confirmed/delivered/shipped KPIs.
   const map = new Map();
   orders.forEach(o => {
-    if(o.status === 'draft' || o.from_draft) return;
+    if(o.status === 'draft') return;
     const algDate = toAlgeriaDate(o.created_at);
     if(!algDate) return;
     const key = algDate.toISOString().slice(0,10);
