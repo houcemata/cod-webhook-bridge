@@ -2107,10 +2107,10 @@ function getFinPeriodRange(){
   return null;
 }
 
-function inFinRange(dateStr,range){
-  if(!range||!dateStr)return true;
-  const d=new Date(dateStr);
-  return d>=range.from&&d<range.to;
+function inFinRange(dateStr, range){
+  if(!range || !dateStr) return true;
+  const d = new Date(new Date(dateStr).getTime() + 60*60*1000);
+  return d >= range.from && d < range.to;
 }
 function payLogInRange(log,range){
   if(!range)return true;
@@ -2138,10 +2138,15 @@ async function loadAdPerformance(range){
 }
 
 function dayKey(dateStr){
-  if(!dateStr)return'';
-  const d=new Date(dateStr);
+  if(!dateStr) return '';
+  const d = new Date(dateStr);
   if(Number.isNaN(d.getTime())) return String(dateStr).slice(0,10);
-  return d.toISOString().slice(0,10);
+  const algeriaMs = d.getTime() + 60*60*1000;
+  const a = new Date(algeriaMs);
+  const yyyy = a.getUTCFullYear();
+  const mm = String(a.getUTCMonth()+1).padStart(2,'0');
+  const dd = String(a.getUTCDate()).padStart(2,'0');
+  return `${yyyy}-${mm}-${dd}`;
 }
 
 function formatDayLabel(dateKey){
@@ -2155,17 +2160,18 @@ function safeRate(n,d){
 }
 
 function buildOrderDailyRows(orders){
-  const map=new Map();
-  orders.forEach(o=>{
-    const key=dayKey(o.created_at);
-    if(!key)return;
-    if(!map.has(key)) map.set(key,{date:key,total:0,confirmed:0,delivered:0});
-    const row=map.get(key);
+  const map = new Map();
+  orders.forEach(o => {
+    if(o.status === 'draft' || o.from_draft) return;
+    const key = dayKey(o.created_at);
+    if(!key) return;
+    if(!map.has(key)) map.set(key, {date:key, total:0, confirmed:0, delivered:0});
+    const row = map.get(key);
     row.total++;
-    if([CONFIRMATION_FLOW_STATUSES].includes(o.status)) row.confirmed++;
-    if(o.status==='delivered') row.delivered++;
+    if(CONFIRMATION_FLOW_STATUSES.has(o.status)) row.confirmed++;
+    if(o.status === 'delivered') row.delivered++;
   });
-  return [...map.values()].sort((a,b)=>a.date.localeCompare(b.date));
+  return [...map.values()].sort((a,b) => a.date.localeCompare(b.date));
 }
 
 function renderAdPerformancePanel(range,summary,periodOrders,deliveredOrders,confirmedOrders){
