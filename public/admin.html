@@ -2173,23 +2173,24 @@ function safeRate(n,d){
   return d?((n/d)*100):0;
 }
 
+// Finance "Confirmed" = orders that were genuinely confirmed and moved forward in the funnel.
+// Deliberately EXCLUDES failed-delivery / limbo states (attempt_1/2/3, suspended, not_delivered)
+// because those are not confirmed sales. Used by both the daily table and the summary cards.
+const FINANCE_CONFIRMED_STATUSES = new Set(['confirmed','shipped','shipping','delivered','returned','rescheduled']);
+
 function buildOrderDailyRows(orders){
-  // Matches dashboard behavior exactly: only literal 'draft' status is excluded from counts.
-  // from_draft=true orders that have progressed (confirmed/shipped/delivered/etc.) DO count here,
-  // same as they count in the dashboard's total/confirmed/delivered/shipped KPIs.
+  //   total     = every order in range (drafts included, no exclusion)
+  //   confirmed = FINANCE_CONFIRMED_STATUSES (confirmed+shipped+shipping+delivered+returned+rescheduled)
+  //   delivered = literal 'delivered' status only
   const map = new Map();
   orders.forEach(o => {
-    if(o.status === 'draft') return;
     const algDate = toAlgeriaDate(o.created_at);
     if(!algDate) return;
     const key = algDate.toISOString().slice(0,10);
     if(!map.has(key)) map.set(key, {date:key, total:0, confirmed:0, delivered:0});
     const row = map.get(key);
     row.total++;
-    // "Confirmed" = orders that ever reached confirmation (the funnel), matching the dashboard's
-    // confirmedFlow / CONFIRMATION_FLOW_STATUSES used for its confirmation-rate calculations —
-    // i.e. still counts as confirmed even after moving on to shipped/delivered/returned/etc.
-    if(CONFIRMATION_FLOW_STATUSES.has(o.status)) row.confirmed++;
+    if(FINANCE_CONFIRMED_STATUSES.has(o.status)) row.confirmed++;
     if(o.status === 'delivered') row.delivered++;
   });
   return [...map.values()].sort((a,b) => a.date.localeCompare(b.date));
@@ -2286,9 +2287,9 @@ async function updateFinance(){
 
   // Revenue from delivered orders
   const deliveredOrders=periodOrders.filter(o=>o.status==='delivered');
-  // "Confirmed" = funnel (ever reached confirmation), matching buildOrderDailyRows and the
-  // dashboard's confirmedFlow — not just orders currently sitting in literal 'confirmed' status.
-  const confirmedOrders=periodOrders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status));
+  // "Confirmed" = FINANCE_CONFIRMED_STATUSES (confirmed+shipped+shipping+delivered+returned+rescheduled),
+  // same set the daily table uses. Excludes attempt_1/2/3, suspended, not_delivered.
+  const confirmedOrders=periodOrders.filter(o=>FINANCE_CONFIRMED_STATUSES.has(o.status));
   const revenue=deliveredOrders.reduce((s,o)=>s+Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0)),0);
 
   // Expenses in period
