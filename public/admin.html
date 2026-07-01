@@ -2163,15 +2163,20 @@ function safeRate(n,d){
 }
 
 function buildOrderDailyRows(orders){
+  // Uses the same day-bucketing (toAlgeriaDate) and same status logic as the
+  // dashboard's updateDashboard()/'created' mode, so finance numbers match the dashboard exactly.
   const map = new Map();
   orders.forEach(o => {
     if(o.status === 'draft' || o.from_draft) return;
-    const key = dayKey(o.created_at);
-    if(!key) return;
+    const algDate = toAlgeriaDate(o.created_at);
+    if(!algDate) return;
+    const key = algDate.toISOString().slice(0,10);
     if(!map.has(key)) map.set(key, {date:key, total:0, confirmed:0, delivered:0});
     const row = map.get(key);
     row.total++;
-    if(CONFIRMATION_FLOW_STATUSES.has(o.status)) row.confirmed++;
+    // "Confirmed" = orders currently in the 'confirmed' status only (matches dashboard kpi-confirmed),
+    // NOT the whole CONFIRMATION_FLOW_STATUSES funnel.
+    if(o.status === 'confirmed') row.confirmed++;
     if(o.status === 'delivered') row.delivered++;
   });
   return [...map.values()].sort((a,b) => a.date.localeCompare(b.date));
@@ -2268,7 +2273,9 @@ async function updateFinance(){
 
   // Revenue from delivered orders
   const deliveredOrders=periodOrders.filter(o=>o.status==='delivered');
-  const confirmedOrders=periodOrders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status));
+  // "Confirmed" here matches the dashboard's kpi-confirmed: orders currently sitting in
+  // 'confirmed' status only, not the whole CONFIRMATION_FLOW_STATUSES funnel.
+  const confirmedOrders=periodOrders.filter(o=>o.status==='confirmed');
   const revenue=deliveredOrders.reduce((s,o)=>s+Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0)),0);
 
   // Expenses in period
