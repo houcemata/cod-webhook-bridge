@@ -79,20 +79,38 @@ async function fetchMetaSummary(from, to) {
   url.searchParams.set("level", "account");
   url.searchParams.set("time_increment", "1");
   url.searchParams.set("time_range", JSON.stringify({ since: from, until: to }));
+  url.searchParams.set("limit", "500");
   url.searchParams.set("access_token", accessToken);
 
-  const response = await fetch(url);
-  const data = await response.json().catch(() => ({}));
-  const rows = Array.isArray(data?.data) ? data.data : [];
+  // Meta paginates daily-insight rows (~25/page by default). With time_increment=1 over a long
+  // range this means only the FIRST page (oldest days) comes back and recent days show 0. Follow
+  // the paging.next cursor until all pages are collected so today/yesterday are included.
+  let rows = [];
+  let ok = true;
+  let status = 200;
+  let nextUrl = url.toString();
+  let lastData = null;
+  let guard = 0;
+  while (nextUrl && guard < 50) {
+    guard++;
+    const response = await fetch(nextUrl);
+    ok = response.ok;
+    status = response.status;
+    const data = await response.json().catch(() => ({}));
+    lastData = data;
+    if (Array.isArray(data?.data)) rows = rows.concat(data.data);
+    nextUrl = (response.ok && data?.paging?.next) ? data.paging.next : "";
+  }
+
   const daily = normalizeDailyRows(rows, "meta", USD_TO_DZD);
 
   return {
     provider: "meta",
-    ok: response.ok,
-    status: response.status,
+    ok,
+    status,
     total_spend: sum(daily, "spend"),
     daily,
-    raw: data,
+    raw: lastData,
   };
 }
 
