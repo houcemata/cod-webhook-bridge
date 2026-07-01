@@ -1346,7 +1346,11 @@ function setDashPeriod(p){
 function toAlgeriaDate(dateStr){
   // Convert UTC timestamp to Algeria local date (UTC+1)
   if(!dateStr)return null;
-  const d=new Date(dateStr);
+  // created_at is stored as 'timestamp without time zone' in Postgres, so it can come back without
+  // a trailing 'Z' (e.g. "2026-06-30T23:03:23.224"). new Date() on a string with no timezone marker
+  // parses it as LOCAL browser time, not UTC. Force UTC interpretation by appending 'Z' when missing.
+  const iso = /[Zz]|[+-]\d{2}:?\d{2}$/.test(dateStr) ? dateStr : dateStr + 'Z';
+  const d=new Date(iso);
   // Add 1 hour offset for Algeria (UTC+1)
   d.setTime(d.getTime()+60*60*1000);
   return d;
@@ -3428,13 +3432,4 @@ async function deleteCategory(id){
   await loadCollections();renderCatList();toast('Collection deleted');
 }
 
-function esc(v){if(v==null)return'';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-let _tt;
-function toast(msg,isErr=false){
-  const el=document.getElementById('toast');
-  el.textContent=msg;el.className='show'+(isErr?' err':' ok');
-  clearTimeout(_tt);_tt=setTimeout(()=>el.className='',3000);
-}
-</script>
-</body>
-</html>
+fu
