@@ -2162,7 +2162,7 @@ function buildOrderDailyRows(orders){
     if(!map.has(key)) map.set(key,{date:key,total:0,confirmed:0,delivered:0});
     const row=map.get(key);
     row.total++;
-    if(['confirmed','shipped','rescheduled','delivered','not_delivered'].includes(o.status)) row.confirmed++;
+    if([CONFIRMATION_FLOW_STATUSES].includes(o.status)) row.confirmed++;
     if(o.status==='delivered') row.delivered++;
   });
   return [...map.values()].sort((a,b)=>a.date.localeCompare(b.date));
