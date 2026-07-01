@@ -2094,22 +2094,25 @@ async function loadFinanceData(){
 }
 
 function getFinPeriodRange(){
-  const now=new Date();
-  const p=document.getElementById('fin-period')?.value||'month';
-  if(p==='month'){return{from:new Date(now.getFullYear(),now.getMonth(),1),to:new Date()};}
-  if(p==='lastmonth'){
-    const f=new Date(now.getFullYear(),now.getMonth()-1,1);
-    const t=new Date(now.getFullYear(),now.getMonth(),1);
-    return{from:f,to:t};
+  const p = document.getElementById('fin-period')?.value || 'month';
+  const now = new Date();
+  const algeriaOffset = 60*60*1000;
+  const localNow = new Date(now.getTime() + algeriaOffset);
+  const today = new Date(localNow.getFullYear(), localNow.getMonth(), localNow.getDate());
+  if(p === 'month') return {from: new Date(localNow.getFullYear(), localNow.getMonth(), 1), to: new Date(today.getTime()+86400000)};
+  if(p === 'lastmonth'){
+    const f = new Date(localNow.getFullYear(), localNow.getMonth()-1, 1);
+    const t = new Date(localNow.getFullYear(), localNow.getMonth(), 1);
+    return {from:f, to:t};
   }
-  if(p==='7days'){const f=new Date(now);f.setDate(now.getDate()-7);return{from:f,to:new Date()};}
-  if(p==='30days'){const f=new Date(now);f.setDate(now.getDate()-30);return{from:f,to:new Date()};}
+  if(p === '7days'){const f=new Date(today);f.setDate(today.getDate()-7);return{from:f,to:new Date(today.getTime()+86400000)};}
+  if(p === '30days'){const f=new Date(today);f.setDate(today.getDate()-30);return{from:f,to:new Date(today.getTime()+86400000)};}
   return null;
 }
 
 function inFinRange(dateStr, range){
   if(!range || !dateStr) return true;
-  const d = new Date(new Date(dateStr).getTime() + 60*60*1000);
+  const d = toAlgeriaDate(dateStr);
   return d >= range.from && d < range.to;
 }
 function payLogInRange(log,range){
