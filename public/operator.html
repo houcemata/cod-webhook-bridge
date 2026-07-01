@@ -7,7 +7,7 @@
 <script>document.title='ARCO CRM';</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Cairo:wght@400;600;700;800&family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -373,18 +373,22 @@ button,input,select,textarea{font:inherit}
 
 /* ---- Compact KPI grid ---- */
 .stats-section{padding:12px 12px 0}
-.kpi-grid{grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}
-.kpi-card{padding:9px 10px;border-radius:12px}
-.kpi-card.total{grid-column:1/-1;padding:12px 14px;border:1px solid transparent;
+.kpi-grid{grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.kpi-card{padding:12px 8px;border-radius:14px;aspect-ratio:1/1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px}
+.kpi-card.total{grid-column:1/-1;aspect-ratio:auto;padding:14px 16px;flex-direction:row;justify-content:space-between;
+  border:1px solid transparent;
   background:linear-gradient(180deg,rgba(255,45,142,.10),rgba(139,92,246,.06)) padding-box,var(--arco-grad) border-box;}
-.kpi-label{font-size:9px;letter-spacing:.4px;margin-bottom:3px;gap:4px}
-.kpi-label .dot{width:5px;height:5px}
-.kpi-value{font-size:19px;font-weight:800;font-family:'Barlow Condensed',sans-serif}
-.kpi-card.total .kpi-value{font-size:30px}
+.kpi-label{font-size:9px;letter-spacing:.4px;margin-bottom:0;gap:4px;justify-content:center;text-align:center;line-height:1.15;color:#9a9aab}
+.kpi-card.total .kpi-label{justify-content:flex-start}
+.kpi-label .dot{width:5px;height:5px;flex-shrink:0}
+.kpi-value{font-size:24px;font-weight:800;font-family:'Barlow Condensed',sans-serif;line-height:1}
+/* Total card: solid white number so it stays visible on the pink-tinted card (no gradient-clip) */
+.kpi-card.total .kpi-value{font-size:34px;color:#ffffff!important;background:none!important;-webkit-background-clip:initial!important;background-clip:initial!important}
 .kpi-card.rate{grid-column:auto}
-.kpi-card.rate .kpi-value{font-size:16px}
+.kpi-card.rate .kpi-value{font-size:19px}
 .kpi-sub{display:none}
-.kpi-card.rate .kpi-sub{display:block;font-size:8px;color:#8f8f9f;margin-top:2px;line-height:1.2}
+.kpi-card.rate .kpi-sub{display:block;font-size:8px;color:#8f8f9f;margin-top:1px;line-height:1.1}
 @media(max-width:360px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
 
 /* ---- Order card polish ---- */
@@ -416,6 +420,98 @@ button,input,select,textarea{font:inherit}
 .card-note::placeholder{color:#55555f}
 .card-note:focus{border-color:var(--arco-line-strong);box-shadow:0 0 0 3px rgba(255,45,142,.10)}
 .card-note.saved{border-color:rgba(34,197,94,.5)}
+
+/* ============================================================
+   PLAYFUL + VIBRANT REDESIGN  (pink→purple, rounded, glowy)
+   ============================================================ */
+
+body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
+
+/* floating blobs behind everything for depth */
+#app::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(38vw 38vw at 12% -4%, rgba(255,45,142,.16), transparent 60%),
+    radial-gradient(42vw 42vw at 100% 8%, rgba(168,85,247,.15), transparent 62%),
+    radial-gradient(50vw 40vw at 50% 118%, rgba(192,38,211,.12), transparent 60%);
+  animation:blobFloat 14s ease-in-out infinite alternate;
+}
+@keyframes blobFloat{from{transform:translateY(0)}to{transform:translateY(-18px)}}
+
+/* rounder everything */
+.order-card,.detail-section,.chart-wrap,.modal,.edit-modal,.login-card{border-radius:22px}
+.kpi-card{border-radius:18px}
+
+/* ---- Header ---- */
+.app-header{padding:14px 16px;border-bottom:none;
+  background:linear-gradient(180deg,rgba(12,12,20,.92),rgba(12,12,20,.62));
+  backdrop-filter:blur(20px)}
+.logo{font-family:'Fredoka',sans-serif;font-weight:700;font-size:1.85rem;letter-spacing:.02em}
+.refresh-btn,.logout-btn{border-radius:14px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.09);transition:transform .15s,background .15s}
+.refresh-btn:active,.logout-btn:active{transform:scale(.9)}
+
+/* ---- Tabs: bouncy pills ---- */
+.tab-bar{padding:10px 10px 22px;gap:7px;background:linear-gradient(0deg,rgba(10,10,16,.96),rgba(10,10,16,.7))}
+.tab-btn{border-radius:999px;padding:8px 15px;font-weight:700;font-size:12px;
+  border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.045);color:#a7a7b8;
+  transition:transform .15s ease,box-shadow .2s,color .2s}
+.tab-btn:active{transform:scale(.93)}
+.tab-btn.active{background:var(--arco-grad);color:#fff;border-color:transparent;
+  box-shadow:0 6px 18px rgba(255,45,142,.45),0 0 0 1px rgba(255,255,255,.12) inset;transform:translateY(-1px)}
+.tab-count{background:rgba(255,255,255,.16);border-radius:999px;padding:1px 7px;font-size:10px;font-weight:800}
+.tab-btn.active .tab-count{background:rgba(0,0,0,.22)}
+
+/* ---- KPI cards: glow + gradient value ---- */
+.kpi-card{background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.08);transition:transform .18s,box-shadow .2s;position:relative;overflow:hidden}
+.kpi-card:active{transform:scale(.97)}
+.kpi-card:not(.total) .kpi-value{color:transparent;background:var(--arco-grad-soft);
+  -webkit-background-clip:text;background-clip:text}
+.kpi-card.total{box-shadow:0 10px 30px rgba(255,45,142,.28)}
+.kpi-card.total .kpi-label{color:rgba(255,255,255,.85);font-weight:700}
+
+/* ---- Order cards: status edge strip + glow on press ---- */
+.order-card{position:relative;overflow:hidden;padding-left:18px;
+  background:linear-gradient(165deg,rgba(255,255,255,.05),rgba(20,20,30,.96));
+  border:1px solid rgba(255,255,255,.07);transition:transform .16s,box-shadow .2s,border-color .2s}
+.order-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;
+  background:var(--strip,var(--arco-pink));box-shadow:0 0 14px var(--strip,var(--arco-pink))}
+.order-card:active{transform:scale(.994)}
+.order-card.selected{box-shadow:0 0 0 2px var(--arco-pink),0 10px 30px rgba(255,45,142,.3)}
+.order-name{font-family:'Fredoka',sans-serif;font-weight:600;font-size:17px}
+.order-price{font-weight:800;font-size:16px}
+
+/* status badge — brighter, pill, glow */
+.status-badge{padding:4px 12px;border-radius:999px;font-weight:800;font-size:10.5px;
+  letter-spacing:.5px;backdrop-filter:blur(4px)}
+
+/* ---- Buttons: springy ---- */
+.btn-call-sm,.btn-ship-sm,.btn-detail,.btn-wa-sm,.card-status-select,
+.btn-call,.ship-btn,.track-btn,.save-note-btn,.edit-save-btn,.login-btn,.bulk-ship-btn{
+  transition:transform .14s ease,box-shadow .2s,filter .2s}
+.btn-call-sm:active,.btn-ship-sm:active,.btn-detail:active,.btn-wa-sm:active,
+.btn-call:active,.ship-btn:active,.track-btn:active,.save-note-btn:active,
+.edit-save-btn:active,.login-btn:active,.bulk-ship-btn:active{transform:scale(.92)}
+.btn-call-sm{box-shadow:0 6px 16px rgba(255,45,142,.4)}
+.btn-call-sm,.btn-detail{border-radius:13px}
+.btn-wa-sm{border-radius:13px;box-shadow:0 6px 16px rgba(37,211,102,.35)}
+
+/* ---- Login glow ---- */
+.login-logo{font-family:'Fredoka',sans-serif;font-weight:700}
+.login-card{box-shadow:0 24px 70px rgba(255,45,142,.18),0 0 0 1px rgba(255,255,255,.06)}
+.login-btn{box-shadow:0 10px 26px rgba(255,45,142,.45)}
+
+/* ---- Search/filter pills ---- */
+.search-bar,.filter-select,.date-input{border-radius:15px}
+.filters-bar{background:linear-gradient(180deg,rgba(10,10,16,.9),rgba(10,10,16,.55));backdrop-filter:blur(16px)}
+
+/* toast rounder + glow */
+#toast{border-radius:999px;box-shadow:0 10px 30px rgba(255,45,142,.3);border-color:var(--arco-line-strong)}
+
+/* chart card */
+.chart-wrap{background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(20,20,30,.95))}
+.chart-title{font-family:'Fredoka',sans-serif;font-weight:600;letter-spacing:.02em;color:#c9c9d6}
 </style>
 </head>
 <body>
@@ -485,6 +581,7 @@ button,input,select,textarea{font:inherit}
         <select class="filter-select" id="filter-period" onchange="onPeriodChange()">
           <option value="all" selected>All Time</option>
           <option value="today">Today</option>
+          <option value="yesterday">Yesterday</option>
           <option value="7days">Last 7 Days</option>
           <option value="30days">Last 30 Days</option>
           <option value="month">This Month</option>
@@ -765,6 +862,12 @@ function inPeriod(o){
       && d.getUTCMonth()===nowDZ.getUTCMonth()
       && d.getUTCDate()===nowDZ.getUTCDate();
   }
+  if(p==='yesterday'){
+    const y=new Date(nowDZ);y.setUTCDate(nowDZ.getUTCDate()-1);
+    return d.getUTCFullYear()===y.getUTCFullYear()
+      && d.getUTCMonth()===y.getUTCMonth()
+      && d.getUTCDate()===y.getUTCDate();
+  }
   if(p==='7days'){
     const w=new Date(nowDZ);w.setUTCDate(nowDZ.getUTCDate()-7);return d>=w;
   }
@@ -961,7 +1064,7 @@ function renderOrdersList(){
     const timeStr = dt ? dt.toLocaleTimeString('fr-DZ',{hour:'2-digit',minute:'2-digit',hour12:false}) : '';
     const calls = Number(o.call_count||0);
     const clockSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
-    return `<div class="order-card${checked?' selected':''}" id="card-${o.id}">
+    return `<div class="order-card${checked?' selected':''}" id="card-${o.id}" style="--strip:${statusColor(o.status)}">
       <div class="card-top-row">
         <div class="card-checkbox${isConf?' visible':''}${checked?' checked':''}" onclick="toggleSelect(${o.id})"></div>
         <div class="card-main" onclick="openDetail(${o.id})">
@@ -1149,7 +1252,8 @@ function refreshCardInPlace(o){
     return;
   }
   if(!card)return;
-  // rebuild just the badge + status select + ship button area
+  // rebuild just the badge + status select + strip color
+  card.style.setProperty('--strip',statusColor(o.status));
   const badge=card.querySelector('.status-badge');
   if(badge){badge.className=`status-badge s-${o.status}`;badge.textContent=statusLabel(o.status);}
   const sel=card.querySelector('.card-status-select');
@@ -1157,15 +1261,19 @@ function refreshCardInPlace(o){
 }
 
 // ── DETAIL ──
+let _listScrollY=0;
 function openDetail(id){
   currentOrder=allOrders.find(o=>o.id===id);
   if(!currentOrder)return;
+  // Remember where the list was scrolled so we can restore it when we come back.
+  _listScrollY=window.scrollY||window.pageYOffset||0;
   // Show duplicate warning in detail view
   const dups=getDuplicatesForOrder(currentOrder);
   renderDetail(dups);
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-detail').classList.add('active');
   document.getElementById('tab-bar').style.display='none';
+  window.scrollTo(0,0); // detail always starts at the top
 }
 
 function renderDetail(dups=[]){
@@ -1229,6 +1337,9 @@ function closeDetail(){
   document.getElementById('screen-main').classList.add('active');
   document.getElementById('tab-bar').style.display='flex';
   currentOrder=null;
+  // Restore the list scroll position (screens use display:none which forgets it).
+  // rAF ensures the layout is back before we scroll.
+  requestAnimationFrame(()=>window.scrollTo(0,_listScrollY));
 }
 
 // ── ACTIONS ──
@@ -1594,6 +1705,7 @@ function rebuildSingleCard(id){
   const checked=selectedIds.has(o.id);
   const clockSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
   card.className=`order-card${checked?' selected':''}`;
+  card.style.setProperty('--strip',statusColor(o.status));
   card.innerHTML=`
       <div class="card-top-row">
         <div class="card-checkbox${isConf?' visible':''}${checked?' checked':''}" onclick="toggleSelect(${o.id})"></div>
@@ -1658,6 +1770,7 @@ function checkAndShowDupBanner(orderId){
 
 // ── HELPERS ──
 function statusLabel(k){return STATUSES.find(s=>s.k===k)?.l||k;}
+function statusColor(k){return STATUSES.find(s=>s.k===k)?.c||'#ff2d8e';}
 function waIcon(){return `<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;}
 function esc(v){if(v==null)return '';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function sizeLabel(it){
