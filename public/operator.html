@@ -219,22 +219,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </style>
 <style>
 :root{
-  --arco-yellow:#F5C500;
-  --arco-black:#080808;
-  --arco-dark:#111111;
+  /* Pink → purple accent system on dark */
+  --arco-pink:#ff2d8e;
+  --arco-pink-soft:#ff6ab5;
+  --arco-purple:#a855f7;
+  --arco-purple-deep:#7c3aed;
+  --arco-accent:#ff2d8e;            /* primary single-color accent (was yellow) */
+  --arco-grad:linear-gradient(135deg,#ff2d8e 0%,#c026d3 52%,#8b5cf6 100%);
+  --arco-grad-soft:linear-gradient(135deg,#ff6ab5,#a855f7);
+  --arco-black:#080810;
+  --arco-dark:#111119;
   --arco-red:#e11d48;
   --arco-green:#22c55e;
   --arco-line:rgba(255,255,255,.08);
-  --arco-line-strong:rgba(245,197,0,.24);
-  --arco-panel:linear-gradient(180deg, rgba(255,255,255,.04), rgba(17,17,17,.95));
-  --arco-shadow:0 18px 44px rgba(0,0,0,.34);
+  --arco-line-strong:rgba(255,45,142,.32);
+  --arco-panel:linear-gradient(180deg, rgba(255,255,255,.045), rgba(17,17,25,.96));
+  --arco-shadow:0 18px 44px rgba(0,0,0,.42);
+  --arco-glow:0 0 24px rgba(255,45,142,.28);
 }
 body{
   font-family:'Cairo',sans-serif;
   background:
-    radial-gradient(circle at top left, rgba(245,197,0,.12), transparent 24%),
-    radial-gradient(circle at 100% 12%, rgba(225,29,72,.08), transparent 22%),
-    linear-gradient(180deg, #080808 0%, #0b0b0b 38%, #111111 100%);
+    radial-gradient(circle at top left, rgba(255,45,142,.14), transparent 26%),
+    radial-gradient(circle at 100% 10%, rgba(139,92,246,.14), transparent 24%),
+    radial-gradient(circle at 50% 120%, rgba(192,38,211,.10), transparent 40%),
+    linear-gradient(180deg, #080810 0%, #0b0b13 38%, #101019 100%);
   color:#f8f8f8;
 }
 button,input,select,textarea{font:inherit}
@@ -245,8 +254,8 @@ button,input,select,textarea{font:inherit}
   inset:0;
   pointer-events:none;
   background:
-    radial-gradient(circle at 24% 18%, rgba(245,197,0,.12), transparent 18%),
-    radial-gradient(circle at 80% 26%, rgba(245,197,0,.08), transparent 14%);
+    radial-gradient(circle at 24% 18%, rgba(255,45,142,.14), transparent 20%),
+    radial-gradient(circle at 80% 26%, rgba(139,92,246,.12), transparent 16%);
 }
 .login-card,.kpi-card,.chart-wrap,.order-card,.detail-section,.modal,.edit-modal{
   background:var(--arco-panel);
@@ -264,7 +273,12 @@ button,input,select,textarea{font:inherit}
 }
 .login-logo{font-size:3rem;line-height:.92}
 .logo{font-size:2rem;line-height:.9}
-.login-logo span,.logo span,.kpi-card.total .kpi-value,.kpi-card.rate .kpi-value,.order-price,.price-row:last-child,.total-display,.history-arrow,.back-btn{color:var(--arco-yellow)}
+.login-logo span,.logo span,.kpi-card.total .kpi-value,.kpi-card.rate .kpi-value,.order-price,.price-row:last-child,.total-display,.history-arrow,.back-btn{
+  color:transparent;
+  background:var(--arco-grad);
+  -webkit-background-clip:text;
+  background-clip:text;
+}
 .login-subtitle{
   font-family:'Barlow Condensed',sans-serif;
   color:#a3a3a3;
@@ -280,12 +294,12 @@ button,input,select,textarea{font:inherit}
 .filter-select,.date-input,.page-size-select,.card-status-select,.status-dropdown,.edit-select{padding:10px 12px}
 .login-input:focus,.search-bar:focus,.filter-select:focus,.date-input:focus,.page-size-select:focus,.card-status-select:focus,.status-dropdown:focus,.note-field:focus,.edit-input:focus,.edit-select:focus{
   border-color:var(--arco-line-strong);
-  box-shadow:0 0 0 3px rgba(245,197,0,.08);
+  box-shadow:0 0 0 3px rgba(255,45,142,.12);
 }
 .login-btn,.btn-call-sm,.btn-call,.save-note-btn,.ship-btn,.bulk-ship-btn,.edit-save-btn,.tab-btn.active,.page-btn.active{
-  background:linear-gradient(135deg, var(--arco-yellow), #ffd84d);
-  border-color:var(--arco-yellow);
-  color:#080808;
+  background:var(--arco-grad);
+  border-color:transparent;
+  color:#fff;
 }
 .login-btn,.btn-call-sm,.btn-call,.save-note-btn,.ship-btn,.bulk-ship-btn,.edit-save-btn,.logout-btn,.tab-btn,.sort-btn{
   font-family:'Barlow Condensed',sans-serif;
@@ -321,9 +335,9 @@ button,input,select,textarea{font:inherit}
 .select-all-btn{border-radius:12px}
 .bulk-count,.customer-location,.price-label,.legend-label,.order-meta{color:#b7b7b7}
 .btn-ship-sm{
-  background:#1a1a1a;
-  border:1px solid rgba(245,197,0,.25);
-  color:var(--arco-yellow);
+  background:rgba(255,45,142,.12);
+  border:1px solid rgba(255,45,142,.32);
+  color:var(--arco-pink-soft);
 }
 .btn-detail,.history-btn{color:#c7c7c7}
 .btn-whatsapp,.btn-wa-sm{background:var(--arco-green)}
@@ -333,8 +347,8 @@ button,input,select,textarea{font:inherit}
   color:#ff7899;
 }
 .history-type.status{
-  background:rgba(245,197,0,.14);
-  color:var(--arco-yellow);
+  background:rgba(255,45,142,.16);
+  color:var(--arco-pink-soft);
 }
 .history-type.field{background:#3b82f622;color:#8db2ff}
 #toast{
@@ -344,6 +358,64 @@ button,input,select,textarea{font:inherit}
 }
 #toast.err{background:#1a0000;border-color:rgba(225,29,72,.45);color:#ff7f9f}
 .empty-wrap{color:#5e5e5e}
+
+/* ============ PINK REDESIGN v2 : compact KPIs, card notes, timestamp, call badge ============ */
+
+/* Sweep remaining red base-accents to the new accent */
+.login-input:focus,.search-bar:focus,.filter-select:focus,.date-input:focus,.page-size-select:focus,.card-status-select:focus,.status-dropdown:focus,.note-field:focus,.edit-input:focus,.edit-select:focus{border-color:var(--arco-line-strong)}
+.order-card.selected{border-color:var(--arco-pink)!important;box-shadow:0 0 0 1px rgba(255,45,142,.5),var(--arco-shadow)}
+.card-checkbox.checked{background:var(--arco-grad)!important;border-color:transparent!important}
+.card-checkbox.checked::after{content:'\2713';font-size:12px;color:#fff;font-weight:800}
+.tab-btn.active{box-shadow:var(--arco-glow)}
+
+/* Headings font upgrade */
+.customer-name-big,.modal-title,.total-display{font-family:'Barlow Condensed',sans-serif;letter-spacing:.01em}
+
+/* ---- Compact KPI grid ---- */
+.stats-section{padding:12px 12px 0}
+.kpi-grid{grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px}
+.kpi-card{padding:9px 10px;border-radius:12px}
+.kpi-card.total{grid-column:1/-1;padding:12px 14px;border:1px solid transparent;
+  background:linear-gradient(180deg,rgba(255,45,142,.10),rgba(139,92,246,.06)) padding-box,var(--arco-grad) border-box;}
+.kpi-label{font-size:9px;letter-spacing:.4px;margin-bottom:3px;gap:4px}
+.kpi-label .dot{width:5px;height:5px}
+.kpi-value{font-size:19px;font-weight:800;font-family:'Barlow Condensed',sans-serif}
+.kpi-card.total .kpi-value{font-size:30px}
+.kpi-card.rate{grid-column:auto}
+.kpi-card.rate .kpi-value{font-size:16px}
+.kpi-sub{display:none}
+.kpi-card.rate .kpi-sub{display:block;font-size:8px;color:#8f8f9f;margin-top:2px;line-height:1.2}
+@media(max-width:360px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ---- Order card polish ---- */
+.order-card{border-radius:16px;transition:border-color .18s,transform .18s}
+.order-card:active{transform:scale(.996)}
+.order-name{font-family:'Barlow Condensed',sans-serif;font-size:16px;letter-spacing:.01em}
+.order-price{font-size:15px;font-weight:800}
+
+/* Timestamp chip on card */
+.card-time{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#9a9aab;
+  background:rgba(255,255,255,.04);border:1px solid var(--arco-line);border-radius:999px;
+  padding:2px 9px;margin-top:8px}
+.card-time svg{width:11px;height:11px;opacity:.8}
+
+/* Call button + count badge */
+.btn-call-sm{position:relative;overflow:visible}
+.call-badge{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;padding:0 4px;
+  border-radius:999px;background:#fff;color:#c026d3;font-size:11px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;line-height:1;
+  box-shadow:0 2px 6px rgba(0,0,0,.4);border:1.5px solid #c026d3}
+
+/* Inline note on card */
+.card-note-wrap{margin-top:10px}
+.card-note-label{font-size:9px;letter-spacing:.6px;text-transform:uppercase;color:#7d7d8e;
+  margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.card-note{width:100%;background:rgba(255,255,255,.03);border:1px solid var(--arco-line);
+  border-radius:11px;padding:9px 11px;color:#f0f0f5;font-size:13px;font-family:inherit;
+  resize:none;outline:none;min-height:38px;line-height:1.4;transition:border-color .18s,box-shadow .18s}
+.card-note::placeholder{color:#55555f}
+.card-note:focus{border-color:var(--arco-line-strong);box-shadow:0 0 0 3px rgba(255,45,142,.10)}
+.card-note.saved{border-color:rgba(34,197,94,.5)}
 </style>
 </head>
 <body>
@@ -884,7 +956,11 @@ function renderOrdersList(){
 
   el.innerHTML=pageOrders.map(o=>{
     const checked=selectedIds.has(o.id);
-    const dateStr=o.created_at ? toAlgeriaDate(o.created_at).toLocaleDateString('fr-DZ') : '';
+    const dt = o.created_at ? toAlgeriaDate(o.created_at) : null;
+    const dateStr = dt ? dt.toLocaleDateString('fr-DZ',{day:'2-digit',month:'2-digit',year:'2-digit'}) : '';
+    const timeStr = dt ? dt.toLocaleTimeString('fr-DZ',{hour:'2-digit',minute:'2-digit',hour12:false}) : '';
+    const calls = Number(o.call_count||0);
+    const clockSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
     return `<div class="order-card${checked?' selected':''}" id="card-${o.id}">
       <div class="card-top-row">
         <div class="card-checkbox${isConf?' visible':''}${checked?' checked':''}" onclick="toggleSelect(${o.id})"></div>
@@ -896,15 +972,21 @@ function renderOrdersList(){
           <div class="order-meta">
             <b>${(Array.isArray(o.items)&&o.items.length)?esc(o.items.map(it=>(it.product||it.product_slug||it.slug||'')+' '+sizeLabel(it)).join('، ')):esc(o.product)+(o.variable?' - '+esc(o.variable):'')}</b><br/>
             Location: ${o.type_livraison==='pickup'?'Stop Desk - '+esc(o.station_code||'?'):esc(o.commune)+', '+esc(o.wilaya)}<br/>
-            Phone: ${esc(o.phone)}<br/>
-            Date: ${dateStr}
+            Phone: ${esc(o.phone)}
           </div>
           <span class="status-badge s-${o.status}">${statusLabel(o.status)}</span>
+          <span class="card-time">${clockSvg}${dateStr}${timeStr?' · '+timeStr:''}</span>
         </div>
+      </div>
+      <div class="card-note-wrap" onclick="event.stopPropagation()">
+        <div class="card-note-label">📝 Note</div>
+        <textarea class="card-note" id="note-${o.id}" placeholder="Add a note…"
+          onclick="event.stopPropagation()"
+          onblur="saveCardNote(${o.id},this)">${esc(o.notes||'')}</textarea>
       </div>
       <div class="card-actions">
         <button class="btn-wa-sm" onclick="openWhatsApp('${esc(o.phone)}')">${waIcon()}</button>
-        <button class="btn-call-sm" onclick="callCustomer('${esc(o.phone)}')">Call</button>
+        <button class="btn-call-sm" onclick="callCustomer('${esc(o.phone)}',${o.id})">Call${calls>0?`<span class="call-badge" id="callbadge-${o.id}">${calls}</span>`:''}</button>
         <select class="card-status-select" onchange="updateStatusCard(this,${o.id})">
           ${STATUSES.map(s=>`<option value="${s.k}"${o.status===s.k?' selected':''}>${s.l}</option>`).join('')}
         </select>
@@ -1033,7 +1115,7 @@ async function updateStatusCard(sel,id){
     const dups=getDuplicatesForOrder(o);
     if(dups.length){
       const names=dups.map(d=>`${d.name} [${d.status}]`).join(', ');
-      if(!confirm(`?? Duplicate phone detected!\nSame number found in: ${names}\n\nStill confirm this order?`)){
+      if(!confirm(`⚠️ Duplicate phone detected!\nSame number found in: ${names}\n\nStill confirm this order?`)){
         sel.value=o.status;
         return;
       }
@@ -1046,8 +1128,32 @@ async function updateStatusCard(sel,id){
     body:JSON.stringify({order_id:o.order_id,old_status:old,new_status:newStatus,changed_by:'operator'})});
   o.status=newStatus;
   sel.disabled=false;
-  await loadOrders();
+  // Update in place — no full reload, so scroll position is preserved.
+  refreshCardInPlace(o);
+  updateTabCounts();
+  updateKPIs();
+  drawDonut();
   toast('Status updated');
+}
+
+// Re-render a single order card in place (keeps scroll position). If the order no longer
+// belongs in the current tab/filter, remove its card instead of rebuilding the whole list.
+function refreshCardInPlace(o){
+  const card=document.getElementById(`card-${o.id}`);
+  const stillMatches = (currentTab==='all'||o.status===currentTab) && filteredOrders.some(x=>x.id===o.id);
+  if(!stillMatches){
+    // status moved it out of this tab: drop from filtered list + remove card
+    filteredOrders=filteredOrders.filter(x=>x.id!==o.id);
+    if(card)card.style.transition='opacity .2s',card.style.opacity='0',setTimeout(()=>card.remove(),200);
+    updateTabCounts();
+    return;
+  }
+  if(!card)return;
+  // rebuild just the badge + status select + ship button area
+  const badge=card.querySelector('.status-badge');
+  if(badge){badge.className=`status-badge s-${o.status}`;badge.textContent=statusLabel(o.status);}
+  const sel=card.querySelector('.card-status-select');
+  if(sel)sel.value=o.status;
 }
 
 // ── DETAIL ──
@@ -1076,7 +1182,7 @@ function renderDetail(dups=[]){
       <div class="phone-row">
         <div class="phone-number">${esc(o.phone)}</div>
         <button class="btn-whatsapp" onclick="openWhatsApp('${esc(o.phone)}')">${waIcon()}</button>
-        <button class="btn-call" onclick="callCustomer('${esc(o.phone)}')">Call</button>
+        <button class="btn-call" onclick="callCustomer('${esc(o.phone)}',${o.id})">Call</button>
       </div>
     </div>
     <div class="detail-section">
@@ -1126,7 +1232,44 @@ function closeDetail(){
 }
 
 // ── ACTIONS ──
-function callCustomer(phone){window.location.href=`tel:${phone}`;}
+async function callCustomer(phone,id){
+  // Increment persisted call_count, update badge in place, then place the call.
+  if(id!=null){
+    const o=allOrders.find(x=>x.id===id);
+    if(o){
+      const next=Number(o.call_count||0)+1;
+      o.call_count=next;
+      // update badge in the DOM immediately (no re-render)
+      const btn=document.querySelector(`#card-${id} .btn-call-sm`);
+      if(btn){
+        let b=document.getElementById(`callbadge-${id}`);
+        if(!b){b=document.createElement('span');b.className='call-badge';b.id=`callbadge-${id}`;btn.appendChild(b);}
+        b.textContent=next;
+      }
+      // persist in background (don't block the call)
+      sbFetch(`orders?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({call_count:next})}).catch(()=>{});
+    }
+  }
+  window.location.href=`tel:${phone}`;
+}
+
+// Save a card's note on blur (click away). Updates in place, no reload, no scroll jump.
+async function saveCardNote(id,ta){
+  const o=allOrders.find(x=>x.id===id);
+  if(!o)return;
+  const note=ta.value;
+  if((o.notes||'')===note)return; // nothing changed
+  o.notes=note;
+  try{
+    await sbFetch(`orders?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({notes:note})});
+    ta.classList.add('saved');
+    setTimeout(()=>ta.classList.remove('saved'),1200);
+    // keep detail view in sync if it's the same order
+    if(currentOrder&&currentOrder.id===id)currentOrder.notes=note;
+  }catch(e){
+    toast('Could not save note',true);
+  }
+}
 function openWhatsApp(phone){
   const p=phone.replace(/\D/g,'');
   window.open(`https://wa.me/213${p.replace(/^0/,'')}`, '_blank');
@@ -1141,14 +1284,22 @@ async function updateStatusDetail(newStatus){
   await sbFetch('order_history',{method:'POST',
     body:JSON.stringify({order_id:o.order_id,old_status:old,new_status:newStatus,changed_by:'operator'})});
   o.status=newStatus;
-  await loadOrders();
+  // update the in-memory list object + its card without a full reload
+  const listObj=allOrders.find(x=>x.id===o.id);
+  if(listObj)listObj.status=newStatus;
   renderDetail();
+  updateTabCounts();updateKPIs();drawDonut();
   toast('Status updated');
 }
 async function saveNote(){
   const note=document.getElementById('note-field').value;
   await sbFetch(`orders?id=eq.${currentOrder.id}`,{method:'PATCH',body:JSON.stringify({notes:note})});
   currentOrder.notes=note;
+  // sync the list object + its card textarea (if rendered) without reloading
+  const listObj=allOrders.find(x=>x.id===currentOrder.id);
+  if(listObj)listObj.notes=note;
+  const cardTa=document.getElementById(`note-${currentOrder.id}`);
+  if(cardTa)cardTa.value=note;
   toast('Note saved');
 }
 async function deleteOrder(){
@@ -1418,15 +1569,62 @@ async function saveEdit(){
     }
   }
 
-  const listScrollTop=document.getElementById('orders-list')?.scrollTop||0;
   await sbFetch(`orders?id=eq.${o.id}`,{method:'PATCH',body:JSON.stringify(newData)});
   Object.assign(currentOrder,newData);
+  // sync the same object in the list + rebuild just its card in place (no reload, no scroll jump)
+  const listObj=allOrders.find(x=>x.id===o.id);
+  if(listObj)Object.assign(listObj,newData);
   closeModal('edit-modal');
   renderDetail();
-  await loadOrders();
-  const ordersList=document.getElementById('orders-list');
-  if(ordersList)ordersList.scrollTop=listScrollTop;
+  rebuildSingleCard(o.id);
   toast('Order updated');
+}
+
+// Rebuild one order card's full HTML in place from allOrders (preserves list scroll position).
+function rebuildSingleCard(id){
+  const card=document.getElementById(`card-${id}`);
+  if(!card)return;
+  const o=allOrders.find(x=>x.id===id);
+  if(!o)return;
+  const dt=o.created_at?toAlgeriaDate(o.created_at):null;
+  const dateStr=dt?dt.toLocaleDateString('fr-DZ',{day:'2-digit',month:'2-digit',year:'2-digit'}):'';
+  const timeStr=dt?dt.toLocaleTimeString('fr-DZ',{hour:'2-digit',minute:'2-digit',hour12:false}):'';
+  const calls=Number(o.call_count||0);
+  const isConf=currentTab==='confirmed';
+  const checked=selectedIds.has(o.id);
+  const clockSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  card.className=`order-card${checked?' selected':''}`;
+  card.innerHTML=`
+      <div class="card-top-row">
+        <div class="card-checkbox${isConf?' visible':''}${checked?' checked':''}" onclick="toggleSelect(${o.id})"></div>
+        <div class="card-main" onclick="openDetail(${o.id})">
+          <div class="card-name-price">
+            <div class="order-name">${esc(o.name)}</div>
+            <div class="order-price">${Number(o.prix_total||0).toLocaleString()} DZD</div>
+          </div>
+          <div class="order-meta">
+            <b>${(Array.isArray(o.items)&&o.items.length)?esc(o.items.map(it=>(it.product||it.product_slug||it.slug||'')+' '+sizeLabel(it)).join('، ')):esc(o.product)+(o.variable?' - '+esc(o.variable):'')}</b><br/>
+            Location: ${o.type_livraison==='pickup'?'Stop Desk - '+esc(o.station_code||'?'):esc(o.commune)+', '+esc(o.wilaya)}<br/>
+            Phone: ${esc(o.phone)}
+          </div>
+          <span class="status-badge s-${o.status}">${statusLabel(o.status)}</span>
+          <span class="card-time">${clockSvg}${dateStr}${timeStr?' · '+timeStr:''}</span>
+        </div>
+      </div>
+      <div class="card-note-wrap" onclick="event.stopPropagation()">
+        <div class="card-note-label">📝 Note</div>
+        <textarea class="card-note" id="note-${o.id}" placeholder="Add a note…"
+          onclick="event.stopPropagation()" onblur="saveCardNote(${o.id},this)">${esc(o.notes||'')}</textarea>
+      </div>
+      <div class="card-actions">
+        <button class="btn-wa-sm" onclick="openWhatsApp('${esc(o.phone)}')">${waIcon()}</button>
+        <button class="btn-call-sm" onclick="callCustomer('${esc(o.phone)}',${o.id})">Call${calls>0?`<span class="call-badge" id="callbadge-${o.id}">${calls}</span>`:''}</button>
+        <select class="card-status-select" onchange="updateStatusCard(this,${o.id})">
+          ${STATUSES.map(s=>`<option value="${s.k}"${o.status===s.k?' selected':''}>${s.l}</option>`).join('')}
+        </select>
+        ${o.status==='confirmed'?`<button class="btn-ship-sm" onclick="shipSingle(${o.id})">Ship</button>`:''}
+        <button class="btn-detail" onclick="openDetail(${o.id})">Details</button>
+      </div>`;
 }
 
 function closeModal(id){document.getElementById(id).classList.remove('open');}
