@@ -2129,8 +2129,15 @@ async function loadAdPerformance(range){
   const {data:{session}}=await sb.auth.getSession();
   const token=session?.access_token;
   if(!token) return {skipped:true,reason:'missing_session',daily:[],meta:{total_spend:0},tiktok:{total_spend:0}};
-  const from=range?.from instanceof Date ? range.from.toISOString().slice(0,10) : '';
-  const to=range?.to instanceof Date ? new Date(range.to.getTime()-1).toISOString().slice(0,10) : '';
+  let from=range?.from instanceof Date ? range.from.toISOString().slice(0,10) : '';
+  let to=range?.to instanceof Date ? new Date(range.to.getTime()-1).toISOString().slice(0,10) : '';
+  if(!range){
+    // "All time": no range means fetch everything, not nothing. Derive bounds from the
+    // earliest/latest order in memory, falling back to a wide window if orders aren't loaded yet.
+    const createdDates=(allOrders||[]).map(o=>o.created_at).filter(Boolean).sort();
+    from=createdDates.length ? toAlgeriaDate(createdDates[0]).toISOString().slice(0,10) : '2020-01-01';
+    to=new Date().toISOString().slice(0,10);
+  }
   if(!from||!to) return {skipped:true,reason:'missing_range',daily:[],meta:{total_spend:0},tiktok:{total_spend:0}};
   const res=await fetch(`/api/ad-performance?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,{
     headers:{Authorization:`Bearer ${token}`}
@@ -2175,9 +2182,10 @@ function buildOrderDailyRows(orders){
     if(!map.has(key)) map.set(key, {date:key, total:0, confirmed:0, delivered:0});
     const row = map.get(key);
     row.total++;
-    // "Confirmed" = orders currently in the 'confirmed' status only (matches dashboard kpi-confirmed),
-    // NOT the whole CONFIRMATION_FLOW_STATUSES funnel.
-    if(o.status === 'confirmed') row.confirmed++;
+    // "Confirmed" = orders that ever reached confirmation (the funnel), matching the dashboard's
+    // confirmedFlow / CONFIRMATION_FLOW_STATUSES used for its confirmation-rate calculations —
+    // i.e. still counts as confirmed even after moving on to shipped/delivered/returned/etc.
+    if(CONFIRMATION_FLOW_STATUSES.has(o.status)) row.confirmed++;
     if(o.status === 'delivered') row.delivered++;
   });
   return [...map.values()].sort((a,b) => a.date.localeCompare(b.date));
@@ -2274,9 +2282,9 @@ async function updateFinance(){
 
   // Revenue from delivered orders
   const deliveredOrders=periodOrders.filter(o=>o.status==='delivered');
-  // "Confirmed" here matches the dashboard's kpi-confirmed: orders currently sitting in
-  // 'confirmed' status only, not the whole CONFIRMATION_FLOW_STATUSES funnel.
-  const confirmedOrders=periodOrders.filter(o=>o.status==='confirmed');
+  // "Confirmed" = funnel (ever reached confirmation), matching buildOrderDailyRows and the
+  // dashboard's confirmedFlow — not just orders currently sitting in literal 'confirmed' status.
+  const confirmedOrders=periodOrders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status));
   const revenue=deliveredOrders.reduce((s,o)=>s+Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0)),0);
 
   // Expenses in period
