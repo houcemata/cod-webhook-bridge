@@ -672,6 +672,7 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
       <button class="select-all-btn" onclick="toggleSelectAll()">Select All</button>
       <span class="bulk-count" id="bulk-count">0 selected</span>
       <button class="bulk-ship-btn" onclick="bulkShip()">Bulk Ship</button>
+      <button class="bulk-ship-btn" style="background:#16a34a;flex:0 0 auto;padding:10px 14px;" onclick="exportConfirmedXLSX()">⬇ Export Print List</button>
     </div>
 
     <!-- Orders list -->
@@ -1853,6 +1854,70 @@ function toast(msg,isErr=false){
   const el=document.getElementById('toast');
   el.textContent=msg;el.className='show'+(isErr?' err':'');
   clearTimeout(_tt);_tt=setTimeout(()=>el.className='',2500);
+}
+
+// ── EXPORT CONFIRMED ORDERS AS CLEAN XLSX FOR PRINT TOOL ──
+function exportConfirmedXLSX(){
+  // Get all confirmed orders currently in filteredOrders (the confirmed tab)
+  const orders = allOrders.filter(o => o.status === 'confirmed');
+  if(!orders.length){ toast('No confirmed orders to export', true); return; }
+
+  // Build rows: one row per product line item
+  const rows = [];
+  rows.push(['Order ID', 'Customer', 'Phone', 'Wilaya', 'Commune', 'Delivery Type', 'Desk', 'Product', 'Size', 'Total (DZD)']);
+
+  orders.forEach(o => {
+    const delivery = o.type_livraison === 'pickup' ? 'Stop Desk' : 'Home';
+    const desk = o.type_livraison === 'pickup' ? (o.station_code || '') : '';
+    const baseRow = [
+      o.id,
+      o.name || '',
+      o.phone || '',
+      o.wilaya || '',
+      o.commune || '',
+      delivery,
+      desk,
+    ];
+
+    // Multi-item orders (items array)
+    if(Array.isArray(o.items) && o.items.length){
+      o.items.forEach(it => {
+        const productName = it.product || it.product_slug || it.slug || '';
+        const size = sizeLabel(it) === 'M' ? '30x40 cm' : sizeLabel(it) === 'L' ? '40x60 cm' : (it.size || it.variant || '');
+        rows.push([...baseRow, productName, size, Number(o.prix_total || 0)]);
+      });
+    } else {
+      // Single-item order
+      const size = o.variable && o.variable.includes('40x60') ? '40x60 cm' :
+                   o.variable && o.variable.includes('30x40') ? '30x40 cm' : (o.variable || '');
+      rows.push([...baseRow, o.product || '', size, Number(o.prix_total || 0)]);
+    }
+  });
+
+  // Use SheetJS to create XLSX
+  if(typeof XLSX === 'undefined'){
+    toast('Loading export library…');
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = () => doExportXLSX(rows);
+    s.onerror = () => toast('Failed to load export library', true);
+    document.head.appendChild(s);
+  } else {
+    doExportXLSX(rows);
+  }
+}
+
+function doExportXLSX(rows){
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  // Column widths
+  ws['!cols'] = [
+    {wch:10},{wch:22},{wch:14},{wch:14},{wch:16},{wch:12},{wch:18},{wch:30},{wch:10},{wch:12}
+  ];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Confirmed Orders');
+  const today = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `arco_confirmed_${today}.xlsx`);
+  toast('✅ Export downloaded!');
 }
 </script>
 </body>
