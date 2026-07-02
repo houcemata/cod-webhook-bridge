@@ -1858,43 +1858,28 @@ function toast(msg,isErr=false){
 
 // ── EXPORT CONFIRMED ORDERS AS CLEAN XLSX FOR PRINT TOOL ──
 function exportConfirmedXLSX(){
-  // Get all confirmed orders currently in filteredOrders (the confirmed tab)
   const orders = allOrders.filter(o => o.status === 'confirmed');
   if(!orders.length){ toast('No confirmed orders to export', true); return; }
 
-  // Build rows: one row per product line item
-  const rows = [];
-  rows.push(['Order ID', 'Customer', 'Phone', 'Wilaya', 'Commune', 'Delivery Type', 'Desk', 'Product', 'Size', 'Total (DZD)']);
+  // One row per product line — just what's needed for printing
+  const rows = [['Order ID', 'Product', 'Size']];
 
   orders.forEach(o => {
-    const delivery = o.type_livraison === 'pickup' ? 'Stop Desk' : 'Home';
-    const desk = o.type_livraison === 'pickup' ? (o.station_code || '') : '';
-    const baseRow = [
-      o.id,
-      o.name || '',
-      o.phone || '',
-      o.wilaya || '',
-      o.commune || '',
-      delivery,
-      desk,
-    ];
-
-    // Multi-item orders (items array)
     if(Array.isArray(o.items) && o.items.length){
       o.items.forEach(it => {
-        const productName = it.product || it.product_slug || it.slug || '';
-        const size = sizeLabel(it) === 'M' ? '30x40 cm' : sizeLabel(it) === 'L' ? '40x60 cm' : (it.size || it.variant || '');
-        rows.push([...baseRow, productName, size, Number(o.prix_total || 0)]);
+        const name = it.product || it.product_slug || it.slug || '';
+        const sl   = sizeLabel(it);
+        const size = sl === 'M' ? '30x40 cm' : sl === 'L' ? '40x60 cm' : (it.size || it.variant || '');
+        rows.push([o.id, name, size]);
       });
     } else {
-      // Single-item order
-      const size = o.variable && o.variable.includes('40x60') ? '40x60 cm' :
-                   o.variable && o.variable.includes('30x40') ? '30x40 cm' : (o.variable || '');
-      rows.push([...baseRow, o.product || '', size, Number(o.prix_total || 0)]);
+      const size = o.variable && o.variable.includes('40x60') ? '40x60 cm'
+                 : o.variable && o.variable.includes('30x40') ? '30x40 cm'
+                 : (o.variable || '');
+      rows.push([o.id, o.product || '', size]);
     }
   });
 
-  // Use SheetJS to create XLSX
   if(typeof XLSX === 'undefined'){
     toast('Loading export library…');
     const s = document.createElement('script');
@@ -1909,14 +1894,10 @@ function exportConfirmedXLSX(){
 
 function doExportXLSX(rows){
   const ws = XLSX.utils.aoa_to_sheet(rows);
-  // Column widths
-  ws['!cols'] = [
-    {wch:10},{wch:22},{wch:14},{wch:14},{wch:16},{wch:12},{wch:18},{wch:30},{wch:10},{wch:12}
-  ];
+  ws['!cols'] = [{wch:12}, {wch:38}, {wch:12}];
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Confirmed Orders');
-  const today = new Date().toISOString().slice(0,10);
-  XLSX.writeFile(wb, `arco_confirmed_${today}.xlsx`);
+  XLSX.utils.book_append_sheet(wb, ws, 'Confirmed');
+  XLSX.writeFile(wb, `arco_envoi_${new Date().toISOString().slice(0,10)}.xlsx`);
   toast('✅ Export downloaded!');
 }
 </script>
