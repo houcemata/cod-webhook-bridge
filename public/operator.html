@@ -658,7 +658,14 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
     <!-- Orders toolbar -->
     <div class="orders-toolbar">
       <div class="toolbar-left">
-        <button class="sort-btn" id="sort-btn" onclick="toggleSort()">Newest</button>
+        <select class="sort-btn" id="sort-field" onchange="applyFilters()" style="padding:7px 10px;font-size:12px;">
+          <option value="created_at">Order date</option>
+          <option value="confirmed_at">Confirmed date</option>
+        </select>
+        <select class="sort-btn" id="sort-dir" onchange="applyFilters()" style="padding:7px 10px;font-size:12px;">
+          <option value="desc">Newest first</option>
+          <option value="asc">Oldest first</option>
+        </select>
         <select class="page-size-select" id="page-size-select" onchange="onPageSizeChange()">
           <option value="30">30 / page</option>
           <option value="all">Show All</option>
@@ -799,7 +806,7 @@ const SB_H = {
 
 const OPERATOR_TAB_KEY='arco_operator_tab';
 let allOrders=[], filteredOrders=[], currentTab=localStorage.getItem(OPERATOR_TAB_KEY)||'all', currentOrder=null;
-let sortAsc=false, selectedIds=new Set(), currentUser=null, currentRole=null;
+let selectedIds=new Set(), currentUser=null, currentRole=null;
 let noestDesks=null;
 
 function normalizeDeskCode(code){
@@ -990,11 +997,13 @@ function applyFilters(){
     return true;
   });
 
-  // FIX: sort AFTER filtering, using reliable timestamp comparison
+  // Sort by selected field + direction
+  const sortField = document.getElementById('sort-field')?.value || 'created_at';
+  const sortDir   = document.getElementById('sort-dir')?.value   || 'desc';
   filteredOrders.sort((a,b)=>{
-    const da=new Date(a.created_at||0).getTime();
-    const db=new Date(b.created_at||0).getTime();
-    return sortAsc ? da-db : db-da;
+    const da=new Date(a[sortField]||a.created_at||0).getTime();
+    const db=new Date(b[sortField]||b.created_at||0).getTime();
+    return sortDir==='asc' ? da-db : db-da;
   });
 
   renderOrdersList();
@@ -1003,13 +1012,7 @@ function applyFilters(){
   drawDonut();
 }
 
-// ── SORT ──
-function toggleSort(){
-  sortAsc=!sortAsc;
-  currentPage=1;
-  document.getElementById('sort-btn').textContent=sortAsc?'Oldest':'Newest';
-  applyFilters();
-}
+// ── SORT ── (handled by dropdowns, applyFilters called on change)
 
 // ── PAGE SIZE ──
 function onPageSizeChange(){
@@ -1294,10 +1297,13 @@ async function updateStatusCard(sel,id){
   }
   const old=o.status;
   sel.disabled=true;
-  await sbFetch(`orders?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({status:newStatus})});
+  const patchBody={status:newStatus};
+  if(newStatus==='confirmed') patchBody.confirmed_at=new Date().toISOString();
+  await sbFetch(`orders?id=eq.${id}`,{method:'PATCH',body:JSON.stringify(patchBody)});
   await sbFetch('order_history',{method:'POST',
     body:JSON.stringify({order_id:o.order_id,old_status:old,new_status:newStatus,changed_by:'operator'})});
   o.status=newStatus;
+  if(newStatus==='confirmed') o.confirmed_at=new Date().toISOString();
   sel.disabled=false;
   // Update in place — no full reload, so scroll position is preserved.
   refreshCardInPlace(o);
