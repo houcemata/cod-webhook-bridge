@@ -1990,61 +1990,52 @@ function makeProductPicker(containerId, initialValue, onChange){
   const names = pl.map(p=>p.name);
 
   let selected = initialValue || (names[0]||'');
-  let open = false;
 
-  wrap.innerHTML = `
-    <div class="prod-dropdown-wrap" id="${containerId}-wrap">
-      <input type="text" class="prod-search-input" id="${containerId}-input"
-        placeholder="Search product…" autocomplete="off"/>
-      <div class="prod-dropdown-list" id="${containerId}-list"></div>
-    </div>`;
+  wrap.innerHTML =
+    '<input type="text" class="prod-search-input" autocomplete="off" placeholder="Search product…"/>' +
+    '<div class="prod-dropdown-list"></div>';
 
-  const input = document.getElementById(`${containerId}-input`);
-  const list  = document.getElementById(`${containerId}-list`);
+  const input = wrap.querySelector('input');
+  const list  = wrap.querySelector('.prod-dropdown-list');
 
-  function renderList(filter=''){
-    const q = filter.toLowerCase();
+  function renderList(filter){
+    const q = (filter||'').toLowerCase();
     const filtered = q ? names.filter(n=>n.toLowerCase().includes(q)) : names;
-    list.innerHTML = filtered.map(n=>
-      `<div class="prod-dropdown-item${n===selected?' active':''}"
-            onmousedown="event.preventDefault()"
-            onclick="(function(){
-              document.getElementById('${containerId}-input').value=${JSON.stringify('')}+${JSON.stringify('')};
-              window.__pickProduct_${containerId}(${JSON.stringify('')}+${JSON.stringify('')}+arguments[0])
-            }).call(this,${JSON.stringify('')}+this.textContent)">${esc(n)}</div>`
-    ).join('');
+    list.innerHTML = '';
+    filtered.forEach(function(n){
+      const item = document.createElement('div');
+      item.className = 'prod-dropdown-item' + (n===selected?' active':'');
+      item.textContent = n;
+      item.addEventListener('mousedown', function(e){ e.preventDefault(); });
+      item.addEventListener('click', function(){
+        selected = n;
+        input.value = n;
+        list.classList.remove('open');
+        onChange(n);
+      });
+      list.appendChild(item);
+    });
   }
 
-  window[`__pickProduct_${containerId}`] = function(name){
-    selected = name;
-    input.value = name;
-    list.classList.remove('open');
-    open = false;
-    onChange(name);
-  };
-
-  // Set initial display value
   input.value = selected;
   onChange(selected);
 
-  input.addEventListener('focus', ()=>{
-    renderList('');
-    list.classList.add('open');
-    open = true;
-  });
-  input.addEventListener('input', ()=>{
+  input.addEventListener('focus', function(){
     renderList(input.value);
     list.classList.add('open');
   });
-  input.addEventListener('blur', ()=>{
-    setTimeout(()=>{ list.classList.remove('open'); open=false; }, 150);
-    // If typed value matches a product exactly, use it; else revert
-    const match = names.find(n=>n.toLowerCase()===input.value.toLowerCase());
-    if(match){ selected=match; input.value=match; onChange(match); }
-    else { input.value=selected; }
+  input.addEventListener('input', function(){
+    renderList(input.value);
+    list.classList.add('open');
   });
-
-  renderList('');
+  input.addEventListener('blur', function(){
+    setTimeout(function(){
+      list.classList.remove('open');
+      const match = names.find(n=>n.toLowerCase()===input.value.toLowerCase());
+      if(match){ selected=match; input.value=match; onChange(match); }
+      else{ input.value=selected; }
+    }, 150);
+  });
 }
 </script>
 </body>
