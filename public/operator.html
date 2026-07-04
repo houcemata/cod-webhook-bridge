@@ -216,6 +216,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dup-banner{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.35);border-radius:12px;padding:10px 14px;margin:0 14px 8px;font-size:12px;color:#f59e0b;display:flex;align-items:flex-start;gap:8px}
 .dup-banner b{font-weight:700}
 .dup-banner-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+
+/* ── Searchable product dropdown ── */
+.prod-dropdown-wrap{position:relative;flex:1}
+.prod-search-input{width:100%;box-sizing:border-box;background:#1a1a1a;color:#ddd;border:1px solid #333;border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit}
+.prod-search-input:focus{outline:none;border-color:#F5C500}
+.prod-dropdown-list{display:none;position:absolute;z-index:9999;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid #333;border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;margin-top:2px}
+.prod-dropdown-list.open{display:block}
+.prod-dropdown-item{padding:7px 10px;font-size:13px;cursor:pointer;color:#ddd;border-bottom:1px solid #111}
+.prod-dropdown-item:hover,.prod-dropdown-item.active{background:#F5C500;color:#000}
 </style>
 <style>
 :root{
@@ -1548,7 +1557,7 @@ async function openEdit(){
     // Fetch product list for dropdowns (cached)
     if(!window.__productList){
       try{
-        const r=await sbFetch('products?select=name,slug&active=eq.true&order=sort_order.asc,name.asc');
+        const r=await sbFetch('products?select=name,slug&active=eq.true&order=name.asc');
         if(r.ok) window.__productList=await r.json();
       }catch{}
       if(!window.__productList) window.__productList=[];
@@ -1565,11 +1574,11 @@ async function openEdit(){
         const matched=window.__productList.find(p=>p.name===currentName||p.slug===(it.product_slug||it.slug));
         const unknownOpt=!matched?`<option value="${esc(currentName)}">${esc(currentName)||'Unknown'}</option>`:'';
         const opts=window.__productList.map(p=>`<option value="${esc(p.name)}"${(matched?p.name===currentName:false)||p.slug===(it.product_slug||it.slug)?' selected':''}>${esc(p.name)}</option>`).join('');
+        const pickerId=`prod-picker-cart-${i}`;
         return `<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #1a1a1a">
-          <select class="edit-select" style="flex:1;font-size:13px;padding:7px 8px"
-            onchange="(function(el){document.getElementById('edit-modal').__editItems[${i}].product=el.value})(this)">
-            ${unknownOpt}${opts}
-          </select>
+          <div class="prod-dropdown-wrap" style="flex:1">
+            <div id="${pickerId}"></div>
+          </div>
           <select class="edit-select" style="width:62px;font-size:13px;padding:7px 6px"
             onchange="(function(el){const m=document.getElementById('edit-modal').__editItems[${i}];m.size=el.value;m.variant=el.value==='M'?'30×40 cm':'40×60 cm'})(this)">
             <option value="M"${sizeLabel(it)==='M'?' selected':''}>M</option>
@@ -1596,23 +1605,81 @@ async function openEdit(){
         + Add Item
       </button>`;
     }
-    window.__rerenderCartRows=renderCartRows;
+    function renderAndInitPickers(){
+      renderCartRows();
+      // Init a searchable picker for each row
+      editItems.forEach((it,i)=>{
+        const currentName=it.product||it.product_slug||it.slug||'';
+        const pickerId=`prod-picker-cart-${i}`;
+        makeProductPicker(pickerId, currentName, (name)=>{
+          document.getElementById('edit-modal').__editItems[i].product=name;
+        });
+      });
+    }
+    window.__rerenderCartRows=renderAndInitPickers;
 
     prodSec.innerHTML=`
       <div class="edit-label" style="margin-bottom:8px">ORDER ITEMS</div>
       <div id="edit-cart-rows" style="margin-bottom:12px"></div>`;
-    renderCartRows();
+    renderAndInitPickers();
 
   } else {
+    // Fetch product list if not cached yet
+    if(!window.__productList){
+      try{
+        const r=await sbFetch('products?select=name,slug&active=eq.true&order=name.asc');
+        if(r.ok) window.__productList=await r.json();
+      }catch{}
+      if(!window.__productList) window.__productList=[];
+    }
+    // Convert single-product order to items array so we can use same add/remove logic
+    const initName=o.product||'';
+    const initSize=o.variable&&o.variable.includes('60')?'L':'M';
+    const editItemsNorm=[{product:initName,size:initSize,variant:initSize==='M'?'30×40 cm':'40×60 cm',is_free:false,line_price:Number(o.prix_total||0)-(o.shipping_cost||0),price:Number(o.prix_total||0)-(o.shipping_cost||0)}];
+    document.getElementById('edit-modal').__editItems=editItemsNorm;
+
+    function renderNonCartRows(){
+      const wrap=document.getElementById('edit-cart-rows');
+      if(!wrap)return;
+      const items=document.getElementById('edit-modal').__editItems;
+      wrap.innerHTML=items.map((it,i)=>`
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #1a1a1a">
+          <div class="prod-dropdown-wrap" style="flex:1"><div id="prod-picker-nc-${i}"></div></div>
+          <select class="edit-select" style="width:62px;font-size:13px;padding:7px 6px"
+            onchange="(function(el){const m=document.getElementById('edit-modal').__editItems[${i}];m.size=el.value;m.variant=el.value==='M'?'30×40 cm':'40×60 cm'})(this)">
+            <option value="M"${(it.size||'M')==='M'?' selected':''}>M</option>
+            <option value="L"${(it.size||'M')==='L'?' selected':''}>L</option>
+          </select>
+          <input type="number" class="edit-input" style="width:80px;font-size:13px;padding:7px 8px;text-align:right" min="0"
+            value="${Number(it.line_price||0)}" placeholder="0"
+            oninput="(function(el){const m=document.getElementById('edit-modal').__editItems[${i}];const v=parseFloat(el.value)||0;m.line_price=v;m.price=v;m.is_free=(v===0);calcTotal()})(this)"/>
+          ${items.length>1?`<button onclick="(function(){document.getElementById('edit-modal').__editItems.splice(${i},1);renderNonCartRowsAndInit();calcTotal()})()"
+            style="background:#1a0a0a;border:1px solid #3a1a1a;color:#e11d48;border-radius:8px;width:30px;height:30px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center">×</button>`:''}
+        </div>`).join('')+
+      `<button onclick="(function(){
+          const pl=window.__productList||[];
+          const fn=pl.length?pl[0].name:'';
+          document.getElementById('edit-modal').__editItems.push({product:fn,size:'M',variant:'30×40 cm',is_free:false,line_price:0,price:0});
+          renderNonCartRowsAndInit();calcTotal();})()"
+        style="width:100%;margin-top:10px;background:#0a0a0a;border:1px dashed #333;color:#888;border-radius:10px;padding:9px;font-size:13px;cursor:pointer">
+        + Add Item
+      </button>`;
+    }
+    function renderNonCartRowsAndInit(){
+      renderNonCartRows();
+      const items=document.getElementById('edit-modal').__editItems;
+      items.forEach((it,i)=>{
+        makeProductPicker(`prod-picker-nc-${i}`,it.product,(name)=>{
+          document.getElementById('edit-modal').__editItems[i].product=name;
+        });
+      });
+    }
+    window.__rerenderCartRows=renderNonCartRowsAndInit;
+
     prodSec.innerHTML=`
-      <div class="edit-field">
-        <div class="edit-label">Product</div>
-        <input class="edit-input" id="edit-product" value="${esc(o.product||'')}"/>
-      </div>
-      <div class="edit-field">
-        <div class="edit-label">Variant</div>
-        <input class="edit-input" id="edit-variable" value="${esc(o.variable||'')}"/>
-      </div>`;
+      <div class="edit-label" style="margin-bottom:8px">ORDER ITEMS</div>
+      <div id="edit-cart-rows" style="margin-bottom:12px"></div>`;
+    renderNonCartRowsAndInit();
   }
   const shipping=o.shipping_cost||0;
   const priceEl=document.getElementById('edit-product-price');
@@ -1723,6 +1790,14 @@ async function saveEdit(){
 
   const isCartEdit=Array.isArray(o.items)&&o.items.length>0;
   const editedItems=document.getElementById('edit-modal').__editItems;
+  // For non-cart orders that now have __editItems, sync back to product/variable fields
+  if(editedItems&&!isCartEdit){
+    const first=editedItems[0]||{};
+    const prodEl=document.getElementById('edit-product');
+    const varEl=document.getElementById('edit-variable');
+    if(prodEl) prodEl.value=first.product||'';
+    if(varEl) varEl.value=first.variant||(first.size==='L'?'40×60 cm':'30×40 cm');
+  }
 
   const newData={
     name:document.getElementById('edit-name').value,
@@ -1905,6 +1980,71 @@ function doExportXLSX(rows){
   XLSX.utils.book_append_sheet(wb, ws, 'Confirmed');
   XLSX.writeFile(wb, `arco_envoi_${new Date().toISOString().slice(0,10)}.xlsx`);
   toast('✅ Export downloaded!');
+}
+
+// ── Searchable product picker ──────────────────────────────────────────────
+function makeProductPicker(containerId, initialValue, onChange){
+  const wrap = document.getElementById(containerId);
+  if(!wrap) return;
+  const pl = (window.__productList||[]);
+  const names = pl.map(p=>p.name);
+
+  let selected = initialValue || (names[0]||'');
+  let open = false;
+
+  wrap.innerHTML = `
+    <div class="prod-dropdown-wrap" id="${containerId}-wrap">
+      <input type="text" class="prod-search-input" id="${containerId}-input"
+        placeholder="Search product…" autocomplete="off"/>
+      <div class="prod-dropdown-list" id="${containerId}-list"></div>
+    </div>`;
+
+  const input = document.getElementById(`${containerId}-input`);
+  const list  = document.getElementById(`${containerId}-list`);
+
+  function renderList(filter=''){
+    const q = filter.toLowerCase();
+    const filtered = q ? names.filter(n=>n.toLowerCase().includes(q)) : names;
+    list.innerHTML = filtered.map(n=>
+      `<div class="prod-dropdown-item${n===selected?' active':''}"
+            onmousedown="event.preventDefault()"
+            onclick="(function(){
+              document.getElementById('${containerId}-input').value=${JSON.stringify('')}+${JSON.stringify('')};
+              window.__pickProduct_${containerId}(${JSON.stringify('')}+${JSON.stringify('')}+arguments[0])
+            }).call(this,${JSON.stringify('')}+this.textContent)">${esc(n)}</div>`
+    ).join('');
+  }
+
+  window[`__pickProduct_${containerId}`] = function(name){
+    selected = name;
+    input.value = name;
+    list.classList.remove('open');
+    open = false;
+    onChange(name);
+  };
+
+  // Set initial display value
+  input.value = selected;
+  onChange(selected);
+
+  input.addEventListener('focus', ()=>{
+    renderList('');
+    list.classList.add('open');
+    open = true;
+  });
+  input.addEventListener('input', ()=>{
+    renderList(input.value);
+    list.classList.add('open');
+  });
+  input.addEventListener('blur', ()=>{
+    setTimeout(()=>{ list.classList.remove('open'); open=false; }, 150);
+    // If typed value matches a product exactly, use it; else revert
+    const match = names.find(n=>n.toLowerCase()===input.value.toLowerCase());
+    if(match){ selected=match; input.value=match; onChange(match); }
+    else { input.value=selected; }
+  });
+
+  renderList('');
 }
 </script>
 </body>
