@@ -176,15 +176,24 @@ export function buildZRPayload({ order, orderId, wilayaId, communeId, hubId }) {
 
 function buildProductList(order) {
   if (Array.isArray(order.items) && order.items.length) {
-    return order.items.map(it => ({
-      productName: String(it.product || it.product_slug || it.slug || "Poster").slice(0, 100),
-      unitPrice:   parseFloat(it.line_price || it.price || 0),
-      quantity:    1,
-      stockType:   "none",
-    }));
+    return order.items.map(it => {
+      const name = it.product || it.product_slug || it.slug || "Poster";
+      const size = it.size || it.variant || "";
+      const productName = [name, size].filter(Boolean).join(" - ");
+      return {
+        productName: productName.slice(0, 100),
+        unitPrice:   parseFloat(it.line_price || it.price || 0),
+        quantity:    1,
+        stockType:   "none",
+      };
+    });
   }
+  // Single-product order: include variant if present
+  const name = order.product || "Poster";
+  const variant = order.variable || "";
+  const productName = [name, variant].filter(Boolean).join(" - ");
   return [{
-    productName: String(order.product || "Poster").slice(0, 100),
+    productName: productName.slice(0, 100),
     unitPrice:   parseFloat((order.prix_total || 0) - (order.shipping_cost || 0)),
     quantity:    1,
     stockType:   "none",
@@ -193,10 +202,17 @@ function buildProductList(order) {
 
 function buildDescription(order) {
   if (Array.isArray(order.items) && order.items.length) {
-    const names = order.items.map(it => it.product || it.product_slug || it.slug || "").filter(Boolean);
-    return names.join(", ").slice(0, 250) || "Commande ARCO";
+    const parts = order.items.map(it => {
+      const name = it.product || it.product_slug || it.slug || "";
+      const size = it.size || it.variant || "";
+      return [name, size].filter(Boolean).join(" ");
+    }).filter(Boolean);
+    return parts.join(", ").slice(0, 250) || "Commande ARCO";
   }
-  return String(order.product || "Commande ARCO").slice(0, 250);
+  // Single-product: include variant
+  const base = order.product || "Commande ARCO";
+  const variant = order.variable || "";
+  return [base, variant].filter(Boolean).join(" - ").slice(0, 250);
 }
 
 // ── Map ZR state names → ARCO statuses ────────────────────────────────────
