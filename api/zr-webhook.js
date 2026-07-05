@@ -27,9 +27,9 @@ async function verifySvixSignature(rawBody, headers) {
 
   if (!msgId || !msgTimestamp || !msgSignature) return false;
 
-  // Reject messages older than 5 minutes
+  // Reject messages older than 24 hours (wide window to allow replays from ZR dashboard)
   const ts = parseInt(msgTimestamp, 10);
-  if (Math.abs(Date.now() / 1000 - ts) > 300) return false;
+  if (Math.abs(Date.now() / 1000 - ts) > 86400) return false;
 
   const toSign    = `${msgId}.${msgTimestamp}.${rawBody}`;
   const secret    = WEBHOOK_SECRET.startsWith("whsec_")
@@ -89,10 +89,12 @@ export default async function handler(req, res) {
     return res.status(200).json({ received: true, skipped: "unknown event type" });
   }
 
-  const parcelId  = data?.id;
-  const externalId = data?.externalId; // this is the order.order_id we sent
-  const stateName  = data?.state?.name;
+  const parcelId  = data?.id;          // ZR's UUID — stored as tracking_number
+  const externalId = data?.externalId;  // what we sent as externalId (DB id or order_id)
+  const stateName  = data?.state?.name; // French slug e.g. "pret_a_expedier"
   const isReturn   = data?.isReturn;
+
+  console.log(`[zr-webhook] state name raw: "${stateName}" externalId: ${externalId} parcelId: ${parcelId}`);
 
   if (!parcelId && !externalId) {
     return res.status(200).json({ received: true, skipped: "no parcel identifier" });
@@ -111,10 +113,11 @@ export default async function handler(req, res) {
   }
 
   if (!order && externalId) {
+    // Try matching externalId against both order_id (old) and id (new DB-id style)
     const { data: rows } = await supabase
       .from("orders")
       .select("id, order_id, status, shipping_agency")
-      .eq("order_id", externalId)
+      .or(`order_id.eq.${externalId},id.eq.${externalId}`)
       .limit(1);
     order = rows?.[0] || null;
   }
