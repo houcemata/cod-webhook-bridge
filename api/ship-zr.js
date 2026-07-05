@@ -8,7 +8,7 @@ import { requireRole } from "./_auth.js";
 import {
   zrPost, findWilayaId, findCommuneId,
   buildZRPayload, updateSupabase, logHistory,
-} from "./zr.js";
+} from "./_zr.js";
 
 function changedByOf(auth) {
   return auth.role?.name || auth.role?.email || auth.user?.email || auth.role?.role || "operator";
