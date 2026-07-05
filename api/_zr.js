@@ -146,7 +146,7 @@ export function buildZRPayload({ order, orderId, wilayaId, communeId, hubId }) {
 
   const payload = {
     customer: {
-      customerId: "00000000-0000-0000-0000-000000000000", // random GUID — not linking to ZR customer
+      customerId: crypto.randomUUID(), // random GUID — not linking to ZR customer
       name:       String(order.name || `Client ${orderId}`).slice(0, 100),
       phone: {
         number1: phone,
