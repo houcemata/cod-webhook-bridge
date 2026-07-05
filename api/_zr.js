@@ -156,7 +156,7 @@ export function buildZRPayload({ order, orderId, wilayaId, communeId, hubId }) {
     deliveryType: isPickup ? "pickup-point" : "home",
     description:  buildDescription(order),
     amount:       parseFloat(order.prix_total || 0),
-    externalId:   String(order.order_id || orderId).slice(0, 100),
+    externalId:   String(orderId).slice(0, 100),  // DB id — always unique, safe to retry
   };
 
   if (!isPickup && wilayaId) {
@@ -216,37 +216,83 @@ function buildDescription(order) {
 }
 
 // ── Map ZR state names → ARCO statuses ────────────────────────────────────
+// ZR sends French state names (both spaced and snake_case variants).
+// Source: ZR Express API docs + observed webhook payloads.
 export const ZR_STATE_MAP = {
-  // In transit / processing
-  "order received":          "shipped",
-  "ready to dispatch":       "shipped",
-  "dispatched":              "shipped",
-  "in transit":              "shipped",
-  "at hub":                  "shipped",
-  "out for delivery":        "shipped",
-  "on route":                "shipped",
-  "picked up":               "shipped",
+  // ── In transit / processing ────────────────────────────────────
+  "commande_recue":                      "shipped",  // order received
+  "commande_confirmee":                  "shipped",  // order confirmed
+  "pret a expedier":                     "shipped",  // ready to dispatch
+  "pret_a_expedier":                     "shipped",
+  "ready to dispatch":                   "shipped",
+  "dispatch":                            "shipped",
+  "en_traitement":                       "shipped",  // in processing
+  "en traitement":                       "shipped",
+  "colis_recuperer":                     "shipped",  // parcel picked up from supplier
+  "recupere par fournisseur":            "shipped",
+  "attente recuperation fournisseur":    "shipped",  // waiting for supplier pickup
+  "sortie en livraison":                 "shipped",  // out for delivery
+  "en_livraison":                        "shipped",
+  "en livraison":                        "shipped",
+  "on route":                            "shipped",
+  "on-route":                            "shipped",
+  "out for delivery":                    "shipped",
+  "vers_wilaya":                         "shipped",  // towards wilaya
+  "scan":                                "shipped",  // scanned at hub
+  "encaisse":                            "shipped",  // collected/processed
+  "reinjecte dans stock":                "shipped",  // reinjected
+  "in transit":                          "shipped",
+  "at hub":                              "shipped",
+  "dispatched":                          "shipped",
+  "order received":                      "shipped",
+  "picked up":                           "shipped",
 
-  // Delivered
-  "delivered":               "delivered",
-  "delivery confirmed":      "delivered",
+  // ── Delivered ──────────────────────────────────────────────────
+  "livre":                               "delivered",
+  "livré":                               "delivered",
+  "confirme au bureau":                  "delivered",  // confirmed at stop desk
+  "traitee":                             "delivered",  // processed/settled
+  "delivered":                           "delivered",
+  "delivery confirmed":                  "delivered",
 
-  // Failed / return
-  "delivery failed":         "not_delivered",
-  "undelivered":             "not_delivered",
-  "return requested":        "not_delivered",
-  "return in transit":       "not_delivered",
-  "return at hub":           "not_delivered",
-  "return delivered":        "returned",
-  "return completed":        "returned",
-  "returned":                "returned",
+  // ── Failed attempts (not delivered yet, still active) ──────────
+  "appel_confirmation":                  "shipped",   // confirmation call
+  "appel telephonique":                  "shipped",   // phone call attempt
+  "appel téléphonique":                  "shipped",
+  "sms_envoye":                          "shipped",   // SMS sent
+  "injoignable":                         "shipped",   // unreachable
+  "ne repond pas_1":                     "shipped",   // no answer attempt 1
+  "ne repond pas_2":                     "shipped",   // no answer attempt 2
+  "ne repond pas_3":                     "not_delivered", // no answer attempt 3 → give up
+  "reporter a une date ulterieure":      "shipped",   // postponed
+  "reporté à une date ultérieure":       "shipped",
+  "commune_erronee":                     "shipped",   // wrong commune
+  "commune erronée":                     "shipped",
 
-  // Canceled
-  "canceled":                "canceled",
-  "cancelled":               "canceled",
+  // ── Return / failed terminal ───────────────────────────────────
+  "commande_anullee":                    "canceled",
+  "commande annulée":                    "canceled",
+  "canceled":                            "canceled",
+  "cancelled":                           "canceled",
+  "annule":                              "canceled",
+  "retour":                              "not_delivered",
+  "en attente dechange":                 "not_delivered", // awaiting exchange
+  "return requested":                    "not_delivered",
+  "return in transit":                   "not_delivered",
+  "return at hub":                       "not_delivered",
+  "delivery failed":                     "not_delivered",
+  "undelivered":                         "not_delivered",
+  "returned":                            "returned",
+  "return delivered":                    "returned",
+  "return completed":                    "returned",
 };
 
 export function mapZRState(stateName) {
   if (!stateName) return null;
-  return ZR_STATE_MAP[stateName.toLowerCase().trim()] || null;
+  const normalized = stateName.toLowerCase().trim();
+  // Try exact match first
+  if (ZR_STATE_MAP[normalized]) return ZR_STATE_MAP[normalized];
+  // Try with diacritics stripped (e.g. "livré" → "livre")
+  const stripped = normalized.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return ZR_STATE_MAP[stripped] || null;
 }
