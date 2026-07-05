@@ -973,10 +973,17 @@ function populateCommunes(wilayaId){
 }
 async function loadDesks(){
   const sel=document.getElementById('f-desk');if(!sel)return;
-  if(!desks){try{const r=await fetch('/api/noest-desks');if(r.ok)desks=await r.json();}catch(e){}}
+  sel.innerHTML='<option value="">جاري التحميل...</option>';
+  if(!desks){try{const r=await fetch('/api/zr-lookup?type=hubs');if(r.ok)desks=await r.json();}catch(e){}}
   const id=(document.getElementById('f-wilaya').value||'').split('|')[0];
-  const entries=Object.entries(desks||{}).filter(([code])=>id&&new RegExp('^'+id+'[A-Z]').test(code));
-  sel.innerHTML='<option value="">اختر النقطة</option>'+entries.map(([code,d])=>`<option value="${code}">${esc(d.name||code)}</option>`).join('');
+  const hubs=Array.isArray(desks)?desks:[];
+  // Filter by wilaya code if available (hubs may have wilayaCode or territory.code)
+  const matching=id?hubs.filter(h=>{
+    const code=h.wilayaCode||(h.territory&&h.territory.code);
+    return code&&String(code)===String(Number(id));
+  }):hubs;
+  const list=matching.length?matching:hubs;
+  sel.innerHTML='<option value="">اختر النقطة</option>'+list.map(h=>`<option value="${h.id}">${esc(h.name||h.id)}</option>`).join('');
 }
 function shippingCost(){return delivery==='home'?Number(shipping.home_delivery||0):Number(shipping.stop_desk||0);}
 function total(){return Number(variant.price||0)+shippingCost();}
