@@ -8,7 +8,7 @@
 // Subscribe to:  parcel.state.updated, parcel.state.situation.created, parcel.isReturn.updated
 
 import { createClient } from "@supabase/supabase-js";
-import { mapZRState } from "./zr.js";
+import { mapZRState } from "./_zr.js";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
