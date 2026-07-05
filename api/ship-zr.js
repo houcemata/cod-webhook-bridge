@@ -16,10 +16,12 @@ function changedByOf(auth) {
 
 function extractZRError(data) {
   if (!data) return "ZR Express request failed";
-  if (data.detail) return String(data.detail);
-  if (data.title)  return String(data.title);
+  // Field-level errors first — most specific
   if (Array.isArray(data.errors) && data.errors.length)
     return data.errors.map(e => e.description || e.code || JSON.stringify(e)).join(" | ");
+  if (data.detail && data.detail !== "One or more validation errors occurred") return String(data.detail);
+  if (data.title)  return String(data.title);
+  if (data.detail) return String(data.detail);
   return JSON.stringify(data);
 }
 
@@ -80,6 +82,7 @@ export default async function handler(req, res) {
         if (matched) results[matched.orderId] = { error: Array.isArray(f.errors) ? f.errors.map(e => e.description || e.code).join(" | ") : extractZRError(f) };
       }
       if (!r.ok && !r.data?.successes?.length && !r.data?.failures?.length) {
+        console.error("ZR bulk error:", JSON.stringify({ status: r.status, response: r.data, payloads: slice.map(v => v.payload) }, null, 2));
         for (const v of slice) results[v.orderId] = { error: extractZRError(r.data) || `ZR bulk failed (HTTP ${r.status})` };
       }
     }
@@ -120,7 +123,7 @@ export default async function handler(req, res) {
   const r = await zrPost("/parcels", payload);
 
   if (!r.ok || !r.data?.id) {
-    console.error("ZR create error:", { status: r.status, orderId, response: r.data });
+    console.error("ZR create error:", JSON.stringify({ status: r.status, orderId, payload, response: r.data }, null, 2));
     return res.status(400).json({ error: extractZRError(r.data), zr_status: r.status, zr_response: r.data });
   }
 
