@@ -80,7 +80,9 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Invalid JSON" });
   }
 
-  const { eventType, data } = event;
+  // ZR sends PascalCase keys (EventType, Data) — normalise both
+  const eventType = event.eventType || event.EventType;
+  const data      = event.data      || event.Data;
 
   console.log(`[zr-webhook] ${eventType} — parcel ${data?.id || "?"}`);
 
@@ -89,10 +91,10 @@ export default async function handler(req, res) {
     return res.status(200).json({ received: true, skipped: "unknown event type" });
   }
 
-  const parcelId  = data?.id;          // ZR's UUID — stored as tracking_number
-  const externalId = data?.externalId;  // what we sent as externalId (DB id or order_id)
-  const stateName  = data?.state?.name; // French slug e.g. "pret_a_expedier"
-  const isReturn   = data?.isReturn;
+  const parcelId  = data?.id  || data?.Id;           // ZR's UUID — stored as tracking_number
+  const externalId = data?.externalId || data?.ExternalId;  // what we sent
+  const stateName  = data?.state?.name || data?.State?.Name; // French slug
+  const isReturn   = data?.isReturn ?? data?.IsReturn;
 
   console.log(`[zr-webhook] state name raw: "${stateName}" externalId: ${externalId} parcelId: ${parcelId}`);
 
