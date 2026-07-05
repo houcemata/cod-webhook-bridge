@@ -687,7 +687,7 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
     <div class="bulk-bar" id="bulk-bar">
       <button class="select-all-btn" onclick="toggleSelectAll()">Select All</button>
       <span class="bulk-count" id="bulk-count">0 selected</span>
-      <button class="bulk-ship-btn" onclick="bulkShip()">Bulk Ship</button>
+      <button class="bulk-ship-btn" onclick="bulkShipZR()">Bulk Ship (ZR)</button>
       <button class="bulk-ship-btn" style="background:#16a34a;flex:0 0 auto;padding:10px 14px;" onclick="exportConfirmedXLSX()">⬇ Export Print List</button>
     </div>
 
@@ -1173,7 +1173,7 @@ function renderOrdersList(){
         <select class="card-status-select" onchange="updateStatusCard(this,${o.id})">
           ${STATUSES.map(s=>`<option value="${s.k}"${o.status===s.k?' selected':''}>${s.l}</option>`).join('')}
         </select>
-        ${o.status==='confirmed'?`<button class="btn-ship-sm" onclick="shipSingle(${o.id})">Ship</button>`:''}
+        ${o.status==='confirmed'?`<button class="btn-ship-sm" onclick="shipSingleZR(${o.id})">Ship (ZR)</button>`:''}
         <button class="btn-detail" onclick="openDetail(${o.id})">Details</button>
       </div>
     </div>`;
@@ -1395,10 +1395,10 @@ function renderDetail(dups=[]){
     </div>
     ${o.status==='confirmed'?`<div class="detail-section"><div class="detail-section-title">Ship Order</div>
       ${o.type_livraison==='pickup'&&!o.station_code?`<div style="color:#f59e0b;font-size:13px;margin-bottom:8px">Warning: no stop desk selected. Tap Edit first.</div>`:''}
-      <button class="ship-btn" onclick="shipSingle(${o.id})">Send to Noest Express</button>
+      <button class="ship-btn" onclick="shipSingleZR(${o.id})">Send to ZR Express</button>
     </div>`:''}
     ${o.status==='shipped'&&o.tracking_number?`<div class="detail-section"><div class="detail-section-title">Tracking</div>
-      <div style="font-size:13px;color:#888;margin-bottom:8px">Noest - <b style="color:#fff">${esc(o.tracking_number)}</b></div>
+      <div style="font-size:13px;color:#888;margin-bottom:8px">${o.shipping_agency==='zr'?'ZR Express':'Noest'} - <b style="color:#fff">${esc(o.tracking_number)}</b></div>
       <button class="track-btn" onclick="openTracking()">Track Shipment</button>
     </div>`:''}
     <div class="detail-section">
@@ -1471,7 +1471,10 @@ function openWhatsApp(phone){
 }
 function openTracking(){
   if(!currentOrder?.tracking_number)return;
-  window.open(`https://app.noest-dz.com/track/${currentOrder.tracking_number}`,'_blank');
+  const url = currentOrder.shipping_agency === 'zr'
+    ? `https://zrexpress.app/track/${currentOrder.tracking_number}`
+    : `https://app.noest-dz.com/track/${currentOrder.tracking_number}`;
+  window.open(url,'_blank');
 }
 async function updateStatusDetail(newStatus){
   const o=currentOrder,old=o.status;
@@ -1703,7 +1706,7 @@ function onEditTypeChange(selectedCommune='',selectedDesk=''){
   if(type==='pickup'){
     communeWrap.style.display='none';
     deskWrap.style.display='block';
-    populateEditDesks(selectedDesk);
+    populateZRHubs(selectedDesk);
   } else {
     communeWrap.style.display='block';
     deskWrap.style.display='none';
@@ -1714,12 +1717,13 @@ function onEditTypeChange(selectedCommune='',selectedDesk=''){
 
 function onEditWilayaChange(){
   const type=document.getElementById('edit-type').value;
+  const wilayaKey=document.getElementById('edit-wilaya').value;
   if(type==='home'){
-    const wilaya=document.getElementById('edit-wilaya').value;
-    populateEditCommunes(wilaya,'');
+    populateEditCommunes(wilayaKey,'');
   } else {
-    populateEditDesks('');
+    populateZRHubs('');
   }
+  autoFillShippingFromZR(wilayaKey, type);
 }
 
 function populateEditCommunes(wilaya,selected){
@@ -1884,7 +1888,7 @@ function rebuildSingleCard(id){
         <select class="card-status-select" onchange="updateStatusCard(this,${o.id})">
           ${STATUSES.map(s=>`<option value="${s.k}"${o.status===s.k?' selected':''}>${s.l}</option>`).join('')}
         </select>
-        ${o.status==='confirmed'?`<button class="btn-ship-sm" onclick="shipSingle(${o.id})">Ship</button>`:''}
+        ${o.status==='confirmed'?`<button class="btn-ship-sm" onclick="shipSingleZR(${o.id})">Ship (ZR)</button>`:''}
         <button class="btn-detail" onclick="openDetail(${o.id})">Details</button>
       </div>`;
 }
@@ -2036,6 +2040,106 @@ function makeProductPicker(containerId, initialValue, onChange){
       else{ input.value=selected; }
     }, 150);
   });
+}
+
+// ── ZR Express helpers ────────────────────────────────────────────────────
+let zrHubs = null;
+let zrRatesCache = null;
+
+async function loadZrHubs() {
+  if (zrHubs) return zrHubs;
+  try { const r = await fetch('/api/zr-lookup?type=hubs'); if (r.ok) zrHubs = await r.json(); } catch {}
+  return zrHubs || [];
+}
+
+async function loadZrRates() {
+  if (zrRatesCache) return zrRatesCache;
+  try {
+    const r = await fetch('/api/zr-lookup?type=rates');
+    if (r.ok) {
+      const data = await r.json();
+      zrRatesCache = {};
+      (data.rates || []).forEach(row => {
+        zrRatesCache[row.wilaya_id] = { home: row.home_delivery, pickup: row.stop_desk };
+      });
+    }
+  } catch {}
+  return zrRatesCache || {};
+}
+
+async function autoFillShippingFromZR(wilayaKey, deliveryType) {
+  const code = parseInt((wilayaKey || '').split(' ')[0]);
+  if (!code) return;
+  const rates = await loadZrRates();
+  const rate = rates[code];
+  if (!rate) return;
+  const price = deliveryType === 'pickup' ? rate.pickup : rate.home;
+  const el = document.getElementById('edit-shipping-price');
+  if (el) { el.value = price; calcTotal(); }
+}
+
+async function shipSingleZR(id) {
+  const o = allOrders.find(x => x.id === id);
+  if (!o) return;
+  if (o.type_livraison === 'pickup' && !o.station_code) { toast('Edit order and select a stop desk first', true); return; }
+  toast('Shipping via ZR Express...');
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    const r = await fetch('/api/ship-zr', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token || ''}` },
+      body: JSON.stringify({ orderId: o.id, order: o, hubId: o.station_code || null }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'Failed');
+    o.status = 'shipped'; o.tracking_number = data.tracking_number; o.shipping_agency = 'zr';
+    await loadOrders();
+    toast('✅ Shipped via ZR! #' + data.tracking_number);
+  } catch (e) { toast('Error: ' + e.message, true); }
+}
+
+async function bulkShipZR() {
+  if (!selectedIds.size) return;
+  const ids = [...selectedIds];
+  const missing = ids.filter(id => { const o = allOrders.find(x => x.id === id); return o && o.type_livraison === 'pickup' && !o.station_code; });
+  if (missing.length) { toast(`${missing.length} orders missing stop desk`, true); return; }
+  toast(`Shipping ${ids.length} orders via ZR Express...`);
+  const { data: { session } } = await sb.auth.getSession();
+  const payloadOrders = ids.map(id => { const o = allOrders.find(x => x.id === id); return o ? { orderId: o.id, order: o, hubId: o.station_code || null } : null; }).filter(Boolean);
+  try {
+    const r = await fetch('/api/ship-zr', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token || ''}` },
+      body: JSON.stringify({ orders: payloadOrders }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'Bulk ship failed');
+    const results = data.results || {};
+    let ok = 0, fail = 0;
+    for (const o of allOrders) {
+      const res = results[o.id];
+      if (res && res.success) { o.status = 'shipped'; o.tracking_number = res.tracking_number; o.shipping_agency = 'zr'; ok++; }
+      else if (res && res.error) { fail++; }
+    }
+    selectedIds.clear();
+    await loadOrders();
+    toast(`${ok} shipped via ZR${fail ? `, ${fail} failed` : ''}`, fail > 0);
+  } catch (e) { toast('Error: ' + e.message, true); }
+}
+
+async function populateZRHubs(selectedId) {
+  const sel = document.getElementById('edit-desk');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Loading hubs...</option>';
+  const hubs = await loadZrHubs();
+  const wilayaKey = document.getElementById('edit-wilaya').value;
+  const code = parseInt((wilayaKey || '').split(' ')[0]);
+  const matching = code ? hubs.filter(h => h.wilayaCode === code || (h.territory && h.territory.code === code)) : [];
+  const others = hubs.filter(h => !matching.find(m => m.id === h.id));
+  const optHtml = h => `<option value="${h.id}"${h.id === selectedId ? ' selected' : ''}>${esc(h.name || h.id)}</option>`;
+  sel.innerHTML = '<option value="">Select Stop Desk</option>' +
+    (matching.length ? '<optgroup label="This Wilaya">' + matching.map(optHtml).join('') + '</optgroup>' : '') +
+    '<optgroup label="All Hubs">' + others.map(optHtml).join('') + '</optgroup>';
 }
 </script>
 </body>
