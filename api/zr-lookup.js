@@ -6,7 +6,7 @@
 // GET /api/zr-lookup?type=rates         → delivery rates per wilaya (preview)
 // POST /api/zr-lookup?type=rates        → upsert rates into Supabase shipping_rates
 
-import { getTerritories, zrPost, zrGet } from "./zr.js";
+import { getTerritories, zrPost, zrGet } from "./_zr.js";
 
 export default async function handler(req, res) {
   const type = req.query?.type || (typeof req.url === 'string' ? new URL(req.url, 'http://x').searchParams.get('type') : null);
