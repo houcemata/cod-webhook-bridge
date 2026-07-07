@@ -114,6 +114,8 @@ export default async function handler(req, res) {
     if (!wilayaId)
       return res.status(400).json({ error: `Unknown wilaya: "${order.wilaya}". Edit the order and fix the wilaya first.` });
     if (order.commune) communeId = await findCommuneId(wilayaId, order.commune);
+    if (!communeId)
+      return res.status(400).json({ error: `Commune "${order.commune}" not found in ZR territories for ${order.wilaya}. Edit the order and fix the commune.` });
   }
 
   if (isPickup && !hubId && !order.station_code)

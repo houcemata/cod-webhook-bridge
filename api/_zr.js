@@ -88,6 +88,11 @@ export async function findCommuneId(wilayaId, communeName) {
   let match = communes.find(c => normStr(c.name) === query);
   if (!match) match = communes.find(c => normStr(c.name).includes(query) || query.includes(normStr(c.name)));
 
+  if (!match) {
+    // Log available communes to help debug mismatches
+    console.warn(`[zr] commune not found: "${communeName}" (normalized: "${query}") in wilaya ${wilayaId}. Available: ${communes.slice(0, 10).map(c => c.name).join(", ")}`);
+  }
+
   return match?.id || null;
 }
 
