@@ -83,13 +83,18 @@ export async function findWilayaId(wilayaName) {
 export async function findCommuneId(wilayaId, communeName) {
   const territories = await getTerritories();
   const communes = territories.filter(t => t.level === "commune" && t.parentId === wilayaId);
-  const query = normStr(communeName);
 
+  // Debug: if no communes found, log the structure of first few territories
+  if (communes.length === 0) {
+    const sample = territories.slice(0, 3);
+    console.warn(`[zr] no communes for parentId ${wilayaId}. Sample territory keys: ${JSON.stringify(Object.keys(sample[0] || {}))}. Sample: ${JSON.stringify(sample[0])}`);
+  }
+
+  const query = normStr(communeName);
   let match = communes.find(c => normStr(c.name) === query);
   if (!match) match = communes.find(c => normStr(c.name).includes(query) || query.includes(normStr(c.name)));
 
-  if (!match) {
-    // Log available communes to help debug mismatches
+  if (!match && communes.length > 0) {
     console.warn(`[zr] commune not found: "${communeName}" (normalized: "${query}") in wilaya ${wilayaId}. Available: ${communes.slice(0, 10).map(c => c.name).join(", ")}`);
   }
 
