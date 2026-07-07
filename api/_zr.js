@@ -38,7 +38,6 @@ let _territoriesCache = null;
 export async function getTerritories() {
   if (_territoriesCache) return _territoriesCache;
 
-  // Fetch all territories in one big page (Algeria has ~58 wilayas + ~1500 communes)
   const r = await zrPost("/territories/search", {
     pageNumber: 1,
     pageSize:   5000,
@@ -47,6 +46,10 @@ export async function getTerritories() {
   if (!r.ok) throw new Error(`ZR territories fetch failed: ${r.status}`);
 
   const items = r.data?.items || [];
+  const wilayas = items.filter(t => t.level === "wilaya").length;
+  const communes = items.filter(t => t.level === "commune").length;
+  console.log(`[zr] territories loaded: ${items.length} total (${wilayas} wilayas, ${communes} communes), totalCount: ${r.data?.totalCount}`);
+
   _territoriesCache = items;
   return items;
 }
