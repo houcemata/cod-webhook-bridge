@@ -81,15 +81,33 @@ export async function findWilayaId(wilayaName) {
   const wilayas = territories.filter(t => t.level === "wilaya");
   const query = normStr(wilayaName);
 
-  // 1) exact normalised match
-  let match = wilayas.find(w => normStr(w.name) === query);
+  // Common name overrides (English → French as ZR stores them)
+  const nameOverrides = {
+    "algiers":       "alger",
+    "oran":          "oran",
+    "constantine":   "constantine",
+    "batna":         "batna",
+    "setif":         "setif",
+    "annaba":        "annaba",
+    "tlemcen":       "tlemcen",
+    "blida":         "blida",
+    "bejaia":        "bejaia",
+    "tiaret":        "tiaret",
+  };
+  const remapped = nameOverrides[query] || query;
+
+  // 1) exact normalised match (try both original and remapped)
+  let match = wilayas.find(w => normStr(w.name) === remapped || normStr(w.name) === query);
   // 2) code-prefix match (e.g. "16" → Alger)
   if (!match) {
     const code = parseInt(wilayaName);
     if (!isNaN(code)) match = wilayas.find(w => w.code === code);
   }
   // 3) contains match
+  if (!match) match = wilayas.find(w => normStr(w.name).includes(remapped) || remapped.includes(normStr(w.name)));
   if (!match) match = wilayas.find(w => normStr(w.name).includes(query) || query.includes(normStr(w.name)));
+
+  if (!match) console.warn(`[zr] wilaya not found: "${wilayaName}" (normalized: "${query}", remapped: "${remapped}")`);
 
   return match?.id || null;
 }
