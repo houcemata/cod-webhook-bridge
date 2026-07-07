@@ -38,20 +38,31 @@ let _territoriesCache = null;
 export async function getTerritories() {
   if (_territoriesCache) return _territoriesCache;
 
-  const r = await zrPost("/territories/search", {
-    pageNumber: 1,
-    pageSize:   5000,
-    orderBy:    ["code asc"],
-  });
-  if (!r.ok) throw new Error(`ZR territories fetch failed: ${r.status}`);
+  // ZR paginates at 1000 — fetch all pages
+  const allItems = [];
+  let pageNumber = 1;
+  const pageSize = 1000;
 
-  const items = r.data?.items || [];
-  const wilayas = items.filter(t => t.level === "wilaya").length;
-  const communes = items.filter(t => t.level === "commune").length;
-  console.log(`[zr] territories loaded: ${items.length} total (${wilayas} wilayas, ${communes} communes), totalCount: ${r.data?.totalCount}`);
+  while (true) {
+    const r = await zrPost("/territories/search", {
+      pageNumber,
+      pageSize,
+      orderBy: ["code asc"],
+    });
+    if (!r.ok) throw new Error(`ZR territories fetch failed: ${r.status}`);
+    const items = r.data?.items || [];
+    allItems.push(...items);
+    const totalCount = r.data?.totalCount || 0;
+    if (allItems.length >= totalCount || items.length < pageSize) break;
+    pageNumber++;
+  }
 
-  _territoriesCache = items;
-  return items;
+  const wilayas = allItems.filter(t => t.level === "wilaya").length;
+  const communes = allItems.filter(t => t.level === "commune").length;
+  console.log(`[zr] territories loaded: ${allItems.length} total (${wilayas} wilayas, ${communes} communes)`);
+
+  _territoriesCache = allItems;
+  return allItems;
 }
 
 // Normalise a string for fuzzy matching (strip diacritics, lowercase, collapse spaces)
