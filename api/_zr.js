@@ -234,15 +234,33 @@ export async function findCommuneId(wilayaId, communeName) {
     return null;
   }
 
-  const query = normStr(communeName);
+  // Common customer spelling → ZR spelling corrections
+  const COMMUNE_CORRECTIONS = {
+    "setaouali":         "staoueli",
+    "staouali":          "staoueli",
+    "bordj bou naama":   "bordj bounaama",
+    "bordj bounaama":    "bordj bounaama",
+    "el karma":          "el kerma",
+    "bordj ghdir":       "bordj ghedir",
+    "bordj ghdir":       "bordj ghedir",
+    "bir el djir":       "bir el djir",
+    "ain benian":        "ain benian",
+    "draria":            "draria",
+    "ain defla":         "ain defla",
+  };
 
-  // 1) exact match after full normalization (strips accents, lowercase)
-  let match = communes.find(c => normStr(c.name) === query);
-  // 2) also try matching against Arabic name
+  const query = normStr(communeName);
+  const corrected = COMMUNE_CORRECTIONS[query] || query;
+
+  // 1) exact match after full normalization
+  let match = communes.find(c => normStr(c.name) === corrected);
+  if (!match) match = communes.find(c => normStr(c.name) === query);
+  // 2) Arabic name match
   if (!match) match = communes.find(c => normStr(c.nameArabic || "") === query);
   // 3) contains match
+  if (!match) match = communes.find(c => normStr(c.name).includes(corrected) || corrected.includes(normStr(c.name)));
   if (!match) match = communes.find(c => normStr(c.name).includes(query) || query.includes(normStr(c.name)));
-  // 4) postal code match (e.g. commune entered as "16001")
+  // 4) postal code match
   if (!match) match = communes.find(c => c.postalCode === communeName.trim());
 
   if (!match) {
@@ -411,7 +429,8 @@ export const ZR_STATE_MAP = {
   // ── Delivered ──────────────────────────────────────────────────
   "livre":                               "delivered",
   "livré":                               "delivered",
-  "confirme au bureau":                  "delivered",  // confirmed at stop desk
+  "confirme au bureau":                  "shipped",   // arrived at destination stop desk
+  "confirme_au_bureau":                  "shipped",
   "traitee":                             "delivered",  // processed/settled
   "delivered":                           "delivered",
   "delivery confirmed":                  "delivered",
