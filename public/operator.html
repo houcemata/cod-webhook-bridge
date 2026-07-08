@@ -1787,16 +1787,15 @@ async function saveEdit(){
     return;
   }
 
-  const isCartEdit=Array.isArray(o.items)&&o.items.length>0;
-  const editedItems=document.getElementById('edit-modal').__editItems;
-  // For non-cart orders that now have __editItems, sync back to product/variable fields
-  if(editedItems&&!isCartEdit){
-    const first=editedItems[0]||{};
-    const prodEl=document.getElementById('edit-product');
-    const varEl=document.getElementById('edit-variable');
-    if(prodEl) prodEl.value=first.product||'';
-    if(varEl) varEl.value=first.variant||(first.size==='L'?'40×60 cm':'30×40 cm');
-  }
+  const editedItems=document.getElementById('edit-modal').__editItems||[];
+  const hasMultipleItems=editedItems.length>1;
+
+  // Sync first item back to hidden fields
+  const first=editedItems[0]||{};
+  const prodEl=document.getElementById('edit-product');
+  const varEl=document.getElementById('edit-variable');
+  if(prodEl) prodEl.value=first.product||'';
+  if(varEl) varEl.value=first.variant||(first.size==='L'?'40×60 cm':'30×40 cm');
 
   const newData={
     name:document.getElementById('edit-name').value,
@@ -1805,11 +1804,11 @@ async function saveEdit(){
     commune,
     type_livraison:type,
     station_code:stationCode,
-    product:document.getElementById('edit-product')?document.getElementById('edit-product').value:(currentOrder.product||''),
-    variable:document.getElementById('edit-variable')?document.getElementById('edit-variable').value:(currentOrder.variable||''),
+    product:hasMultipleItems?`سلة ${editedItems.length} قطع`:(first.product||currentOrder.product||''),
+    variable:hasMultipleItems?editedItems.map(it=>it.variant||(it.size==='L'?'40×60 cm':'30×40 cm')).join(' + ').slice(0,250):(first.variant||(first.size==='L'?'40×60 cm':'30×40 cm')),
     shipping_cost:shippingPrice,
     prix_total:productPrice+shippingPrice,
-    ...(isCartEdit&&editedItems?{items:editedItems}:{}),
+    items:editedItems.length>0?editedItems:null,
   };
 
   // Log field changes to history
