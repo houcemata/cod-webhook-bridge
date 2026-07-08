@@ -76,38 +76,151 @@ export function normStr(s) {
     .trim();
 }
 
+// Static mapping of all common wilaya name variants → wilaya code (1-58)
+// Covers Arabic transliterations, French names, English names, common misspellings
+const WILAYA_NAME_TO_CODE = {
+  // 1
+  "adrar": 1,
+  // 2
+  "chlef": 2, "ech cheliff": 2, "ech-cheliff": 2, "el asnam": 2,
+  // 3
+  "laghouat": 3,
+  // 4
+  "oum el bouaghi": 4, "oum el-bouaghi": 4, "oum bouaghi": 4,
+  // 5
+  "batna": 5,
+  // 6
+  "bejaia": 6, "bejaia": 6, "bgayet": 6, "béjaïa": 6,
+  // 7
+  "biskra": 7,
+  // 8
+  "bechar": 8, "béchar": 8,
+  // 9
+  "blida": 9,
+  // 10
+  "bouira": 10,
+  // 11
+  "tamanrasset": 11, "tamanghasset": 11,
+  // 12
+  "tebessa": 12, "tébessa": 12,
+  // 13
+  "tlemcen": 13,
+  // 14
+  "tiaret": 14,
+  // 15
+  "tizi ouzou": 15, "tizi-ouzou": 15,
+  // 16
+  "alger": 16, "algiers": 16, "el djazair": 16,
+  // 17
+  "djelfa": 17,
+  // 18
+  "jijel": 18,
+  // 19
+  "setif": 19, "sétif": 19,
+  // 20
+  "saida": 20, "saïda": 20,
+  // 21
+  "skikda": 21,
+  // 22
+  "sidi bel abbes": 22, "sidi bel abbès": 22, "sidi bel-abbes": 22,
+  // 23
+  "annaba": 23,
+  // 24
+  "guelma": 24,
+  // 25
+  "constantine": 25,
+  // 26
+  "medea": 26, "médéa": 26,
+  // 27
+  "mostaganem": 27,
+  // 28
+  "msila": 28, "m sila": 28, "m'sila": 28,
+  // 29
+  "mascara": 29,
+  // 30
+  "ouargla": 30,
+  // 31
+  "oran": 31,
+  // 32
+  "el bayadh": 32,
+  // 33
+  "illizi": 33,
+  // 34
+  "bordj bou arreridj": 34, "bordj bou-arreridj": 34, "bba": 34,
+  // 35
+  "boumerdes": 35, "boumerdès": 35,
+  // 36
+  "el tarf": 36,
+  // 37
+  "tindouf": 37,
+  // 38
+  "tissemsilt": 38,
+  // 39
+  "el oued": 39,
+  // 40
+  "khenchela": 40,
+  // 41
+  "souk ahras": 41,
+  // 42
+  "tipaza": 42, "tipasa": 42,
+  // 43
+  "mila": 43,
+  // 44
+  "ain defla": 44, "aïn defla": 44,
+  // 45
+  "naama": 45, "naâma": 45,
+  // 46
+  "ain temouchent": 46, "aïn témouchent": 46,
+  // 47
+  "ghardaia": 47, "ghardaïa": 47,
+  // 48
+  "relizane": 48,
+  // 49
+  "timimoun": 49,
+  // 50
+  "bordj badji mokhtar": 50,
+  // 51
+  "ouled djellal": 51,
+  // 52
+  "beni abbes": 52, "béni abbès": 52,
+  // 53
+  "in salah": 53, "in-salah": 53,
+  // 54
+  "in guezzam": 54, "in-guezzam": 54,
+  // 55
+  "touggourt": 55,
+  // 56
+  "djanet": 56,
+  // 57
+  "el meghaier": 57, "el-meghaier": 57,
+  // 58
+  "el meniaa": 58, "el-meniaa": 58,
+};
+
 export async function findWilayaId(wilayaName) {
   const territories = await getTerritories();
   const wilayas = territories.filter(t => t.level === "wilaya");
   const query = normStr(wilayaName);
 
-  // Common name overrides (English → French as ZR stores them)
-  const nameOverrides = {
-    "algiers":       "alger",
-    "oran":          "oran",
-    "constantine":   "constantine",
-    "batna":         "batna",
-    "setif":         "setif",
-    "annaba":        "annaba",
-    "tlemcen":       "tlemcen",
-    "blida":         "blida",
-    "bejaia":        "bejaia",
-    "tiaret":        "tiaret",
-  };
-  const remapped = nameOverrides[query] || query;
+  // 1) exact normalised match against ZR names
+  let match = wilayas.find(w => normStr(w.name) === query);
 
-  // 1) exact normalised match (try both original and remapped)
-  let match = wilayas.find(w => normStr(w.name) === remapped || normStr(w.name) === query);
-  // 2) code-prefix match (e.g. "16" → Alger)
+  // 2) static code lookup (covers English names, variants, misspellings)
+  if (!match) {
+    const code = WILAYA_NAME_TO_CODE[query];
+    if (code) match = wilayas.find(w => w.code === code);
+  }
+
+  // 3) numeric code match (e.g. "16" → Alger)
   if (!match) {
     const code = parseInt(wilayaName);
     if (!isNaN(code)) match = wilayas.find(w => w.code === code);
   }
-  // 3) contains match
-  if (!match) match = wilayas.find(w => normStr(w.name).includes(remapped) || remapped.includes(normStr(w.name)));
+
+  // 4) contains match as last resort
   if (!match) match = wilayas.find(w => normStr(w.name).includes(query) || query.includes(normStr(w.name)));
 
-  if (!match) console.warn(`[zr] wilaya not found: "${wilayaName}" (normalized: "${query}", remapped: "${remapped}")`);
+  if (!match) console.warn(`[zr] wilaya not found: "${wilayaName}" (normalized: "${query}")`);
 
   return match?.id || null;
 }
@@ -116,18 +229,24 @@ export async function findCommuneId(wilayaId, communeName) {
   const territories = await getTerritories();
   const communes = territories.filter(t => t.level === "commune" && t.parentId === wilayaId);
 
-  // Debug: if no communes found, log the structure of first few territories
   if (communes.length === 0) {
-    const sample = territories.slice(0, 3);
-    console.warn(`[zr] no communes for parentId ${wilayaId}. Sample territory keys: ${JSON.stringify(Object.keys(sample[0] || {}))}. Sample: ${JSON.stringify(sample[0])}`);
+    console.warn(`[zr] no communes found for wilayaId ${wilayaId}`);
+    return null;
   }
 
   const query = normStr(communeName);
-  let match = communes.find(c => normStr(c.name) === query);
-  if (!match) match = communes.find(c => normStr(c.name).includes(query) || query.includes(normStr(c.name)));
 
-  if (!match && communes.length > 0) {
-    console.warn(`[zr] commune not found: "${communeName}" (normalized: "${query}") in wilaya ${wilayaId}. Available: ${communes.slice(0, 10).map(c => c.name).join(", ")}`);
+  // 1) exact match after full normalization (strips accents, lowercase)
+  let match = communes.find(c => normStr(c.name) === query);
+  // 2) also try matching against Arabic name
+  if (!match) match = communes.find(c => normStr(c.nameArabic || "") === query);
+  // 3) contains match
+  if (!match) match = communes.find(c => normStr(c.name).includes(query) || query.includes(normStr(c.name)));
+  // 4) postal code match (e.g. commune entered as "16001")
+  if (!match) match = communes.find(c => c.postalCode === communeName.trim());
+
+  if (!match) {
+    console.warn(`[zr] commune not found: "${communeName}" in wilaya ${wilayaId}. Available: ${communes.map(c => c.name).join(", ")}`);
   }
 
   return match?.id || null;
