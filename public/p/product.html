@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>ARCO Product</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="/meta-pixel.js"></script>
+<script src="/tiktok-pixel.js"></script>
+<script src="/draft-capture.js"></script>
+<script src="/cart.js"></script>
+<style>
+:root{--yellow:#F5C500;--black:#080808;--dark:#111;--line:rgba(255,255,255,.12);--muted:#aaa;--red:#e11d48;--green:#22c55e}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--black);color:#fff;font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(245,197,0,.13),transparent 290px),radial-gradient(circle at 50% 0,rgba(245,197,0,.14),transparent 38%);z-index:-1}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.shell{width:min(1160px,100%);margin:0 auto;padding:18px 18px 110px}
+.topbar{display:flex;align-items:center;justify-content:space-between;direction:ltr;padding-bottom:24px}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:5px;color:var(--yellow);text-decoration:none}
+.brand img{height:34px;width:auto;display:block}
+.back{color:#ddd;text-decoration:none;border:1px solid var(--line);border-radius:4px;padding:7px 10px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:1px}
+.product-layout{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:28px;align-items:start;direction:ltr}
+.gallery{position:sticky;top:18px}.main-img{aspect-ratio:4/5;background:#131313;border:1px solid var(--line);border-radius:8px;overflow:hidden}.main-img img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}.thumb{aspect-ratio:1;border:1px solid var(--line);border-radius:5px;background:#151515;overflow:hidden}.thumb.active{border-color:var(--yellow)}.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.panel{direction:rtl}.kicker{font-family:'Barlow Condensed',sans-serif;color:var(--yellow);font-weight:900;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;direction:ltr;text-align:right}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-height:.88;letter-spacing:2px;direction:ltr;text-align:right}
+.desc{color:#d7d7d7;line-height:1.9;margin:16px 0 18px;font-size:16px}.price-row{display:flex;align-items:center;gap:12px;justify-content:flex-start;direction:ltr;margin-bottom:20px}
+.price{font-family:'Bebas Neue',sans-serif;color:var(--yellow);font-size:46px;letter-spacing:1px}.old{font-family:'Barlow Condensed',sans-serif;color:#777;text-decoration:line-through;font-size:24px}
+.block{border-top:1px solid var(--line);padding-top:18px;margin-top:18px}.label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:900;margin-bottom:10px}.hint{font-size:12px;color:var(--muted);font-weight:600}
+.option-group{margin-top:12px}.option-group:first-child{margin-top:0}.option-title{font-weight:900;margin-bottom:8px;color:#ddd}.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.choice{border:1px solid var(--line);background:#111;color:#fff;border-radius:6px;padding:12px;text-align:right}.choice.active{border-color:var(--yellow);box-shadow:inset 0 0 0 1px rgba(245,197,0,.5)}.choice strong{display:block}.choice span{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+.form{display:grid;gap:10px}.field{display:grid;gap:6px}.field span{font-size:13px;color:#ddd;font-weight:700}.field input,.field select,.field textarea{width:100%;background:#111;color:#fff;border:1px solid var(--line);border-radius:5px;padding:12px;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--yellow)}
+.summary{display:grid;gap:8px;background:#101010;border:1px solid var(--line);border-radius:8px;padding:14px;margin-top:14px}.sum-row{display:flex;align-items:center;justify-content:space-between;gap:14px;color:#d2d2d2}.sum-row.total{border-top:1px solid var(--line);padding-top:9px;color:#fff;font-weight:900}
+.order-btn{width:100%;border:0;background:var(--yellow);color:var(--black);font-weight:900;border-radius:6px;padding:15px;margin-top:14px;min-height:56px}.order-btn.loading{opacity:.7;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#181818;color:#fff;border:1px solid var(--line);border-radius:999px;padding:10px 18px;z-index:30;opacity:0;pointer-events:none;transition:.2s;white-space:nowrap}.toast.show{opacity:1}.toast.err{border-color:rgba(225,29,72,.7)}
+.sticky{position:fixed;left:0;right:0;bottom:0;background:rgba(8,8,8,.9);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:10px 14px;display:none;align-items:center;justify-content:space-between;gap:12px;z-index:20;direction:ltr}.sticky strong{color:var(--yellow);font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px}.sticky button{background:var(--yellow);color:var(--black);border:0;border-radius:5px;padding:11px 18px;font-weight:900}
+.success{position:fixed;inset:0;background:rgba(8,8,8,.96);z-index:40;display:none;place-items:center;padding:22px;text-align:center}.success.show{display:grid}.success-box{max-width:460px}.success h2{font-family:'Bebas Neue',sans-serif;color:var(--yellow);font-size:58px;letter-spacing:2px}.success p{line-height:1.8;color:#ddd;margin-top:10px}.success a{display:inline-block;margin-top:20px;background:var(--yellow);color:#080808;text-decoration:none;font-weight:900;padding:12px 18px;border-radius:5px}
+.success-icon{font-size:52px;margin-bottom:6px}
+.success-call-note{color:var(--muted);font-size:13px;margin-top:14px}
+.success-phone-wrap{margin-top:10px;display:grid;justify-items:center;gap:6px}
+.success-phone-btn{background:var(--yellow);color:#080808;border:0;border-radius:8px;padding:13px 22px;font-weight:900;font-size:18px;letter-spacing:1px;cursor:pointer;font-family:'Cairo',sans-serif}
+.success-copy-hint{color:var(--muted);font-size:12px}
+.success-copy-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#181818;color:#fff;border:1px solid var(--line);border-radius:999px;padding:10px 18px;z-index:50;opacity:0;pointer-events:none;transition:.2s}
+.success-copy-toast.show{opacity:1}
+.loader,.missing{min-height:60vh;display:grid;place-items:center;text-align:center;color:#ddd}
+@media(max-width:860px){.product-layout{grid-template-columns:1fr}.gallery{position:static}.choices{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.choice{padding:9px 8px}.choice strong{font-size:14px}.choice span{font-size:11px;margin-top:2px}.option-group{margin-top:9px}.block{padding-top:13px;margin-top:13px}.form{gap:7px}.field input,.field select,.field textarea{padding:9px}.summary{padding:10px;gap:5px;margin-top:10px}.sticky.visible{display:flex}.shell{padding-bottom:96px}}
+</style>
+<style>
+.kids-theme{
+  --yellow:#d9b35b;
+  --black:#f8f3ea;
+  --dark:#fffaf4;
+  --line:rgba(104,124,105,.16);
+  --muted:#6f7480;
+  --red:#b95b74;
+  --green:#5b8b79;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(183,214,186,.44), transparent 26%),
+    radial-gradient(circle at 82% 14%, rgba(226,184,205,.42), transparent 24%),
+    linear-gradient(180deg, #f7f4ef 0%, #f4f0e9 48%, #f8f3ea 100%);
+  color:#2f2f2f;
+}
+body.kids-theme::before{background:none;opacity:0}
+.kids-theme .shell{padding:16px 16px 104px}
+.kids-theme .topbar{padding-bottom:16px}
+.kids-theme .brand{color:#cbad4e;text-shadow:none}
+.kids-theme .back{background:rgba(255,255,255,.7);color:#4d5360;border-color:rgba(104,124,105,.18)}
+.kids-hero{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:18px;
+  align-items:center;
+  justify-items:center;
+  margin-top:4px;
+}
+.kids-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family:'Poppins',sans-serif;
+  font-weight:700;
+  font-size:12px;
+  letter-spacing:1.8px;
+  text-transform:uppercase;
+  color:#7d7a78;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(104,124,105,.12);
+  border-radius:999px;
+  padding:8px 12px;
+  width:fit-content;
+}
+.kids-hero h1{
+  font-family:'Cairo',sans-serif;
+  font-size:clamp(34px,6vw,66px);
+  line-height:1.02;
+  letter-spacing:-.5px;
+  color:#2f3b34;
+  margin-top:10px;
+}
+.kids-lead{
+  margin-top:10px;
+  color:#5f646c;
+  line-height:1.9;
+  font-size:16px;
+  max-width:600px;
+}
+.kids-price-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  gap:10px;
+  margin-top:12px;
+}
+.kids-price{
+  font-family:'Poppins',sans-serif;
+  font-size:44px;
+  font-weight:800;
+  color:#deaf28;
+}
+.kids-old{
+  font-family:'Poppins',sans-serif;
+  font-size:24px;
+  color:#87909b;
+  text-decoration:line-through;
+}
+.kids-chip{
+  background:#fff;
+  border:1px solid rgba(104,124,105,.15);
+  color:#6d5d3a;
+  border-radius:999px;
+  padding:8px 12px;
+  font-family:'Poppins',sans-serif;
+  font-size:12px;
+  font-weight:700;
+}
+.kids-hero-card{
+  background:linear-gradient(180deg,#fffef9,#eef2e9);
+  border:1px solid rgba(104,124,105,.15);
+  border-radius:28px;
+  padding:14px;
+  box-shadow:0 24px 60px rgba(61,75,52,.08);
+  width:min(760px,100%);
+}
+.kids-version-stack{
+  margin-top:12px;
+}
+.kids-mockup{
+  background:
+    radial-gradient(circle at 50% 20%, rgba(255,255,255,.95), rgba(245,241,232,.88) 52%, rgba(228,236,224,.92) 100%);
+  border:1px solid rgba(104,124,105,.14);
+  border-radius:22px;
+  overflow:hidden;
+  aspect-ratio:4/5;
+  position:relative;
+}
+.kids-mockup img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.kids-mockup-tag{
+  position:absolute;
+  left:18px;
+  bottom:18px;
+  background:rgba(255,255,255,.86);
+  border:1px solid rgba(104,124,105,.12);
+  color:#49504c;
+  border-radius:999px;
+  padding:10px 16px;
+  font-family:'Poppins',sans-serif;
+  font-size:13px;
+  font-weight:700;
+  box-shadow:0 10px 20px rgba(77,83,76,.08);
+}
+.kids-benefits{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin-top:16px;
+}
+.kid-benefit{
+  background:rgba(255,255,255,.8);
+  border:1px solid rgba(104,124,105,.12);
+  border-radius:18px;
+  padding:14px 12px;
+  min-height:108px;
+  box-shadow:0 14px 30px rgba(61,75,52,.05);
+}
+.kid-benefit .icon{
+  font-size:24px;
+  margin-bottom:10px;
+}
+.kid-benefit strong{
+  display:block;
+  font-family:'Cairo',sans-serif;
+  font-size:15px;
+  color:#324038;
+  line-height:1.4;
+}
+.kid-benefit span{
+  display:block;
+  margin-top:6px;
+  color:#6a7280;
+  font-family:'Poppins',sans-serif;
+  font-size:12px;
+  line-height:1.6;
+}
+.kids-panel{
+  margin-top:18px;
+  background:rgba(255,255,255,.78);
+  border:1px solid rgba(104,124,105,.14);
+  border-radius:28px;
+  padding:16px;
+  box-shadow:0 18px 40px rgba(61,75,52,.05);
+}
+.kids-panel-title{
+  font-family:'Cairo',sans-serif;
+  font-size:28px;
+  font-weight:900;
+  color:#2f3b34;
+  line-height:1.2;
+}
+.kids-panel-sub{
+  margin-top:6px;
+  color:#757b85;
+  font-family:'Poppins',sans-serif;
+  font-size:13px;
+}
+.kids-order-price{
+  margin-top:12px;
+}
+.kids-product-info{
+  margin-top:16px;
+}
+.kids-product-box{
+  background:rgba(255,255,255,.76);
+  border:1px solid rgba(104,124,105,.12);
+  border-radius:24px;
+  padding:18px;
+  box-shadow:0 18px 36px rgba(61,75,52,.05);
+}
+.kids-product-name{
+  margin-top:8px;
+  font-family:'Cairo',sans-serif;
+  font-size:26px;
+  font-weight:900;
+  color:#2f3b34;
+  line-height:1.25;
+}
+.kids-product-desc{
+  margin-top:8px;
+  color:#5e6772;
+  font-family:'Poppins',sans-serif;
+  font-size:14px;
+  line-height:1.8;
+}
+.kids-reminder{
+  margin-top:12px;
+  background:linear-gradient(135deg,rgba(209,232,207,.45),rgba(247,231,208,.55));
+  border:1px solid rgba(104,124,105,.14);
+  border-radius:18px;
+  padding:12px 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.kids-reminder .kleft{
+  font-family:'Poppins',sans-serif;
+  color:#73807a;
+  font-size:12px;
+}
+.kids-reminder .kright{
+  font-family:'Cairo',sans-serif;
+  font-weight:900;
+  color:#3a4b41;
+  text-align:right;
+}
+.kids-select-card{
+  margin-top:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.82),rgba(245,241,235,.88));
+  border:1px solid rgba(104,124,105,.12);
+  border-radius:24px;
+  padding:14px;
+}
+.kids-select-title{
+  font-family:'Poppins',sans-serif;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  font-size:12px;
+  font-weight:800;
+  color:#7a7f83;
+  margin-bottom:12px;
+}
+.kids-select-block{margin-top:16px}
+.kids-select-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  font-family:'Cairo',sans-serif;
+  font-size:15px;
+  font-weight:900;
+  color:#39443b;
+  margin-bottom:10px;
+}
+.kids-select-head small{
+  font-family:'Poppins',sans-serif;
+  font-size:12px;
+  color:#7d838d;
+  font-weight:600;
+}
+.kids-theme .choices{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.kids-theme .choice{
+  background:rgba(255,255,255,.9);
+  color:#39443b;
+  border-color:rgba(104,124,105,.16);
+  border-radius:18px;
+  padding:12px 12px 11px;
+  text-align:right;
+  min-height:76px;
+}
+.kids-theme .choice strong{
+  font-family:'Cairo',sans-serif;
+  font-size:16px;
+  font-weight:900;
+  color:#34403a;
+}
+.kids-theme .choice span{
+  display:block;
+  font-family:'Poppins',sans-serif;
+  color:#7a828e;
+  font-size:12px;
+  margin-top:4px;
+}
+.kids-theme .choice.active{
+  border-color:#d8b85d;
+  box-shadow:inset 0 0 0 1px rgba(216,184,93,.25), 0 12px 26px rgba(166,140,55,.12);
+  background:linear-gradient(180deg,rgba(255,255,250,.96),rgba(247,238,218,.96));
+}
+.kids-section-label{
+  font-family:'Poppins',sans-serif;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  color:#9a8d6f;
+  font-size:12px;
+  font-weight:800;
+}
+.kids-form-grid .field input,
+.kids-form-grid .field select,
+.kids-form-grid .field textarea{
+  background:rgba(255,255,255,.88);
+  border-color:rgba(104,124,105,.16);
+  color:#2d3330;
+  border-radius:16px;
+  padding:14px 14px;
+}
+.kids-form-grid .field span{
+  color:#4c5652;
+  font-family:'Cairo',sans-serif;
+  font-weight:700;
+}
+.kids-summary{
+  background:linear-gradient(180deg,rgba(248,243,235,.95),rgba(255,255,255,.92));
+  border:1px solid rgba(104,124,105,.14);
+}
+.kids-summary .sum-row.total strong{
+  color:#111;
+}
+.kids-theme .order-btn{
+  background:linear-gradient(180deg,#d9b55d,#cda746);
+  color:#1d1b14;
+  border-radius:18px;
+  min-height:60px;
+  box-shadow:0 18px 30px rgba(207,170,67,.22);
+}
+.kids-theme .order-btn-fr{display:none}
+.kids-theme .order-btn-ar{display:block}
+.kids-footer{
+  margin-top:16px;
+  background:rgba(255,255,255,.75);
+  border:1px solid rgba(104,124,105,.12);
+  border-radius:22px;
+  padding:14px;
+}
+.kids-footer-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.kids-footer-item{
+  background:rgba(243,239,231,.85);
+  border:1px solid rgba(104,124,105,.12);
+  border-radius:18px;
+  padding:14px 12px;
+  text-align:center;
+}
+.kids-footer-item .fi-emoji{font-size:20px;margin-bottom:8px}
+.kids-footer-item strong{
+  display:block;
+  font-family:'Cairo',sans-serif;
+  color:#334139;
+  font-size:14px;
+}
+.kids-footer-item span{
+  display:block;
+  margin-top:4px;
+  font-family:'Poppins',sans-serif;
+  font-size:12px;
+  color:#7a8089;
+}
+.kids-theme .sticky{
+  background:rgba(251,248,241,.94);
+  border-top:1px solid rgba(104,124,105,.16);
+}
+.kids-theme .sticky strong{color:#c8a03d}
+.kids-theme .sticky button{
+  background:linear-gradient(180deg,#d9b55d,#cda746);
+  color:#1d1b14;
+  border-radius:16px;
+}
+.kids-theme .success{
+  background:rgba(246,243,236,.98);
+}
+.kids-theme .success-box{
+  background:rgba(255,255,255,.88);
+  border:1px solid rgba(104,124,105,.14);
+  border-radius:28px;
+  padding:20px 18px 18px;
+  box-shadow:0 20px 50px rgba(61,75,52,.08);
+}
+.kids-theme .success h2{color:#c6a03d}
+.kids-theme .success p{color:#51565c}
+.kids-theme .success a{background:linear-gradient(180deg,#d9b55d,#cda746);color:#1d1b14;border-radius:16px}
+.kids-theme .success-copy-toast{
+  background:#f4ead1;
+  color:#4c3b15;
+  border-color:rgba(197,160,60,.26);
+}
+@media(max-width:1024px){
+  .kids-hero,.kids-benefits,.kids-footer-grid{grid-template-columns:1fr}
+  .kids-mockup{max-width:620px;margin:0 auto}
+}
+@media(max-width:860px){
+  .kids-hero{grid-template-columns:1fr}
+  .kids-benefits,.kids-footer-grid{grid-template-columns:1fr 1fr}
+  .kids-hero-card{order:1}
+  .kids-panel-title{font-size:24px}
+  .kids-panel-sub{font-size:12px}
+  .kids-theme .choices{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+}
+@media(max-width:620px){
+  .kids-benefits{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:6px;
+  }
+  .kids-footer-grid{grid-template-columns:1fr}
+  .kids-hero{gap:14px}
+  .kids-price{font-size:34px}
+  .kids-old{font-size:19px}
+  .kids-chip{padding:7px 10px}
+  .kids-panel{padding:14px}
+  .kids-select-card{padding:12px}
+  .kids-reminder{padding:11px 12px}
+  .kids-footer{padding:12px}
+  .kid-benefit{
+    min-height:0;
+    aspect-ratio:1;
+    padding:8px 6px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    text-align:center;
+  }
+  .kid-benefit .icon{
+    font-size:16px;
+    margin-bottom:6px;
+  }
+  .kid-benefit strong{
+    font-size:10px;
+    line-height:1.2;
+  }
+  .kid-benefit span{display:none}
+  .kids-mockup-tag{left:12px;bottom:12px;padding:8px 12px;font-size:12px}
+}
+</style>
+</head>
+<body>
+<main class="shell" id="app">
+  <header class="topbar">
+    <a class="brand" href="/"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/ACRO%20logo%20shopiy-03.png" alt="ARCO"></a>
+    <a class="back" href="/">Products</a>
+  </header>
+  <div class="loader">Loading product...</div>
+</main>
+<div class="sticky" id="sticky"><strong id="sticky-total">0 DZD</strong><button onclick="scrollToOrder()">اطلب الآن</button></div>
+<div class="toast" id="toast"></div>
+<div class="success" id="success">
+  <div class="success-box">
+    <div class="success-icon">🎉</div>
+    <h2>تم استلام الطلب!</h2>
+    <p>شكراً لك! طلبك تم بنجاح. سيتواصل معك فريق ARCO قريباً لتأكيد الطلب.</p>
+    <p id="success-id"></p>
+    <div class="success-call-note">احفظ هذا الرقم حتى نعاود الاتصال بك لاحقاً.</div>
+    <div class="success-phone-wrap">
+      <button class="success-phone-btn" id="success-phone-btn" type="button">0550374607</button>
+      <div class="success-copy-hint">اضغط لنسخ الرقم</div>
+    </div>
+  </div>
+</div>
+<div class="success-copy-toast" id="success-copy-toast">تم نسخ الرقم</div>
+
+<script>
+const SB_URL='https://mpkpehuatqsubohltssi.supabase.co/rest/v1';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
+const H={apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'application/json'};
+const WILAYAS=[['01','Adrar'],['02','Chlef'],['03','Laghouat'],['04','Oum El Bouaghi'],['05','Batna'],['06','Bejaia'],['07','Biskra'],['08','Bechar'],['09','Blida'],['10','Bouira'],['11','Tamanrasset'],['12','Tebessa'],['13','Tlemcen'],['14','Tiaret'],['15','Tizi Ouzou'],['16','Algiers'],['17','Djelfa'],['18','Jijel'],['19','Setif'],['20','Saida'],['21','Skikda'],['22','Sidi Bel Abbes'],['23','Annaba'],['24','Guelma'],['25','Constantine'],['26','Medea'],['27','Mostaganem'],['28',"M'Sila"],['29','Mascara'],['30','Ouargla'],['31','Oran'],['32','El Bayadh'],['33','Illizi'],['34','Bordj Bou Arreridj'],['35','Boumerdes'],['36','El Tarf'],['37','Tindouf'],['38','Tissemsilt'],['39','El Oued'],['40','Khenchela'],['41','Souk Ahras'],['42','Tipaza'],['43','Mila'],['44','Ain Defla'],['45','Naama'],['46','Ain Temouchent'],['47','Ghardaia'],['48','Relizane'],['49','Timimoun'],['50','Bordj Badji Mokhtar'],['51','Ouled Djellal'],['52','Beni Abbes'],['53','In Salah'],['54','In Guezzam'],['55','Touggourt'],['56','Djanet'],['57',"El M'Ghair"],['58','El Menia']];
+const WILAYA_DATA={"01 - Adrar":["Adrar","Akabli","Aougrout","Aoulef","Bouda","Charouine","Deldoul","Fenoughil","Reggane","Sali","Sbaa","Talmine","Tamentit","Timimoun","Tinerkouk","Tit","Tsabit","Zaouiet Kounta"],"02 - Chlef":["Abou El Hassen","Ain Merane","Benairia","Beni Haoua","Beni Rached","Boukadir","Breira","Chettia","Chlef","Dahra","El Hadjadj","El Karimia","El Marsa","Harchoun","Herenfa","Moussadek","Oued Fodda","Oued Sly","Ouled Fares","Sendjas","Sobha","Tadjna","Taougrite","Tenes","Zeboudja"],"03 - Laghouat":["Aflou","Ain Mahdi","Brida","El Ghicha","El Haouaita","Gueltat Sidi Saad","Hadj Mechri","Hassi Delaa","Hassi R'Mel","Ksar El Hirane","Laghouat","Oued M'Zi","Sidi Makhlouf","Tadjmout"],"04 - Oum El Bouaghi":["Ain Beida","Ain Fekroune","Ain Kercha","Ain M'lila","Berriche","El Amiria","El Djazia","Fkirina","Ksar Sbahi","Meskiana","Oum El Bouaghi","Rahia","Sigus","Souk Naamane"],"05 - Batna":["Ain Touta","Arris","Barika","Batna","Bouzina","Chemora","El Madher","Fesdis","Ghassira","Ichmoul","Ksar Belezma","Larbaa","Menaa","Merouana","N Gaous","Oued Chaaba","Ras El Aioun","Seriana","Tazoult","Timgad","Tkout"],"06 - BÃƒÆ’Ã‚Â©jaÃƒÆ’Ã‚Â¯a":["Adekar","Akbou","Akfadou","Amalou","Amizour","Aokas","Barbacha","Bejaia","Beni Ksila","Chemini","Darguina","El Kseur","Feraoun","Ighil Ali","Ighram","Kendira","Kherrata","Melbou","Oued Ghir","Seddouk","Sidi Aich","Souk El Thenine","Tazmalt","Tichi","Toudja"],"07 - Biskra":["Ain Naga","Biskra","Chetma","Djemorah","Doucen","El Kantara","El Outaya","Foughala","Lichana","M'lili","Mchouneche","Ouled Djellal","Oumache","Sidi Khaled","Sidi Okba","Tolga","Zeribet El Oued"],"08 - BÃƒÆ’Ã‚Â©char":["Abadla","Bechar","Beni Abbes","Beni Ounif","Boukais","Igli","Kenedsa","Kerzaz","Lahmar","Mogheul","Taghit","Timoudi"],"09 - Blida":["Ain Romana","Beni Mered","Blida","Bouarfa","Boufarik","Bougara","Bouinan","Chebli","Chiffa","El Affroun","Guerrouaou","Hammam Melouane","Larbaa","Meftah","Mouzaia","Oued El Alleug","Ouled Yaich","Soumaa"],"10 - BouÃƒÆ’Ã‚Â¯ra":["Aghbalou","Ain Bessem","Ain El Hadjar","Bechloul","Bir Ghbalou","Bordj Oukhriss","Bouira","Chorfa","Djebahia","El Adjiba","El Hachimia","El Mokrani","Haizer","Kadiria","Lakhdaria","Mchedallah","Oued El Berdi","Ouled Rached","Saharidj","Souk El Khemis","Sour El Ghozlane","Taghzout"],"11 - Tamanrasset":["Abalessa","Idles","In Amguel","In Ghar","In Guezzam","In Salah","Tamanrasset","Tinzaouatine"],"12 - TÃƒÆ’Ã‚Â©bessa":["Ain Zerga","Bekkaria","Bir El Ater","Bir El Mokadem","Boukhadra","Boulhaf Dyr","Cheria","El Aouinet","El Kouif","El Ma El Biodh","El Meridj","Ferkane","Hammamet","Morsot","Negrine","Ouenza","Oum Ali","Tebessa","Tlidjene"],"13 - Tlemcen":["Ain Fezza","Ain Ghoraba","Ain Nehala","Ain Tallout","Bab El Assa","Beni Bahdel","Beni Boussaid","Beni Mester","Beni Snous","Bensekrane","Chetouane","El Aricha","Fellaoucene","Ghazaouet","Hammam Boughrara","Hennaya","Honaine","Maghnia","Mansourah","Nedroma","Ouled Mimoun","Remchi","Sebdou","Sidi Abdelli","Sidi Djillali","Souahlia","Tlemcen"],"14 - Tiaret":["Ain Bouchekif","Ain Deheb","Ain El Hadid","Chehaima","Dahmouni","Frenda","Guertoufa","Hamadia","Ksar Chellala","Mahdia","Meghila","Naima","Oued Lilli","Rahouia","Rechaiga","Sidi Hosni","Sougueur","Tagdemt","Takhemaret","Tiaret","Tidda","Tousnina"],"15 - Tizi Ouzou":["Ain El Hammam","Ain Zaouia","Azazga","Azzefoun","Beni Yenni","Boghni","Boudjima","Bouzguene","Draa Ben Khedda","Draa El Mizan","Freha","Iferhounene","Iflissen","Larba Nath Irathen","Maatkas","Makouda","Mekla","Ouacif","Ouadhia","Ouaguenoun","Souk El Thenine","Tadmait","Tigzirt","Timizart","Tizi Ouzou","Tizi Rached","Yakourene"],"16 - Algiers":["Ain Benian","Ain Taya","Alger Centre","Bab El Oued","Bab Ezzouar","Baba Hesen","Bachedjerah","Baraki","Ben Aknoun","Bir Mourad Rais","Bir Touta","Birkhadem","Bordj El Bahri","Bordj El Kiffan","Bourouba","Bouzareah","Casbah","Cheraga","Dar El Beida","Dely Ibrahim","Douira","Draria","El Achour","El Biar","El Harrach","El Madania","El Mouradia","Herraoua","Hussein Dey","Hydra","Kheraisia","Kouba","Marsa","Mohamed Belouzdad","Mohammadia","Oued Smar","Ouled Fayet","Rahmania","Reghaia","Rouiba","Sidi M'hamed","Sidi Moussa","Souidania","Zeralda"],"17 - Djelfa":["Ain El Ibel","Ain Oussera","Benhar","Birine","Charef","Djelfa","El Idrissia","El Khemis","Guernini","Had Sahary","Hassi Bahbah","Hassi El Euch","M'Liliha","Messaad","Moudjebara","Sidi Ladjel","Zaafrane"],"18 - Jijel":["Bordj T'her","Chekfa","El Ancer","El Aouana","El Milia","Erraguene","Jijel","Ouadjana","Sidi Abdelaziz","Taher","Texena","Ziamma Mansouriah"],"19 - SÃƒÆ’Ã‚Â©tif":["Ain Abessa","Ain Arnat","Ain El Kebira","Ain Oulmane","Amoucha","Babor","Beni Aziz","Beni Ouartilane","Bir El Arch","Bouandas","Bougaa","Bousselam","Boutaleb","Djemila","El Eulma","El Ouricia","Guenzet","Guidjel","Hamma","Hammam Guergour","Mezloug","Ouled Sabor","Rosfa","Salah Bey","Setif","Taya","Tella"],"20 - SaÃƒÆ’Ã‚Â¯da":["Ain El Hadjar","Ain Sekhouna","Doui Thabet","El Hassasna","Moulay Larbi","Ouled Brahim","Saida","Sidi Boubekeur","Youb"],"21 - Skikda":["Ain Cherchar","Azzaba","Collo","El Harrouch","El Marsa","Kerkera","Ramdane Djamel","Sidi Mezghiche","Skikda","Tamalous","Zitouna"],"22 - Sidi Bel AbbÃƒÆ’Ã‚Â¨s":["Ain El Berd","Belarbi","Ben Badis","Bir El Hammam","Dhaya","Lamtar","Makedra","Marhoum","Merine","Mostefa Ben Brahim","Moulay Slissen","Ras El Ma","Sfissef","Sidi Ali Benyoub","Sidi Bel Abbes","Sidi Brahim","Tabia","Telagh","Tenira","Tessala"],"23 - Annaba":["Ain Berda","Annaba","Berrahel","Chetaibi","El Bouni","El Hadjar","Seraidi","Sidi Amer"],"24 - Guelma":["Ain Ben Beida","Ain Larbi","Ain Makhlouf","Ain Reggada","Belkhir","Bouchegouf","Guelma","Hammam Maskhoutine","Heliopolis","Medjez Amar","Nechmaya","Oued Zenati","Roknia","Tamlouka"],"25 - Constantine":["Ain Abid","Ain Smara","Beni Hamiden","Constantine","Didouche Mourad","El Khroub","Hamma Bouziane","Ibn Badis","Ibn Ziad","Ouled Rahmoune","Zighoud Youcef"],"26 - MÃƒÆ’Ã‚Â©dÃƒÆ’Ã‚Â©a":["Ain Boucif","Berrouaghia","Boghar","Boughezoul","El Hamdania","El Omaria","Ksar El Boukhari","Medea","Meftaha","Mihoub","Ouled Antar","Sedraia","Sidi Naamane","Souagui","Tablat","Zoubiria"],"27 - Mostaganem":["Achaacha","Ain Nouissy","Ain Tadles","Bouguirat","El Hassiane","Hadjadj","Hassi Mameche","Mostaganem","Oued El Kheir","Ouled Boughalem","Safsaf","Sayada","Sidi Ali","Sidi Lakhdar","Stidia","Touahria"],"28 - M'Sila":["Ain El Hadjel","Ain El Melh","Beni Ilmane","Bir Foda","Bou Saada","Chellal","El Hamel","Hammam Dhalaa","M'sila","Maadid","Magra","Medjedel","Ouanougha","Ouled Addi Guebala","Ouled Mansour","Sidi Aissa","Sidi Ameur","Zarzour"],"29 - Mascara":["Ain Fekan","Alaimia","Aouf","Benian","Bou Hanifia","Chorfa","El Bordj","El Hachem","Froha","Ghriss","Hacine","Maoussa","Mascara","Mohammadia","Oggaz","Oued El Abtal","Oued Taria","Sehailia","Sidi Abdelmoumene","Sig","Teghennif","Zahana"],"30 - Ouargla":["Ain Beida","Benaceur","El Allia","El Hadjira","Hassi Ben Abdellah","Hassi Messaoud","Megarine","Nezla","Ngoussa","Ouargla","Rouissat","Sidi Khouiled","Taibet","Tamacine","Touggourt","Zaouia El Abidia"],"31 - Oran":["Ain Biya","Ain Turk","Arzew","Ben Freha","Bethioua","Bir El Djir","Boufatis","Bousfer","Boutlelis","El Karma","Es Senia","Gdyel","Hassi Ben Okba","Hassi Bounif","Mers El Kebir","Messerghin","Oran","Oued Tlelat","Sidi Ben Yebka","Sidi Chami","Tafraoui"],"32 - El Bayadh":["Boualem","Brezina","El Abiodh Sidi Cheikh","El Bayadh","El Bnoud","El Kheither","Ghassoul","Rogassa","Sidi Ameur","Sidi Slimane"],"33 - Illizi":["Bordj El Haouasse","Bordj Omar Driss","Debdeb","Djanet","Illizi","In Amenas"],"34 - Bordj Bou ArrÃƒÆ’Ã‚Â©ridj":["Ain Taghrout","Belimour","Bir Kasdali","Bordj Bou Arreridj","Bordj Ghdir","Bordj Zemoura","Djaafra","El Achir","El Hamadia","El Main","Ghilassa","Hasnaoua","Khelil","Mansoura","Medjana","Ouled Brahem","Ras El Oued","Sidi Embarek","Teniet En Nasr","Tixter"],"35 - BoumerdÃƒÆ’Ã‚Â¨s":["Afir","Ammal","Baghlia","Beni Amrane","Bordj Menaiel","Boudouaou","Boumerdes","Chabet El Ameur","Corso","Dellys","Djinet","El Kharrouba","Hammedi","Isser","Khemis El Khechna","Larbatache","Naciria","Ouled Aissa","Ouled Moussa","Si Mustapha","Sidi Daoud","Souk El Had","Thenia","Tidjelabine","Timezrit","Zemmouri"],"36 - El Tarf":["Ain El Assel","Ben M Hidi","Besbes","Bouhadjar","Bouteldja","Chefia","Drean","El Kala","El Tarf","Oued Zitoun","Zitouna"],"37 - Tindouf":["Oum El Assel","Tindouf"],"38 - Tissemsilt":["Bordj Bou Naama","Boucaid","Khemisti","Lardjem","Layoune","Lazharia","Melaab","Ouled Bessem","Sidi Abed","Sidi Lantri","Sidi Slimane","Theniet El Had","Tissemsilt"],"39 - El Oued":["Bayadha","Debila","Djamaa","El Mghair","El Ogla","El Oued","Guemar","Hassi Khelifa","Kouinine","Mrara","Nakhla","Oued El Alenda","Oum Touyour","Reguiba","Robbah","Sidi Amrane","Sidi Aoun","Still","Taghzout","Taleb Larbi","Tendla"],"40 - Khenchela":["Ain Touila","Babar","Baghai","Bouhmama","Chelia","Cherchar","Djellal","El Hamma","El Mahmal","Kais","Khenchela","Msara","Ouled Rechache","Remila","Tamza","Yabous"],"41 - Souk Ahras":["Ain Soltane","Bir Bouhouche","Haddada","Hanancha","Khedara","Khemissa","M'daourouche","Mechroha","Merahna","Oued Keberit","Ouled Driss","Sedrata","Sidi Fredj","Souk Ahras","Taoura","Tiffech"],"42 - Tipaza":["Ain Tagourait","Attatba","Bou Haroun","Bou Ismail","Bourkika","Cherchell","Damous","Douaouda","Fouka","Gouraya","Hadjout","Khemisti","Kolea","Larhat","Menaceur","Meurad","Sidi Amar","Sidi Ghiles","Sidi Rached","Tipaza"],"43 - Mila":["Ahmed Rachedi","Ain Mellouk","Amira Arras","Chelghoum Laid","El Mechira","Ferdjioua","Grarem Gouga","Mila","Minar Zarza","Oued Athmenia","Oued Endja","Rouached","Sidi Khelifa","Sidi Merouane","Tadjenanet","Telerghma","Zeghaia"],"44 - AÃƒÆ’Ã‚Â¯n Defla":["Ain Benian","Ain Defla","Ain Lechiakh","Arib","Belaas","Bordj Emir Khaled","Boumedfaa","Djelida","Djendel","El Abadia","El Amra","El Attaf","Hammam Righa","Khemis Miliana","Miliana","Oued Chorfa","Rouina","Sidi Lakhdar","Zeddine"],"45 - NaÃƒÆ’Ã‚Â¢ma":["Ain Ben Khelil","Ain Sefra","El Biod","Kasdir","Mechria","Moghrar","Naama","Sfissifa","Tiout"],"46 - AÃƒÆ’Ã‚Â¯n TÃƒÆ’Ã‚Â©mouchent":["Ain El Arbaa","Ain Kihal","Ain Temouchent","Ain Tolba","Beni Saf","Bou Zedjar","El Amria","El Malah","Hammam Bouhadjar","Hassi El Ghella","Oued Berkeche","Ouled Boudjemaa","Ouled Kihal","Sidi Ben Adda","Sidi Boumediene","Sidi Safi","Tamzoura","Terga"],"47 - GhardaÃƒÆ’Ã‚Â¯a":["Berriane","Bounoura","El Atteuf","El Guerrara","El Meniaa","Ghardaia","Hassi Fehal","Mansoura","Metlili","Sebseb","Zelfana"],"48 - Relizane":["Ain Rahma","Ammi Moussa","Bendaoud","Beni Zentis","Djidiouia","El Guettar","El Hamadna","El Matmar","Had Echkalla","Kalaa","Lahlef","Mazouna","Mediouna","Ouarizane","Oued Rhiou","Relizane","Sidi Khettab","Sidi M'hamed Benali","Sidi Saada","Yellel","Zemmoura"],"49 - Timimoun":["Aougrout","Charouine","Deldoul","Metarfa","Ouled Aissa","Talmine","Timimoun","Tinerkouk"],"51 - Ouled Djellal":["Besbes","Chaiba","Doucen","Ouled Djellal","Ras El Miad","Sidi Khaled"],"52 - BÃƒÆ’Ã‚Â©ni AbbÃƒÆ’Ã‚Â¨s":["Beni-Abbes","Beni-Ikhlef","El Ouata","Igli","Kerzaz","Ksabi","Tamtert","Timoudi"],"53 - In Salah":["Ain Salah","Foggaret Ezzoua","Inghar"],"55 - Touggourt":["Blidet Amor","El Alia","El-Hadjira","Megarine","Nezla","Sidi Slimane","Taibet","Tebesbest","Temacine","Touggourt","Zaouia El Abidia"],"56 - Djanet":["Bordj El Haouass","Djanet"],"57 - El M'Ghair":["Djamaa","El-M'ghaier","M'rara","Oum Touyour","Sidi Amrane","Sidi Khelil","Still","Tenedla"],"58 - El Menia":["El Meniaa","Hassi Fehal","Hassi Gara"]};
+const WILAYA_COMMUNES=Object.fromEntries(Object.entries(WILAYA_DATA).map(([key,value])=>[key.slice(0,2),value]));
+let product=null,variant=null,selectedOptions={},delivery='home',shipping={home_delivery:0,stop_desk:0},desks=null,selectedDesk='',checkoutTracked=false,draftCaptureBound=false;
+
+function slugFromPath(){const parts=location.pathname.split('/').filter(Boolean);return parts[1]&&parts[1]!=='product.html'?decodeURIComponent(parts[1]):new URLSearchParams(location.search).get('slug');}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function enc(v){return encodeURIComponent(String(v??''));}
+function money(v){return Number(v||0).toLocaleString('fr-DZ')+' DZD';}
+function images(){
+  const base=Array.isArray(product.images)?product.images:(product.images?[product.images]:[]);
+  const variantImages=variants().map(v=>v.image).filter(Boolean);
+  return [...new Set([...base,...variantImages])];
+}
+function variants(){
+  const raw=product.variants;let list=[];
+  if(Array.isArray(raw))list=raw;
+  else if(raw&&typeof raw==='object')list=Object.entries(raw).map(([name,val])=>typeof val==='object'?{name,...val}:{name,price:val});
+  if(!list.length)list=[{name:'Standard',label:'Standard',price:product.price}];
+  return list.map(v=>({name:v.name||v.label||v.value||'Standard',label:v.label||v.name||v.value||'Standard',price:Number(v.price||product.price),stock:v.stock,image:v.image||'',options:v.options||null}));
+}
+function optionGroups(){
+  const groups={};
+  variants().forEach(v=>{
+    if(!v.options)return;
+    Object.entries(v.options).forEach(([name,value])=>{
+      if(!groups[name])groups[name]=[];
+      if(value&&!groups[name].includes(value))groups[name].push(value);
+    });
+  });
+  return groups;
+}
+function hasOptionGroups(){return Object.keys(optionGroups()).length>0;}
+function setDefaultOptions(){
+  const first=variants()[0];
+  if(isKidsProduct()){
+    const match=(variants().find(v=>{
+      const label=String(v.label||v.name||'').trim();
+      const parts=label.split('/').map(part=>part.trim()).filter(Boolean);
+      return parts.length>=2;
+    })||first)||{};
+    const label=String(match.label||match.name||'').trim();
+    const parts=label.split('/').map(part=>part.trim()).filter(Boolean);
+    selectedOptions=parts.length>=2?{Version:parts[0],Size:parts.slice(1).join(' / ')}:(match?.options?{...match.options}:{});
+    return;
+  }
+  selectedOptions=first?.options?{...first.options}:{};
+}
+function findSelectedVariant(){
+  if(isKidsProduct()){
+    const list=kidsParsedVariants();
+    if(list.length){
+      const version=String(selectedOptions.Version||list[0].version||'').trim().toLowerCase();
+      const size=String(selectedOptions.Size||list[0].size||'').trim().toLowerCase();
+      const match=list.find(v=>String(v.version).trim().toLowerCase()===version&&String(v.size).trim().toLowerCase()===size);
+      return match || list[0] || variant || variants()[0];
+    }
+  }
+  if(!hasOptionGroups())return variant||variants()[0];
+  return variants().find(v=>v.options&&Object.entries(selectedOptions).every(([name,value])=>v.options[name]===value))||variants()[0];
+}
+function renderVariantControls(){
+  if(!hasOptionGroups()){
+    return `<div class="choices" id="variant-choices">${variants().map((v,i)=>`<button class="choice ${i===0?'active':''}" onclick="selectVariant(${i},this)"><strong>${esc(v.label)}</strong><span>${money(v.price)}</span></button>`).join('')}</div>`;
+  }
+  const groups=optionGroups();
+  return Object.entries(groups).map(([name,values])=>`
+    <div class="option-group">
+      <div class="option-title">${esc(name)}</div>
+      <div class="choices">${values.map(value=>`<button class="choice ${selectedOptions[name]===value?'active':''}" onclick="selectOption('${enc(name)}','${enc(value)}',this)"><strong>${esc(value)}</strong></button>`).join('')}</div>
+    </div>`).join('');
+}
+function isKidsProduct(){
+  return String(product?.slug || '').toLowerCase() === 'zikr-kids';
+}
+function kidsNormalizeToken(value){
+  return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9x]+/g,'');
+}
+function kidsLooksLikeSize(value){
+  const token = kidsNormalizeToken(value);
+  return /\d{2,3}x\d{2,3}/.test(token) || token.includes('cm');
+}
+function kidsLooksLikeVersion(value){
+  const token = kidsNormalizeToken(value);
+  return token.includes('garcon') || token.includes('fille');
+}
+const KIDS_TEXT = {
+  boys: "نسخة الأولاد",
+  girls: "نسخة البنات",
+  title: "أمثلة الأذكار للأطفال",
+  back: "العودة",
+  benefits: [
+    ["تعلم بصري", "تساعد اللوحات الطفل على تذكّر الأذكار بطريقة بسيطة ومتكررة يومياً"],
+    ["رسوم لطيفة", "أسلوب هادئ وودود ينسجم مع غرفة الطفل ويمنحها دفئاً جميلاً"],
+    ["طباعة ممتازة", "ألوان ناعمة وواضحة، وتشطيب مناسب لهدية جميلة ومفيدة"],
+    ["هدية ذات معنى", "هدية تجمع بين الجمال والفائدة وتناسب غرفة الأطفال والانتقال إلى بيت جديد"]
+  ],
+  order: "الطلب",
+  selectVersion: "اختيار النسخة",
+  selectSize: "اختيار الحجم",
+  versionHead: "النسخة",
+  sizeHead: "الحجم",
+  versionHint: "ولد / بنت",
+  versionSpan: "تصميم كامل للأطفال",
+  sizeHint: "اختر الحجم المناسب",
+  youOrder: "أنت تطلب هذا التصميم",
+  info: "معلوماتك",
+  name: "الاسم الكامل",
+  phone: "رقم الهاتف",
+  wilaya: "الولاية",
+  commune: "البلدية",
+  pickup: "نقطة الاستلام",
+  home: "إلى المنزل",
+  office: "إلى أقرب مكتب",
+  product: "المنتج",
+  shipping: "التوصيل",
+  total: "المجموع",
+  orderNow: "اطلب الآن",
+  orderButtonSecondary: "طلب مباشر",
+  cash: "الدفع عند الاستلام فقط",
+  productInfoLabel: "تفاصيل المنتج",
+  productInfoTitle: "ARCO ART — أمثلة الأذكار للأطفال",
+  productInfoDesc: "ثلاث لوحات قماشية بدون إطار، بتصميم ناعم ومحبّب للأطفال، تساعد على تذكّر أذكار الصباح والمساء والنوم بطريقة جميلة وعملية داخل غرفة الطفل.",
+  panelSub: "اختر نسخة الولد أو البنت من الصورة أعلاه، ثم اختر الحجم المناسب. يتغيّر التصميم تلقائياً عند تبديل النسخة.",
+  namePlaceholder: "مثال: أحمد بن علي",
+  phonePlaceholder: "05XXXXXXXX",
+  wilayaPlaceholder: "اختر الولاية",
+  communePlaceholder: "اختر البلدية",
+  deskPlaceholder: "اختر النقطة",
+  homeHint: "اختر الولاية",
+  pickupHint: "اختر الولاية أولاً",
+  trust: [
+    "الدفع عند الاستلام فقط",
+    "رسوم لطيفة",
+    "هدية مفيدة"
+  ],
+  footer: [
+    ["تعلم يومي", "مراجعة الأذكار بدون ضغط"],
+    ["ألوان هادئة", "درجات ناعمة ومريحة تناسب غرفة الطفل"],
+    ["جاهزة للإهداء", "هدية ذات قيمة ومعنى"],
+    ["خدمة الدفع عند الاستلام", "نتواصل معك لتأكيد الطلب"]
+  ]
+};
+function kidsParseVariantLabel(label){
+  const parts = String(label || '').split('/').map(part=>part.trim()).filter(Boolean);
+  let version = '';
+  let size = '';
+  parts.forEach(part => {
+    if (!version && kidsLooksLikeVersion(part)) version = part;
+    else if (!size && kidsLooksLikeSize(part)) size = part;
+  });
+  if (!version && parts[0]) version = parts[0];
+  if (!size && parts[1]) size = parts[1];
+  return { version, size };
+}
+function kidsVariantData(){
+  return variants().map((v,index)=>{
+    const label = String(v.label || v.name || '').trim();
+    const parsed = kidsParseVariantLabel(label);
+    return {
+      ...v,
+      index,
+      rawLabel: label,
+      version: parsed.version,
+      size: parsed.size,
+    };
+  });
+}
+function kidsParsedVariants(){
+  return kidsVariantData().filter(v=>v.version && v.size);
+}
+function kidsVersionDisplay(value){
+  const token = kidsNormalizeToken(value);
+  if (token.includes('garcon')) return KIDS_TEXT.boys;
+  if (token.includes('fille')) return KIDS_TEXT.girls;
+  return String(value || '').trim();
+}
+function kidsSizeDisplay(value){
+  const text = String(value || '').trim();
+  return text.replace(/\s*[x×]\s*/g, " × ").replace(/\s*cm\b/gi, " cm");
+}
+function kidsVersionValues(){
+  const map = new Map();
+  kidsParsedVariants().forEach(v=>{
+    if (!map.has(v.version)) map.set(v.version, { value: v.version, label: kidsVersionDisplay(v.version) });
+  });
+  return [...map.values()];
+}
+function kidsSizeValues(){
+  const map = new Map();
+  kidsParsedVariants().forEach(v=>{
+    if (!map.has(v.size)) map.set(v.size, { value: v.size, label: kidsSizeDisplay(v.size) });
+  });
+  return [...map.values()];
+}
+function kidsOldPriceForSize(size){
+  return kidsNormalizeToken(size).includes('40x60') ? 4900 : 3600;
+}
+function kidsFindVariant(version,size){
+  const list = kidsParsedVariants();
+  const normalizedVersion = kidsNormalizeToken(version);
+  const normalizedSize = kidsNormalizeToken(size);
+  return list.find(v=>kidsNormalizeToken(v.version)===normalizedVersion && kidsNormalizeToken(v.size)===normalizedSize) || list[0] || variants()[0];
+}
+function kidsSelectedState(){
+  const list = kidsParsedVariants();
+  const first = list[0] || variants()[0] || {};
+  let version = selectedOptions.Version || first.version || first.options?.Version || '';
+  let size = selectedOptions.Size || first.size || first.options?.Size || '';
+  if (kidsLooksLikeSize(version) && kidsLooksLikeVersion(size)) {
+    const swap = version;
+    version = size;
+    size = swap;
+  }
+  return { version, size, match: kidsFindVariant(version, size) || variants()[0] };
+}
+function kidsVersionImage(version){
+  const normalizedVersion = kidsNormalizeToken(version);
+  const list = kidsParsedVariants().filter(v=>kidsNormalizeToken(v.version)===normalizedVersion && v.image);
+  return list[0]?.image || variants().find(v=>v.image)?.image || '';
+}
+function updateKidsMeta(){
+  if (!isKidsProduct()) return;
+  const { version, size, match } = kidsSelectedState();
+  const title = [kidsVersionDisplay(version), kidsSizeDisplay(size)].filter(Boolean).join(" — ");
+  const titleEl = document.getElementById('kids-order-title');
+  const captionEl = document.getElementById('kids-mockup-tag');
+  const oldPriceEl = document.getElementById('kids-old-price');
+  const productPriceEl = document.getElementById('base-price');
+  const mainImg = document.getElementById('main-img');
+  if (titleEl) titleEl.textContent = title || KIDS_TEXT.title;
+  if (captionEl) captionEl.textContent = title || KIDS_TEXT.title;
+  if (oldPriceEl) oldPriceEl.textContent = money(kidsOldPriceForSize(size));
+  if (productPriceEl && match) productPriceEl.textContent = money(match.price);
+  const versionImg = kidsVersionImage(version);
+  if (mainImg && versionImg) mainImg.src = versionImg;
+}
+function renderKidsSelectors(){
+  const versions = kidsVersionValues();
+  const { version } = kidsSelectedState();
+  return `
+    <div class="kids-select-card">
+      <div class="kids-select-title">${KIDS_TEXT.selectVersion}</div>
+      <div class="kids-select-block">
+        <div class="kids-select-head"><span>${KIDS_TEXT.versionHead}</span><small>${KIDS_TEXT.versionHint}</small></div>
+        <div class="choices">
+          ${versions.map(item=>`<button class="choice ${version===item.value?'active':''}" onclick="selectOption('Version','${enc(item.value)}',this)"><strong>${esc(item.label)}</strong><span>${KIDS_TEXT.versionSpan}</span></button>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+function renderKidsSizeSelector(){
+  const versions = kidsVersionValues();
+  const sizes = kidsSizeValues();
+  const { version, size } = kidsSelectedState();
+  return `
+    <div class="kids-select-card">
+      <div class="kids-select-title">${KIDS_TEXT.selectSize}</div>
+      <div class="kids-select-block">
+        <div class="kids-select-head"><span>${KIDS_TEXT.sizeHead}</span><small>${KIDS_TEXT.sizeHint}</small></div>
+        <div class="choices">
+          ${sizes.map(item=>{
+            const matched = kidsFindVariant(version || versions[0]?.value, item.value);
+            return `<button class="choice ${size===item.value?'active':''}" onclick="selectOption('Size','${enc(item.value)}',this)"><strong>${esc(item.label)}</strong><span>${money(matched?.price || (kidsNormalizeToken(item.value).includes('40x60') ? 3900 : 2900))}</span></button>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+function renderKidsPage(){
+  document.body.classList.add('kids-theme');
+  document.title = 'ARCO - ' + KIDS_TEXT.title;
+  const imgs = images();
+  const { version, size } = kidsSelectedState();
+  const titleLine = [kidsVersionDisplay(version), kidsSizeDisplay(size)].filter(Boolean).join(' â€” ') || KIDS_TEXT.title;
+  const heroImg = kidsVersionImage(version) || imgs[0] || '';
+  document.getElementById('app').innerHTML = `
+    <section class="kids-benefits">
+      ${KIDS_TEXT.benefits.map(([t,s])=>`<div class="kid-benefit"><div class="icon">&#11088;</div><strong>${t}</strong><span>${s}</span></div>`).join('')}
+    </section>
+    <section class="kids-hero">
+      <div class="kids-hero-card">
+        <div class="kids-mockup">
+          ${heroImg ? `<img id="main-img" src="${esc(heroImg)}" alt="${KIDS_TEXT.title}">` : ''}
+          <div class="kids-mockup-tag" id="kids-mockup-tag">${esc(titleLine)}</div>
+        </div>
+        <div class="kids-version-stack">
+          ${renderKidsSelectors()}
+        </div>
+      </div>
+    </section>
+    <section class="kids-panel" id="order">
+      <div class="kids-section-label">${KIDS_TEXT.order}</div>
+      <div class="kids-panel-title">${KIDS_TEXT.selectSize}</div>
+      <div class="kids-panel-sub">${KIDS_TEXT.panelSub}</div>
+      <div class="kids-order-price">
+        <div class="kids-price-row">
+          <span class="kids-old" id="kids-old-price">${money(kidsOldPriceForSize(size))}</span>
+          <span class="kids-price" id="base-price">${money(variant.price)}</span>
+          <span class="kids-chip">${KIDS_TEXT.cash}</span>
+        </div>
+      </div>
+      <div class="kids-reminder">
+        <div class="kleft">${KIDS_TEXT.youOrder}</div>
+        <div class="kright" id="kids-order-title">${esc(titleLine)}</div>
+      </div>
+      ${renderKidsSizeSelector()}
+      <div class="variant-label"><span>${KIDS_TEXT.info}</span></div>
+      <div class="form kids-form-grid">
+        <label class="field"><span>${KIDS_TEXT.name}</span><input id="f-name" autocomplete="name" placeholder="${KIDS_TEXT.namePlaceholder}"></label>
+        <label class="field"><span>${KIDS_TEXT.phone}</span><input id="f-phone" inputmode="tel" placeholder="${KIDS_TEXT.phonePlaceholder}"></label>
+        <label class="field"><span>${KIDS_TEXT.wilaya}</span><select id="f-wilaya" onchange="onWilayaChange()"><option value="">${KIDS_TEXT.wilayaPlaceholder}</option>${WILAYAS.map(w=>`<option value="${w[0]}|${esc(w[1])}">${w[0]} - ${esc(w[1])}</option>`).join('')}</select></label>
+        <div class="choices"><button class="choice active" onclick="selectDelivery(event,'home')"><strong>${KIDS_TEXT.home}</strong><span id="home-price">${KIDS_TEXT.homeHint}</span></button><button class="choice" onclick="selectDelivery(event,'pickup')"><strong>${KIDS_TEXT.office}</strong><span id="desk-price">${KIDS_TEXT.pickupHint}</span></button></div>
+        <label class="field" id="commune-wrap"><span>${KIDS_TEXT.commune}</span><select id="f-commune"><option value="">${KIDS_TEXT.communePlaceholder}</option></select></label>
+        <label class="field" id="desk-wrap" style="display:none"><span>${KIDS_TEXT.pickup}</span><select id="f-desk" onchange="selectedDesk=this.value"><option value="">${KIDS_TEXT.deskPlaceholder}</option></select></label>
+      </div>
+      <div class="summary kids-summary"><div class="sum-row"><span>${KIDS_TEXT.product}</span><strong id="sum-product">${money(variant.price)}</strong></div><div class="sum-row"><span>${KIDS_TEXT.shipping}</span><strong id="sum-ship">0 DZD</strong></div><div class="sum-row total"><span>${KIDS_TEXT.total}</span><strong id="sum-total">${money(variant.price)}</strong></div></div>
+      <button class="order-btn" id="order-btn" onclick="submitOrder()"><span class="order-btn-ar">${KIDS_TEXT.orderNow}</span><span class="order-btn-fr">${KIDS_TEXT.orderButtonSecondary}</span></button>
+      <div class="trust-row" style="margin-top:16px">
+        <div class="trust-item"><span>&#10003;</span><span>${KIDS_TEXT.trust[0]}</span></div>
+        <div class="trust-item"><span>&#127912;</span><span>${KIDS_TEXT.trust[1]}</span></div>
+        <div class="trust-item"><span>&#127873;</span><span>${KIDS_TEXT.trust[2]}</span></div>
+      </div>
+    </section>
+    <section class="kids-product-info">
+      <div class="kids-product-box">
+        <div class="kids-section-label">${KIDS_TEXT.productInfoLabel}</div>
+        <div class="kids-product-name">${KIDS_TEXT.productInfoTitle}</div>
+        <div class="kids-product-desc">${KIDS_TEXT.productInfoDesc}</div>
+      </div>
+    </section>
+    <section class="kids-footer">
+      <div class="kids-footer-grid">
+        ${KIDS_TEXT.footer.map(([title,desc], i)=>`<div class="kids-footer-item"><div class="fi-emoji">${['&#128065;&#65039;','&#127793;','&#128230;','&#128172;'][i]}</div><strong>${title}</strong><span>${desc}</span></div>`).join('')}
+      </div>
+    </section>`;
+  const stickyBtn = document.querySelector('#sticky button');
+  if (stickyBtn) stickyBtn.textContent = 'اطلب الآن';
+  updateTotals();
+  updateKidsMeta();
+  bindDraftCapture();
+}
+function isPoster(){return String(product?.type||'').toLowerCase()==='poster';}
+function addCurrentToCart(){
+  if(!product||!window.ARCOCart)return;
+  const v=findSelectedVariant()||variant||variants()[0];
+  const img=(v&&v.image)||images()[0]||'';
+  if(product.collection){try{localStorage.setItem('arco_last_collection',product.collection);}catch(e){}}
+  window.ARCOCart.add({
+    product_slug:product.slug,
+    product:product.name,
+    variant:(v&&(v.label||v.name))||'Standard',
+    selected_options:selectedOptions||null,
+    price:Number((v&&v.price)||product.price||0),
+    image:img
+  });
+}
+async function loadProduct(){
+  const slug=slugFromPath();if(!slug){missing();return;}
+  try{
+    const res=await fetch(`${SB_URL}/products?select=*&slug=eq.${encodeURIComponent(slug)}&active=eq.true&limit=1`,{headers:H});
+    if(!res.ok)throw new Error(await res.text());
+    const data=await res.json();if(!data[0]){missing();return;}
+    product=data[0];variant=variants()[0];setDefaultOptions();variant=findSelectedVariant();render();
+    if(window.ARCOMeta){
+      window.ARCOMeta.trackViewContent({content_name:product.name,content_ids:[product.slug],content_category:variant.label,value:Number(variant.price||product.price||0),currency:'DZD'});
+    }
+    if(window.ARCOTikTok){
+      window.ARCOTikTok.trackViewContent({content_name:product.name,content_ids:[product.slug],content_category:variant.label,value:Number(variant.price||product.price||0),currency:'DZD'});
+    }
+  }catch(e){document.getElementById('app').innerHTML='<div class="missing">تعذر تحميل المنتج.</div>';}
+}
+function missing(){document.getElementById('app').innerHTML='<div class="missing">هذا المنتج غير متوفر حالياً.</div>';}
+function render(){
+  if (isKidsProduct()) {
+    renderKidsPage();
+    return;
+  }
+  const imgs=images();document.title=product.name+' - ARCO';
+  document.getElementById('app').innerHTML=`
+    <header class="topbar"><a class="brand" href="/"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/ACRO%20logo%20shopiy-03.png" alt="ARCO"></a><a class="back" href="/">Products</a></header>
+    <section class="product-layout">
+      <div class="gallery">
+        <div class="main-img">${imgs[0]?`<img id="main-img" src="${esc(imgs[0])}" alt="${esc(product.name)}">`:''}</div>
+        ${imgs.length>1?`<div class="thumbs">${imgs.map((img,i)=>`<button class="thumb ${i===0?'active':''}" onclick="setImage(this,'${esc(img)}')"><img src="${esc(img)}" alt=""></button>`).join('')}</div>`:''}
+      </div>
+      <div class="panel">
+        <div class="kicker">ARCO - COD Algeria</div>
+        <h1>${esc(product.name)}</h1>
+        <div class="desc">${esc(product.description_ar||product.description_fr||'لوحات قماشية مميزة للأطفال مع الدفع عند الاستلام فقط.')}</div>
+        <div class="price-row">${product.original_price?`<span class="old">${money(product.original_price)}</span>`:''}<span class="price" id="base-price">${money(variant.price)}</span></div>
+        <div class="block">
+          <div class="label">النسخة <span class="hint">اختر النسخة</span></div>
+          ${renderVariantControls()}
+        </div>
+        <div class="block" id="order">
+          <div class="label">معلوماتك <span class="hint">الدفع عند الاستلام فقط</span></div>
+          <div class="form">
+            <label class="field"><span>الاسم الكامل</span><input id="f-name" autocomplete="name"></label>
+            <label class="field"><span>رقم الهاتف</span><input id="f-phone" inputmode="tel" placeholder="05XXXXXXXX"></label>
+            <label class="field"><span>الولاية</span><select id="f-wilaya" onchange="onWilayaChange()"><option value="">اختر الولاية</option>${WILAYAS.map(w=>`<option value="${w[0]}|${esc(w[1])}">${w[0]} - ${esc(w[1])}</option>`).join('')}</select></label>
+            <div class="choices"><button class="choice active" onclick="selectDelivery(event,'home')"><strong>إلى المنزل</strong><span id="home-price">اختر الولاية</span></button><button class="choice" onclick="selectDelivery(event,'pickup')"><strong>إلى أقرب مكتب</strong><span id="desk-price">اختر الولاية</span></button></div>
+            <label class="field" id="commune-wrap"><span>البلدية</span><select id="f-commune"><option value="">اختر البلدية</option></select></label>
+            <label class="field" id="desk-wrap" style="display:none"><span>نقطة الاستلام</span><select id="f-desk" onchange="selectedDesk=this.value"><option value="">اختر النقطة</option></select></label>
+          </div>
+          <div class="summary"><div class="sum-row"><span>المنتج</span><strong id="sum-product">${money(variant.price)}</strong></div><div class="sum-row"><span>التوصيل</span><strong id="sum-ship">0 DZD</strong></div><div class="sum-row total"><span>المجموع</span><strong id="sum-total">${money(variant.price)}</strong></div></div>
+          ${isPoster()?`<button class="order-btn" id="addcart-btn" onclick="addCurrentToCart()" style="background:#fff;color:#080808;margin-bottom:0">🛒 أضف إلى السلة — اشترِ 2 و الثالثة مجاناً</button>`:''}
+          <button class="order-btn" id="order-btn" onclick="submitOrder()">اطلب الآن</button>
+        </div>
+      </div>
+    </section>`;
+  updateTotals();
+  bindDraftCapture();
+}
+function bindDraftCapture(){if(draftCaptureBound||!window.ARCODraft||!product)return;draftCaptureBound=window.ARCODraft.bindDraftCapture({phoneInputId:'f-phone',watchInputIds:['f-name','f-phone','f-wilaya','f-commune','f-desk'],buildPayload:()=>({product_slug:product.slug,name:document.getElementById('f-name')?.value||'',phone:document.getElementById('f-phone')?.value||'',wilaya:document.getElementById('f-wilaya')?.value.split('|')[1]||'',wilaya_id:Number((document.getElementById('f-wilaya')?.value||'').split('|')[0]||0)||0,commune:document.getElementById('f-commune')?.value||'',delivery_type:delivery,station_code:delivery==='pickup'?selectedDesk:null,variant_label:variant?.label||variant?.name||'Standard',selected_options:selectedOptions,product_name:product.name,shipping_cost:shippingCost(),notes:'draft lead'})});}
+function setImage(btn,src){document.querySelectorAll('.thumb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('main-img').src=src;}
+function selectVariant(i,btn){variant=variants()[i];document.querySelectorAll('#variant-choices .choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();updateKidsMeta();window.ARCODraft?.triggerCapture?.();}
+function selectOption(name,value,btn){
+  name=decodeURIComponent(name);
+  value=decodeURIComponent(value);
+  selectedOptions[name]=value;
+  variant=findSelectedVariant();
+  btn.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(isKidsProduct()){
+    const mainImg=document.getElementById('main-img');
+    if(name==='Version'&&mainImg){
+      const versionImg=kidsVersionImage(value);
+      if(versionImg) mainImg.src=versionImg;
+    }
+  }else if(variant.image&&document.getElementById('main-img')){
+    document.getElementById('main-img').src=variant.image;
+  }
+  updateTotals();
+  updateKidsMeta();
+  window.ARCODraft?.triggerCapture?.();
+}
+function selectDelivery(ev,type){ev.preventDefault();delivery=type;selectedDesk='';ev.currentTarget.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));ev.currentTarget.classList.add('active');document.getElementById('commune-wrap').style.display=type==='home'?'grid':'none';document.getElementById('desk-wrap').style.display=type==='pickup'?'grid':'none';if(type==='pickup')loadDesks();updateTotals();window.ARCODraft?.triggerCapture?.();}
+async function onWilayaChange(){
+  const val=document.getElementById('f-wilaya').value;if(!val)return;selectedDesk='';
+  const id=val.split('|')[0];
+  populateCommunes(id);
+  const res=await fetch(`${SB_URL}/shipping_rates?wilaya_id=eq.${Number(id)}&select=home_delivery,stop_desk&limit=1`,{headers:H});
+  const data=await res.json();shipping=data[0]||{home_delivery:0,stop_desk:0};
+  document.getElementById('home-price').textContent=money(shipping.home_delivery);
+  document.getElementById('desk-price').textContent=money(shipping.stop_desk);
+  if(delivery==='pickup')loadDesks();updateTotals();window.ARCODraft?.triggerCapture?.();
+}
+function populateCommunes(wilayaId){
+  const sel=document.getElementById('f-commune');if(!sel)return;
+  const communes=WILAYA_COMMUNES[String(wilayaId).padStart(2,'0')]||[];
+  sel.innerHTML='<option value="">اختر البلدية</option>'+communes.map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join('');
+}
+async function loadDesks(){
+  const sel=document.getElementById('f-desk');if(!sel)return;
+  if(!desks){try{const r=await fetch('/api/noest-desks');if(r.ok)desks=await r.json();}catch(e){}}
+  const id=(document.getElementById('f-wilaya').value||'').split('|')[0];
+  const entries=Object.entries(desks||{}).filter(([code])=>id&&new RegExp('^'+id+'[A-Z]').test(code));
+  sel.innerHTML='<option value="">اختر النقطة</option>'+entries.map(([code,d])=>`<option value="${code}">${esc(d.name||code)}</option>`).join('');
+}
+function shippingCost(){return delivery==='home'?Number(shipping.home_delivery||0):Number(shipping.stop_desk||0);}
+function total(){return Number(variant.price||0)+shippingCost();}
+function updateTotals(){['sum-product','base-price'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=money(variant.price)});const s=document.getElementById('sum-ship'),t=document.getElementById('sum-total'),st=document.getElementById('sticky-total'),sticky=document.getElementById('sticky');if(s)s.textContent=money(shippingCost());if(t)t.textContent=money(total());if(st)st.textContent=money(total());if(sticky)sticky.classList.toggle('visible',!!product);if(isKidsProduct())updateKidsMeta();}
+function scrollToOrder(){document.getElementById('order').scrollIntoView({behavior:'smooth'});}
+function trackProductCheckout(){
+  if(checkoutTracked||!window.ARCOMeta||!product)return;
+  checkoutTracked=true;
+  window.ARCOMeta.trackInitiateCheckout({content_name:product.name,content_ids:[product.slug],content_category:variant.label,value:total(),currency:'DZD'});
+  if(window.ARCOTikTok){
+    window.ARCOTikTok.trackInitiateCheckout({content_name:product.name,content_ids:[product.slug],content_category:variant.label,value:total(),currency:'DZD'});
+  }
+}
+async function submitOrder(){
+  const name=document.getElementById('f-name').value.trim(),phone=document.getElementById('f-phone').value.replace(/\s/g,''),wilayaVal=document.getElementById('f-wilaya').value,commune=document.getElementById('f-commune').value.trim();
+  const btn=document.getElementById('order-btn');
+  const btnAr=btn?.querySelector('.order-btn-ar');
+  const btnFr=btn?.querySelector('.order-btn-fr');
+  const restoreButton=()=>{ if(btnAr){btnAr.textContent='اطلب الآن';} else if(btn){btn.textContent='اطلب الآن';} if(btnFr){btnFr.textContent='Commander Maintenant';} };
+  if(!name)return toast('أدخل الاسم',true);
+  if(!/^0[567]\d{8}$/.test(phone))return toast('رقم الهاتف غير صحيح',true);
+  if(!wilayaVal)return toast('اختر الولاية',true);
+  if(!shippingCost())return toast('اختر ولاية متوفرة',true);
+  if(delivery==='home'&&!commune)return toast('اختر البلدية',true);
+  if(delivery==='pickup'&&!selectedDesk)return toast('اختر نقطة الاستلام',true);
+  trackProductCheckout();
+  const [wilayaId,wilaya]=wilayaVal.split('|');
+  btn.classList.add('loading');
+  if(btnAr){btnAr.textContent='جاري الإرسال...';} else if(btn){btn.textContent='جاري الإرسال...';}
+  const payload={product_slug:product.slug,name,phone,wilaya,wilaya_id:Number(wilayaId),commune:delivery==='home'?commune:'',delivery_type:delivery==='home'?'home':'pickup',station_code:delivery==='pickup'?selectedDesk:null,variant_label:variant.label,selected_options:selectedOptions,event_source_url:location.href,draft_order_id:(window.ARCODraft?.getStoredDraftId({product_slug:product.slug,phone,variant_label:variant?.label||variant?.name||'Standard',delivery_type:delivery})||undefined)};
+  try{
+    const r=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const result=await r.json().catch(()=>({}));
+    if(!r.ok||!result.ok)throw new Error(result.error||'failed');
+    if(window.ARCOMeta){
+      window.ARCOMeta.trackPurchase({content_name:product.name,content_ids:[product.slug],content_category:variant.label,value:total(),currency:'DZD',eventID:result.order_id});
+    }
+    if(window.ARCOTikTok){
+      window.ARCOTikTok.trackPurchase({content_name:product.name,content_ids:[product.slug],content_category:variant.label,value:total(),currency:'DZD',eventID:result.order_id});
+    }
+    if(window.ARCODraft){window.ARCODraft.clearStoredDraftId({product_slug:product.slug,phone,variant_label:variant?.label||variant?.name||'Standard',delivery_type:delivery});}
+    document.getElementById('success-id').textContent='#'+result.order_id;document.getElementById('success').classList.add('show');
+    const phoneBtn = document.getElementById('success-phone-btn');
+    const copyToast = document.getElementById('success-copy-toast');
+    if (phoneBtn && copyToast) {
+      phoneBtn.onclick = async () => {
+        const phone = '0550374607';
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(phone);
+          } else {
+            throw new Error('clipboard unavailable');
+          }
+        } catch (err) {
+          const ta = document.createElement('textarea');
+          ta.value = phone;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          ta.setAttribute('readonly', '');
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        copyToast.classList.add('show');
+        clearTimeout(window.__kidsSuccessCopyToastTimer);
+        window.__kidsSuccessCopyToastTimer = setTimeout(() => copyToast.classList.remove('show'), 1800);
+      };
+    }
+  }catch(e){btn.classList.remove('loading');restoreButton();const m=(e&&e.message&&e.message!=='failed'&&e.message!=='Failed')?e.message:'حدث خطأ. حاول مرة أخرى';toast(m,true);}
+}
+let tt;function toast(msg,err=false){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(err?' err':'');clearTimeout(tt);tt=setTimeout(()=>el.className='toast',2600);}
+loadProduct();
+</script>
+</body>
+</html>
