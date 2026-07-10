@@ -1398,14 +1398,17 @@ function updateDashboard(){
     const shipped=orders.filter(o=>o.status==='shipped'||o.status==='shipping').length;
     const canceled=orders.filter(o=>o.status==='canceled').length;
     const returned=orders.filter(o=>o.status==='returned').length;
-    // ── Rate formulas (per spec) ──  "shipped" includes out-for-delivery (shipping).
-    const nonDraft=orders.filter(o=>o.status!=='draft'&&!o.from_draft).length;   // total minus draft leads
-    const confirmedNum=confirmed+shipped+delivered+returned;       // = confirmed orders
-    const delConfDenom=confirmed+shipped+delivered+returned;      // delivery-rate (confirmed) denominator
-    const confRateAll=total?(confirmedNum/total*100).toFixed(1):'0.0';          // confirmed / all leads
-    const confRateNonDraft=nonDraft?(confirmedNum/nonDraft*100).toFixed(1):'0.0'; // confirmed / non-draft
-    const delRateConfirmed=delConfDenom?(delivered/delConfDenom*100).toFixed(1):'0.0'; // delivered / (confirmed+shipped+returned)
-    const delRateAll=nonDraft?(delivered/nonDraft*100).toFixed(1):'0.0';        // delivered / non-draft leads
+    // ── Rate formulas ──
+    // nonDraft = all real orders (excludes draft leads, includes from_draft since those are real orders)
+    const nonDraft=orders.filter(o=>o.status!=='draft').length;
+    // confirmedFunnel = orders that passed confirmation (confirmed + shipped + delivered + returned + not_delivered)
+    const confirmedFunnel=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
+    // delivery rate denominator = all orders that were shipped (shipped + delivered + returned + not_delivered)
+    const shippedFunnel=shipped+delivered+returned+orders.filter(o=>o.status==='not_delivered').length;
+    const confRateAll=total?(confirmedFunnel/total*100).toFixed(1):'0.0';
+    const confRateNonDraft=nonDraft?(confirmedFunnel/nonDraft*100).toFixed(1):'0.0';
+    const delRateConfirmed=shippedFunnel?(delivered/shippedFunnel*100).toFixed(1):'0.0';
+    const delRateAll=nonDraft?(delivered/nonDraft*100).toFixed(1):'0.0';
     const delRate=delRateAll;
     document.getElementById('kpi-total').textContent=total;
     document.getElementById('kpi-delivered').textContent=delivered;
