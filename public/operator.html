@@ -1084,39 +1084,51 @@ function updateTabCounts(){
 }
 
 // ── DAILY TARGET ──
-// Auto: 55% of all currently pending orders. No manual setting needed.
+function getDailyTarget(){return parseInt(localStorage.getItem('daily_target')||'0',10);}
+function setDailyTarget(n){localStorage.setItem('daily_target',String(n));}
+
+function promptSetTarget(){
+  const cur=getDailyTarget();
+  const val=prompt('Set daily confirmed orders target:',cur||'');
+  if(val===null)return;
+  const n=parseInt(val,10);
+  if(!isNaN(n)&&n>=0){setDailyTarget(n);updateDailyTarget();}
+}
+
 function updateDailyTarget(){
+  const target=getDailyTarget();
   const banner=document.getElementById('daily-target-banner');
   if(!banner)return;
-  const pending=allOrders.filter(o=>o.status==='pending').length;
-  if(!pending){banner.style.display='none';return;}
+  if(!target){banner.style.display='none';return;}
   banner.style.display='block';
-  const target=Math.max(1,Math.round(pending*0.55));
 
+  // Count today's confirmed orders (Algeria time UTC+1)
   const now=new Date();
   const alg=new Date(now.getTime()+60*60*1000);
   const todayStart=new Date(Date.UTC(alg.getUTCFullYear(),alg.getUTCMonth(),alg.getUTCDate())-60*60*1000);
-  const PAST_PENDING=new Set(['confirmed','shipped','shipping','delivered','not_delivered',
-    'returned','attempt_1','attempt_2','attempt_3','suspended','rescheduled','canceled','duplicated']);
-  const doneToday=allOrders.filter(o=>{
-    if(!PAST_PENDING.has(o.status))return false;
-    if(!o.updated_at)return false;
-    const d=new Date(o.updated_at.endsWith('Z')?o.updated_at:o.updated_at+'Z');
-    return d>=todayStart;
+  const todayEnd=new Date(todayStart.getTime()+86400000);
+
+  const CONFIRMED_STATUSES=new Set(['confirmed','shipped','shipping','delivered','not_delivered','returned','attempt_1','attempt_2','attempt_3','suspended','rescheduled']);
+  const todayConfirmed=allOrders.filter(o=>{
+    if(!CONFIRMED_STATUSES.has(o.status))return false;
+    if(!o.created_at)return false;
+    const d=new Date(o.created_at.endsWith('Z')?o.created_at:o.created_at+'Z');
+    return d>=todayStart&&d<todayEnd;
   }).length;
-  const pct=Math.min(100,Math.round(doneToday/target*100));
+
+  const pct=Math.min(100,Math.round(todayConfirmed/target*100));
   const bar=document.getElementById('target-bar');
   const cnt=document.getElementById('target-count');
   const msg=document.getElementById('target-msg');
-  if(bar){bar.style.width=pct+'%';bar.style.background=pct>=100?'#22c55e':pct>=60?'linear-gradient(135deg,#ff2d8e,#a855f7)':'#e11d48';}
-  if(cnt){cnt.textContent=`${doneToday}/${target}`;cnt.style.color=pct>=100?'#22c55e':'#ff2d8e';}
-  const remaining=target-doneToday;
-  if(msg){
-    if(pct>=100)msg.textContent=`🎯 Target reached! (${pending} still pending)`;
-    else if(pct>=75)msg.textContent=`Almost there — ${remaining} more to confirm`;
-    else if(pct>=50)msg.textContent=`Halfway — ${remaining} more to go`;
-    else msg.textContent=`${pending} pending · confirm ${remaining} more to hit 55% target`;
-  }
+
+  if(bar)bar.style.width=pct+'%';
+  if(bar)bar.style.background=pct>=100?'#22c55e':pct>=60?'linear-gradient(135deg,#ff2d8e,#a855f7)':'#e11d48';
+  if(cnt)cnt.textContent=`${todayConfirmed}/${target}`;
+
+  if(pct>=100)msg.textContent='🎯 Target reached!';
+  else if(pct>=75)msg.textContent=`Almost there — ${target-todayConfirmed} more to go`;
+  else if(pct>=50)msg.textContent=`Halfway — keep pushing`;
+  else msg.textContent=`${target-todayConfirmed} confirmed orders to reach today's target`;
 }
 
 // ── KPIs ──
