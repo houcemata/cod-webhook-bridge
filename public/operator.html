@@ -622,6 +622,7 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
     <div class="logo">ARCO <span>CRM</span></div>
     <div class="header-actions">
     <button class="refresh-btn" onclick="refreshAll()">R</button>
+      <button class="logout-btn" onclick="promptSetTarget()" style="background:rgba(255,45,142,0.15);border:1px solid rgba(255,45,142,0.35);color:#ff2d8e">🎯 Target</button>
       <button class="logout-btn" onclick="doLogout()">Logout</button>
     </div>
   </div>
@@ -637,7 +638,6 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#888">DAILY TARGET</div>
           <div style="display:flex;align-items:center;gap:8px">
             <span id="target-count" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#ff2d8e">0/0</span>
-            
           </div>
         </div>
         <div style="background:rgba(255,255,255,0.05);border-radius:99px;height:6px;overflow:hidden">
