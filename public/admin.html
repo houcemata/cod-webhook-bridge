@@ -383,6 +383,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     <div class="nav-item" onclick="showPage('finance')" id="nav-finance"><span class="nav-icon">💰</span>Finance</div>
     <div class="nav-item" onclick="showPage('stock')" id="nav-stock"><span class="nav-icon">📦</span>Stock</div>
     <div class="nav-item" onclick="showPage('performance')" id="nav-performance"><span class="nav-icon">🏆</span>Performance</div>
+    <div class="nav-item" onclick="showPage('products-perf')" id="nav-products-perf"><span class="nav-icon">📈</span>Products</div>
     <div class="sidebar-bottom">
       <div class="user-card">
         <div class="user-avatar" id="sidebar-avatar">H</div>
@@ -737,6 +738,23 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     </div>
 
     <!-- OPERATOR PERFORMANCE -->
+    <!-- PRODUCT PERFORMANCE -->
+    <div class="page" id="page-products-perf">
+      <div class="page-header">
+        <div><div class="page-title">PRODUCTS</div><div class="page-subtitle">Revenue, delivery & return rate per product</div></div>
+        <select class="filter-select" id="pp-period" onchange="renderProductPerf()">
+          <option value="all">All Time</option>
+          <option value="month" selected>This Month</option>
+          <option value="7days">Last 7 Days</option>
+          <option value="30days">Last 30 Days</option>
+        </select>
+      </div>
+      <!-- Cash Flow Banner -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px" id="cashflow-kpis"></div>
+      <!-- Product Table -->
+      <div class="ad-table" id="product-perf-table"></div>
+    </div>
+
     <div class="page" id="page-performance">
       <div class="page-header">
         <div><div class="page-title">PERFORMANCE</div><div class="page-subtitle">Operator stats &amp; confirmation rates</div></div>
@@ -1148,7 +1166,7 @@ let currentAdminPage='dashboard';
 const ADMIN_PAGE_KEY='arco_admin_page';
 
 function getSavedAdminPage(){
-  const allowed=['dashboard','orders','products','operators','finance','stock','performance'];
+  const allowed=['dashboard','orders','products','operators','finance','stock','performance','products-perf'];
   const saved=localStorage.getItem(ADMIN_PAGE_KEY);
   return allowed.includes(saved)?saved:'dashboard';
 }
@@ -1159,6 +1177,7 @@ function renderCurrentAdminPage(){
   if(currentAdminPage==='products')renderProducts();
   if(currentAdminPage==='operators')renderOperators();
   if(currentAdminPage==='finance')updateFinance();
+  if(currentAdminPage==='products-perf')renderProductPerf();
   if(currentAdminPage==='stock'){
     if(allStockItems.length)renderStockPage();
     else loadFinanceData().then(()=>{ if(currentAdminPage==='stock') renderStockPage(); });
@@ -1398,17 +1417,14 @@ function updateDashboard(){
     const shipped=orders.filter(o=>o.status==='shipped'||o.status==='shipping').length;
     const canceled=orders.filter(o=>o.status==='canceled').length;
     const returned=orders.filter(o=>o.status==='returned').length;
-    // ── Rate formulas ──
-    // nonDraft = all real orders (excludes draft leads, includes from_draft since those are real orders)
-    const nonDraft=orders.filter(o=>o.status!=='draft').length;
-    // confirmedFunnel = orders that passed confirmation (confirmed + shipped + delivered + returned + not_delivered)
-    const confirmedFunnel=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
-    // delivery rate denominator = all orders that were shipped (shipped + delivered + returned + not_delivered)
-    const shippedFunnel=shipped+delivered+returned+orders.filter(o=>o.status==='not_delivered').length;
-    const confRateAll=total?(confirmedFunnel/total*100).toFixed(1):'0.0';
-    const confRateNonDraft=nonDraft?(confirmedFunnel/nonDraft*100).toFixed(1):'0.0';
-    const delRateConfirmed=shippedFunnel?(delivered/shippedFunnel*100).toFixed(1):'0.0';
-    const delRateAll=nonDraft?(delivered/nonDraft*100).toFixed(1):'0.0';
+    // ── Rate formulas (per spec) ──  "shipped" includes out-for-delivery (shipping).
+    const nonDraft=orders.filter(o=>o.status!=='draft'&&!o.from_draft).length;   // total minus draft leads
+    const confirmedNum=confirmed+shipped+delivered+returned;       // = confirmed orders
+    const delConfDenom=confirmed+shipped+delivered+returned;      // delivery-rate (confirmed) denominator
+    const confRateAll=total?(confirmedNum/total*100).toFixed(1):'0.0';          // confirmed / all leads
+    const confRateNonDraft=nonDraft?(confirmedNum/nonDraft*100).toFixed(1):'0.0'; // confirmed / non-draft
+    const delRateConfirmed=delConfDenom?(delivered/delConfDenom*100).toFixed(1):'0.0'; // delivered / (confirmed+shipped+returned)
+    const delRateAll=nonDraft?(delivered/nonDraft*100).toFixed(1):'0.0';        // delivered / non-draft leads
     const delRate=delRateAll;
     document.getElementById('kpi-total').textContent=total;
     document.getElementById('kpi-delivered').textContent=delivered;
@@ -1441,9 +1457,11 @@ function updateDashboard(){
     const confirmedFlow=['confirmed','shipped','shipping','rescheduled','delivered','not_delivered','returned','attempt_1','attempt_2','attempt_3','suspended'].reduce((sum,status)=>sum+(countByStatus[status]||0),0);
     const shipped=(countByStatus['shipped']||0)+(countByStatus['shipping']||0);
     const canceled=countByStatus['canceled']||0;
-    const returned=countByStatus['returned']||0;
+    const returned=(countByStatus['returned']||0)+(countByStatus['not_delivered']||0);
     const pending=countByStatus['pending']||0;
-    const total=hist.length;
+    // total = unique orders that had activity in this period (not event count)
+    const uniqueOrderIds=new Set(hist.map(h=>h.order_id));
+    const total=uniqueOrderIds.size;
     document.getElementById('kpi-total').textContent=total;
     document.getElementById('kpi-delivered').textContent=delivered;
     document.getElementById('kpi-del-rate').textContent='deliveries';
@@ -1473,7 +1491,7 @@ function updateDashboard(){
     document.getElementById('kpi-total-sub').textContent=range?periodLabel():'All time';
     document.getElementById('kpi-returned').textContent=returned;
     document.getElementById('kpi-pending-sub').textContent='moved to pending';
-    document.getElementById('kpi-shipped-sub').textContent='shipped today';
+    document.getElementById('kpi-shipped-sub').textContent='shipped in period';
     document.getElementById('kpi-canceled-sub').textContent='cancellations';
     const allStatuses=hist.map(h=>h.new_status).filter(s=>STATUSES.some(x=>x.k===s));
     drawDonut(allStatuses);
@@ -3318,6 +3336,100 @@ async function deleteProdLog(id){
   await updateFinance();
   if(currentAdminPage==='stock')renderStockPage();
   toast('Production log deleted');
+}
+
+// ── PRODUCT PERFORMANCE PAGE ──
+function getPPPeriodRange(){
+  const p=document.getElementById('pp-period')?.value||'all';
+  const now=new Date();
+  const alg=new Date(now.getTime()+60*60*1000);
+  const today=new Date(Date.UTC(alg.getUTCFullYear(),alg.getUTCMonth(),alg.getUTCDate()));
+  if(p==='7days'){const s=new Date(today);s.setDate(s.getDate()-7);return{start:s,end:new Date(today.getTime()+86400000)};}
+  if(p==='30days'){const s=new Date(today);s.setDate(s.getDate()-30);return{start:s,end:new Date(today.getTime()+86400000)};}
+  if(p==='month')return{start:new Date(Date.UTC(alg.getUTCFullYear(),alg.getUTCMonth(),1)),end:new Date(today.getTime()+86400000)};
+  return null;
+}
+
+function renderProductPerf(){
+  const range=getPPPeriodRange();
+  const orders=range?allOrders.filter(o=>{
+    if(!o.created_at)return false;
+    const d=new Date(o.created_at.endsWith('Z')?o.created_at:o.created_at+'Z');
+    return d>=range.start&&d<range.end;
+  }):allOrders;
+
+  // Cash flow banner
+  const inTransit=orders.filter(o=>o.status==='shipped'||o.status==='shipping');
+  const cashInTransit=inTransit.reduce((s,o)=>s+Number(o.prix_total||0),0);
+  const delivered=orders.filter(o=>o.status==='delivered');
+  const cashCollected=delivered.reduce((s,o)=>s+Number(o.prix_total||0),0);
+  const returned=orders.filter(o=>o.status==='returned'||o.status==='not_delivered');
+  const cashLost=returned.reduce((s,o)=>s+Number(o.shipping_cost||0),0);
+  const pending=orders.filter(o=>o.status==='confirmed');
+  const cashPending=pending.reduce((s,o)=>s+Number(o.prix_total||0),0);
+
+  document.getElementById('cashflow-kpis').innerHTML=`
+    <div class="kpi-card hi" style="padding:16px">
+      <div class="kpi-label">💵 COLLECTED</div>
+      <div class="kpi-value" style="font-size:28px;color:var(--green)">${fmtDZD(cashCollected)}</div>
+      <div class="kpi-sub">${delivered.length} delivered orders</div>
+    </div>
+    <div class="kpi-card" style="padding:16px">
+      <div class="kpi-label">🚚 IN TRANSIT</div>
+      <div class="kpi-value" style="font-size:28px;color:var(--yellow)">${fmtDZD(cashInTransit)}</div>
+      <div class="kpi-sub">${inTransit.length} orders in transit</div>
+    </div>
+    <div class="kpi-card" style="padding:16px">
+      <div class="kpi-label">⏳ CONFIRMED</div>
+      <div class="kpi-value" style="font-size:28px;color:#3b82f6">${fmtDZD(cashPending)}</div>
+      <div class="kpi-sub">${pending.length} awaiting shipment</div>
+    </div>
+    <div class="kpi-card" style="padding:16px">
+      <div class="kpi-label">❌ SHIPPING LOST</div>
+      <div class="kpi-value" style="font-size:28px;color:var(--red)">${fmtDZD(cashLost)}</div>
+      <div class="kpi-sub">${returned.length} returned/undelivered</div>
+    </div>`;
+
+  // Product stats — group by product name
+  const stats={};
+  const nonDraft=orders.filter(o=>o.status!=='draft'&&o.status!=='pending'&&o.status!=='duplicated');
+  nonDraft.forEach(o=>{
+    // Handle cart orders — expand items
+    const items=Array.isArray(o.items)&&o.items.length?o.items:[{product:o.product,variant:o.variable,line_price:Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0))}];
+    items.forEach(it=>{
+      const key=it.product||'Unknown';
+      if(!stats[key])stats[key]={name:key,orders:0,delivered:0,returned:0,revenue:0,shipping_lost:0};
+      stats[key].orders++;
+      if(o.status==='delivered'){stats[key].delivered++;stats[key].revenue+=Number(it.line_price||0);}
+      if(o.status==='returned'||o.status==='not_delivered'){stats[key].returned++;stats[key].shipping_lost+=Number(o.shipping_cost||0);}
+    });
+  });
+
+  const rows=Object.values(stats).sort((a,b)=>b.revenue-a.revenue);
+
+  if(!rows.length){
+    document.getElementById('product-perf-table').innerHTML='<div style="padding:40px;text-align:center;color:var(--gray)">No data for this period</div>';
+    return;
+  }
+
+  document.getElementById('product-perf-table').innerHTML=`
+    <div class="ad-table-row ad-table-head" style="grid-template-columns:2fr 80px 80px 80px 80px 120px 100px;min-width:700px">
+      <div>PRODUCT</div><div>ORDERS</div><div>DELIVERED</div><div>RETURNED</div><div>DEL %</div><div>REVENUE</div><div>SHIP LOST</div>
+    </div>
+    ${rows.map(r=>{
+      const delRate=r.orders?Math.round(r.delivered/r.orders*100):0;
+      const retRate=r.orders?Math.round(r.returned/r.orders*100):0;
+      const rateColor=delRate>=60?'var(--green)':delRate>=40?'var(--yellow)':'var(--red)';
+      return `<div class="ad-table-row" style="grid-template-columns:2fr 80px 80px 80px 80px 120px 100px;min-width:700px">
+        <div style="font-weight:700;font-size:13px">${esc(r.name)}</div>
+        <div style="color:var(--gray)">${r.orders}</div>
+        <div style="color:var(--green)">${r.delivered}</div>
+        <div style="color:${retRate>20?'var(--red)':'var(--gray)'}">${r.returned}</div>
+        <div style="color:${rateColor};font-family:'Bebas Neue',sans-serif;font-size:16px">${delRate}%</div>
+        <div style="color:var(--yellow);font-family:'Bebas Neue',sans-serif;font-size:15px">${fmtDZD(r.revenue)}</div>
+        <div style="color:var(--red);font-size:12px">${fmtDZD(r.shipping_lost)}</div>
+      </div>`;
+    }).join('')}`;
 }
 
 // ── PERFORMANCE PAGE ──
