@@ -613,7 +613,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-label">Cost / Order</div><div class="kpi-value" id="fin-cpo">—</div><div class="kpi-sub">Total cost ÷ delivered</div></div>
         <div class="kpi-card"><div class="kpi-icon">🖼️</div><div class="kpi-label">Frames Made</div><div class="kpi-value" id="fin-frames">—</div><div class="kpi-sub">In period</div></div>
         <div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-label">Staff Costs</div><div class="kpi-value" id="fin-staffcost">—</div><div class="kpi-sub" id="fin-staffcost-sub">—</div></div>
-        <div class="kpi-card hi"><div class="kpi-icon">📦</div><div class="kpi-label">Stock Value</div><div class="kpi-value" id="fin-stock-value">—</div><div class="kpi-sub">At cost price</div></div>
+        <div class="kpi-card hi"><div class="kpi-icon">📦</div><div class="kpi-label">Stock Value</div><div class="kpi-value" id="fin-stock-value">—</div><div class="kpi-sub">Production materials at cost</div></div>
       </div>
 
       <!-- COST BREAKDOWN BAR -->
@@ -688,7 +688,6 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <div class="page-header">
         <div><div class="page-title">STOCK</div><div class="page-subtitle">Variant stock levels &amp; history</div></div>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-ghost" onclick="openAddStock('ready_to_ship')">+ Ready Stock</button>
           <button class="btn btn-ghost" onclick="openAddStock('production_material')">+ Materials</button>
           <button class="btn btn-primary" onclick="openManualStockAdjust()">✏️ Adjust</button>
         </div>
@@ -706,17 +705,26 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         <div id="stock-material-kpis" class="stock-material-kpis"></div>
       </div>
 
-      <div class="stock-split-grid" style="margin-bottom:16px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+        <!-- PHYSICAL STOCK IN HAND -->
         <div class="glass-card" style="padding:20px">
-          <div class="stock-section-title">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
             <div>
-              <strong>READY TO SHIP</strong>
-              <span>Grouped by active product. Tap a product to expand or collapse its variants.</span>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">STOCK IN HAND</div>
+              <div style="font-size:12px;color:var(--gray);margin-top:2px">Returns & physical inventory — update manually</div>
             </div>
-            <button class="btn btn-ghost btn-sm" onclick="openAddStock('ready_to_ship')">+ Add</button>
+            <button class="btn btn-ghost btn-sm" onclick="openAddHandStock()">+ Add Type</button>
           </div>
-          <div id="stock-ready-list"></div>
+
+          <!-- Value summary -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px" id="hand-stock-summary"></div>
+
+          <!-- Stock rows -->
+          <div id="hand-stock-list"></div>
         </div>
+
+        <!-- PRODUCTION MATERIALS -->
         <div class="glass-card" style="padding:20px">
           <div class="stock-section-title">
             <div>
@@ -5246,6 +5254,196 @@ renderEmployeePay=function(range,deliveredOrders,frameMakerPay,operatorPay,print
       ${!ps.remaining<=0?`<button class="btn btn-primary btn-sm" onclick="openMarkPaid('${e.key}','${esc(e.name)}',${e.owed})">Mark Paid</button>`:''}
     </div>`;
   }).join('');
+};
+</script>
+
+<!-- HAND STOCK MODAL -->
+<div class="modal-overlay" id="hand-stock-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="hand-stock-modal-title">ADD STOCK TYPE</div>
+      <button class="modal-close" onclick="closeModal('hand-stock-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="hs-id"/>
+      <div class="form-field"><label class="form-label">Name</label><input class="form-input" id="hs-name" placeholder="e.g. Small Poster 30×40"/></div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Retail Price (DZD)</label><input class="form-input" id="hs-retail" type="number" min="0" placeholder="0"/></div>
+        <div class="form-field"><label class="form-label">Cost Price (DZD)</label><input class="form-input" id="hs-cost" type="number" min="0" placeholder="0"/></div>
+      </div>
+      <div class="form-field"><label class="form-label">Current Quantity</label><input class="form-input" id="hs-qty" type="number" min="0" placeholder="0"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('hand-stock-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveHandStock()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// STOCK IN HAND — physical inventory (returns)
+// Stored in Supabase: hand_stock table
+// 4 default types + ability to add custom
+// ══════════════════════════════════════════════════════════
+
+const HAND_STOCK_DEFAULTS = [
+  {name: 'Small Poster 30×40', retail: 1450, cost: 280},
+  {name: 'Large Poster 40×60', retail: 1950, cost: 480},
+  {name: 'Small Set 30×40',    retail: 2900, cost: 855},
+  {name: 'Large Set 40×60',    retail: 3900, cost: 1440},
+];
+
+let allHandStock = [];
+
+async function loadHandStock(){
+  const {data, error} = await sb.from('hand_stock').select('*').order('sort_order').order('id');
+  if(error){ console.error('hand_stock load error:', error); allHandStock=[]; return; }
+  allHandStock = data || [];
+  // If empty, seed with defaults
+  if(!allHandStock.length){
+    await seedHandStockDefaults();
+  }
+}
+
+async function seedHandStockDefaults(){
+  const rows = HAND_STOCK_DEFAULTS.map((d,i) => ({
+    name: d.name, retail_price: d.retail, cost_price: d.cost, quantity: 0, sort_order: i
+  }));
+  const {data} = await sb.from('hand_stock').insert(rows).select();
+  allHandStock = data || [];
+}
+
+function renderHandStock(){
+  const listEl = document.getElementById('hand-stock-list');
+  const summaryEl = document.getElementById('hand-stock-summary');
+  if(!listEl) return;
+
+  const totalRetail = allHandStock.reduce((s,i) => s + Number(i.quantity||0)*Number(i.retail_price||0), 0);
+  const totalCost   = allHandStock.reduce((s,i) => s + Number(i.quantity||0)*Number(i.cost_price||0), 0);
+  const totalProfit = totalRetail - totalCost;
+  const totalUnits  = allHandStock.reduce((s,i) => s + Number(i.quantity||0), 0);
+
+  if(summaryEl){
+    summaryEl.innerHTML = `
+      <div style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--gray);letter-spacing:1px;margin-bottom:4px">RETAIL VALUE</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--green)">${fmtDZD(totalRetail)}</div>
+      </div>
+      <div style="background:rgba(225,29,72,0.06);border:1px solid rgba(225,29,72,0.15);border-radius:12px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--gray);letter-spacing:1px;margin-bottom:4px">COST VALUE</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--red)">${fmtDZD(totalCost)}</div>
+      </div>
+      <div style="background:rgba(245,197,0,0.06);border:1px solid rgba(245,197,0,0.2);border-radius:12px;padding:10px;text-align:center">
+        <div style="font-size:10px;color:var(--gray);letter-spacing:1px;margin-bottom:4px">PROFIT POT.</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--yellow)">${fmtDZD(totalProfit)}</div>
+      </div>`;
+  }
+
+  if(!allHandStock.length){
+    listEl.innerHTML = '<div style="color:var(--gray);font-size:13px;padding:12px 0">No stock types yet.</div>';
+    return;
+  }
+
+  listEl.innerHTML = allHandStock.map(item => {
+    const qty    = Number(item.quantity||0);
+    const retail = Number(item.retail_price||0);
+    const cost   = Number(item.cost_price||0);
+    const retVal = qty * retail;
+    const profit = qty * (retail - cost);
+    return `<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px">${esc(item.name)}</div>
+        <div style="font-size:11px;color:var(--gray);margin-top:2px">
+          Retail ${fmtDZD(retail)} · Cost ${fmtDZD(cost)} · Profit/unit ${fmtDZD(retail-cost)}
+        </div>
+        ${qty>0?`<div style="font-size:12px;color:var(--green);margin-top:2px">Value: ${fmtDZD(retVal)} · Profit: ${fmtDZD(profit)}</div>`:''}
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <button class="btn btn-ghost btn-sm" onclick="adjustHandStock(${item.id}, -1)" ${qty<=0?'disabled':''}>−</button>
+        <input type="number" min="0" value="${qty}"
+          style="width:60px;text-align:center;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:6px;color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:20px"
+          onchange="setHandStockQty(${item.id}, this.value)"/>
+        <button class="btn btn-ghost btn-sm" onclick="adjustHandStock(${item.id}, 1)">+</button>
+        <button class="btn btn-ghost btn-sm" onclick="editHandStock(${item.id})" style="margin-left:4px">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteHandStock(${item.id})">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function adjustHandStock(id, delta){
+  const item = allHandStock.find(x=>x.id===id);
+  if(!item) return;
+  const newQty = Math.max(0, Number(item.quantity||0) + delta);
+  await setHandStockQty(id, newQty);
+}
+
+async function setHandStockQty(id, val){
+  const qty = Math.max(0, parseInt(val)||0);
+  const {error} = await sb.from('hand_stock').update({quantity: qty}).eq('id', id);
+  if(error){toast(error.message||'Error saving', true); return;}
+  const item = allHandStock.find(x=>x.id===id);
+  if(item) item.quantity = qty;
+  renderHandStock();
+}
+
+function openAddHandStock(){
+  document.getElementById('hs-id').value = '';
+  document.getElementById('hs-name').value = '';
+  document.getElementById('hs-retail').value = '';
+  document.getElementById('hs-cost').value = '';
+  document.getElementById('hs-qty').value = '0';
+  document.getElementById('hand-stock-modal-title').textContent = 'ADD STOCK TYPE';
+  document.getElementById('hand-stock-modal').classList.add('open');
+}
+
+function editHandStock(id){
+  const item = allHandStock.find(x=>x.id===id);
+  if(!item) return;
+  document.getElementById('hs-id').value = item.id;
+  document.getElementById('hs-name').value = item.name||'';;
+  document.getElementById('hs-retail').value = item.retail_price||0;
+  document.getElementById('hs-cost').value = item.cost_price||0;
+  document.getElementById('hs-qty').value = item.quantity||0;
+  document.getElementById('hand-stock-modal-title').textContent = 'EDIT STOCK TYPE';
+  document.getElementById('hand-stock-modal').classList.add('open');
+}
+
+async function saveHandStock(){
+  const id      = document.getElementById('hs-id').value;
+  const name    = document.getElementById('hs-name').value.trim();
+  const retail  = parseFloat(document.getElementById('hs-retail').value)||0;
+  const cost    = parseFloat(document.getElementById('hs-cost').value)||0;
+  const qty     = parseInt(document.getElementById('hs-qty').value)||0;
+  if(!name){toast('Name required',true);return;}
+  const payload = {name, retail_price:retail, cost_price:cost, quantity:qty};
+  if(id){
+    await sb.from('hand_stock').update(payload).eq('id', id);
+  } else {
+    payload.sort_order = allHandStock.length;
+    await sb.from('hand_stock').insert(payload);
+  }
+  closeModal('hand-stock-modal');
+  await loadHandStock();
+  renderHandStock();
+  toast('Saved ✓');
+}
+
+async function deleteHandStock(id){
+  if(!confirm('Delete this stock type?')) return;
+  await sb.from('hand_stock').delete().eq('id', id);
+  await loadHandStock();
+  renderHandStock();
+  toast('Deleted');
+}
+
+// Hook into stock page load
+const _origRenderStockPage = renderStockPage;
+renderStockPage = async function(){
+  _origRenderStockPage();
+  await loadHandStock();
+  renderHandStock();
 };
 </script>
 </body>
