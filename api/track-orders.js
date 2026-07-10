@@ -71,6 +71,18 @@ const EVENT_STATUS_MAP = {
 };
 
 /**
+ * Noest payment event keys — when we see these, Noest has signaled
+ * that they've transmitted COD cash back to us. We record them in
+ * noest_payment_events for reconciliation against manual payouts.
+ */
+const PAYMENT_EVENT_KEYS = new Set([
+  "verssement_admin_cust",
+  "validation_reception_cash_by_partener",
+  "amount_transmitted_to_partner",
+  "amount_received_by_partner",
+]);
+
+/**
  * Statuses that are terminal (don't need tracking anymore)
  */
 const TERMINAL_STATUSES = [
@@ -140,10 +152,42 @@ export default async function handler(req, res) {
     const idsByStatus = {};       // newStatus -> [order.id]
     const historyRows = [];       // single bulk insert
     const deliveredOrders = [];   // for notifications
+    const paymentEventRows = [];  // noest payment signals to persist
 
     for (const order of orders) {
       const latestEvent = eventMap.get(order.tracking_number);
       if (!latestEvent) continue;
+
+      // ── Detect payment signals from ALL activity (not just latest event) ──
+      // We scan the full activity list to catch payment events even if a newer
+      // non-payment event is the "latest" one.
+      const allActivity = eventMap.getRawActivity
+        ? eventMap.getRawActivity(order.tracking_number)
+        : [];
+      const paymentActivities = allActivity.filter(act => {
+        const key = normalizeNoestEventKey(act.event_key || act.event || act.status || "");
+        return PAYMENT_EVENT_KEYS.has(key);
+      });
+      for (const pa of paymentActivities) {
+        const pKey = normalizeNoestEventKey(pa.event_key || pa.event || "");
+        paymentEventRows.push({
+          tracking_number: order.tracking_number,
+          order_id: order.order_id,
+          order_amount: Number(order.prix_total || 0),
+          event_key: pKey,
+          event_date: pa.date || null,
+        });
+      }
+      // Also check the latestEvent itself
+      if (PAYMENT_EVENT_KEYS.has(latestEvent.event_key)) {
+        paymentEventRows.push({
+          tracking_number: order.tracking_number,
+          order_id: order.order_id,
+          order_amount: Number(order.prix_total || 0),
+          event_key: latestEvent.event_key,
+          event_date: latestEvent.date || null,
+        });
+      }
 
       const newStatus = EVENT_STATUS_MAP[latestEvent.event_key];
       if (!newStatus || newStatus === order.status) continue;
@@ -181,6 +225,24 @@ export default async function handler(req, res) {
       if (historyError) {
         console.error(`[track-orders] bulk history insert failed:`, historyError);
         errors++;
+      }
+    }
+
+    // 4b) Persist Noest payment events (upsert — unique on tracking+event_key).
+    if (paymentEventRows.length) {
+      const dedupedPayments = [];
+      const seen = new Set();
+      for (const row of paymentEventRows) {
+        const k = `${row.tracking_number}|${row.event_key}`;
+        if (!seen.has(k)) { seen.add(k); dedupedPayments.push(row); }
+      }
+      const { error: paymentError } = await supabase
+        .from("noest_payment_events")
+        .upsert(dedupedPayments, { onConflict: "tracking_number,event_key", ignoreDuplicates: true });
+      if (paymentError) {
+        console.warn(`[track-orders] payment events insert failed (non-fatal):`, paymentError.message);
+      } else {
+        console.log(`[track-orders] Recorded ${dedupedPayments.length} Noest payment events`);
       }
     }
 
@@ -252,7 +314,8 @@ function resolveActivityToEvent(orderData) {
 // Returns Map<tracking_number, resolvedEvent>.
 async function getNoestEventsBatch(trackingNumbers) {
   const out = new Map();
-  const CHUNK = 50; // well under Noest's 60 req/min limit even for thousands of orders
+  const rawActivityMap = new Map(); // tracking -> full activity array
+  const CHUNK = 50;
   for (let i = 0; i < trackingNumbers.length; i += CHUNK) {
     const batch = trackingNumbers.slice(i, i + CHUNK);
     try {
@@ -270,13 +333,20 @@ async function getNoestEventsBatch(trackingNumbers) {
       }
       const data = await response.json();
       for (const t of batch) {
-        const ev = resolveActivityToEvent(data?.[t]);
+        const orderData = data?.[t];
+        const ev = resolveActivityToEvent(orderData);
         if (ev) out.set(t, ev);
+        // Store full activity for payment event scanning
+        if (Array.isArray(orderData?.activity)) {
+          rawActivityMap.set(t, orderData.activity);
+        }
       }
     } catch (err) {
       console.error(`[track-orders] batch error:`, err.message);
     }
   }
+  // Attach helper so caller can get raw activity
+  out.getRawActivity = (tracking) => rawActivityMap.get(tracking) || [];
   return out;
 }
 
