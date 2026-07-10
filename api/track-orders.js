@@ -26,34 +26,39 @@ const NOEST_BASE = "https://app.noest-dz.com/api/public";
  */
 const EVENT_STATUS_MAP = {
   // ── In transit / out for delivery ──
-  validation_collect_colis: "shipping",
-  validation_reception_admin: "shipping",
-  validation_reception: "shipping",
-  fdr_activated: "shipping",
-  sent_to_redispatch: "shipping",
-  nouvel_tentative_asked_by_customer: "shipping",
-  mise_a_jour: "shipping",
-  return_redispatched_to_livraison: "shipping", // return put back out for delivery
+  upload: "shipping",                            // uploaded to Noest system
+  customer_validation: "shipping",               // validated by partner
+  validation_collect_colis: "shipping",          // package picked up from partner
+  validation_reception_admin: "shipping",        // reception validated by admin
+  validation_reception: "shipping",              // picked up by driver
+  fdr_activated: "shipping",                     // route sheet activated
+  sent_to_redispatch: "shipping",                // being reassigned
+  nouvel_tentative_asked_by_customer: "shipping",// new attempt requested
+  mise_a_jour: "shipping",                       // delivery attempt made
+  return_redispatched_to_livraison: "shipping",  // return put back out for delivery
   out_for_delivery: "shipping",
   picked_up_by_driver: "shipping",
 
-  // ── Delivered ── (COD cash-collection events only happen AFTER delivery,
-  // so they count as proof of delivery)
+  // ── Delivered ──
   livre: "delivered",
   livred: "delivered",
   delivered: "delivered",
-  verssement_admin_cust: "delivered",
+  pickedup: "shipping",                          // parcel picked up by Noest driver from partner
+  valid_return_pickup: "shipping",               // pickup validated
+  pickup_picked_recu: "shipping",               // pickup received by Noest partner
+  verssement_admin_cust: "delivered",            // cash transmitted to partner
   validation_reception_cash_by_partener: "delivered",
   amount_transmitted_to_partner: "delivered",
   amount_received_by_partner: "delivered",
   echange_valide: "delivered",
   echange_valid_by_hub: "delivered",
+  colis_pickup_transmit_to_partner: "returned",  // stop desk pickup sent back to partner (customer didn't collect)
 
-  // ── Suspended ──
-  colis_suspendu: "suspended",
-  suspended: "suspended",
+  // ── Suspended — driver couldn't reach customer, still in process ──
+  colis_suspendu: "shipping",
+  suspended: "shipping",
 
-  // ── Returned ── (parcel coming back / received by partner)
+  // ── Returned ──
   return_asked_by_customer: "returned",
   return_asked_by_hub: "returned",
   retour_dispatched_to_partenaires: "returned",
@@ -68,6 +73,8 @@ const EVENT_STATUS_MAP = {
   return_requested_by_partner: "returned",
   return_in_transit: "returned",
   return_package_transmitted_to_partner: "returned",
+  annulation_dispatch_retour: "returned",        // return transmission cancelled = back to partner
+  cancel_return_dispatched_to_partenaire: "returned",
 };
 
 /**
@@ -89,7 +96,8 @@ const TERMINAL_STATUSES = [
   "delivered",
   "canceled",
   "returned",
-  "suspended",
+  // "suspended" removed — Noest can reattempt suspended orders,
+  // so we keep watching them until they resolve to delivered or returned
   "not_delivered",
   "duplicated",
 ];
