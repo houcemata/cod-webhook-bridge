@@ -377,13 +377,11 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     <div class="nav-section">Operations</div>
     <div class="nav-item" onclick="showPage('orders')" id="nav-orders"><span class="nav-icon">📦</span>Orders<span class="nav-badge" id="pending-badge" style="display:none">0</span></div>
     <div class="nav-item" onclick="showPage('products')" id="nav-products"><span class="nav-icon">🛍️</span>Products</div>
-    <div class="nav-section">Team</div>
-    <div class="nav-item" onclick="showPage('operators')" id="nav-operators"><span class="nav-icon">👥</span>Operators</div>
     <div class="nav-section">Business</div>
     <div class="nav-item" onclick="showPage('finance')" id="nav-finance"><span class="nav-icon">💰</span>Finance</div>
+    <div class="nav-item" onclick="showPage('analytics')" id="nav-analytics"><span class="nav-icon">📊</span>Analytics</div>
+    <div class="nav-item" onclick="showPage('operations')" id="nav-operations"><span class="nav-icon">🏭</span>Operations</div>
     <div class="nav-item" onclick="showPage('stock')" id="nav-stock"><span class="nav-icon">📦</span>Stock</div>
-    <div class="nav-item" onclick="showPage('performance')" id="nav-performance"><span class="nav-icon">🏆</span>Performance</div>
-    <div class="nav-item" onclick="showPage('products-perf')" id="nav-products-perf"><span class="nav-icon">📈</span>Products</div>
     <div class="sidebar-bottom">
       <div class="user-card">
         <div class="user-avatar" id="sidebar-avatar">H</div>
@@ -567,14 +565,6 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     </div>
 
     <!-- OPERATORS -->
-    <div class="page" id="page-operators">
-      <div class="page-header">
-        <div><div class="page-title">OPERATORS</div><div class="page-subtitle">Manage your team</div></div>
-        <button class="btn btn-primary" onclick="openAddOperator()">+ Add Operator</button>
-      </div>
-      <div class="operators-grid" id="operators-grid"></div>
-    </div>
-
     <!-- FINANCE -->
     <div class="page" id="page-finance">
       <div class="page-header">
@@ -646,24 +636,6 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px">
-
-        <!-- PRODUCTION LOG -->
-        <div class="glass-card" style="padding:20px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">DAILY PRODUCTION</div>
-            <button class="btn btn-primary btn-sm" onclick="openProductionLog()">+ Log Today</button>
-          </div>
-          <div id="production-log-list" style="max-height:300px;overflow-y:auto"></div>
-        </div>
-
-        <!-- EMPLOYEE PAY -->
-        <div class="glass-card" style="padding:20px">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">EMPLOYEE PAY</div>
-          <div id="employee-pay-list"></div>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px">
         <!-- EXPENSES -->
         <div class="glass-card" style="padding:20px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -677,28 +649,6 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         <div class="glass-card" style="padding:20px">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">REVENUE BY SIZE</div>
           <div id="revenue-by-size"></div>
-        </div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-        <div class="glass-card" style="padding:20px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">PAY HISTORY</div>
-            <select class="filter-select" id="pay-history-filter" onchange="renderPayHistory()" style="width:auto;min-width:150px">
-              <option value="all">All Employees</option>
-            </select>
-          </div>
-          <div id="pay-history-list" style="max-height:320px;overflow-y:auto"></div>
-        </div>
-
-        <div class="glass-card" style="padding:20px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">STOCK USAGE HISTORY</div>
-            <select class="filter-select" id="stock-usage-filter" onchange="renderStockUsageHistory()" style="width:auto;min-width:150px">
-              <option value="all">All Items</option>
-            </select>
-          </div>
-          <div id="stock-usage-list" style="max-height:320px;overflow-y:auto"></div>
         </div>
       </div>
 
@@ -793,49 +743,101 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       </div>
     </div>
 
-    <!-- OPERATOR PERFORMANCE -->
-    <!-- PRODUCT PERFORMANCE -->
-    <div class="page" id="page-products-perf">
+    <!-- ANALYTICS PAGE -->
+    <div class="page" id="page-analytics">
       <div class="page-header">
-        <div><div class="page-title">PRODUCTS</div><div class="page-subtitle">Unit economics — revenue, COGS, shipping loss, gross profit per product</div></div>
-        <select class="filter-select" id="pp-period" onchange="renderProductPerf()">
-          <option value="all">All Time</option>
+        <div><div class="page-title">ANALYTICS</div><div class="page-subtitle">Ad performance · by collection · by size</div></div>
+        <select class="filter-select" id="an-period" onchange="renderAnalytics()">
           <option value="month" selected>This Month</option>
+          <option value="lastmonth">Last Month</option>
           <option value="7days">Last 7 Days</option>
           <option value="30days">Last 30 Days</option>
+          <option value="all">All Time</option>
         </select>
       </div>
 
-      <!-- Cashflow KPIs (kept for compatibility) -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px" id="cashflow-kpis"></div>
+      <!-- AD PERFORMANCE -->
+      <div class="glass-card" style="padding:20px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">AD PERFORMANCE</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:4px">Daily spend vs orders — Meta + TikTok</div>
+          </div>
+          <div id="an-ad-source" style="font-size:12px;color:var(--gray)"></div>
+        </div>
+        <div id="an-ad-summary" class="ad-summary-grid" style="margin-bottom:16px"></div>
+        <div id="an-ad-table" class="ad-table"></div>
+      </div>
 
-      <!-- Global ad spend context bar -->
-      <div class="glass-card" style="padding:16px 20px;margin-bottom:16px" id="pp-adspend-bar">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--gray);text-transform:uppercase">Global Ad Spend (period)</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--yellow)" id="pp-total-adspend">—</div>
-          <div style="font-size:12px;color:var(--gray)" id="pp-adspend-note">Shown as context — not attributed per product</div>
+      <!-- BY COLLECTION -->
+      <div class="glass-card" style="padding:20px;margin-bottom:16px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">BY COLLECTION</div>
+        <div id="an-collection-table"></div>
+      </div>
+
+      <!-- BY SIZE -->
+      <div class="glass-card" style="padding:20px;margin-bottom:16px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">BY SIZE</div>
+        <div id="an-size-table"></div>
+      </div>
+    </div>
+
+    <!-- OPERATIONS PAGE -->
+    <div class="page" id="page-operations">
+      <div class="page-header">
+        <div><div class="page-title">OPERATIONS</div><div class="page-subtitle">Production · employee pay · history</div></div>
+        <select class="filter-select" id="ops-period" onchange="renderOperations()">
+          <option value="month" selected>This Month</option>
+          <option value="lastmonth">Last Month</option>
+          <option value="7days">Last 7 Days</option>
+          <option value="30days">Last 30 Days</option>
+          <option value="all">All Time</option>
+        </select>
+      </div>
+
+      <!-- PRODUCTION KPIs -->
+      <div class="kpi-grid" style="margin-bottom:20px" id="ops-kpis"></div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px">
+        <!-- DAILY PRODUCTION LOG -->
+        <div class="glass-card" style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">DAILY PRODUCTION</div>
+            <button class="btn btn-primary btn-sm" onclick="openProductionLog()">+ Log Today</button>
+          </div>
+          <div id="ops-production-list" style="max-height:360px;overflow-y:auto"></div>
+        </div>
+
+        <!-- EMPLOYEE PAY -->
+        <div class="glass-card" style="padding:20px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">EMPLOYEE PAY</div>
+          <div id="ops-employee-pay"></div>
         </div>
       </div>
 
-      <!-- Per-product unit economics cards -->
-      <div id="product-unit-economics"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+        <!-- PAY HISTORY -->
+        <div class="glass-card" style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">PAY HISTORY</div>
+            <select class="filter-select" id="ops-pay-filter" onchange="renderOpsPayHistory()" style="width:auto;min-width:150px">
+              <option value="all">All Employees</option>
+            </select>
+          </div>
+          <div id="ops-pay-history" style="max-height:320px;overflow-y:auto"></div>
+        </div>
 
-      <!-- Legacy table (hidden, kept for compat) -->
-      <div class="ad-table" id="product-perf-table" style="display:none"></div>
-    </div>
-
-    <div class="page" id="page-performance">
-      <div class="page-header">
-        <div><div class="page-title">PERFORMANCE</div><div class="page-subtitle">Operator stats &amp; confirmation rates</div></div>
-        <select class="filter-select" id="perf-period" onchange="renderPerformance()">
-          <option value="all">All Time</option>
-          <option value="month" selected>This Month</option>
-          <option value="7days">Last 7 Days</option>
-          <option value="30days">Last 30 Days</option>
-        </select>
+        <!-- STOCK USAGE HISTORY -->
+        <div class="glass-card" style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">STOCK USAGE</div>
+            <select class="filter-select" id="ops-usage-filter" onchange="renderOpsStockUsage()" style="width:auto;min-width:150px">
+              <option value="all">All Items</option>
+            </select>
+          </div>
+          <div id="ops-stock-usage" style="max-height:320px;overflow-y:auto"></div>
+        </div>
       </div>
-      <div id="performance-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px"></div>
     </div>
 
   </div>
@@ -848,7 +850,8 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
       <button class="mobile-nav-btn active" onclick="showPage('dashboard')" id="mnav-dashboard"><span class="mobile-nav-icon">📊</span><span class="mobile-nav-label">Dashboard</span></button>
       <button class="mobile-nav-btn" onclick="showPage('orders')" id="mnav-orders"><span class="mobile-nav-icon">📦</span><span class="mobile-nav-label">Orders</span></button>
       <button class="mobile-nav-btn" onclick="showPage('products')" id="mnav-products"><span class="mobile-nav-icon">🛍️</span><span class="mobile-nav-label">Products</span></button>
-      <button class="mobile-nav-btn" onclick="showPage('operators')" id="mnav-operators"><span class="mobile-nav-icon">👥</span><span class="mobile-nav-label">Team</span></button>
+      <button class="mobile-nav-btn" onclick="showPage('analytics')" id="mnav-analytics"><span class="mobile-nav-icon">📊</span><span class="mobile-nav-label">Analytics</span></button>
+      <button class="mobile-nav-btn" onclick="showPage('operations')" id="mnav-operations"><span class="mobile-nav-icon">🏭</span><span class="mobile-nav-label">Ops</span></button>
       <button class="mobile-nav-btn" onclick="showPage('finance')" id="mnav-finance"><span class="mobile-nav-icon">💰</span><span class="mobile-nav-label">Finance</span></button>
       <button class="mobile-nav-btn" onclick="showPage('stock')" id="mnav-stock"><span class="mobile-nav-icon">📦</span><span class="mobile-nav-label">Stock</span></button>
     </div>
@@ -1236,7 +1239,7 @@ let currentAdminPage='dashboard';
 const ADMIN_PAGE_KEY='arco_admin_page';
 
 function getSavedAdminPage(){
-  const allowed=['dashboard','orders','products','operators','finance','stock','performance','products-perf'];
+  const allowed=['dashboard','orders','products','finance','analytics','operations','stock'];
   const saved=localStorage.getItem(ADMIN_PAGE_KEY);
   return allowed.includes(saved)?saved:'dashboard';
 }
@@ -1245,14 +1248,13 @@ function renderCurrentAdminPage(){
   if(currentAdminPage==='dashboard')updateDashboard();
   if(currentAdminPage==='orders')renderOrdersTable();
   if(currentAdminPage==='products')renderProducts();
-  if(currentAdminPage==='operators')renderOperators();
   if(currentAdminPage==='finance')updateFinance();
-  if(currentAdminPage==='products-perf')renderProductPerf();
   if(currentAdminPage==='stock'){
     if(allStockItems.length)renderStockPage();
     else loadFinanceData().then(()=>{ if(currentAdminPage==='stock') renderStockPage(); });
   }
-  if(currentAdminPage==='performance')renderPerformance();
+  if(currentAdminPage==='analytics')renderAnalytics();
+  if(currentAdminPage==='operations')renderOperations();
 }
 
 // ── AUTH ──
@@ -4867,6 +4869,383 @@ updateFinance=async function(){
   await loadDebtsData();
   renderDebts();
   renderIncome();
+};
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// ANALYTICS PAGE
+// ══════════════════════════════════════════════════════════
+
+function getAnPeriodRange(){
+  const p=document.getElementById('an-period')?.value||'month';
+  const now=new Date();
+  const alg=new Date(now.getTime()+60*60*1000);
+  const today=new Date(Date.UTC(alg.getUTCFullYear(),alg.getUTCMonth(),alg.getUTCDate()));
+  if(p==='month') return {from:new Date(Date.UTC(alg.getUTCFullYear(),alg.getUTCMonth(),1)),to:new Date(today.getTime()+86400000)};
+  if(p==='lastmonth'){
+    const f=new Date(Date.UTC(alg.getUTCFullYear(),alg.getUTCMonth()-1,1));
+    const t=new Date(Date.UTC(alg.getUTCFullYear(),alg.getUTCMonth(),1));
+    return{from:f,to:t};
+  }
+  if(p==='7days'){const f=new Date(today);f.setDate(today.getDate()-7);return{from:f,to:new Date(today.getTime()+86400000)};}
+  if(p==='30days'){const f=new Date(today);f.setDate(today.getDate()-30);return{from:f,to:new Date(today.getTime()+86400000)};}
+  return null;
+}
+
+async function renderAnalytics(){
+  const range=getAnPeriodRange();
+  const periodOrders=range?allOrders.filter(o=>{
+    if(!o.created_at)return false;
+    const d=new Date(o.created_at.endsWith('Z')?o.created_at:o.created_at+'Z');
+    return d>=range.from&&d<range.to;
+  }):allOrders;
+
+  const delivered=periodOrders.filter(o=>o.status==='delivered');
+  const confirmed=periodOrders.filter(o=>FINANCE_CONFIRMED_STATUSES.has(o.status));
+
+  // Load ad performance
+  let adSummary={daily:[],meta:{total_spend:0,skipped:true},tiktok:{total_spend:0,skipped:true}};
+  try{
+    adSummary=await loadAdPerformance(range);
+    finAdSpend=Number(adSummary?.meta?.total_spend||0)+Number(adSummary?.tiktok?.total_spend||0);
+  }catch(e){}
+
+  // Render ad performance panel into analytics tab
+  const srcEl=document.getElementById('an-ad-source');
+  const sumEl=document.getElementById('an-ad-summary');
+  const tblEl=document.getElementById('an-ad-table');
+  if(srcEl){
+    const ms=adSummary?.meta?.skipped?'Meta not connected':(adSummary?.meta?.ok===false?'Meta error':'Meta ✓');
+    const ts=adSummary?.tiktok?.skipped?'TikTok not connected':(adSummary?.tiktok?.ok===false?'TikTok error':'TikTok ✓');
+    srcEl.textContent=ms+' | '+ts;
+  }
+  if(sumEl&&tblEl){
+    const metaSpend=Number(adSummary?.meta?.total_spend||0);
+    const tiktokSpend=Number(adSummary?.tiktok?.total_spend||0);
+    const totalSpend=metaSpend+tiktokSpend;
+    const confirmedCPA=confirmed.length?Math.round(totalSpend/confirmed.length):0;
+    const realCPA=delivered.length?Math.round(totalSpend/delivered.length):0;
+    sumEl.innerHTML=[
+      {label:'Meta Spend',value:fmtDZD(metaSpend),sub:'Ads Manager'},
+      {label:'TikTok Spend',value:fmtDZD(tiktokSpend),sub:'Ads Manager'},
+      {label:'Total Spend',value:fmtDZD(totalSpend),sub:'Combined'},
+      {label:'Orders',value:String(periodOrders.length),sub:'In period'},
+      {label:'Confirmed',value:String(confirmed.length),sub:'Pipeline'},
+      {label:'Delivered',value:String(delivered.length),sub:'Cash collected'},
+      {label:'CPA (confirmed)',value:fmtDZD(confirmedCPA),sub:'Spend / confirmed'},
+      {label:'CPA (real)',value:fmtDZD(realCPA),sub:'Spend / delivered'},
+    ].map(c=>`<div class="ad-summary-card"><div class="ad-summary-label">${esc(c.label)}</div><div class="ad-summary-value">${esc(c.value)}</div><div class="ad-summary-sub">${esc(c.sub)}</div></div>`).join('');
+
+    // Daily table
+    const dailyOrders=buildOrderDailyRows(periodOrders);
+    const spendMap=new Map();
+    (adSummary?.daily||[]).forEach(r=>{if(r?.date)spendMap.set(r.date,{meta:Number(r.meta_spend||0),tiktok:Number(r.tiktok_spend||0)});});
+    const mergedDates=[...new Set([...spendMap.keys(),...dailyOrders.map(r=>r.date)])].sort();
+    if(!mergedDates.length){
+      tblEl.innerHTML='<div style="padding:18px;color:var(--gray);font-size:13px">No data for this period.</div>';
+    } else {
+      const hdr=`<div class="ad-table-row ad-table-head">${['Date','Meta','TikTok','Total Spend','Orders','Confirmed','Delivered','CPA (conf)','CPA (real)'].map(h=>`<div>${h}</div>`).join('')}</div>`;
+      const rows=mergedDates.map(date=>{
+        const sp=spendMap.get(date)||{meta:0,tiktok:0};
+        const dy=dailyOrders.find(r=>r.date===date)||{total:0,confirmed:0,delivered:0};
+        const tot=sp.meta+sp.tiktok;
+        return`<div class="ad-table-row">
+          <div class="ad-cell-date">${esc(formatDayLabel(date))}</div>
+          <div class="ad-cell-num">${fmtDZD(sp.meta)}</div>
+          <div class="ad-cell-num">${fmtDZD(sp.tiktok)}</div>
+          <div class="ad-cell-num">${fmtDZD(tot)}</div>
+          <div class="ad-cell-num">${dy.total}</div>
+          <div class="ad-cell-num">${dy.confirmed}</div>
+          <div class="ad-cell-num">${dy.delivered}</div>
+          <div class="ad-cell-num">${dy.confirmed?fmtDZD(Math.round(tot/dy.confirmed)):'-'}</div>
+          <div class="ad-cell-num">${dy.delivered?fmtDZD(Math.round(tot/dy.delivered)):'-'}</div>
+        </div>`;
+      }).join('');
+      tblEl.innerHTML=hdr+rows;
+    }
+  }
+
+  // BY COLLECTION
+  renderCollectionBreakdown(periodOrders, delivered);
+
+  // BY SIZE
+  renderSizeBreakdown(periodOrders, delivered);
+}
+
+function renderCollectionBreakdown(periodOrders, delivered){
+  const el=document.getElementById('an-collection-table');
+  if(!el) return;
+
+  // Build product→collection map from allProducts
+  const prodCollMap={};
+  (allProducts||[]).forEach(p=>{
+    if(p.name&&p.collection) prodCollMap[p.name]=p.collection;
+    if(p.slug&&p.collection) prodCollMap[p.slug]=p.collection;
+  });
+
+  const stats={};
+  const nonDraft=periodOrders.filter(o=>o.status!=='draft'&&o.status!=='pending'&&o.status!=='duplicated');
+  nonDraft.forEach(o=>{
+    const items=Array.isArray(o.items)&&o.items.length
+      ?o.items:[{product:o.product,line_price:Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0))}];
+    items.forEach(it=>{
+      const col=prodCollMap[it.product]||prodCollMap[it.product_slug]||'Uncategorized';
+      if(!stats[col]) stats[col]={name:col,orders:0,delivered:0,returned:0,revenue:0,shipping_loss:0};
+      const s=stats[col];
+      s.orders++;
+      if(o.status==='delivered'){s.delivered++;s.revenue+=Number(it.line_price||0);}
+      if(o.status==='returned'||o.status==='not_delivered'){s.returned++;s.shipping_loss+=Number(o.shipping_cost||0);}
+    });
+  });
+
+  const rows=Object.values(stats).sort((a,b)=>b.revenue-a.revenue);
+  if(!rows.length){el.innerHTML='<div style="color:var(--gray);font-size:13px;padding:12px 0">No order data for this period.</div>';return;}
+
+  const hdr=`<div class="ad-table-row ad-table-head" style="grid-template-columns:2fr 70px 90px 70px 70px 130px 110px">
+    <div>COLLECTION</div><div>ORDERS</div><div>DELIVERED</div><div>RETURNED</div><div>DEL%</div><div>REVENUE</div><div>SHIP LOST</div>
+  </div>`;
+  const tRows=rows.map(r=>{
+    const del=r.orders?Math.round(r.delivered/r.orders*100):0;
+    const ret=r.orders?Math.round(r.returned/r.orders*100):0;
+    const c=del>=60?'var(--green)':del>=40?'var(--yellow)':'var(--red)';
+    return`<div class="ad-table-row" style="grid-template-columns:2fr 70px 90px 70px 70px 130px 110px">
+      <div style="font-weight:700">${esc(r.name)}</div>
+      <div style="color:var(--gray)">${r.orders}</div>
+      <div style="color:var(--green)">${r.delivered}</div>
+      <div style="color:${ret>20?'var(--red)':'var(--gray)'}">${r.returned}</div>
+      <div style="color:${c};font-family:'Bebas Neue',sans-serif;font-size:16px">${del}%</div>
+      <div style="color:var(--yellow);font-family:'Bebas Neue',sans-serif;font-size:15px">${fmtDZD(r.revenue)}</div>
+      <div style="color:var(--red);font-size:12px">${fmtDZD(r.shipping_loss)}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div class="ad-table">${hdr}${tRows}</div>`;
+}
+
+function renderSizeBreakdown(periodOrders, delivered){
+  const el=document.getElementById('an-size-table');
+  if(!el) return;
+
+  const stats={};
+  const nonDraft=periodOrders.filter(o=>o.status!=='draft'&&o.status!=='pending'&&o.status!=='duplicated');
+  nonDraft.forEach(o=>{
+    const items=Array.isArray(o.items)&&o.items.length
+      ?o.items:[{variant:o.variable,line_price:Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0))}];
+    items.forEach(it=>{
+      const raw=String(it.variant||it.size||'Unknown');
+      // Normalize size: extract dimensions
+      const m=raw.match(/(\d+)\s*[×x\*]\s*(\d+)/);
+      const size=m?`${m[1]}×${m[2]} cm`:raw.slice(0,20);
+      if(!stats[size]) stats[size]={size,orders:0,delivered:0,returned:0,revenue:0,shipping_loss:0};
+      const s=stats[size];
+      s.orders++;
+      if(o.status==='delivered'){s.delivered++;s.revenue+=Number(it.line_price||0);}
+      if(o.status==='returned'||o.status==='not_delivered'){s.returned++;s.shipping_loss+=Number(o.shipping_cost||0);}
+    });
+  });
+
+  const rows=Object.values(stats).sort((a,b)=>b.revenue-a.revenue);
+  if(!rows.length){el.innerHTML='<div style="color:var(--gray);font-size:13px;padding:12px 0">No data.</div>';return;}
+
+  const hdr=`<div class="ad-table-row ad-table-head" style="grid-template-columns:2fr 70px 90px 70px 70px 130px 110px">
+    <div>SIZE</div><div>ORDERS</div><div>DELIVERED</div><div>RETURNED</div><div>DEL%</div><div>REVENUE</div><div>SHIP LOST</div>
+  </div>`;
+  const tRows=rows.map(r=>{
+    const del=r.orders?Math.round(r.delivered/r.orders*100):0;
+    const ret=r.orders?Math.round(r.returned/r.orders*100):0;
+    const c=del>=60?'var(--green)':del>=40?'var(--yellow)':'var(--red)';
+    return`<div class="ad-table-row" style="grid-template-columns:2fr 70px 90px 70px 70px 130px 110px">
+      <div style="font-weight:700;font-family:'Bebas Neue',sans-serif;font-size:18px">${esc(r.size)}</div>
+      <div style="color:var(--gray)">${r.orders}</div>
+      <div style="color:var(--green)">${r.delivered}</div>
+      <div style="color:${ret>20?'var(--red)':'var(--gray)'}">${r.returned}</div>
+      <div style="color:${c};font-family:'Bebas Neue',sans-serif;font-size:16px">${del}%</div>
+      <div style="color:var(--yellow);font-family:'Bebas Neue',sans-serif;font-size:15px">${fmtDZD(r.revenue)}</div>
+      <div style="color:var(--red);font-size:12px">${fmtDZD(r.shipping_loss)}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML=`<div class="ad-table">${hdr}${tRows}</div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// OPERATIONS PAGE
+// ══════════════════════════════════════════════════════════
+
+function getOpsPeriodRange(){
+  const p=document.getElementById('ops-period')?.value||'month';
+  const now=new Date();
+  const alg=new Date(now.getTime()+60*60*1000);
+  const today=new Date(Date.UTC(alg.getUTCFullYear(),alg.getUTCMonth(),alg.getUTCDate()));
+  if(p==='month') return{from:new Date(Date.UTC(alg.getUTCFullYear(),alg.getUTCMonth(),1)),to:new Date(today.getTime()+86400000)};
+  if(p==='lastmonth'){
+    const f=new Date(Date.UTC(alg.getUTCFullYear(),alg.getUTCMonth()-1,1));
+    const t=new Date(Date.UTC(alg.getUTCFullYear(),alg.getUTCMonth(),1));
+    return{from:f,to:t};
+  }
+  if(p==='7days'){const f=new Date(today);f.setDate(today.getDate()-7);return{from:f,to:new Date(today.getTime()+86400000)};}
+  if(p==='30days'){const f=new Date(today);f.setDate(today.getDate()-30);return{from:f,to:new Date(today.getTime()+86400000)};}
+  return null;
+}
+
+function inOpsRange(dateStr, range){
+  if(!range||!dateStr) return true;
+  const d=toAlgeriaDate(dateStr);
+  return d>=range.from&&d<range.to;
+}
+
+async function renderOperations(){
+  if(!allProductionLogs.length&&!allStockItems.length) await loadFinanceData();
+  if(!allEmployeesDB.length) await loadNewFinanceData();
+
+  const range=getOpsPeriodRange();
+  const periodLogs=allProductionLogs.filter(l=>inOpsRange(l.date,range));
+  const periodOrders=allOrders.filter(o=>inOpsRange(o.created_at,range));
+  const delivered=periodOrders.filter(o=>o.status==='delivered');
+
+  const totalFrames=periodLogs.reduce((s,l)=>s+(l.m_frames||0)+(l.l_frames||0)+(l.xl_frames||0)+(l.xxl_frames||0),0);
+  const totalSqm=periodLogs.reduce((s,l)=>s+Number(l.print_sqm||0),0);
+  const fmPay=periodLogs.reduce((s,l)=>s+Number(l.total_pay_frame_maker||0),0);
+
+  const opEmp=allEmployeesDB.find(e=>e.key==='operator');
+  const prEmp=allEmployeesDB.find(e=>e.key==='printer');
+  const pgEmp=allEmployeesDB.find(e=>e.key==='print_guy');
+  const opPay=opEmp?delivered.length*Number(opEmp.rate||0):delivered.length*150;
+  const prPay=prEmp?totalSqm*Number(prEmp.rate||0):totalSqm*450;
+  const thu=countThursdays(range);
+  const pgPay=pgEmp?thu*Number(pgEmp.rate||0):thu*2000;
+  const totalStaff=fmPay+opPay+prPay+pgPay;
+
+  // KPIs
+  const kpiEl=document.getElementById('ops-kpis');
+  if(kpiEl) kpiEl.innerHTML=`
+    <div class="kpi-card hi"><div class="kpi-icon">🖼️</div><div class="kpi-label">Frames Made</div><div class="kpi-value">${totalFrames}</div><div class="kpi-sub">${periodLogs.length} production days</div></div>
+    <div class="kpi-card"><div class="kpi-icon">🖨️</div><div class="kpi-label">Printed</div><div class="kpi-value">${totalSqm.toFixed(1)}</div><div class="kpi-sub">m² in period</div></div>
+    <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-label">Delivered</div><div class="kpi-value">${delivered.length}</div><div class="kpi-sub">orders this period</div></div>
+    <div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-label">Staff Cost</div><div class="kpi-value" style="font-size:26px">${fmtDZD(totalStaff)}</div><div class="kpi-sub">Auto-calculated</div></div>`;
+
+  // Production log
+  const prodEl=document.getElementById('ops-production-list');
+  if(prodEl) renderProductionLogs(periodLogs, 'ops-production-list');
+
+  // Employee pay
+  const empEl=document.getElementById('ops-employee-pay');
+  if(empEl) renderEmployeePay(range, delivered, fmPay, opPay, pgPay, prPay, totalSqm, 'ops-employee-pay');
+
+  // Pay history filter
+  populateOpsPayFilter();
+  renderOpsPayHistory();
+  populateOpsUsageFilter();
+  renderOpsStockUsage();
+}
+
+function populateOpsPayFilter(){
+  const sel=document.getElementById('ops-pay-filter');
+  if(!sel) return;
+  const cur=sel.value||'all';
+  sel.innerHTML='<option value="all">All Employees</option>'+
+    allEmployeesDB.map(e=>`<option value="${esc(e.key)}">${esc(e.name)}</option>`).join('');
+  sel.value=[...sel.options].some(o=>o.value===cur)?cur:'all';
+}
+
+function renderOpsPayHistory(){
+  const el=document.getElementById('ops-pay-history');
+  if(!el) return;
+  const filter=document.getElementById('ops-pay-filter')?.value||'all';
+  const rows=allPayLogs.filter(p=>filter==='all'||normalizeEmployeeRole(p.employee_role)===filter)
+    .slice(0,30);
+  if(!rows.length){el.innerHTML='<div style="padding:16px 0;font-size:13px;color:var(--gray)">No pay history yet.</div>';return;}
+  el.innerHTML=rows.map(p=>`
+    <div class="history-row">
+      <div>
+        <div class="history-title">${esc(p.employee_name||'Employee')}</div>
+        <div class="history-meta">${esc(p.employee_role||'')} · ${fmtDate(p.period_start)} → ${fmtDate(p.period_end)}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="history-amount">${fmtDZD(p.amount_paid||0)}</div>
+        <button class="btn btn-danger btn-sm" style="margin-top:4px" onclick="deletePayLog(${p.id})">×</button>
+      </div>
+    </div>`).join('');
+}
+
+function populateOpsUsageFilter(){
+  const sel=document.getElementById('ops-usage-filter');
+  if(!sel) return;
+  const cur=sel.value||'all';
+  const materials=allStockItems.filter(i=>inferStockKind(i)==='production_material');
+  sel.innerHTML='<option value="all">All Items</option>'+materials.map(i=>`<option value="${i.id}">${esc(i.name)}</option>`).join('');
+  sel.value=[...sel.options].some(o=>o.value===cur)?cur:'all';
+}
+
+function renderOpsStockUsage(){
+  const el=document.getElementById('ops-stock-usage');
+  if(!el) return;
+  const filter=document.getElementById('ops-usage-filter')?.value||'all';
+  const rows=allStockUsage.filter(u=>{
+    const item=allStockItems.find(i=>String(i.id)===String(u.stock_item_id));
+    if(!item||inferStockKind(item)!=='production_material') return false;
+    return filter==='all'||String(u.stock_item_id)===String(filter);
+  }).slice(0,30);
+  if(!rows.length){el.innerHTML='<div style="padding:16px 0;font-size:13px;color:var(--gray)">No usage recorded yet.</div>';return;}
+  el.innerHTML=rows.map(u=>{
+    const item=allStockItems.find(i=>String(i.id)===String(u.stock_item_id));
+    return`<div class="history-row">
+      <div>
+        <div class="history-title">${esc(item?.name||'Unknown')}</div>
+        <div class="history-meta">${esc(item?.size||'')} · ${fmtDate(u.created_at)}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--red)">-${Number(u.quantity_used||0).toLocaleString()}</div>
+        <button class="btn btn-danger btn-sm" style="margin-top:4px" onclick="deleteStockUsageLog(${u.id})">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Patch renderProductionLogs to accept optional target element id
+const _origRenderProdLogs=renderProductionLogs;
+renderProductionLogs=function(logs, targetId){
+  const id=targetId||'production-log-list';
+  const el=document.getElementById(id);
+  if(!el) return;
+  if(!logs||!logs.length){el.innerHTML='<div class="empty-state" style="padding:24px"><div class="empty-icon">📋</div><div class="empty-text">No production logged yet</div></div>';return;}
+  el.innerHTML=logs.map(l=>{
+    const frames=(l.m_frames||0)+(l.l_frames||0)+(l.xl_frames||0)+(l.xxl_frames||0);
+    return`<div class="prod-log-row">
+      <div>
+        <div style="font-weight:700;font-size:13px">${fmtDate(l.date)}</div>
+        <div style="font-size:11px;color:var(--gray)">${frames} frames${l.print_sqm?' · '+Number(l.print_sqm).toFixed(1)+'m²':''} ${l.notes?'· '+esc(l.notes):''}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--yellow)">${fmtDZD(l.total_pay_frame_maker||0)}</div>
+        <button class="btn btn-danger btn-sm" style="margin-top:4px" onclick="deleteProdLog(${l.id})">×</button>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+// Patch renderEmployeePay to accept optional target element id
+const _origRenderEmpPay=renderEmployeePay;
+renderEmployeePay=function(range,deliveredOrders,frameMakerPay,operatorPay,printGuyPay,printerPay,printerSqm,targetId){
+  const id=targetId||'employee-pay-list';
+  const el=document.getElementById(id);
+  if(!el) return;
+  const employees=[
+    {key:'frame_maker',name:'Frame Maker 1 + 2',owed:frameMakerPay,basis:'frames made'},
+    {key:'operator',name:'Operator Girl',owed:operatorPay,basis:`${deliveredOrders.length} delivered × rate`},
+    {key:'print_guy',name:'Print File Guy',owed:printGuyPay,basis:`${countThursdays(range)} Thursdays`},
+    {key:'printer',name:'Printer',owed:printerPay,basis:`${Number(printerSqm||0).toFixed(1)}m²`},
+  ];
+  el.innerHTML=employees.map(e=>{
+    const ps=getEmployeePaySummary(e.key,e.owed,range);
+    return`<div class="emp-card">
+      <div class="emp-name">${esc(e.name)}</div>
+      <div class="emp-role">${esc(e.basis)}</div>
+      <div class="emp-status emp-status-${ps.status}">${ps.status.toUpperCase()}</div>
+      <div class="emp-owed">${fmtDZD(e.owed)}</div>
+      <div class="emp-owed-label">Owed this period · ${fmtDZD(ps.remaining)} remaining</div>
+      ${!ps.remaining<=0?`<button class="btn btn-primary btn-sm" onclick="openMarkPaid('${e.key}','${esc(e.name)}',${e.owed})">Mark Paid</button>`:''}
+    </div>`;
+  }).join('');
 };
 </script>
 </body>
