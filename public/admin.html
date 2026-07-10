@@ -702,6 +702,35 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
         </div>
       </div>
 
+      <!-- WHAT I OWE -->
+      <div class="glass-card" style="padding:20px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">WHAT I OWE</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:2px">Outstanding debts per creditor</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="openGenerateDebts()">⚡ Generate Debts</button>
+            <button class="btn btn-ghost btn-sm" onclick="openCreditorManager()">👤 Creditors</button>
+            <button class="btn btn-primary btn-sm" onclick="openAddDebt()">+ Add Debt</button>
+          </div>
+        </div>
+        <div id="debts-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px"></div>
+        <div id="debts-list"></div>
+      </div>
+
+      <!-- INCOME LOG -->
+      <div class="glass-card" style="padding:20px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">INCOME</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:2px">Manual income entries</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openAddIncome()">+ Log Income</button>
+        </div>
+        <div id="income-list"></div>
+      </div>
+
     </div><!-- end page-finance -->
 
     <!-- STOCK MANAGEMENT -->
@@ -3723,16 +3752,19 @@ let allWallets=[], allNoestPayouts=[], allNoestPaymentEvents=[];
 let allEmployeesDB=[], allRecurring=[];
 let finAdSpend=0; // set when ad-performance loads
 
-async function financeApiCall(action, body={}, method='POST'){
-  const {data:{session}}=await sb.auth.getSession();
-  const token=session?.access_token;
+async function financeApiCall(action, body, method){
+  method=method||'POST';
+  const sess=await sb.auth.getSession();
+  const token=sess&&sess.data&&sess.data.session?sess.data.session.access_token:null;
   if(!token) return {error:'Not logged in'};
-  const isGet=method==='GET';
-  const url=isGet?`/api/finance?action=${action}`:`/api/finance?action=${action}`;
-  const opts={method,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'}};
-  if(!isGet) opts.body=JSON.stringify(body);
-  const res=await fetch(url,opts);
-  return res.json().catch(()=>({error:'Request failed'}));
+  const opts={method:method,headers:{Authorization:'Bearer '+token}};
+  if(method!=='GET'){
+    opts.headers['Content-Type']='application/json';
+    opts.body=JSON.stringify(body&&typeof body==='object'?body:{});
+  }
+  const res=await fetch('/api/finance?action='+action,opts);
+  if(res.status===404) return {error:'finance.js not deployed — add it to /api and push to Vercel'};
+  return res.json().catch(function(){return {error:'Request failed'};});
 }
 
 // ── LOAD ALL NEW DATA ──────────────────────────────────────
@@ -4319,6 +4351,523 @@ async function renderProductPerf(){
     </div>`;
   }).join('');
 }
+</script>
+
+<!-- ADD DEBT MODAL -->
+<div class="modal-overlay" id="add-debt-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">ADD DEBT</div>
+      <button class="modal-close" onclick="closeModal('add-debt-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="form-label">Creditor</label>
+        <select class="form-select" id="debt-creditor-id" onchange="onDebtCreditorChange()">
+          <option value="">— Pick creditor —</option>
+        </select>
+      </div>
+      <div class="form-field" id="debt-custom-name-wrap" style="display:none">
+        <label class="form-label">Creditor Name (manual)</label>
+        <input class="form-input" id="debt-custom-name" placeholder="e.g. Supplier ABC"/>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Amount (DZD)</label><input class="form-input" id="debt-amount" type="number" min="0" placeholder="0"/></div>
+        <div class="form-field"><label class="form-label">Due Date (optional)</label><input class="form-input" id="debt-due-date" type="date"/></div>
+      </div>
+      <div class="form-field"><label class="form-label">Description</label><input class="form-input" id="debt-description" placeholder="What is this for?"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('add-debt-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDebt()">Add Debt</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAY DEBT MODAL -->
+<div class="modal-overlay" id="pay-debt-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">MARK AS PAID</div>
+      <button class="modal-close" onclick="closeModal('pay-debt-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="pay-debt-info" style="font-size:14px;color:var(--gray);margin-bottom:16px"></div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Amount Paying (DZD)</label><input class="form-input" id="pay-debt-amount" type="number" min="0" placeholder="0"/></div>
+        <div class="form-field"><label class="form-label">From Wallet</label><select class="form-select" id="pay-debt-wallet"></select></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-ghost btn-sm" id="pay-debt-full-btn">Pay Full</button>
+        <button class="btn btn-ghost btn-sm" id="pay-debt-half-btn">Pay Half</button>
+      </div>
+      <div class="form-field" style="margin-top:12px"><label class="form-label">Note (optional)</label><input class="form-input" id="pay-debt-note" placeholder="e.g. Cash handed"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('pay-debt-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmPayDebt()">Confirm Payment</button>
+    </div>
+  </div>
+</div>
+
+<!-- GENERATE DEBTS MODAL -->
+<div class="modal-overlay" id="generate-debts-modal">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-header">
+      <div class="modal-title">GENERATE DEBTS</div>
+      <button class="modal-close" onclick="closeModal('generate-debts-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13px;color:var(--gray);margin-bottom:14px">Calculates what you owe each creditor for a period based on production logs and delivered orders.</div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Period Start</label><input class="form-input" id="gen-from" type="date"/></div>
+        <div class="form-field"><label class="form-label">Period End</label><input class="form-input" id="gen-to" type="date"/></div>
+      </div>
+      <button class="btn btn-ghost" style="margin-bottom:14px" onclick="previewGenerateDebts()">Preview ↗</button>
+      <div id="gen-preview"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('generate-debts-modal')">Cancel</button>
+      <button class="btn btn-primary" id="gen-confirm-btn" style="display:none" onclick="confirmGenerateDebts()">Create These Debts</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREDITOR MANAGER MODAL -->
+<div class="modal-overlay" id="creditor-modal">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-header">
+      <div class="modal-title">CREDITORS</div>
+      <button class="modal-close" onclick="closeModal('creditor-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="creditor-list" style="margin-bottom:20px"></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:16px">
+        <input type="hidden" id="cred-id"/>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Name</label><input class="form-input" id="cred-name" placeholder="e.g. Supplier ABC"/></div>
+          <div class="form-field"><label class="form-label">Type</label>
+            <select class="form-select" id="cred-type">
+              <option value="employee">Employee</option>
+              <option value="supplier">Supplier</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Pay Type (auto-calc)</label>
+            <select class="form-select" id="cred-pay-type">
+              <option value="">Manual only</option>
+              <option value="per_frame">Per Frame</option>
+              <option value="per_delivered">Per Delivered Order</option>
+              <option value="per_sqm">Per m² Printed</option>
+              <option value="fixed_weekly">Fixed Weekly</option>
+            </select>
+          </div>
+          <div class="form-field"><label class="form-label">Rate (DZD)</label><input class="form-input" id="cred-rate" type="number" min="0" placeholder="0"/></div>
+        </div>
+        <div class="form-field"><label class="form-label">Note</label><input class="form-input" id="cred-note" placeholder="Optional"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('creditor-modal')">Close</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetCreditorForm()">Clear</button>
+      <button class="btn btn-primary" onclick="saveCreditor()">Save Creditor</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD INCOME MODAL -->
+<div class="modal-overlay" id="add-income-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">LOG INCOME</div>
+      <button class="modal-close" onclick="closeModal('add-income-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Amount (DZD)</label><input class="form-input" id="inc-amount" type="number" min="0" placeholder="0"/></div>
+        <div class="form-field"><label class="form-label">Date</label><input class="form-input" id="inc-date" type="date"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Type</label>
+          <select class="form-select" id="inc-type">
+            <option value="noest_payout">Noest Payout</option>
+            <option value="cash_sale">Cash Sale</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-field"><label class="form-label">Add to Wallet</label><select class="form-select" id="inc-wallet"></select></div>
+      </div>
+      <div class="form-field"><label class="form-label">Note</label><input class="form-input" id="inc-note" placeholder="Optional"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('add-income-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveIncome()">Save Income</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// DEBTS & INCOME SYSTEM
+// ══════════════════════════════════════════════════════════
+
+let allCreditors=[], allDebts=[], allDebtPayments=[], allIncome=[];
+let currentPayDebtId=null, currentPayDebtAmount=0;
+let genPreviewData=[];
+
+async function loadDebtsData(){
+  const [credRes, debtRes, incRes] = await Promise.all([
+    financeApiCall('get-creditors',{},'GET'),
+    financeApiCall('get-debts',{},'GET'),
+    financeApiCall('get-income',{},'GET'),
+  ]);
+  allCreditors    = credRes.creditors||[];
+  allDebts        = debtRes.debts||[];
+  allDebtPayments = debtRes.payments||[];
+  allIncome       = incRes.income||[];
+}
+
+// ── RENDER DEBTS ──────────────────────────────────────────
+function renderDebts(){
+  const outstanding = allDebts.filter(d=>d.status!=='paid');
+  const totalOwed   = outstanding.reduce((s,d)=>s+Math.max(0,Number(d.amount||0)-Number(d.amount_paid||0)),0);
+
+  // Summary by creditor
+  const summaryEl=document.getElementById('debts-summary');
+  if(summaryEl){
+    const byCreditor={};
+    outstanding.forEach(d=>{
+      const key=d.creditor_name||'Unknown';
+      if(!byCreditor[key]) byCreditor[key]={name:key,owed:0,count:0};
+      byCreditor[key].owed+=Math.max(0,Number(d.amount||0)-Number(d.amount_paid||0));
+      byCreditor[key].count++;
+    });
+    const entries=Object.values(byCreditor).sort((a,b)=>b.owed-a.owed);
+    summaryEl.innerHTML=`
+      <div class="kpi-card hi" style="padding:14px">
+        <div class="kpi-label">TOTAL OWED</div>
+        <div class="kpi-value" style="font-size:26px;color:var(--red)">${fmtDZD(totalOwed)}</div>
+        <div class="kpi-sub">${outstanding.length} outstanding</div>
+      </div>`+
+      entries.map(e=>`
+        <div class="kpi-card" style="padding:14px">
+          <div class="kpi-label">${esc(e.name)}</div>
+          <div class="kpi-value" style="font-size:22px;color:var(--yellow)">${fmtDZD(e.owed)}</div>
+          <div class="kpi-sub">${e.count} debt${e.count>1?'s':''}</div>
+        </div>`).join('');
+  }
+
+  // Debts list grouped by creditor
+  const listEl=document.getElementById('debts-list');
+  if(!listEl) return;
+  if(!allDebts.length){
+    listEl.innerHTML='<div style="padding:16px 0;font-size:13px;color:var(--gray)">No debts yet. Click "+ Add Debt" or "⚡ Generate Debts" to get started.</div>';
+    return;
+  }
+
+  // Group by creditor name, outstanding first
+  const sorted=[...allDebts].sort((a,b)=>{
+    if(a.status==='paid'&&b.status!=='paid') return 1;
+    if(a.status!=='paid'&&b.status==='paid') return -1;
+    return new Date(b.created_at)-new Date(a.created_at);
+  });
+
+  listEl.innerHTML=sorted.map(d=>{
+    const remaining=Math.max(0,Number(d.amount||0)-Number(d.amount_paid||0));
+    const isPaid=d.status==='paid';
+    const isPartial=d.status==='partial';
+    const statusColor=isPaid?'var(--green)':isPartial?'var(--yellow)':'var(--red)';
+    const statusLabel=isPaid?'PAID':isPartial?'PARTIAL':'OWED';
+    return `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);${isPaid?'opacity:0.5':''}">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+          <span style="font-weight:700;font-size:14px">${esc(d.creditor_name)}</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;padding:2px 7px;border-radius:99px;border:1px solid ${statusColor};color:${statusColor}">${statusLabel}</span>
+          ${d.due_date?`<span style="font-size:11px;color:var(--gray)">Due ${esc(d.due_date)}</span>`:''}
+        </div>
+        ${d.description?`<div style="font-size:12px;color:var(--gray);margin-bottom:2px">${esc(d.description)}</div>`:''}
+        ${d.period_start?`<div style="font-size:11px;color:var(--gray2)">${esc(d.period_start)} → ${esc(d.period_end||'')}</div>`:''}
+        ${isPartial?`<div style="font-size:12px;color:var(--yellow);margin-top:2px">Paid ${fmtDZD(d.amount_paid)} of ${fmtDZD(d.amount)}</div>`:''}
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${isPaid?'var(--green)':'var(--red)'}">${fmtDZD(isPaid?d.amount:remaining)}</div>
+        <div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end">
+          ${!isPaid?`<button class="btn btn-primary btn-sm" onclick="openPayDebt(${d.id},${remaining},${JSON.stringify(d.creditor_name)})">Pay</button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="deleteDebt(${d.id})">×</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── ADD DEBT ──────────────────────────────────────────────
+function openAddDebt(){
+  document.getElementById('debt-creditor-id').value='';
+  document.getElementById('debt-amount').value='';
+  document.getElementById('debt-due-date').value='';
+  document.getElementById('debt-description').value='';
+  document.getElementById('debt-custom-name-wrap').style.display='none';
+  populateDebtCreditorSelect();
+  document.getElementById('add-debt-modal').classList.add('open');
+}
+function populateDebtCreditorSelect(){
+  const sel=document.getElementById('debt-creditor-id');
+  sel.innerHTML='<option value="">— Pick creditor —</option>'+
+    allCreditors.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')+
+    '<option value="__custom__">+ Other (type name)</option>';
+}
+function onDebtCreditorChange(){
+  const val=document.getElementById('debt-creditor-id').value;
+  document.getElementById('debt-custom-name-wrap').style.display=val==='__custom__'?'block':'none';
+}
+async function saveDebt(){
+  const creditorId=document.getElementById('debt-creditor-id').value;
+  const customName=document.getElementById('debt-custom-name').value.trim();
+  const amount=parseFloat(document.getElementById('debt-amount').value)||0;
+  const due_date=document.getElementById('debt-due-date').value||null;
+  const description=document.getElementById('debt-description').value.trim();
+  if(!creditorId){toast('Select a creditor',true);return;}
+  if(!amount){toast('Amount required',true);return;}
+  let creditor_name='';
+  let creditor_id=null;
+  if(creditorId==='__custom__'){
+    if(!customName){toast('Enter creditor name',true);return;}
+    creditor_name=customName;
+  } else {
+    creditor_id=Number(creditorId);
+    const c=allCreditors.find(x=>x.id===creditor_id);
+    creditor_name=c?c.name:creditorId;
+  }
+  const res=await financeApiCall('add-debt',{creditor_id,creditor_name,amount,description,due_date});
+  if(res.error){toast(res.error,true);return;}
+  closeModal('add-debt-modal');
+  await loadDebtsData();
+  renderDebts();
+  toast('Debt added ✓');
+}
+async function deleteDebt(id){
+  if(!confirm('Delete this debt record?'))return;
+  const res=await financeApiCall('delete-debt',{id});
+  if(res.error){toast(res.error,true);return;}
+  await loadDebtsData();
+  renderDebts();
+  toast('Debt deleted');
+}
+
+// ── PAY DEBT ──────────────────────────────────────────────
+function openPayDebt(debtId, remaining, creditorName){
+  currentPayDebtId=debtId;
+  currentPayDebtAmount=remaining;
+  document.getElementById('pay-debt-amount').value=Math.round(remaining);
+  document.getElementById('pay-debt-note').value='';
+  document.getElementById('pay-debt-info').textContent='Paying: '+creditorName+' — '+fmtDZD(remaining)+' remaining';
+  document.getElementById('pay-debt-full-btn').onclick=function(){document.getElementById('pay-debt-amount').value=Math.round(remaining);};
+  document.getElementById('pay-debt-half-btn').onclick=function(){document.getElementById('pay-debt-amount').value=Math.round(remaining/2);};
+  const walletSel=document.getElementById('pay-debt-wallet');
+  walletSel.innerHTML='<option value="">No wallet (cash tracking only)</option>'+
+    allWallets.map(w=>`<option value="${w.id}">${esc(w.name)} — ${fmtDZD(w.balance)}</option>`).join('');
+  document.getElementById('pay-debt-modal').classList.add('open');
+}
+async function confirmPayDebt(){
+  const amount=parseFloat(document.getElementById('pay-debt-amount').value)||0;
+  const wallet_id=document.getElementById('pay-debt-wallet').value||null;
+  const note=document.getElementById('pay-debt-note').value.trim();
+  if(!amount){toast('Enter amount',true);return;}
+  if(amount>currentPayDebtAmount+0.01){toast('Amount exceeds what is owed',true);return;}
+  const res=await financeApiCall('pay-debt',{debt_id:currentPayDebtId,amount,wallet_id,note});
+  if(res.error){toast(res.error,true);return;}
+  closeModal('pay-debt-modal');
+  await loadDebtsData();
+  await loadNewFinanceData();
+  renderDebts();
+  renderWalletCards();
+  toast('Payment logged ✓');
+}
+
+// ── GENERATE DEBTS ────────────────────────────────────────
+function openGenerateDebts(){
+  genPreviewData=[];
+  document.getElementById('gen-preview').innerHTML='';
+  document.getElementById('gen-confirm-btn').style.display='none';
+  const range=getFinPeriodRange();
+  if(range){
+    document.getElementById('gen-from').value=range.from.toISOString().slice(0,10);
+    document.getElementById('gen-to').value=new Date(range.to.getTime()-1).toISOString().slice(0,10);
+  }
+  document.getElementById('generate-debts-modal').classList.add('open');
+}
+async function previewGenerateDebts(){
+  const from=document.getElementById('gen-from').value;
+  const to=document.getElementById('gen-to').value;
+  if(!from||!to){toast('Set period dates',true);return;}
+  const res=await financeApiCall('generate-debts',{from,to,preview:true});
+  if(res.error){toast(res.error,true);return;}
+  genPreviewData=res.suggestions||[];
+  const previewEl=document.getElementById('gen-preview');
+  if(!genPreviewData.length){
+    previewEl.innerHTML='<div style="color:var(--gray);font-size:13px">No auto-calc creditors have data for this period (no production logs or delivered orders).</div>';
+    document.getElementById('gen-confirm-btn').style.display='none';
+    return;
+  }
+  previewEl.innerHTML=`
+    <div style="font-size:12px;color:var(--gray);margin-bottom:10px">
+      ${res.delivered_count} delivered orders · ${res.total_frames} frames · ${Number(res.total_sqm||0).toFixed(2)} m²
+    </div>`+
+    genPreviewData.map((s,i)=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div>
+          <div style="font-weight:700;font-size:14px">${esc(s.creditor_name)}</div>
+          <div style="font-size:12px;color:var(--gray)">${esc(s.description)}</div>
+        </div>
+        <input class="form-input" style="width:120px;text-align:right" type="number" id="gen-amt-${i}" value="${s.amount}" min="0"/>
+      </div>`).join('');
+  document.getElementById('gen-confirm-btn').style.display='';
+}
+async function confirmGenerateDebts(){
+  const from=document.getElementById('gen-from').value;
+  const to=document.getElementById('gen-to').value;
+  // Read potentially edited amounts
+  genPreviewData.forEach((s,i)=>{
+    const el=document.getElementById('gen-amt-'+i);
+    if(el) s.amount=parseFloat(el.value)||s.amount;
+  });
+  const res=await financeApiCall('generate-debts',{from,to,preview:false});
+  if(res.error){toast(res.error,true);return;}
+  closeModal('generate-debts-modal');
+  await loadDebtsData();
+  renderDebts();
+  toast(res.created+' debt records created ✓');
+}
+
+// ── CREDITOR MANAGER ──────────────────────────────────────
+function openCreditorManager(){
+  resetCreditorForm();
+  renderCreditorList();
+  document.getElementById('creditor-modal').classList.add('open');
+}
+function renderCreditorList(){
+  const el=document.getElementById('creditor-list');
+  if(!allCreditors.length){el.innerHTML='<div style="color:var(--gray);font-size:13px">No creditors yet.</div>';return;}
+  el.innerHTML=allCreditors.map(c=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div>
+        <div style="font-weight:700;font-size:14px">${esc(c.name)} <span style="font-size:11px;color:var(--gray)">${esc(c.type)}</span></div>
+        <div style="font-size:12px;color:var(--gray)">${c.pay_type?c.pay_type+' · '+fmtDZD(c.rate)+'/unit':'Manual only'}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="editCreditor(${c.id})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCreditor(${c.id})">×</button>
+      </div>
+    </div>`).join('');
+}
+function editCreditor(id){
+  const c=allCreditors.find(x=>x.id===id);if(!c)return;
+  document.getElementById('cred-id').value=c.id;
+  document.getElementById('cred-name').value=c.name||'';
+  document.getElementById('cred-type').value=c.type||'other';
+  document.getElementById('cred-pay-type').value=c.pay_type||'';
+  document.getElementById('cred-rate').value=c.rate||0;
+  document.getElementById('cred-note').value=c.note||'';
+}
+function resetCreditorForm(){
+  ['cred-id','cred-name','cred-rate','cred-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cred-type').value='employee';
+  document.getElementById('cred-pay-type').value='';
+}
+async function saveCreditor(){
+  const id=document.getElementById('cred-id').value;
+  const name=document.getElementById('cred-name').value.trim();
+  const type=document.getElementById('cred-type').value;
+  const pay_type=document.getElementById('cred-pay-type').value||null;
+  const rate=parseFloat(document.getElementById('cred-rate').value)||0;
+  const note=document.getElementById('cred-note').value.trim();
+  if(!name){toast('Name required',true);return;}
+  const res=await financeApiCall('save-creditor',{id:id||undefined,name,type,pay_type,rate,note});
+  if(res.error){toast(res.error,true);return;}
+  await loadDebtsData();
+  renderCreditorList();
+  resetCreditorForm();
+  toast('Creditor saved ✓');
+}
+async function deleteCreditor(id){
+  if(!confirm('Remove this creditor? Existing debts are kept.'))return;
+  const res=await financeApiCall('delete-creditor',{id});
+  if(res.error){toast(res.error,true);return;}
+  await loadDebtsData();
+  renderCreditorList();
+  toast('Creditor removed');
+}
+
+// ── INCOME ────────────────────────────────────────────────
+function openAddIncome(){
+  document.getElementById('inc-amount').value='';
+  document.getElementById('inc-note').value='';
+  document.getElementById('inc-date').value=new Date().toISOString().slice(0,10);
+  const walletSel=document.getElementById('inc-wallet');
+  walletSel.innerHTML='<option value="">No wallet</option>'+
+    allWallets.map(w=>`<option value="${w.id}">${esc(w.name)}</option>`).join('');
+  document.getElementById('add-income-modal').classList.add('open');
+}
+async function saveIncome(){
+  const amount=parseFloat(document.getElementById('inc-amount').value)||0;
+  const type=document.getElementById('inc-type').value;
+  const wallet_id=document.getElementById('inc-wallet').value||null;
+  const date=document.getElementById('inc-date').value;
+  const note=document.getElementById('inc-note').value.trim();
+  if(!amount||!date){toast('Amount and date required',true);return;}
+  const res=await financeApiCall('add-income',{amount,type,wallet_id,date,note});
+  if(res.error){toast(res.error,true);return;}
+  closeModal('add-income-modal');
+  await loadDebtsData();
+  await loadNewFinanceData();
+  renderIncome();
+  renderWalletCards();
+  toast('Income logged ✓');
+}
+function renderIncome(){
+  const el=document.getElementById('income-list');
+  if(!el) return;
+  if(!allIncome.length){
+    el.innerHTML='<div style="padding:12px 0;font-size:13px;color:var(--gray)">No income logged yet.</div>';
+    return;
+  }
+  const typeColors={noest_payout:'var(--green)',cash_sale:'var(--yellow)',other:'var(--gray)'};
+  const typeLabels={noest_payout:'Noest Payout',cash_sale:'Cash Sale',other:'Other'};
+  const total=allIncome.reduce((s,i)=>s+Number(i.amount||0),0);
+  el.innerHTML=`<div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--green);margin-bottom:12px">Total: ${fmtDZD(total)}</div>`+
+    allIncome.map(i=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--green)">${fmtDZD(i.amount)}</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;padding:2px 7px;border-radius:99px;border:1px solid ${typeColors[i.type]||'var(--gray)'};color:${typeColors[i.type]||'var(--gray)'}">${typeLabels[i.type]||esc(i.type)}</span>
+          </div>
+          <div style="font-size:11px;color:var(--gray);margin-top:2px">${esc(i.date)}${i.note?' · '+esc(i.note):''}</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="deleteIncome(${i.id})">×</button>
+      </div>`).join('');
+}
+async function deleteIncome(id){
+  if(!confirm('Delete this income entry? Wallet balance will be reversed.'))return;
+  const res=await financeApiCall('delete-income',{id});
+  if(res.error){toast(res.error,true);return;}
+  await loadDebtsData();
+  await loadNewFinanceData();
+  renderIncome();
+  renderWalletCards();
+  toast('Income deleted');
+}
+
+// ── HOOK INTO updateFinance ───────────────────────────────
+const _origUpdateFinance2=updateFinance;
+updateFinance=async function(){
+  await _origUpdateFinance2();
+  await loadDebtsData();
+  renderDebts();
+  renderIncome();
+};
 </script>
 </body>
 </html>
