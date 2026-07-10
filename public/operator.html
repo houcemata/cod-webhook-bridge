@@ -632,16 +632,16 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
     <!-- Stats — only visible on "all" tab -->
     <div id="stats-section" class="stats-section">
       <!-- Daily Target Tracker -->
-      <div id="daily-target-banner" style="margin-bottom:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:12px 16px;display:none">
+      <div id="daily-target-banner" style="margin-bottom:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,45,142,0.25);border-radius:16px;padding:12px 16px;display:none">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#888">DAILY TARGET</div>
           <div style="display:flex;align-items:center;gap:8px">
-            <span id="target-count" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--yellow)">0/0</span>
-            <button onclick="promptSetTarget()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#888;border-radius:8px;padding:3px 8px;font-size:11px;cursor:pointer">SET</button>
+            <span id="target-count" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#ff2d8e">0/0</span>
+            
           </div>
         </div>
         <div style="background:rgba(255,255,255,0.05);border-radius:99px;height:6px;overflow:hidden">
-          <div id="target-bar" style="height:100%;border-radius:99px;background:var(--yellow);transition:width 0.4s;width:0%"></div>
+          <div id="target-bar" style="height:100%;border-radius:99px;background:linear-gradient(135deg,#ff2d8e,#a855f7);transition:width 0.4s;width:0%"></div>
         </div>
         <div id="target-msg" style="font-size:11px;color:#666;margin-top:6px;text-align:center"></div>
       </div>
@@ -1121,7 +1121,7 @@ function updateDailyTarget(){
   const msg=document.getElementById('target-msg');
 
   if(bar)bar.style.width=pct+'%';
-  if(bar)bar.style.background=pct>=100?'var(--green)':pct>=60?'var(--yellow)':'#e11d48';
+  if(bar)bar.style.background=pct>=100?'#22c55e':pct>=60?'linear-gradient(135deg,#ff2d8e,#a855f7)':'#e11d48';
   if(cnt)cnt.textContent=`${todayConfirmed}/${target}`;
 
   if(pct>=100)msg.textContent='🎯 Target reached!';
@@ -1137,10 +1137,12 @@ function updateKPIs(){
   const delivered=orders.filter(o=>o.status==='delivered').length;
   const confirmed=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
   const nonDraft=orders.filter(o=>o.status!=='draft').length;
-  const confRateAll=total?(confirmed/total*100).toFixed(1):'0.0';
-  const confRateNonDraft=nonDraft?(confirmed/nonDraft*100).toFixed(1):'0.0';
-  const delRateConfirmed=confirmed?(delivered/confirmed*100).toFixed(1):'0.0';
-  const delRateAll=total?(delivered/total*100).toFixed(1):'0.0';
+  const confirmedFunnel=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
+  const shippedFunnel=orders.filter(o=>['shipped','shipping','delivered','returned','not_delivered'].includes(o.status)).length;
+  const confRateAll=total?(confirmedFunnel/total*100).toFixed(1):'0.0';
+  const confRateNonDraft=nonDraft?(confirmedFunnel/nonDraft*100).toFixed(1):'0.0';
+  const delRateConfirmed=shippedFunnel?(delivered/shippedFunnel*100).toFixed(1):'0.0';
+  const delRateAll=nonDraft?(delivered/nonDraft*100).toFixed(1):'0.0';
   let html=`<div class="kpi-card total"><div class="kpi-label"><span class="dot"></span>Total Orders</div><div class="kpi-value">${total}</div></div>`;
   STATUSES.forEach(s=>{
     html+=`<div class="kpi-card"><div class="kpi-label"><span class="dot" style="background:${s.c}"></span>${s.l}</div><div class="kpi-value">${orders.filter(o=>o.status===s.k).length}</div></div>`;
