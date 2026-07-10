@@ -631,6 +631,20 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
 
     <!-- Stats — only visible on "all" tab -->
     <div id="stats-section" class="stats-section">
+      <!-- Daily Target Tracker -->
+      <div id="daily-target-banner" style="margin-bottom:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:12px 16px;display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#888">DAILY TARGET</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span id="target-count" style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--yellow)">0/0</span>
+            <button onclick="promptSetTarget()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#888;border-radius:8px;padding:3px 8px;font-size:11px;cursor:pointer">SET</button>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05);border-radius:99px;height:6px;overflow:hidden">
+          <div id="target-bar" style="height:100%;border-radius:99px;background:var(--yellow);transition:width 0.4s;width:0%"></div>
+        </div>
+        <div id="target-msg" style="font-size:11px;color:#666;margin-top:6px;text-align:center"></div>
+      </div>
       <div class="kpi-grid" id="kpi-grid"></div>
       <div class="chart-wrap">
         <div class="chart-title">Order Distribution</div>
@@ -1068,6 +1082,54 @@ function updateTabCounts(){
   if(cnt)cnt.textContent=`${filteredOrders.length} orders`;
 }
 
+// ── DAILY TARGET ──
+function getDailyTarget(){return parseInt(localStorage.getItem('daily_target')||'0',10);}
+function setDailyTarget(n){localStorage.setItem('daily_target',String(n));}
+
+function promptSetTarget(){
+  const cur=getDailyTarget();
+  const val=prompt('Set daily confirmed orders target:',cur||'');
+  if(val===null)return;
+  const n=parseInt(val,10);
+  if(!isNaN(n)&&n>=0){setDailyTarget(n);updateDailyTarget();}
+}
+
+function updateDailyTarget(){
+  const target=getDailyTarget();
+  const banner=document.getElementById('daily-target-banner');
+  if(!banner)return;
+  if(!target){banner.style.display='none';return;}
+  banner.style.display='block';
+
+  // Count today's confirmed orders (Algeria time UTC+1)
+  const now=new Date();
+  const alg=new Date(now.getTime()+60*60*1000);
+  const todayStart=new Date(Date.UTC(alg.getUTCFullYear(),alg.getUTCMonth(),alg.getUTCDate())-60*60*1000);
+  const todayEnd=new Date(todayStart.getTime()+86400000);
+
+  const CONFIRMED_STATUSES=new Set(['confirmed','shipped','shipping','delivered','not_delivered','returned','attempt_1','attempt_2','attempt_3','suspended','rescheduled']);
+  const todayConfirmed=allOrders.filter(o=>{
+    if(!CONFIRMED_STATUSES.has(o.status))return false;
+    if(!o.created_at)return false;
+    const d=new Date(o.created_at.endsWith('Z')?o.created_at:o.created_at+'Z');
+    return d>=todayStart&&d<todayEnd;
+  }).length;
+
+  const pct=Math.min(100,Math.round(todayConfirmed/target*100));
+  const bar=document.getElementById('target-bar');
+  const cnt=document.getElementById('target-count');
+  const msg=document.getElementById('target-msg');
+
+  if(bar)bar.style.width=pct+'%';
+  if(bar)bar.style.background=pct>=100?'var(--green)':pct>=60?'var(--yellow)':'#e11d48';
+  if(cnt)cnt.textContent=`${todayConfirmed}/${target}`;
+
+  if(pct>=100)msg.textContent='🎯 Target reached!';
+  else if(pct>=75)msg.textContent=`Almost there — ${target-todayConfirmed} more to go`;
+  else if(pct>=50)msg.textContent=`Halfway — keep pushing`;
+  else msg.textContent=`${target-todayConfirmed} confirmed orders to reach today's target`;
+}
+
 // ── KPIs ──
 function updateKPIs(){
   const orders=allOrders.filter(o=>inPeriod(o));
@@ -1088,6 +1150,7 @@ function updateKPIs(){
          <div class="kpi-card rate"><div class="kpi-label"><span class="dot"></span>Delivery Rate</div><div class="kpi-value">${delRateConfirmed}%</div><div class="kpi-sub">Delivered / confirmed orders</div></div>
          <div class="kpi-card rate"><div class="kpi-label"><span class="dot"></span>Delivery Rate</div><div class="kpi-value">${delRateAll}%</div><div class="kpi-sub">Delivered / all leads</div></div>`;
   document.getElementById('kpi-grid').innerHTML=html;
+  updateDailyTarget();
 }
 
 // ── DONUT ──
