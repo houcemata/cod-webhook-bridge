@@ -33,6 +33,23 @@ export default async function handler(req, res) {
       case "save-recurring":      return await saveRecurring(req, res);
       case "delete-recurring":    return await deleteRecurring(req, res);
 
+      // ── CREDITORS ─────────────────────────────────────────────────
+      case "get-creditors":       return await getCreditors(req, res);
+      case "save-creditor":       return await saveCreditor(req, res);
+      case "delete-creditor":     return await deleteCreditor(req, res);
+
+      // ── DEBTS ─────────────────────────────────────────────────────
+      case "get-debts":           return await getDebts(req, res);
+      case "add-debt":            return await addDebt(req, res);
+      case "delete-debt":         return await deleteDebt(req, res);
+      case "pay-debt":            return await payDebt(req, res);
+      case "generate-debts":      return await generateDebts(req, res);
+
+      // ── INCOME ────────────────────────────────────────────────────
+      case "get-income":          return await getIncome(req, res);
+      case "add-income":          return await addIncome(req, res);
+      case "delete-income":       return await deleteIncome(req, res);
+
       // ── BREAKDOWN ─────────────────────────────────────────────────
       case "get-breakdown":       return await getBreakdown(req, res);
 
@@ -494,4 +511,276 @@ function calcRecurringTotal(recurring, from, to) {
     }
     return s + amount;
   }, 0);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CREDITORS
+// ══════════════════════════════════════════════════════════════════
+
+async function getCreditors(req, res) {
+  const auth = await requireRole(req, ["admin", "operator"]);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  const sb = getServiceClient();
+  const { data, error } = await sb.from("creditors").select("*").eq("active", true).order("id");
+  if (error) return res.status(500).json({ error: error.message });
+  return res.status(200).json({ creditors: data || [] });
+}
+
+async function saveCreditor(req, res) {
+  const auth = await requireRole(req, ["admin"]);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  const { id, name, type, pay_type, rate, note } = req.body || {};
+  if (!name) return res.status(400).json({ error: "Name required" });
+  const sb = getServiceClient();
+  const payload = {
+    name: String(name).trim(),
+    type: String(type || "other").trim(),
+    pay_type: pay_type ? String(pay_type).trim() : null,
+    rate: Number(rate || 0),
+    note: String(note || "").trim() || null,
+  };
+  if (id) {
+    const { error } = await sb.from("creditors").update(payload).eq("id", id);
+    if (error) return res.status(500).json({ error: error.message });
+  } else {
+    const { error } = await sb.from("creditors").insert(payload);
+    if (error) return res.status(500).json({ error: error.message });
+  }
+  return res.status(200).json({ ok: true });
+}
+
+async function deleteCreditor(req, res) {
+  const auth = await requireRole(req, ["admin"]);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: "Missing id" });
+  const sb = getServiceClient();
+  // Soft delete — keep debt history
+  const { error } = await sb.from("creditors").update({ active: false }).eq("id", id);
+  if (error) return res.status(500).json({ error: error.message });
+  return res.status(200).json({ ok: true });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// DEBTS
+// ══════════════════════════════════════════════════════════════════
+
+async function getDebts(req, res) {
+  const auth = await requireRole(req, ["admin", "operator"]);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  const sb = getServiceClient();
+  const [{ data: debts }, { data: payments }] = await Promise.all([
+    sb.from("debts").select("*").order("created_at", { ascending: false }),
+    sb.from("debt_payments").select("*").order("paid_at", { ascending: false }),
+  ]);
+  return res.status(200).json({ debts: debts || [], payments: payments || [] });
+}
+
+async function addDebt(req, res) {
+  const auth = await requireRole(req, ["admin"]);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  const { creditor_id, creditor_name, amount, description, due_date, period_start, period_end } = req.body || {};
+  if (!creditor_name || !amount) return res.status(400).json({ error: "Creditor name and amount required" });
+  const sb = getServiceClient();
+  const { error } = await sb.from("debts").insert({
+    creditor_id: creditor_id ? Number(creditor_id) : null,
+    creditor_name: String(creditor_name).trim(),
+    amount: Number(amount),
+    description: String(description || "").trim() || null,
+    due_date: due_date || null,
+    period_start: period_start || null,
+    period_end: period_end || null,
+    status: "outstanding",
+    amount_paid: 0,
+  });
+  if (error) return res.status(500).json({ error: error.message });
+  return res.status(200).json({ ok: true });
+}
+
+async function deleteDebt(req, res) {
+  const auth = await requireRole(req, ["admin"]);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: "Missing id" });
+  const sb = getServiceClient();
+  const { error } = await sb.from("debts").delete().eq("id", id);
+  if (error) return res.status(500).json({ error: error.message });
+  return res.status(200).json({ ok: true });
+}
+
+async function payDebt(req, res) {
+  const auth = await requireRole(req, ["admin"]);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  const { debt_id, amount, wallet_id, note } = req.body || {};
+  if (!debt_id || !amount) return res.status(400).json({ error: "debt_id and amount required" });
+  const sb = getServiceClient();
+
+  // Get current debt
+  const { data: debt, error: fetchError } = await sb.from("debts").select("*").eq("id", debt_id).single();
+  if (fetchError || !debt) return res.status(404).json({ error: "Debt not found" });
+
+  const payAmount = Number(amount);
+  const newPaid = Number(debt.amount_paid || 0) + payAmount;
+  const newStatus = newPaid >= Number(debt.amount) ? "paid" : "partial";
+
+  // Log payment
+  const { error: payError } = await sb.from("debt_payments").insert({
+    debt_id: Number(debt_id),
+    amount: payAmount,
+    wallet_id: wallet_id ? Number(wallet_id) : null,
+    note: String(note || "").trim() || null,
+  });
+  if (payError) return res.status(500).json({ error: payError.message });
+
+  // Update debt status
+  const { error: updateError } = await sb.from("debts")
+    .update({ amount_paid: newPaid, status: newStatus })
+    .eq("id", debt_id);
+  if (updateError) return res.status(500).json({ error: updateError.message });
+
+  // Deduct from wallet
+  if (wallet_id) {
+    const { data: wallet } = await sb.from("wallets").select("balance").eq("id", wallet_id).single();
+    if (wallet) {
+      await sb.from("wallets").update({
+        balance: Math.max(0, Number(wallet.balance) - payAmount),
+      }).eq("id", wallet_id);
+    }
+  }
+
+  return res.status(200).json({ ok: true, new_status: newStatus, total_paid: newPaid });
+}
+
+async function generateDebts(req, res) {
+  const auth = await requireRole(req, ["admin"]);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+
+  const { from, to, preview } = req.body || {};
+  if (!from || !to) return res.status(400).json({ error: "from and to dates required" });
+
+  const sb = getServiceClient();
+
+  const [
+    { data: creditors },
+    { data: orders },
+    { data: prodLogs },
+  ] = await Promise.all([
+    sb.from("creditors").select("*").eq("active", true),
+    sb.from("orders").select("prix_total, shipping_cost, status, created_at")
+      .eq("status", "delivered").gte("created_at", from).lte("created_at", to),
+    sb.from("production_logs").select("*")
+      .gte("date", from.slice(0, 10)).lte("date", to.slice(0, 10)),
+  ]);
+
+  const deliveredCount = (orders || []).length;
+  const totalFrames = (prodLogs || []).reduce((s, l) =>
+    s + (l.m_frames || 0) + (l.l_frames || 0) + (l.xl_frames || 0) + (l.xxl_frames || 0), 0);
+  const totalSqm = (prodLogs || []).reduce((s, l) => s + Number(l.print_sqm || 0), 0);
+
+  // Calculate what each creditor is owed
+  const suggestions = (creditors || []).map(c => {
+    let amount = 0;
+    let description = "";
+    if (c.pay_type === "per_frame") {
+      amount = totalFrames * Number(c.rate || 0);
+      description = `${totalFrames} frames × ${c.rate} DZD`;
+    } else if (c.pay_type === "per_delivered") {
+      amount = deliveredCount * Number(c.rate || 0);
+      description = `${deliveredCount} delivered orders × ${c.rate} DZD`;
+    } else if (c.pay_type === "per_sqm") {
+      amount = totalSqm * Number(c.rate || 0);
+      description = `${totalSqm.toFixed(2)} m² × ${c.rate} DZD`;
+    } else {
+      return null; // manual creditors skip auto-gen
+    }
+    if (!amount) return null;
+    return {
+      creditor_id: c.id,
+      creditor_name: c.name,
+      amount: Math.round(amount),
+      description,
+      period_start: from.slice(0, 10),
+      period_end: to.slice(0, 10),
+    };
+  }).filter(Boolean);
+
+  // If preview=true just return suggestions without inserting
+  if (preview) {
+    return res.status(200).json({ suggestions, delivered_count: deliveredCount, total_frames: totalFrames, total_sqm: totalSqm });
+  }
+
+  // Insert debt records
+  if (suggestions.length) {
+    const { error } = await sb.from("debts").insert(
+      suggestions.map(s => ({ ...s, status: "outstanding", amount_paid: 0 }))
+    );
+    if (error) return res.status(500).json({ error: error.message });
+  }
+
+  return res.status(200).json({ ok: true, created: suggestions.length, suggestions });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INCOME
+// ══════════════════════════════════════════════════════════════════
+
+async function getIncome(req, res) {
+  const auth = await requireRole(req, ["admin", "operator"]);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  const sb = getServiceClient();
+  const { data, error } = await sb.from("income").select("*").order("date", { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  return res.status(200).json({ income: data || [] });
+}
+
+async function addIncome(req, res) {
+  const auth = await requireRole(req, ["admin"]);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  const { amount, type, wallet_id, date, note } = req.body || {};
+  if (!amount || !date) return res.status(400).json({ error: "Amount and date required" });
+  const sb = getServiceClient();
+
+  const { error } = await sb.from("income").insert({
+    amount: Number(amount),
+    type: String(type || "other").trim(),
+    wallet_id: wallet_id ? Number(wallet_id) : null,
+    date,
+    note: String(note || "").trim() || null,
+  });
+  if (error) return res.status(500).json({ error: error.message });
+
+  // Add to wallet balance
+  if (wallet_id) {
+    const { data: wallet } = await sb.from("wallets").select("balance").eq("id", wallet_id).single();
+    if (wallet) {
+      await sb.from("wallets").update({
+        balance: Number(wallet.balance) + Number(amount),
+      }).eq("id", wallet_id);
+    }
+  }
+
+  return res.status(200).json({ ok: true });
+}
+
+async function deleteIncome(req, res) {
+  const auth = await requireRole(req, ["admin"]);
+  if (!auth.ok) return res.status(auth.status).json({ error: auth.error });
+  const { id } = req.body || {};
+  if (!id) return res.status(400).json({ error: "Missing id" });
+  const sb = getServiceClient();
+
+  // Reverse wallet balance
+  const { data: entry } = await sb.from("income").select("*").eq("id", id).single();
+  if (entry?.wallet_id) {
+    const { data: wallet } = await sb.from("wallets").select("balance").eq("id", entry.wallet_id).single();
+    if (wallet) {
+      await sb.from("wallets").update({
+        balance: Math.max(0, Number(wallet.balance) - Number(entry.amount)),
+      }).eq("id", entry.wallet_id);
+    }
+  }
+
+  const { error } = await sb.from("income").delete().eq("id", id);
+  if (error) return res.status(500).json({ error: error.message });
+  return res.status(200).json({ ok: true });
 }
