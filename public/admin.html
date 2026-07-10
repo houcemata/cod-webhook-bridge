@@ -578,7 +578,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     <!-- FINANCE -->
     <div class="page" id="page-finance">
       <div class="page-header">
-        <div><div class="page-title">FINANCE</div><div class="page-subtitle">Revenue, ads & production</div></div>
+        <div><div class="page-title">FINANCE</div><div class="page-subtitle">Cash position, P&amp;L &amp; operations</div></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <select class="filter-select" id="fin-period" onchange="updateFinance()">
             <option value="month">This Month</option>
@@ -587,25 +587,57 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
             <option value="30days">Last 30 Days</option>
             <option value="all">All Time</option>
           </select>
+          <button class="btn btn-ghost btn-sm" onclick="openEmployeeManager()">⚙ Employees</button>
+          <button class="btn btn-ghost btn-sm" onclick="openRecurringManager()">↻ Recurring</button>
+          <button class="btn btn-ghost btn-sm" onclick="openWalletManager()">🏦 Wallets</button>
         </div>
       </div>
 
-      <!-- FINANCE KPIs -->
+      <!-- CASH POSITION -->
+      <div style="margin-bottom:8px;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--gray);text-transform:uppercase">Cash Position</div>
+      <div id="wallet-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px"></div>
+
+      <!-- NOEST RECONCILIATION -->
+      <div class="glass-card" style="padding:20px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">NOEST RECONCILIATION</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:2px">Delivered revenue vs actual payouts received</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openNoestPayout()">+ Log Payout</button>
+        </div>
+        <div id="noest-recon-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px"></div>
+        <div id="noest-payment-events" style="margin-bottom:12px"></div>
+        <div id="noest-payouts-list"></div>
+      </div>
+
+      <!-- P&L BREAKDOWN -->
       <div class="kpi-grid" style="margin-bottom:20px">
-        <div class="kpi-card hi"><div class="kpi-icon">💵</div><div class="kpi-label">Product Revenue</div><div class="kpi-value" id="fin-revenue">—</div><div class="kpi-sub">Delivered orders minus shipping</div></div>
-        <div class="kpi-card"><div class="kpi-icon">📤</div><div class="kpi-label">Expenses</div><div class="kpi-value" id="fin-expenses">—</div><div class="kpi-sub">All costs</div></div>
-        <div class="kpi-card"><div class="kpi-icon">📈</div><div class="kpi-label">Net Profit</div><div class="kpi-value" id="fin-profit">—</div><div class="kpi-sub" id="fin-margin">—% margin</div></div>
-        <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-label">Cost / Order</div><div class="kpi-value" id="fin-cpo">—</div><div class="kpi-sub">Per delivered order</div></div>
+        <div class="kpi-card hi"><div class="kpi-icon">💵</div><div class="kpi-label">Revenue</div><div class="kpi-value" id="fin-revenue">—</div><div class="kpi-sub">Delivered — shipping</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📣</div><div class="kpi-label">Ad Spend</div><div class="kpi-value" id="fin-adspend">—</div><div class="kpi-sub" id="fin-cpa-sub">— DZD CPA</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🏭</div><div class="kpi-label">COGS</div><div class="kpi-value" id="fin-cogs">—</div><div class="kpi-sub" id="fin-cogs-sub">Staff + production</div></div>
+        <div class="kpi-card"><div class="kpi-icon">↩️</div><div class="kpi-label">Shipping Loss</div><div class="kpi-value" id="fin-shiploss">—</div><div class="kpi-sub" id="fin-shiploss-sub">— returned orders</div></div>
+        <div class="kpi-card"><div class="kpi-icon">🔁</div><div class="kpi-label">Recurring</div><div class="kpi-value" id="fin-recurring">—</div><div class="kpi-sub">Fixed costs in period</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📤</div><div class="kpi-label">Other Expenses</div><div class="kpi-value" id="fin-expenses">—</div><div class="kpi-sub">Manual entries</div></div>
+        <div class="kpi-card hi"><div class="kpi-icon">📈</div><div class="kpi-label">Net Profit</div><div class="kpi-value" id="fin-profit">—</div><div class="kpi-sub" id="fin-margin">—% margin</div></div>
+        <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-label">Cost / Order</div><div class="kpi-value" id="fin-cpo">—</div><div class="kpi-sub">Total cost ÷ delivered</div></div>
         <div class="kpi-card"><div class="kpi-icon">🖼️</div><div class="kpi-label">Frames Made</div><div class="kpi-value" id="fin-frames">—</div><div class="kpi-sub">In period</div></div>
-        <div class="kpi-card"><div class="kpi-icon">👩‍💼</div><div class="kpi-label">Staff Costs</div><div class="kpi-value" id="fin-staffcost">—</div><div class="kpi-sub">Employee pay</div></div>
+        <div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-label">Staff Costs</div><div class="kpi-value" id="fin-staffcost">—</div><div class="kpi-sub" id="fin-staffcost-sub">—</div></div>
         <div class="kpi-card hi"><div class="kpi-icon">📦</div><div class="kpi-label">Stock Value</div><div class="kpi-value" id="fin-stock-value">—</div><div class="kpi-sub">At cost price</div></div>
       </div>
 
+      <!-- COST BREAKDOWN BAR -->
+      <div class="glass-card" style="padding:20px;margin-bottom:16px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:14px">COST BREAKDOWN</div>
+        <div id="cost-breakdown-bar"></div>
+      </div>
+
+      <!-- AD PERFORMANCE -->
       <div class="glass-card" style="padding:20px;margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px">
           <div>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">AD PERFORMANCE</div>
-            <div style="font-size:12px;color:var(--gray);margin-top:4px">Daily ad spend vs orders and confirmed pipeline</div>
+            <div style="font-size:12px;color:var(--gray);margin-top:4px">Daily spend vs orders — CPA flows into P&amp;L above</div>
           </div>
           <div id="ad-performance-source" style="font-size:12px;color:var(--gray)"></div>
         </div>
@@ -624,16 +656,14 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           <div id="production-log-list" style="max-height:300px;overflow-y:auto"></div>
         </div>
 
-      </div>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px">
-
         <!-- EMPLOYEE PAY -->
         <div class="glass-card" style="padding:20px">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">EMPLOYEE PAY</div>
           <div id="employee-pay-list"></div>
         </div>
+      </div>
 
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px">
         <!-- EXPENSES -->
         <div class="glass-card" style="padding:20px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -642,12 +672,12 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           </div>
           <div id="expenses-list" style="max-height:300px;overflow-y:auto"></div>
         </div>
-      </div>
 
-      <!-- REVENUE BY PRODUCT -->
-      <div class="glass-card" style="padding:20px;margin-bottom:16px">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">REVENUE BY PRODUCT SIZE</div>
-        <div id="revenue-by-size"></div>
+        <!-- REVENUE BY PRODUCT SIZE -->
+        <div class="glass-card" style="padding:20px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray);margin-bottom:16px">REVENUE BY SIZE</div>
+          <div id="revenue-by-size"></div>
+        </div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
@@ -656,9 +686,6 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
             <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gray)">PAY HISTORY</div>
             <select class="filter-select" id="pay-history-filter" onchange="renderPayHistory()" style="width:auto;min-width:150px">
               <option value="all">All Employees</option>
-              <option value="frame_maker">Frame Maker</option>
-              <option value="operator">Operator Girl</option>
-              <option value="print_guy">Print File Guy</option>
             </select>
           </div>
           <div id="pay-history-list" style="max-height:320px;overflow-y:auto"></div>
@@ -673,7 +700,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           </div>
           <div id="stock-usage-list" style="max-height:320px;overflow-y:auto"></div>
         </div>
-        </div>
+      </div>
 
     </div><!-- end page-finance -->
 
@@ -741,7 +768,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
     <!-- PRODUCT PERFORMANCE -->
     <div class="page" id="page-products-perf">
       <div class="page-header">
-        <div><div class="page-title">PRODUCTS</div><div class="page-subtitle">Revenue, delivery &amp; return rate per product</div></div>
+        <div><div class="page-title">PRODUCTS</div><div class="page-subtitle">Unit economics — revenue, COGS, shipping loss, gross profit per product</div></div>
         <select class="filter-select" id="pp-period" onchange="renderProductPerf()">
           <option value="all">All Time</option>
           <option value="month" selected>This Month</option>
@@ -749,8 +776,24 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           <option value="30days">Last 30 Days</option>
         </select>
       </div>
+
+      <!-- Cashflow KPIs (kept for compatibility) -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px" id="cashflow-kpis"></div>
-      <div class="ad-table" id="product-perf-table"></div>
+
+      <!-- Global ad spend context bar -->
+      <div class="glass-card" style="padding:16px 20px;margin-bottom:16px" id="pp-adspend-bar">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--gray);text-transform:uppercase">Global Ad Spend (period)</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--yellow)" id="pp-total-adspend">—</div>
+          <div style="font-size:12px;color:var(--gray)" id="pp-adspend-note">Shown as context — not attributed per product</div>
+        </div>
+      </div>
+
+      <!-- Per-product unit economics cards -->
+      <div id="product-unit-economics"></div>
+
+      <!-- Legacy table (hidden, kept for compat) -->
+      <div class="ad-table" id="product-perf-table" style="display:none"></div>
     </div>
 
     <div class="page" id="page-performance">
@@ -3522,6 +3565,759 @@ function toast(msg,isErr=false){
   const el=document.getElementById('toast');
   el.textContent=msg;el.className='show'+(isErr?' err':' ok');
   clearTimeout(_tt);_tt=setTimeout(()=>el.className='',3000);
+}
+</script>
+
+<!-- NOEST PAYOUT MODAL -->
+<div class="modal-overlay" id="noest-payout-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">LOG NOEST PAYOUT</div>
+      <button class="modal-close" onclick="closeModal('noest-payout-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:rgba(245,197,0,0.06);border:1px solid rgba(245,197,0,0.2);border-radius:12px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--gray)">
+        Record a bank transfer you received from Noest. This reduces the "Noest Owes Me" balance and increases your chosen wallet.
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Date Received</label><input class="form-input" id="np-date" type="date"/></div>
+        <div class="form-field"><label class="form-label">Amount (DZD)</label><input class="form-input" id="np-amount" type="number" min="0" placeholder="0"/></div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Add to Wallet</label>
+        <select class="form-select" id="np-wallet"></select>
+      </div>
+      <div class="form-row">
+        <div class="form-field"><label class="form-label">Reference / Virement #</label><input class="form-input" id="np-ref" placeholder="Optional"/></div>
+        <div class="form-field"><label class="form-label">Note</label><input class="form-input" id="np-note" placeholder="Optional"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('noest-payout-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNoestPayout()">Save Payout</button>
+    </div>
+  </div>
+</div>
+
+<!-- WALLET MANAGER MODAL -->
+<div class="modal-overlay" id="wallet-modal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-title">MANAGE WALLETS</div>
+      <button class="modal-close" onclick="closeModal('wallet-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="wallet-list" style="margin-bottom:20px"></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:16px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--gray);text-transform:uppercase;margin-bottom:12px">Add / Edit Wallet</div>
+        <input type="hidden" id="wlt-id"/>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Name</label><input class="form-input" id="wlt-name" placeholder="e.g. CCP"/></div>
+          <div class="form-field"><label class="form-label">Type</label>
+            <select class="form-select" id="wlt-type">
+              <option value="cash">Cash</option>
+              <option value="bank">Bank</option>
+              <option value="ccp">CCP</option>
+              <option value="baridimob">Baridimob</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field"><label class="form-label">Current Balance (DZD)</label><input class="form-input" id="wlt-balance" type="number" placeholder="0"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('wallet-modal')">Close</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetWalletForm()">Clear</button>
+      <button class="btn btn-primary" onclick="saveWallet()">Save Wallet</button>
+    </div>
+  </div>
+</div>
+
+<!-- EMPLOYEE MANAGER MODAL -->
+<div class="modal-overlay" id="employee-modal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-title">MANAGE EMPLOYEES</div>
+      <button class="modal-close" onclick="closeModal('employee-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="emp-list" style="margin-bottom:20px"></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:16px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--gray);text-transform:uppercase;margin-bottom:12px">Add / Edit Employee</div>
+        <input type="hidden" id="emp-id"/>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Name</label><input class="form-input" id="emp-name" placeholder="Full name"/></div>
+          <div class="form-field"><label class="form-label">Role / Title</label><input class="form-input" id="emp-role" placeholder="e.g. Frame Maker"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Pay Type</label>
+            <select class="form-select" id="emp-pay-type" onchange="updateEmpRateLabel()">
+              <option value="per_frame">Per Frame Made</option>
+              <option value="per_delivered">Per Delivered Order</option>
+              <option value="fixed_weekly">Fixed Weekly (Thu)</option>
+              <option value="per_sqm">Per m² Printed</option>
+            </select>
+          </div>
+          <div class="form-field"><label class="form-label" id="emp-rate-label">Rate (DZD)</label><input class="form-input" id="emp-rate" type="number" min="0" placeholder="0"/></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('employee-modal')">Close</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetEmpForm()">Clear</button>
+      <button class="btn btn-primary" onclick="saveEmployeeDB()">Save Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECURRING EXPENSES MANAGER MODAL -->
+<div class="modal-overlay" id="recurring-modal">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <div class="modal-title">RECURRING EXPENSES</div>
+      <button class="modal-close" onclick="closeModal('recurring-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:12px;color:var(--gray);margin-bottom:14px">These are automatically calculated for the selected period — no manual entry needed each month.</div>
+      <div id="recurring-list" style="margin-bottom:20px"></div>
+      <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:16px">
+        <input type="hidden" id="rec-id"/>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Name</label><input class="form-input" id="rec-name" placeholder="e.g. Adobe CC"/></div>
+          <div class="form-field"><label class="form-label">Amount (DZD)</label><input class="form-input" id="rec-amount" type="number" min="0" placeholder="0"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-field"><label class="form-label">Category</label>
+            <select class="form-select" id="rec-category">
+              <option value="tools">Tools / Software</option>
+              <option value="rent">Rent</option>
+              <option value="marketing">Marketing</option>
+              <option value="staff">Staff</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-field"><label class="form-label">Frequency</label>
+            <select class="form-select" id="rec-frequency">
+              <option value="monthly">Monthly</option>
+              <option value="weekly">Weekly</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('recurring-modal')">Close</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetRecForm()">Clear</button>
+      <button class="btn btn-primary" onclick="saveRecurring()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// NEW FINANCE SYSTEM — wallets, Noest payouts, employees DB,
+// recurring expenses, unit economics
+// ══════════════════════════════════════════════════════════
+
+let allWallets=[], allNoestPayouts=[], allNoestPaymentEvents=[];
+let allEmployeesDB=[], allRecurring=[];
+let finAdSpend=0; // set when ad-performance loads
+
+async function financeApiCall(action, body={}, method='POST'){
+  const {data:{session}}=await sb.auth.getSession();
+  const token=session?.access_token;
+  if(!token) return {error:'Not logged in'};
+  const isGet=method==='GET';
+  const url=isGet?`/api/finance?action=${action}`:`/api/finance?action=${action}`;
+  const opts={method,headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'}};
+  if(!isGet) opts.body=JSON.stringify(body);
+  const res=await fetch(url,opts);
+  return res.json().catch(()=>({error:'Request failed'}));
+}
+
+// ── LOAD ALL NEW DATA ──────────────────────────────────────
+async function loadNewFinanceData(){
+  const [walletRes, noestRes, empRes, recRes] = await Promise.all([
+    financeApiCall('get-wallets','','GET'),
+    financeApiCall('get-noest-summary','','GET'),
+    financeApiCall('get-employees','','GET'),
+    financeApiCall('get-recurring','','GET'),
+  ]);
+  allWallets            = walletRes.wallets||[];
+  allNoestPayouts       = noestRes.payouts||[];
+  allNoestPaymentEvents = noestRes.payment_events||[];
+  allEmployeesDB        = empRes.employees||[];
+  allRecurring          = recRes.recurring||[];
+  window._noestSummary  = noestRes;
+}
+
+// ── WALLETS ───────────────────────────────────────────────
+function renderWalletCards(){
+  const el=document.getElementById('wallet-cards');
+  if(!el) return;
+  if(!allWallets.length){
+    el.innerHTML='<div style="color:var(--gray);font-size:13px">No wallets configured. Click 🏦 Wallets to add one.</div>';
+    return;
+  }
+  const total=allWallets.reduce((s,w)=>s+Number(w.balance||0),0);
+  el.innerHTML=allWallets.map(w=>`
+    <div class="kpi-card" style="cursor:pointer" onclick="openWalletManager()">
+      <div class="kpi-label">${esc(w.name)}</div>
+      <div class="kpi-value" style="font-size:26px;color:var(--yellow)">${fmtDZD(w.balance)}</div>
+      <div class="kpi-sub">${esc(w.type)}</div>
+    </div>`).join('')+`
+    <div class="kpi-card hi">
+      <div class="kpi-label">Total Cash</div>
+      <div class="kpi-value" style="font-size:26px">${fmtDZD(total)}</div>
+      <div class="kpi-sub">All wallets</div>
+    </div>`;
+}
+
+function openWalletManager(){
+  resetWalletForm();
+  renderWalletList();
+  document.getElementById('wallet-modal').classList.add('open');
+}
+function renderWalletList(){
+  const el=document.getElementById('wallet-list');
+  if(!allWallets.length){el.innerHTML='<div style="color:var(--gray);font-size:13px">No wallets yet.</div>';return;}
+  el.innerHTML=allWallets.map(w=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div>
+        <div style="font-weight:700;font-size:14px">${esc(w.name)} <span style="font-size:11px;color:var(--gray)">(${esc(w.type)})</span></div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--yellow)">${fmtDZD(w.balance)}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="editWallet(${w.id})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteWalletDB(${w.id})">×</button>
+      </div>
+    </div>`).join('');
+}
+function editWallet(id){
+  const w=allWallets.find(x=>x.id===id);if(!w)return;
+  document.getElementById('wlt-id').value=w.id;
+  document.getElementById('wlt-name').value=w.name||'';
+  document.getElementById('wlt-type').value=w.type||'cash';
+  document.getElementById('wlt-balance').value=w.balance||0;
+}
+function resetWalletForm(){
+  ['wlt-id','wlt-name','wlt-balance'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('wlt-type').value='cash';
+}
+async function saveWallet(){
+  const id=document.getElementById('wlt-id').value;
+  const name=document.getElementById('wlt-name').value.trim();
+  const type=document.getElementById('wlt-type').value;
+  const balance=parseFloat(document.getElementById('wlt-balance').value)||0;
+  if(!name){toast('Wallet name required',true);return;}
+  const action=id?'update-wallet':'add-wallet';
+  const res=await financeApiCall(action,{id:id||undefined,name,type,balance});
+  if(res.error){toast(res.error,true);return;}
+  await loadNewFinanceData();
+  renderWalletList();
+  renderWalletCards();
+  populateWalletSelects();
+  resetWalletForm();
+  toast('Wallet saved ✓');
+}
+async function deleteWalletDB(id){
+  if(!confirm('Delete this wallet?'))return;
+  const res=await financeApiCall('delete-wallet',{id});
+  if(res.error){toast(res.error,true);return;}
+  await loadNewFinanceData();
+  renderWalletList();
+  renderWalletCards();
+  toast('Wallet deleted');
+}
+function populateWalletSelects(){
+  const sel=document.getElementById('np-wallet');
+  if(!sel) return;
+  sel.innerHTML='<option value="">None (tracking only)</option>'+
+    allWallets.map(w=>`<option value="${w.id}">${esc(w.name)}</option>`).join('');
+}
+
+// ── NOEST RECONCILIATION ──────────────────────────────────
+function renderNoestRecon(){
+  const ns=window._noestSummary||{};
+  const kpiEl=document.getElementById('noest-recon-kpis');
+  const payoutsEl=document.getElementById('noest-payouts-list');
+  const eventsEl=document.getElementById('noest-payment-events');
+  if(!kpiEl) return;
+
+  const owes=Number(ns.noest_owes||0);
+  const signaled=Number(ns.noest_signaled_amount||0);
+  const paid=Number(ns.total_paid_out||0);
+  const delAmt=Number(ns.total_delivered_amount||0);
+
+  kpiEl.innerHTML=`
+    <div class="kpi-card"><div class="kpi-label">📦 Delivered Value</div><div class="kpi-value" style="font-size:24px;color:var(--white)">${fmtDZD(delAmt)}</div><div class="kpi-sub">${ns.total_delivered_count||0} orders</div></div>
+    <div class="kpi-card hi"><div class="kpi-label">💸 Noest Owes You</div><div class="kpi-value" style="font-size:24px;color:var(--yellow)">${fmtDZD(owes)}</div><div class="kpi-sub">Delivered − paid out</div></div>
+    <div class="kpi-card"><div class="kpi-label">✅ Paid Out</div><div class="kpi-value" style="font-size:24px;color:var(--green)">${fmtDZD(paid)}</div><div class="kpi-sub">Logged transfers</div></div>
+    <div class="kpi-card"><div class="kpi-label">📡 Noest Signaled</div><div class="kpi-value" style="font-size:24px;color:var(--blue)">${fmtDZD(signaled)}</div><div class="kpi-sub">Auto-detected from tracking</div></div>`;
+
+  // Payment events
+  if(eventsEl){
+    const events=ns.payment_events||[];
+    if(events.length){
+      eventsEl.innerHTML=`<div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--gray);text-transform:uppercase;margin-bottom:8px">Noest Payment Signals (auto-detected)</div>`+
+        events.slice(0,5).map(e=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:12px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
+            <div style="flex:1;color:var(--gray)">${esc(e.order_id||e.tracking_number)}</div>
+            <div style="color:var(--yellow)">${fmtDZD(e.order_amount||0)}</div>
+            <div style="color:var(--gray2)">${esc(e.event_date||'').slice(0,10)}</div>
+          </div>`).join('')+
+        (events.length>5?`<div style="font-size:11px;color:var(--gray);padding-top:6px">+${events.length-5} more signals</div>`:'');
+    } else {
+      eventsEl.innerHTML='';
+    }
+  }
+
+  // Payouts list
+  if(payoutsEl){
+    const payouts=ns.payouts||[];
+    if(!payouts.length){
+      payoutsEl.innerHTML='<div style="padding:12px 0;font-size:13px;color:var(--gray)">No payouts logged yet. Click "+ Log Payout" when Noest transfers your money.</div>';
+    } else {
+      payoutsEl.innerHTML=`<div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--gray);text-transform:uppercase;margin-bottom:8px">Logged Payouts</div>`+
+        payouts.map(p=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+            <div>
+              <div style="font-weight:700;font-size:14px">${fmtDZD(p.amount)}</div>
+              <div style="font-size:11px;color:var(--gray)">${esc(p.date)} ${p.reference?'· '+esc(p.reference):''} ${p.note?'· '+esc(p.note):''}</div>
+            </div>
+            <button class="btn btn-danger btn-sm" onclick="deleteNoestPayout(${p.id})">×</button>
+          </div>`).join('');
+    }
+  }
+}
+
+function openNoestPayout(){
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('np-date').value=today;
+  document.getElementById('np-amount').value='';
+  document.getElementById('np-ref').value='';
+  document.getElementById('np-note').value='';
+  populateWalletSelects();
+  document.getElementById('noest-payout-modal').classList.add('open');
+}
+async function saveNoestPayout(){
+  const date=document.getElementById('np-date').value;
+  const amount=parseFloat(document.getElementById('np-amount').value)||0;
+  const wallet_id=document.getElementById('np-wallet').value||null;
+  const reference=document.getElementById('np-ref').value.trim();
+  const note=document.getElementById('np-note').value.trim();
+  if(!date||!amount){toast('Date and amount required',true);return;}
+  const res=await financeApiCall('log-noest-payout',{date,amount,wallet_id,reference,note});
+  if(res.error){toast(res.error,true);return;}
+  closeModal('noest-payout-modal');
+  await loadNewFinanceData();
+  renderNoestRecon();
+  renderWalletCards();
+  toast('Payout logged ✓');
+}
+async function deleteNoestPayout(id){
+  if(!confirm('Delete this payout record?'))return;
+  const res=await financeApiCall('delete-noest-payout',{id});
+  if(res.error){toast(res.error,true);return;}
+  await loadNewFinanceData();
+  renderNoestRecon();
+  renderWalletCards();
+  toast('Payout deleted');
+}
+
+// ── EMPLOYEES DB ──────────────────────────────────────────
+function openEmployeeManager(){
+  resetEmpForm();
+  renderEmpList();
+  document.getElementById('employee-modal').classList.add('open');
+}
+function renderEmpList(){
+  const el=document.getElementById('emp-list');
+  if(!allEmployeesDB.length){el.innerHTML='<div style="color:var(--gray);font-size:13px">No employees yet.</div>';return;}
+  el.innerHTML=allEmployeesDB.map(e=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div>
+        <div style="font-weight:700;font-size:14px">${esc(e.name)} <span style="font-size:11px;color:var(--gray)">${esc(e.role||'')}</span></div>
+        <div style="font-size:12px;color:var(--gray)">${empPayLabel(e)}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="editEmployee(${e.id})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteEmployeeDB(${e.id})">×</button>
+      </div>
+    </div>`).join('');
+}
+function empPayLabel(e){
+  if(e.pay_type==='per_frame')    return `${fmtDZD(e.rate)} / frame`;
+  if(e.pay_type==='per_delivered')return `${fmtDZD(e.rate)} / delivered order`;
+  if(e.pay_type==='fixed_weekly') return `${fmtDZD(e.rate)} / week (Thu)`;
+  if(e.pay_type==='per_sqm')      return `${fmtDZD(e.rate)} / m²`;
+  return `${fmtDZD(e.rate)}`;
+}
+function editEmployee(id){
+  const e=allEmployeesDB.find(x=>x.id===id);if(!e)return;
+  document.getElementById('emp-id').value=e.id;
+  document.getElementById('emp-name').value=e.name||'';
+  document.getElementById('emp-role').value=e.role||'';
+  document.getElementById('emp-pay-type').value=e.pay_type||'per_frame';
+  document.getElementById('emp-rate').value=e.rate||0;
+  updateEmpRateLabel();
+}
+function resetEmpForm(){
+  ['emp-id','emp-name','emp-role','emp-rate'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('emp-pay-type').value='per_frame';
+  updateEmpRateLabel();
+}
+function updateEmpRateLabel(){
+  const t=document.getElementById('emp-pay-type').value;
+  const labels={per_frame:'Rate / Frame (DZD)',per_delivered:'Rate / Delivered Order (DZD)',fixed_weekly:'Weekly Amount (DZD)',per_sqm:'Rate / m² (DZD)'};
+  document.getElementById('emp-rate-label').textContent=labels[t]||'Rate (DZD)';
+}
+async function saveEmployeeDB(){
+  const id=document.getElementById('emp-id').value;
+  const name=document.getElementById('emp-name').value.trim();
+  const role=document.getElementById('emp-role').value.trim();
+  const pay_type=document.getElementById('emp-pay-type').value;
+  const rate=parseFloat(document.getElementById('emp-rate').value)||0;
+  if(!name){toast('Name required',true);return;}
+  const res=await financeApiCall('save-employee',{id:id||undefined,name,role,pay_type,rate});
+  if(res.error){toast(res.error,true);return;}
+  await loadNewFinanceData();
+  renderEmpList();
+  resetEmpForm();
+  toast('Employee saved ✓');
+}
+async function deleteEmployeeDB(id){
+  if(!confirm('Remove this employee?'))return;
+  const res=await financeApiCall('delete-employee',{id});
+  if(res.error){toast(res.error,true);return;}
+  await loadNewFinanceData();
+  renderEmpList();
+  toast('Employee removed');
+}
+function populatePayHistoryFilter(){
+  const sel=document.getElementById('pay-history-filter');
+  if(!sel) return;
+  const cur=sel.value||'all';
+  sel.innerHTML='<option value="all">All Employees</option>'+
+    allEmployeesDB.map(e=>`<option value="${esc(e.key)}">${esc(e.name)}</option>`).join('');
+  sel.value=[...sel.options].some(o=>o.value===cur)?cur:'all';
+}
+
+// ── RECURRING EXPENSES ────────────────────────────────────
+function openRecurringManager(){
+  resetRecForm();
+  renderRecurringList();
+  document.getElementById('recurring-modal').classList.add('open');
+}
+function renderRecurringList(){
+  const el=document.getElementById('recurring-list');
+  if(!allRecurring.length){el.innerHTML='<div style="color:var(--gray);font-size:13px">No recurring expenses yet.</div>';return;}
+  el.innerHTML=allRecurring.map(r=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div>
+        <div style="font-weight:700;font-size:14px">${esc(r.name)}</div>
+        <div style="font-size:12px;color:var(--gray)">${fmtDZD(r.amount)} / ${esc(r.frequency)} · ${esc(r.category)}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" onclick="editRecurring(${r.id})">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteRecurringDB(${r.id})">×</button>
+      </div>
+    </div>`).join('');
+}
+function editRecurring(id){
+  const r=allRecurring.find(x=>x.id===id);if(!r)return;
+  document.getElementById('rec-id').value=r.id;
+  document.getElementById('rec-name').value=r.name||'';
+  document.getElementById('rec-amount').value=r.amount||0;
+  document.getElementById('rec-category').value=r.category||'other';
+  document.getElementById('rec-frequency').value=r.frequency||'monthly';
+}
+function resetRecForm(){
+  ['rec-id','rec-name','rec-amount'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('rec-category').value='other';
+  document.getElementById('rec-frequency').value='monthly';
+}
+async function saveRecurring(){
+  const id=document.getElementById('rec-id').value;
+  const name=document.getElementById('rec-name').value.trim();
+  const amount=parseFloat(document.getElementById('rec-amount').value)||0;
+  const category=document.getElementById('rec-category').value;
+  const frequency=document.getElementById('rec-frequency').value;
+  if(!name||!amount){toast('Name and amount required',true);return;}
+  const res=await financeApiCall('save-recurring',{id:id||undefined,name,amount,category,frequency});
+  if(res.error){toast(res.error,true);return;}
+  await loadNewFinanceData();
+  renderRecurringList();
+  resetRecForm();
+  await updateFinance();
+  toast('Recurring expense saved ✓');
+}
+async function deleteRecurringDB(id){
+  if(!confirm('Delete this recurring expense?'))return;
+  const res=await financeApiCall('delete-recurring',{id});
+  if(res.error){toast(res.error,true);return;}
+  await loadNewFinanceData();
+  renderRecurringList();
+  await updateFinance();
+  toast('Recurring expense deleted');
+}
+
+// ── COST BREAKDOWN BAR ────────────────────────────────────
+function renderCostBreakdownBar(adSpend, staffCost, shippingLoss, expTotal, recurringTotal){
+  const el=document.getElementById('cost-breakdown-bar');
+  if(!el) return;
+  const total=adSpend+staffCost+shippingLoss+expTotal+recurringTotal;
+  if(!total){el.innerHTML='<div style="color:var(--gray);font-size:13px">No cost data for this period.</div>';return;}
+  const pct=v=>total?Math.round(v/total*100):0;
+  const segments=[
+    {label:'Ad Spend', value:adSpend, color:'#3b82f6'},
+    {label:'Staff', value:staffCost, color:'#8b5cf6'},
+    {label:'Ship Loss', value:shippingLoss, color:'#e11d48'},
+    {label:'Expenses', value:expTotal, color:'#F5C500'},
+    {label:'Recurring', value:recurringTotal, color:'#22c55e'},
+  ].filter(s=>s.value>0);
+
+  const bar=segments.map(s=>`<div style="height:100%;width:${pct(s.value)}%;background:${s.color};transition:width 0.4s"></div>`).join('');
+  const legend=segments.map(s=>`
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+      <div style="width:10px;height:10px;border-radius:2px;background:${s.color};flex-shrink:0"></div>
+      <div style="color:var(--gray)">${s.label}</div>
+      <div style="color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:14px">${pct(s.value)}%</div>
+      <div style="color:var(--gray2);font-size:11px">${fmtDZD(s.value)}</div>
+    </div>`).join('');
+
+  el.innerHTML=`
+    <div style="height:14px;border-radius:99px;overflow:hidden;display:flex;background:rgba(255,255,255,0.05);margin-bottom:14px">${bar}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px 20px">${legend}</div>`;
+}
+
+// ── UPDATED updateFinance ─────────────────────────────────
+// Patched to load new data and render new sections.
+// Original updateFinance is renamed to _origUpdateFinance.
+const _origUpdateFinance = updateFinance;
+updateFinance = async function(){
+  await loadNewFinanceData();
+  await _origUpdateFinance();
+
+  // Render new sections
+  renderWalletCards();
+  renderNoestRecon();
+  populatePayHistoryFilter();
+
+  // Grab ad spend total from the loaded ad summary
+  const adSummary=adPerformanceSummary||{};
+  finAdSpend=Number(adSummary?.meta?.total_spend||0)+Number(adSummary?.tiktok?.total_spend||0);
+
+  // Update P&L with ad spend in the new KPI cards
+  const finRevEl=document.getElementById('fin-revenue');
+  const revenue=finRevEl?parseFloat(finRevEl.textContent.replace(/[^\d.-]/g,'').replace(/\s/g,''))||0:0;
+  document.getElementById('fin-adspend').textContent=fmtDZD(finAdSpend);
+  const delivCount=allOrders.filter(o=>o.status==='delivered'&&inFinRange(o.created_at,getFinPeriodRange())).length;
+  const cpa=delivCount&&finAdSpend?Math.round(finAdSpend/delivCount):0;
+  document.getElementById('fin-cpa-sub').textContent=cpa?`${fmtDZD(cpa)} CPA`:'No ad data';
+
+  // Shipping loss KPI
+  const range=getFinPeriodRange();
+  const periodOrders=allOrders.filter(o=>inFinRange(o.created_at,range));
+  const returnedOrders=periodOrders.filter(o=>o.status==='returned'||o.status==='not_delivered');
+  const shippingLoss=returnedOrders.reduce((s,o)=>s+Number(o.shipping_cost||0),0);
+  document.getElementById('fin-shiploss').textContent=fmtDZD(shippingLoss);
+  document.getElementById('fin-shiploss-sub').textContent=`${returnedOrders.length} returned orders`;
+
+  // Recurring in period
+  const recurringTotal=calcRecurringInPeriod(allRecurring, range);
+  document.getElementById('fin-recurring').textContent=fmtDZD(recurringTotal);
+
+  // Staff detail sub
+  const periodLogs=allProductionLogs.filter(l=>inFinRange(l.date,range));
+  const fmPay=periodLogs.reduce((s,l)=>s+Number(l.total_pay_frame_maker||0),0);
+  const delivOrd=periodOrders.filter(o=>o.status==='delivered');
+  const opEmp=allEmployeesDB.find(e=>e.key==='operator');
+  const prEmp=allEmployeesDB.find(e=>e.key==='printer');
+  const pgEmp=allEmployeesDB.find(e=>e.key==='print_guy');
+  const opPay=opEmp?delivOrd.length*Number(opEmp.rate||0):delivOrd.length*150;
+  const sqm=periodLogs.reduce((s,l)=>s+Number(l.print_sqm||0),0);
+  const prPay=prEmp?sqm*Number(prEmp.rate||0):sqm*450;
+  const thu=countThursdays(range);
+  const pgPay=pgEmp?thu*Number(pgEmp.rate||0):thu*2000;
+  const staffTotal=fmPay+opPay+prPay+pgPay;
+  const expEl=document.getElementById('fin-expenses');
+  const expTotal=expEl?parseFloat(expEl.textContent.replace(/[^\d.-]/g,'').replace(/\s/g,''))||0:0;
+  document.getElementById('fin-staffcost-sub').textContent=`FM:${fmtDZD(fmPay)} Op:${fmtDZD(opPay)} Pr:${fmtDZD(prPay)} PG:${fmtDZD(pgPay)}`;
+
+  renderCostBreakdownBar(finAdSpend, staffTotal, shippingLoss, expTotal, recurringTotal);
+};
+
+function calcRecurringInPeriod(recurring, range){
+  if(!recurring||!recurring.length) return 0;
+  if(!range) return recurring.reduce((s,r)=>s+Number(r.amount||0),0);
+  const start=range.from;
+  const end=range.to;
+  const days=Math.max(1,Math.round((end-start)/86400000));
+  return recurring.filter(r=>r.active!==false).reduce((s,r)=>{
+    const amt=Number(r.amount||0);
+    if(r.frequency==='monthly') return s+amt*(days/30);
+    if(r.frequency==='weekly')  return s+amt*(days/7);
+    return s+amt;
+  },0);
+}
+
+// ══════════════════════════════════════════════════════════
+// PRODUCTS PERFORMANCE — unit economics
+// ══════════════════════════════════════════════════════════
+
+async function renderProductPerf(){
+  // Keep existing cashflow KPIs working
+  const range=getPPPeriodRange();
+  const orders=range?allOrders.filter(o=>{
+    if(!o.created_at)return false;
+    const d=new Date(o.created_at.endsWith('Z')?o.created_at:o.created_at+'Z');
+    return d>=range.start&&d<range.end;
+  }):allOrders;
+  const inTransit=orders.filter(o=>o.status==='shipped'||o.status==='shipping');
+  const cashInTransit=inTransit.reduce((s,o)=>s+Number(o.prix_total||0),0);
+  const delivered=orders.filter(o=>o.status==='delivered');
+  const cashCollected=delivered.reduce((s,o)=>s+Number(o.prix_total||0),0);
+  const returned=orders.filter(o=>o.status==='returned'||o.status==='not_delivered');
+  const cashLost=returned.reduce((s,o)=>s+Number(o.shipping_cost||0),0);
+  const pending=orders.filter(o=>o.status==='confirmed');
+  const cashPending=pending.reduce((s,o)=>s+Number(o.prix_total||0),0);
+  document.getElementById('cashflow-kpis').innerHTML=`
+    <div class="kpi-card hi" style="padding:16px"><div class="kpi-label">💵 COLLECTED</div><div class="kpi-value" style="font-size:28px;color:var(--green)">${fmtDZD(cashCollected)}</div><div class="kpi-sub">${delivered.length} delivered</div></div>
+    <div class="kpi-card" style="padding:16px"><div class="kpi-label">🚚 IN TRANSIT</div><div class="kpi-value" style="font-size:28px;color:var(--yellow)">${fmtDZD(cashInTransit)}</div><div class="kpi-sub">${inTransit.length} orders</div></div>
+    <div class="kpi-card" style="padding:16px"><div class="kpi-label">⏳ CONFIRMED</div><div class="kpi-value" style="font-size:28px;color:#3b82f6">${fmtDZD(cashPending)}</div><div class="kpi-sub">${pending.length} awaiting</div></div>
+    <div class="kpi-card" style="padding:16px"><div class="kpi-label">❌ SHIP LOST</div><div class="kpi-value" style="font-size:28px;color:var(--red)">${fmtDZD(cashLost)}</div><div class="kpi-sub">${returned.length} returned</div></div>`;
+
+  // Ad spend context
+  const adSpendEl=document.getElementById('pp-total-adspend');
+  const adNoteEl=document.getElementById('pp-adspend-note');
+  if(adSpendEl){
+    adSpendEl.textContent=finAdSpend?fmtDZD(finAdSpend):'Not loaded';
+    if(adNoteEl) adNoteEl.textContent=finAdSpend
+      ?`CPA (real): ${delivered.length?fmtDZD(Math.round(finAdSpend/delivered.length)):'-'} · Shown as context, not attributed per product`
+      :'Go to Finance tab to load ad spend first';
+  }
+
+  // Build per-product stats
+  const productStats={};
+  const nonDraft=orders.filter(o=>o.status!=='draft'&&o.status!=='pending'&&o.status!=='duplicated');
+  nonDraft.forEach(o=>{
+    const items=Array.isArray(o.items)&&o.items.length
+      ?o.items
+      :[{product:o.product,variant:o.variable,line_price:Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0))}];
+    items.forEach(it=>{
+      const key=it.product||'Unknown';
+      if(!productStats[key]) productStats[key]={name:key,orders:0,delivered:0,returned:0,pending:0,revenue:0,shipping_loss:0,variants:{}};
+      const p=productStats[key];
+      p.orders++;
+      const vkey=it.variant||it.size||'Standard';
+      if(!p.variants[vkey]) p.variants[vkey]={name:vkey,orders:0,delivered:0,revenue:0};
+      p.variants[vkey].orders++;
+      if(o.status==='delivered'){
+        p.delivered++;
+        p.revenue+=Number(it.line_price||0);
+        p.variants[vkey].delivered++;
+        p.variants[vkey].revenue+=Number(it.line_price||0);
+      }
+      if(o.status==='returned'||o.status==='not_delivered'){
+        p.returned++;
+        p.shipping_loss+=Number(o.shipping_cost||0);
+      }
+      if(['confirmed','shipped','shipping'].includes(o.status)) p.pending++;
+    });
+  });
+
+  const totalRevenue=Object.values(productStats).reduce((s,p)=>s+p.revenue,0);
+  const rows=Object.values(productStats).sort((a,b)=>b.revenue-a.revenue);
+  const el=document.getElementById('product-unit-economics');
+  if(!el) return;
+  if(!rows.length){
+    el.innerHTML='<div class="glass-card" style="padding:40px;text-align:center;color:var(--gray)">No order data for this period.</div>';
+    return;
+  }
+
+  el.innerHTML=rows.map(p=>{
+    const delRate=p.orders?Math.round(p.delivered/p.orders*100):0;
+    const retRate=p.orders?Math.round(p.returned/p.orders*100):0;
+    const revShare=totalRevenue?Math.round(p.revenue/totalRevenue*100):0;
+    const grossProfit=p.revenue-p.shipping_loss;
+    const adShare=finAdSpend&&totalRevenue?(finAdSpend*(p.revenue/totalRevenue)):0;
+    const netProfit=grossProfit-adShare;
+    const netMargin=p.revenue?Math.round(netProfit/p.revenue*100):0;
+    const rateColor=delRate>=60?'var(--green)':delRate>=40?'var(--yellow)':'var(--red)';
+    const variantRows=Object.values(p.variants).sort((a,b)=>b.revenue-a.revenue).map(v=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px">
+        <div style="color:var(--gray)">${esc(v.name)}</div>
+        <div style="display:flex;gap:16px;text-align:right">
+          <div><span style="color:var(--gray2)">${v.orders} orders</span></div>
+          <div><span style="color:var(--green)">${v.delivered} del</span></div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--yellow)">${fmtDZD(v.revenue)}</div>
+        </div>
+      </div>`).join('');
+
+    return `<div class="glass-card" style="padding:20px;margin-bottom:14px">
+      <!-- Product header -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px">${esc(p.name)}</div>
+          <div style="font-size:11px;color:var(--gray);margin-top:2px">${revShare}% of period revenue</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <div style="background:rgba(245,197,0,0.08);border:1px solid rgba(245,197,0,0.2);border-radius:10px;padding:6px 12px;text-align:center">
+            <div style="font-size:10px;color:var(--gray);letter-spacing:1px">DEL RATE</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${rateColor}">${delRate}%</div>
+          </div>
+          <div style="background:rgba(225,29,72,0.06);border:1px solid rgba(225,29,72,0.15);border-radius:10px;padding:6px 12px;text-align:center">
+            <div style="font-size:10px;color:var(--gray);letter-spacing:1px">RET RATE</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${retRate>20?'var(--red)':'var(--gray)'}">${retRate}%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unit economics grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px">
+        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:var(--gray);letter-spacing:1px;margin-bottom:4px">ORDERS</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px">${p.orders}</div>
+          <div style="font-size:11px;color:var(--gray)">${p.delivered} del · ${p.pending} pending</div>
+        </div>
+        <div style="background:rgba(34,197,94,0.06);border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:var(--gray);letter-spacing:1px;margin-bottom:4px">REVENUE</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--green)">${fmtDZD(p.revenue)}</div>
+          <div style="font-size:11px;color:var(--gray)">excl. shipping</div>
+        </div>
+        <div style="background:rgba(225,29,72,0.06);border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:var(--gray);letter-spacing:1px;margin-bottom:4px">SHIP LOSS</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--red)">${fmtDZD(p.shipping_loss)}</div>
+          <div style="font-size:11px;color:var(--gray)">${p.returned} returned orders</div>
+        </div>
+        <div style="background:rgba(245,197,0,0.06);border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:var(--gray);letter-spacing:1px;margin-bottom:4px">GROSS PROFIT</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${grossProfit>=0?'var(--yellow)':'var(--red)'}">${fmtDZD(grossProfit)}</div>
+          <div style="font-size:11px;color:var(--gray)">revenue − ship loss</div>
+        </div>
+        ${finAdSpend?`
+        <div style="background:rgba(59,130,246,0.06);border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:var(--gray);letter-spacing:1px;margin-bottom:4px">AD SPEND (${revShare}%)</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#3b82f6">${fmtDZD(adShare)}</div>
+          <div style="font-size:11px;color:var(--gray)">proportional share</div>
+        </div>
+        <div style="background:rgba(139,92,246,0.06);border-radius:12px;padding:12px">
+          <div style="font-size:10px;color:var(--gray);letter-spacing:1px;margin-bottom:4px">NET PROFIT</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:${netProfit>=0?'#8b5cf6':'var(--red)'}">${fmtDZD(netProfit)}</div>
+          <div style="font-size:11px;color:var(--gray)">${netMargin}% margin</div>
+        </div>`:''}
+      </div>
+
+      <!-- Variant breakdown -->
+      ${variantRows?`
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:12px">
+        <div style="font-size:10px;color:var(--gray);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">By Variant</div>
+        ${variantRows}
+      </div>`:''}
+    </div>`;
+  }).join('');
 }
 </script>
 </body>
