@@ -110,23 +110,32 @@ function clientIpFromRequest(req) {
 }
 
 // ── Algerian IP check via ipwho.is ──────────────────────────────
-// Free, unlimited, no API key. Fails OPEN so real customers are
-// never blocked if the service is temporarily down.
-async function isAlgerianIp(ip) {
-  if (!ip) return false;
+// Free, unlimited, no API key.
+// Returns { ok: true } if Algerian non-proxy, { ok: false, reason } otherwise.
+// Fails OPEN on errors so real customers are never blocked by API downtime.
+async function checkIpCountry(ip) {
+  if (!ip) return { ok: false, reason: "no_ip" };
   try {
     const res = await fetch(`https://ipwho.is/${ip}`, {
-      signal: AbortSignal.timeout(3000), // 3s timeout
+      signal: AbortSignal.timeout(3000),
     });
     if (!res.ok) {
       console.warn(`[create-order] ipwho.is returned ${res.status} for ${ip}, allowing`);
-      return true; // fail open
+      return { ok: true }; // fail open
     }
     const data = await res.json();
-    return data.country_code === "DZ";
+    if (data.is_proxy === true) {
+      console.warn(`[create-order] blocked proxy/VPN IP: ${ip} (country: ${data.country_code})`);
+      return { ok: false, reason: "proxy" };
+    }
+    if (data.country_code !== "DZ") {
+      console.warn(`[create-order] blocked non-DZ IP: ${ip} (country: ${data.country_code})`);
+      return { ok: false, reason: "non_dz" };
+    }
+    return { ok: true };
   } catch (err) {
     console.warn(`[create-order] ipwho.is lookup failed (allowing): ${err.message}`);
-    return true; // fail open
+    return { ok: true }; // fail open
   }
 }
 
@@ -182,9 +191,10 @@ async function checkIpGate(req, res, supabase) {
     return res.status(403).json({ error: IP_BLOCKED_MESSAGE });
   }
 
-  // 2. Block non-Algerian IPs (VPN/proxy attack from foreign exit nodes)
-  if (!isAlgerianIp(ip)) {
-    console.warn(`[create-order] blocked non-DZ IP: ${ip}`);
+  // 2. Block non-Algerian IPs and proxies/VPNs
+  const { ok, reason } = await checkIpCountry(ip);
+  if (!ok) {
+    console.warn(`[create-order] blocked IP: ${ip} reason: ${reason}`);
     return res.status(403).json({ error: IP_BLOCKED_MESSAGE });
   }
 
