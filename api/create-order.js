@@ -109,58 +109,25 @@ function clientIpFromRequest(req) {
   return "";
 }
 
-// ── Algerian IP ranges ───────────────────────────────────────────
-// Covers Algerie Telecom (ADSL/fibre), Mobilis, Djezzy, Ooredoo,
-// Icosnet, and other DZ-allocated blocks from AFRINIC/RIPE.
-// Each entry is [startInt, endInt] in 32-bit unsigned integer form.
-const DZ_RANGES = [
-  // Algerie Telecom core (41.96.0.0 – 41.111.255.255)
-  [0x29600000, 0x296FFFFF],
-  // Algerie Telecom (105.96.0.0 – 105.127.255.255)
-  [0x69600000, 0x697FFFFF],
-  // Algerie Telecom (193.194.78.0 – 193.194.79.255)
-  [0xC1C24E00, 0xC1C24FFF],
-  // Mobilis (41.200.0.0 – 41.207.255.255)
-  [0x29C80000, 0x29CFFFFF],
-  // Djezzy / Orascom (41.108.0.0 – 41.115.255.255)
-  [0x296C0000, 0x2973FFFF],
-  // Ooredoo Algeria (41.102.0.0 – 41.103.255.255)
-  [0x29660000, 0x2967FFFF],
-  // Icosnet (41.104.0.0 – 41.105.255.255)
-  [0x29680000, 0x2969FFFF],
-  // Djezzy LTE block (196.203.0.0 – 196.203.255.255)
-  [0xC4CB0000, 0xC4CBFFFF],
-  // Algerie Telecom ADSL (41.97.0.0 – 41.98.255.255)
-  [0x29610000, 0x2962FFFF],
-  // Algerie Telecom fibre (41.100.0.0 – 41.101.255.255)
-  [0x29640000, 0x2965FFFF],
-  // Algerie Telecom (109.111.0.0 – 109.111.255.255)
-  [0x6D6F0000, 0x6D6FFFFF],
-  // Algerie Telecom (197.200.0.0 – 197.207.255.255)
-  [0xC5C80000, 0xC5CFFFFF],
-  // Algerie Telecom (41.99.0.0 – 41.99.255.255)
-  [0x29630000, 0x2963FFFF],
-  // TE-data Algeria reseller (196.200.0.0 – 196.200.255.255)
-  [0xC4C80000, 0xC4C8FFFF],
-  // Mobilis 3G (41.201.0.0 – 41.202.255.255)
-  [0x29C90000, 0x29CAFFFF],
-];
-
-function ipToInt(ip) {
-  const parts = ip.split(".");
-  if (parts.length !== 4) return -1;
-  return parts.reduce((acc, part) => {
-    const n = parseInt(part, 10);
-    if (isNaN(n) || n < 0 || n > 255) return -1;
-    return (acc << 8) | n;
-  }, 0) >>> 0; // unsigned 32-bit
-}
-
-function isAlgerianIp(ip) {
+// ── Algerian IP check via ipwho.is ──────────────────────────────
+// Free, unlimited, no API key. Fails OPEN so real customers are
+// never blocked if the service is temporarily down.
+async function isAlgerianIp(ip) {
   if (!ip) return false;
-  const ipInt = ipToInt(ip);
-  if (ipInt === -1) return false;
-  return DZ_RANGES.some(([start, end]) => ipInt >= start && ipInt <= end);
+  try {
+    const res = await fetch(`https://ipwho.is/${ip}`, {
+      signal: AbortSignal.timeout(3000), // 3s timeout
+    });
+    if (!res.ok) {
+      console.warn(`[create-order] ipwho.is returned ${res.status} for ${ip}, allowing`);
+      return true; // fail open
+    }
+    const data = await res.json();
+    return data.country_code === "DZ";
+  } catch (err) {
+    console.warn(`[create-order] ipwho.is lookup failed (allowing): ${err.message}`);
+    return true; // fail open
+  }
 }
 
 // ── Daily per-IP order limit ─────────────────────────────────────
