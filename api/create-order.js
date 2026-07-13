@@ -109,12 +109,68 @@ function clientIpFromRequest(req) {
   return "";
 }
 
+// ── Algerian IP ranges ───────────────────────────────────────────
+// Covers Algerie Telecom (ADSL/fibre), Mobilis, Djezzy, Ooredoo,
+// Icosnet, and other DZ-allocated blocks from AFRINIC/RIPE.
+// Each entry is [startInt, endInt] in 32-bit unsigned integer form.
+const DZ_RANGES = [
+  // Algerie Telecom core (41.96.0.0 – 41.111.255.255)
+  [0x29600000, 0x296FFFFF],
+  // Algerie Telecom (105.96.0.0 – 105.127.255.255)
+  [0x69600000, 0x697FFFFF],
+  // Algerie Telecom (193.194.78.0 – 193.194.79.255)
+  [0xC1C24E00, 0xC1C24FFF],
+  // Mobilis (41.200.0.0 – 41.207.255.255)
+  [0x29C80000, 0x29CFFFFF],
+  // Djezzy / Orascom (41.108.0.0 – 41.115.255.255)
+  [0x296C0000, 0x2973FFFF],
+  // Ooredoo Algeria (41.102.0.0 – 41.103.255.255)
+  [0x29660000, 0x2967FFFF],
+  // Icosnet (41.104.0.0 – 41.105.255.255)
+  [0x29680000, 0x2969FFFF],
+  // Djezzy LTE block (196.203.0.0 – 196.203.255.255)
+  [0xC4CB0000, 0xC4CBFFFF],
+  // Algerie Telecom ADSL (41.97.0.0 – 41.98.255.255)
+  [0x29610000, 0x2962FFFF],
+  // Algerie Telecom fibre (41.100.0.0 – 41.101.255.255)
+  [0x29640000, 0x2965FFFF],
+  // Algerie Telecom (109.111.0.0 – 109.111.255.255)
+  [0x6D6F0000, 0x6D6FFFFF],
+  // Algerie Telecom (197.200.0.0 – 197.207.255.255)
+  [0xC5C80000, 0xC5CFFFFF],
+  // Algerie Telecom (41.99.0.0 – 41.99.255.255)
+  [0x29630000, 0x2963FFFF],
+  // TE-data Algeria reseller (196.200.0.0 – 196.200.255.255)
+  [0xC4C80000, 0xC4C8FFFF],
+  // Mobilis 3G (41.201.0.0 – 41.202.255.255)
+  [0x29C90000, 0x29CAFFFF],
+];
+
+function ipToInt(ip) {
+  const parts = ip.split(".");
+  if (parts.length !== 4) return -1;
+  return parts.reduce((acc, part) => {
+    const n = parseInt(part, 10);
+    if (isNaN(n) || n < 0 || n > 255) return -1;
+    return (acc << 8) | n;
+  }, 0) >>> 0; // unsigned 32-bit
+}
+
+function isAlgerianIp(ip) {
+  if (!ip) return false;
+  const ipInt = ipToInt(ip);
+  if (ipInt === -1) return false;
+  return DZ_RANGES.some(([start, end]) => ipInt >= start && ipInt <= end);
+}
+
 // ── Daily per-IP order limit ─────────────────────────────────────
 // Each IP may place at most this many real (non-draft) orders per
 // calendar day (Algeria time, UTC+1, no DST). Resets at midnight.
 const DAILY_IP_ORDER_LIMIT = 2;
 const IP_LIMIT_MESSAGE =
   "لقد وصلت إلى الحد الأقصى للطلبات اليوم (طلبان). جرّب غداً أو تواصل معنا عبر واتساب.";
+const IP_BLOCKED_MESSAGE =
+  "عذراً، لا يمكن إتمام الطلب. تواصل معنا عبر واتساب إذا كنت تواجه مشكلة.";
 
 function startOfTodayAlgiersUtc() {
   const offsetMs = 60 * 60 * 1000; // Algeria = UTC+1, no daylight saving
@@ -128,10 +184,7 @@ function startOfTodayAlgiersUtc() {
 }
 
 // Returns how many non-draft orders this IP already placed today.
-// Fails OPEN: any error (e.g. column missing) returns 0 so real
-// customers are never blocked by an infrastructure problem.
 async function ipOrderCountToday(supabase, ip) {
-  if (!ip) return 0; // can't identify the client -> don't block
   try {
     const { count, error } = await supabase
       .from("orders")
@@ -148,6 +201,32 @@ async function ipOrderCountToday(supabase, ip) {
     console.error("[create-order] ip rate-limit threw (allowing):", err.message);
     return 0;
   }
+}
+
+// ── Unified IP gate ──────────────────────────────────────────────
+// Call this before inserting any order. Returns null if OK,
+// or a Response (via res) that should be returned immediately.
+async function checkIpGate(req, res, supabase) {
+  const ip = clientIpFromRequest(req);
+
+  // 1. Block missing IP (null-IP bypass attack)
+  if (!ip) {
+    console.warn("[create-order] blocked: no IP detected");
+    return res.status(403).json({ error: IP_BLOCKED_MESSAGE });
+  }
+
+  // 2. Block non-Algerian IPs (VPN/proxy attack from foreign exit nodes)
+  if (!isAlgerianIp(ip)) {
+    console.warn(`[create-order] blocked non-DZ IP: ${ip}`);
+    return res.status(403).json({ error: IP_BLOCKED_MESSAGE });
+  }
+
+  // 3. Daily rate limit
+  if (await ipOrderCountToday(supabase, ip) >= DAILY_IP_ORDER_LIMIT) {
+    return res.status(429).json({ error: IP_LIMIT_MESSAGE });
+  }
+
+  return null; // all checks passed
 }
 
 async function sendOrderNotification(orderData) {
@@ -169,8 +248,6 @@ async function sendOrderNotification(orderData) {
 
 // ════════════════════════════════════════════════════════════════
 // CART ORDER HANDLER (multi-item, buy-2-get-1-free)
-// Only runs when body.items is a non-empty array. Single-product
-// orders below are completely unaffected.
 // ════════════════════════════════════════════════════════════════
 async function handleCartOrder(req, res, supabase, body) {
   const name = normalizeText(body.name);
@@ -197,17 +274,13 @@ async function handleCartOrder(req, res, supabase, body) {
   }
   if (!items.length) return res.status(400).json({ error: "Cart is empty" });
 
-  // Daily per-IP order limit
-  if (await ipOrderCountToday(supabase, clientIp) >= DAILY_IP_ORDER_LIMIT) {
-    return res.status(429).json({ error: IP_LIMIT_MESSAGE });
-  }
+  // ── IP gate (null + non-DZ + rate limit) ──
+  const blocked = await checkIpGate(req, res, supabase);
+  if (blocked) return blocked;
 
   // Resolve each cart item against the DB (never trust browser prices)
   const resolved = [];
   for (const it of items) {
-    // Match on the exact stored slug, case-insensitively (ilike with no wildcards
-    // = case-insensitive equality). Avoids "Product not found" when a slug has
-    // any uppercase letters. Single-product path below is unchanged.
     const slug = normalizeText(it.product_slug);
     if (!slug) continue;
     const { data: productRow } = await supabase
@@ -265,12 +338,7 @@ async function handleCartOrder(req, res, supabase, body) {
   const total = itemsTotal + shippingCost;
   const orderId = createOrderId();
 
-  const summaryLines = itemsForStore.map((it, i) =>
-    `${i + 1}. ${it.product} — ${it.variant}${it.is_free ? " (مجانية 🎁)" : ` — ${it.line_price} DZD`}`
-  );
-  const freeNote = freeCount > 0 ? `\n🎁 ${freeCount} قطعة مجانية (اشترِ 2 والثالثة مجاناً)` : "";
   const composedNotes = notes || "";
-
   const productSummary = `سلة ${itemsForStore.length} قطع`;
   const variableSummary = itemsForStore.map((it) => it.variant).join(" + ").slice(0, 250);
 
@@ -411,10 +479,9 @@ export default async function handler(req, res) {
     const orderId = createOrderId();
     const clientIp = clientIpFromRequest(req);
 
-    // Daily per-IP order limit
-    if (await ipOrderCountToday(supabase, clientIp) >= DAILY_IP_ORDER_LIMIT) {
-      return res.status(429).json({ error: IP_LIMIT_MESSAGE });
-    }
+    // ── IP gate (null + non-DZ + rate limit) ──
+    const blocked = await checkIpGate(req, res, supabase);
+    if (blocked) return blocked;
 
     const orderData = {
       name,
