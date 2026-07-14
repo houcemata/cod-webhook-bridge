@@ -1,5 +1,6 @@
 import { getServiceClient } from "./_auth.js";
 import { getCustomCatalogProduct } from "./_catalog.js";
+import { clientIpFromRequest, checkIpCountry, IP_BLOCKED_MESSAGE } from "./_ip.js";
 
 function normalizeText(value) {
   return String(value || "").trim();
@@ -57,6 +58,18 @@ export default async function handler(req, res) {
       return res.status(403).json({ error: "Forbidden origin" });
     }
 
+    // ── IP gate (null + proxy/VPN + non-DZ) ──
+    const ip = clientIpFromRequest(req);
+    if (!ip) {
+      console.warn("[create-draft] blocked: no IP detected");
+      return res.status(403).json({ error: IP_BLOCKED_MESSAGE });
+    }
+    const { ok, reason } = await checkIpCountry(ip);
+    if (!ok) {
+      console.warn(`[create-draft] blocked IP: ${ip} reason: ${reason}`);
+      return res.status(403).json({ error: IP_BLOCKED_MESSAGE });
+    }
+
     const supabase = getServiceClient();
     const body = req.body || {};
     const productSlug = normalizeText(body.product_slug);
@@ -98,6 +111,7 @@ export default async function handler(req, res) {
       status: "draft",
       from_draft: true,
       notes: normalizeText(body.notes) || "draft lead",
+      ip_address: ip,
     };
     const orderData = { order_id: createOrderId(), ...draftData };
 
