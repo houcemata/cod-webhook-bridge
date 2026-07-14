@@ -101,52 +101,12 @@ function isSameOriginRequest(req) {
   }
 }
 
-function clientIpFromRequest(req) {
-  const forwarded = req.headers["x-forwarded-for"];
-  if (typeof forwarded === "string" && forwarded.trim()) {
-    return forwarded.split(",")[0].trim();
-  }
-  return "";
-}
-
-// ── Algerian IP check via ipwho.is ──────────────────────────────
-// Free, unlimited, no API key.
-// Returns { ok: true } if Algerian non-proxy, { ok: false, reason } otherwise.
-// Fails OPEN on errors so real customers are never blocked by API downtime.
-async function checkIpCountry(ip) {
-  if (!ip) return { ok: false, reason: "no_ip" };
-  try {
-    const res = await fetch(`https://ipwho.is/${ip}`, {
-      signal: AbortSignal.timeout(3000),
-    });
-    if (!res.ok) {
-      console.warn(`[create-order] ipwho.is returned ${res.status} for ${ip}, allowing`);
-      return { ok: true }; // fail open
-    }
-    const data = await res.json();
-    if (data.is_proxy === true) {
-      console.warn(`[create-order] blocked proxy/VPN IP: ${ip} (country: ${data.country_code})`);
-      return { ok: false, reason: "proxy" };
-    }
-    if (data.country_code !== "DZ") {
-      console.warn(`[create-order] blocked non-DZ IP: ${ip} (country: ${data.country_code})`);
-      return { ok: false, reason: "non_dz" };
-    }
-    return { ok: true };
-  } catch (err) {
-    console.warn(`[create-order] ipwho.is lookup failed (allowing): ${err.message}`);
-    return { ok: true }; // fail open
-  }
-}
+import { clientIpFromRequest, checkIpCountry, IP_BLOCKED_MESSAGE, IP_LIMIT_MESSAGE } from "./_ip.js";
 
 // ── Daily per-IP order limit ─────────────────────────────────────
 // Each IP may place at most this many real (non-draft) orders per
 // calendar day (Algeria time, UTC+1, no DST). Resets at midnight.
 const DAILY_IP_ORDER_LIMIT = 2;
-const IP_LIMIT_MESSAGE =
-  "لقد وصلت إلى الحد الأقصى للطلبات اليوم (طلبان). جرّب غداً أو تواصل معنا عبر واتساب.";
-const IP_BLOCKED_MESSAGE =
-  "عذراً، لا يمكن إتمام الطلب. تواصل معنا عبر واتساب إذا كنت تواجه مشكلة.";
 
 function startOfTodayAlgiersUtc() {
   const offsetMs = 60 * 60 * 1000; // Algeria = UTC+1, no daylight saving
