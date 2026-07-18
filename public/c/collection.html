@@ -28,21 +28,24 @@ img{display:block;max-width:100%}
 /* ANNOUNCE + TOPBAR */
 .announce{position:relative;z-index:30;background:var(--bk);border-bottom:1px solid var(--ln);text-align:center;padding:9px 12px}
 .announce span{font:600 .82rem/1 'Changa',sans-serif;letter-spacing:.06em;color:var(--y)}
-.topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(24px);background:rgba(8,8,8,.88);border-bottom:1px solid var(--ln)}
+.topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(24px);background:rgba(8,8,8,.84);border-bottom:1px solid var(--ln)}
 .topbar-inner{position:relative;z-index:1;min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .brand{display:flex;align-items:center;gap:12px}
 .brand-logo{height:40px;width:auto;display:block;object-fit:contain}
+.brand-mark{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--y),#ffd84d);color:#080808;font:800 22px/1 'Changa',sans-serif;flex-shrink:0}
+.brand-text strong{display:block;font:800 1.5rem/.95 'Changa',sans-serif;letter-spacing:.04em}
+.brand-text span{display:block;font:600 .62rem/1 'Changa',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mu)}
 .back-link{font:600 .82rem/1 'Changa',sans-serif;color:var(--mu);padding:9px 15px;border:1px solid var(--ln);border-radius:999px;transition:.2s}
 .back-link:hover{border-color:var(--y);color:var(--y)}
 
-/* COLLECTION HEADER */
+/* HEADER */
 .col-head{position:relative;z-index:1;padding:30px 0 14px;text-align:center}
-.col-head h1{font:800 clamp(2rem,6vw,3.2rem)/1 'Changa',sans-serif;letter-spacing:.01em;color:var(--y)}
+.col-head h1{font:800 clamp(2rem,6vw,3.2rem)/1 'Changa',sans-serif;letter-spacing:.01em}
 .col-head .en{display:block;margin-top:8px;font:600 .8rem/1 'Changa',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--mu)}
 
-/* COLLECTION ICON BAR */
+/* COLLECTION ICON BAR (sticky, swaps page content in place) */
 .col-icon-bar{position:sticky;top:70px;z-index:35;background:rgba(8,8,8,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--ln);padding:10px 0}
-.col-icon-scroll{display:flex;gap:14px;overflow-x:auto;padding:2px;scrollbar-width:none}
+.col-icon-scroll{display:flex;gap:14px;overflow-x:auto;padding:2px 2px 2px;scrollbar-width:none}
 .col-icon-scroll::-webkit-scrollbar{display:none}
 .col-icon-item{flex-shrink:0;width:62px;display:grid;justify-items:center;gap:5px;cursor:pointer;background:none;border:none;font-family:'Changa',sans-serif}
 .col-icon-circle{width:54px;height:54px;border-radius:50%;overflow:hidden;background:linear-gradient(160deg,rgba(245,197,0,.14),var(--dk2));border:2px solid var(--ln);display:grid;place-items:center;transition:.2s}
@@ -52,28 +55,18 @@ img{display:block;max-width:100%}
 .col-icon-item.active .col-icon-circle{border-color:var(--y);box-shadow:0 0 0 2px rgba(245,197,0,.18)}
 .col-icon-item.active .col-icon-name{color:var(--y);font-weight:700}
 
-/* FILTER BAR — includes single/split toggle + subcollection chips */
-.filter-bar{position:relative;z-index:1;padding:14px 0 8px}
-.filter-bar-inner{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-/* Type toggle: لوحة واحدة | سبليت */
-.type-toggle{display:inline-flex;border:1.5px solid var(--ln);border-radius:999px;overflow:hidden;flex-shrink:0}
-.type-btn{padding:8px 18px;background:transparent;border:none;color:var(--mu);font:700 .82rem/1 'Changa',sans-serif;cursor:pointer;transition:.18s;white-space:nowrap}
-.type-btn.active{background:var(--y);color:#080808}
-.type-btn:hover:not(.active){color:var(--tx)}
-/* Subcollection chips */
-.subbar{display:flex;gap:9px;overflow-x:auto;padding:4px 0;scrollbar-width:none;flex:1;min-width:0}
-.subbar::-webkit-scrollbar{display:none}
-.subchip{flex-shrink:0;padding:8px 16px;border-radius:999px;border:1.5px solid var(--ln);background:rgba(255,255,255,.03);color:var(--tx);font:600 .82rem/1 'Changa',sans-serif;cursor:pointer;transition:.2s;white-space:nowrap}
-.subchip:hover{border-color:var(--ln2)}
-.subchip.active{background:var(--y);color:#080808;border-color:var(--y)}
-
-/* SEARCH */
-.col-search{position:relative;z-index:1;margin-top:8px}
+/* SUBCOLLECTION FILTER BAR */
+.subbar{position:relative;z-index:1;display:flex;gap:9px;overflow-x:auto;padding:14px 0 8px;scrollbar-width:none}
+.col-search{position:relative;z-index:1;margin-top:14px}
 .col-search .search-box{width:100%;display:flex;align-items:center;gap:9px;padding:11px 16px;border-radius:999px;border:1px solid var(--ln);background:rgba(255,255,255,.04);transition:.2s}
 .col-search .search-box:focus-within{border-color:var(--ln2)}
 .col-search .search-box svg{width:18px;height:18px;stroke:var(--mu);flex-shrink:0}
 .col-search .search-box input{flex:1;background:none;border:none;outline:none;color:var(--tx);font:600 .92rem/1 'Changa',sans-serif}
 .col-search .search-box input::placeholder{color:var(--mu)}
+.subbar::-webkit-scrollbar{display:none}
+.subchip{flex-shrink:0;padding:9px 18px;border-radius:999px;border:1.5px solid var(--ln);background:rgba(255,255,255,.03);color:var(--tx);font:600 .88rem/1 'Changa',sans-serif;cursor:pointer;transition:.2s;white-space:nowrap}
+.subchip:hover{border-color:var(--ln2)}
+.subchip.active{background:var(--y);color:#080808;border-color:var(--y)}
 
 /* PRODUCT GRID */
 .grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px;padding:18px 0 10px}
@@ -82,13 +75,18 @@ img{display:block;max-width:100%}
 .pthumb{position:relative;aspect-ratio:4/4.8;background:var(--dk2);overflow:hidden}
 .pthumb img{width:100%;height:100%;object-fit:cover;transition:transform .45s}
 .pcard:hover .pthumb img{transform:scale(1.05)}
+.ppill{position:absolute;top:10px;right:10px;padding:5px 11px;border-radius:999px;background:rgba(8,8,8,.72);border:1px solid rgba(255,255,255,.09);color:var(--y);font:600 .68rem/1 'Changa',sans-serif;letter-spacing:.04em}
+.ppill.hot{background:rgba(225,29,72,.18);border-color:rgba(225,29,72,.32);color:#ff7090}
+.ppill{display:none}
+.pbody{display:none}
+/* price + tiny order button overlaid on the bottom of the image */
 .poverlay{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding:10px;direction:ltr;background:linear-gradient(to top,rgba(8,8,8,.82),rgba(8,8,8,.32) 60%,transparent)}
+.pname{display:none}
+.pbottom{display:none}
 .pprice{font:800 1.1rem/1 'Changa',sans-serif;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)}
 .pprice .old{display:block;font:600 .72rem/1 'Changa',sans-serif;color:rgba(255,255,255,.6);text-decoration:line-through;margin-top:3px}
 .porder{flex-shrink:0;width:34px;height:34px;padding:0;border-radius:50%;background:var(--y);color:#080808;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .porder svg{width:17px;height:17px;stroke:#080808;stroke-width:2.4;fill:none}
-/* Split card: wider aspect */
-.pcard.split .pthumb{aspect-ratio:16/9}
 
 .state{position:relative;z-index:1;min-height:40vh;display:grid;place-items:center;text-align:center;color:var(--mu);font-size:1rem}
 
@@ -106,10 +104,10 @@ img{display:block;max-width:100%}
 @media(max-width:640px){
   .grid{grid-template-columns:repeat(2,1fr);gap:10px}
   .col-head{padding:22px 0 10px}
-  .filter-bar-inner{flex-direction:column;align-items:flex-start}
-  .subbar{width:100%}
+  .pbody{padding:10px}
 }
-@media(hover:none),(pointer:coarse){
+/* ── TOUCH DEVICES: kill movement-hovers so the first tap always lands ── */
+@media (hover: none), (pointer: coarse){
   .pcard:hover{transform:none}
   .pcard:hover .pthumb img{transform:none}
   .wa-fab:hover{transform:none}
@@ -123,19 +121,19 @@ img{display:block;max-width:100%}
 
 <div class="orbs" aria-hidden="true"><div class="orb orb-1"></div></div>
 
-<div class="announce"><span>الدفع عند الاستلام — توصيل لكل ولايات الجزائر الـ58 — حقك في الفحص قبل الدفع</span></div>
+<div class="announce"><span>الدفع عند الاستلام ✓ توصيل لكل ولايات الجزائر</span></div>
 
 <header class="topbar">
   <div class="wrap topbar-inner">
     <a class="brand" href="/" aria-label="ARCO">
       <img class="brand-logo" src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/ACRO%20logo%20shopiy-03.png" alt="ARCO">
     </a>
-    <a class="back-link" href="/">الرئيسية</a>
+    <a class="back-link" href="/">← الرئيسية</a>
   </div>
 </header>
 
 <div class="col-icon-bar">
-  <div class="wrap"><div class="col-icon-scroll" id="colIconScroll"><div class="state" style="padding:10px;min-height:0">...</div></div></div>
+  <div class="wrap"><div class="col-icon-scroll" id="colIconScroll"><div class="state" style="padding:10px">...</div></div></div>
 </div>
 
 <section class="col-head wrap">
@@ -144,18 +142,6 @@ img{display:block;max-width:100%}
 </section>
 
 <div class="wrap">
-  <div class="filter-bar">
-    <div class="filter-bar-inner">
-      <!-- Single / Split type toggle -->
-      <div class="type-toggle" role="group" aria-label="نوع اللوحة">
-        <button class="type-btn active" id="type-all" onclick="setTypeFilter('all')">الكل</button>
-        <button class="type-btn" id="type-single" onclick="setTypeFilter('single')">لوحة واحدة</button>
-        <button class="type-btn" id="type-split" onclick="setTypeFilter('split')">سبليت</button>
-      </div>
-      <!-- Subcollection chips -->
-      <div class="subbar" id="subbar"></div>
-    </div>
-  </div>
   <div class="col-search">
     <div class="search-box">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -165,13 +151,17 @@ img{display:block;max-width:100%}
 </div>
 
 <div class="wrap">
+  <div class="subbar" id="subbar"></div>
+</div>
+
+<div class="wrap">
   <div class="grid" id="grid"><div class="state">جاري التحميل...</div></div>
   <div class="pager" id="pager"></div>
 </div>
 
 <a class="wa-fab" href="https://wa.me/213550374607" target="_blank" rel="noreferrer" aria-label="WhatsApp">
   <svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"/></svg>
-  <span>تحدّث معنا</span>
+  <span>أحكي معانا</span>
 </a>
 
 <script>
@@ -196,12 +186,6 @@ function minPrice(p){
   const pr=Array.isArray(p.variants)?p.variants.map(v=>Number(v.price||0)).filter(v=>v>0):[];
   return pr.length?Math.min(...pr):Number(p.price||0);
 }
-function isSplit(p){
-  // Detect split: product type field, or name contains 'سبليت' or 'split', or variant label
-  const name=(p.name||'').toLowerCase();
-  const type=(p.type||p.product_type||'').toLowerCase();
-  return type==='split'||name.includes('split')||name.includes('سبليت');
-}
 
 // ── STATE ──
 let collectionSlug=new URLSearchParams(location.search).get('slug')||
@@ -209,15 +193,13 @@ let collectionSlug=new URLSearchParams(location.search).get('slug')||
 let collection=null;
 let allItems=[];
 let activeSub='all';
-let activeType='all'; // 'all' | 'single' | 'split'
 let page=1;
 let searchQuery='';
 
 function cardHTML(p){
   const img=pImages(p)[0];
   const sale=p.original_price&&p.original_price>minPrice(p);
-  const splitClass=isSplit(p)?' split':'';
-  return`<article class="pcard${splitClass}">
+  return`<article class="pcard">
     <a class="pthumb" href="${productUrl(p.slug)}">
       ${img?`<img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy">`:''}
       <div class="poverlay">
@@ -228,19 +210,9 @@ function cardHTML(p){
   </article>`;
 }
 
-function setTypeFilter(t){
-  activeType=t;page=1;
-  ['all','single','split'].forEach(k=>{
-    document.getElementById('type-'+k)?.classList.toggle('active',k===t);
-  });
-  renderGrid();
-}
-
 function filteredItems(){
   let list=allItems;
   if(activeSub!=='all')list=list.filter(p=>(p.subcollection||'')===activeSub);
-  if(activeType==='split')list=list.filter(p=>isSplit(p));
-  else if(activeType==='single')list=list.filter(p=>!isSplit(p));
   const q=(searchQuery||'').trim().toLowerCase();
   if(q)list=list.filter(p=>(p.name||'').toLowerCase().includes(q));
   return list;
@@ -251,12 +223,13 @@ function renderSubbar(){
   const subs=(collection&&Array.isArray(collection.subs))?collection.subs:[];
   if(!subs.length){bar.style.display='none';bar.innerHTML='';return;}
   bar.style.display='';
+  // ensure an "all" chip exists first
   const hasAll=subs.some(s=>s.slug==='all');
   const chips=[];
   if(!hasAll)chips.push({slug:'all',name_ar:'الكل'});
   chips.push(...subs);
   bar.innerHTML=chips.map(s=>
-    `<button class="subchip${activeSub===s.slug?' active':''}" onclick="selectSub('${esc(s.slug)}')">${esc(s.name_ar||s.name_en||s.slug)}</button>`
+    `<button class="subchip ${activeSub===s.slug?'active':''}" onclick="selectSub('${esc(s.slug)}')">${esc(s.name_ar||s.name_en||s.slug)}</button>`
   ).join('');
 }
 
@@ -288,9 +261,11 @@ function goPage(p){page=p;renderGrid();window.scrollTo({top:0,behavior:'smooth'}
 
 async function load(){
   if(!collectionSlug){document.getElementById('grid').innerHTML='<div class="state">المجموعة غير موجودة</div>';return;}
+
   try{localStorage.setItem('arco_last_collection',collectionSlug);}catch(e){}
   highlightIconBar();
 
+  // 1) fetch collection meta (title + subs)
   try{
     const r=await fetch(`${SB_URL}/collections?select=*&slug=eq.${encodeURIComponent(collectionSlug)}&limit=1`,{headers:H});
     const data=await r.json();
@@ -304,11 +279,11 @@ async function load(){
   }else{
     document.getElementById('col-title').textContent=collectionSlug;
   }
-  activeSub='all';page=1;searchQuery='';activeType='all';
-  ['all','single','split'].forEach(k=>document.getElementById('type-'+k)?.classList.toggle('active',k==='all'));
-  const si=document.getElementById('colSearchInput');if(si)si.value='';
+  activeSub='all';page=1;searchQuery='';
+  {const si=document.getElementById('colSearchInput');if(si)si.value='';}
   renderSubbar();
 
+  // 2) fetch products in this collection
   try{
     const r=await fetch(`${SB_URL}/products?select=*&active=eq.true&collection=eq.${encodeURIComponent(collectionSlug)}&order=sort_order.asc,created_at.desc`,{headers:H});
     const data=await r.json();
@@ -316,10 +291,10 @@ async function load(){
   }catch(e){allItems=[];}
 
   renderGrid();
-  window.scrollTo({top:0,behavior:'instant' in window?'instant':'auto'});
+  window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
 }
 
-// ── COLLECTION ICON BAR ──
+// ── COLLECTION ICON BAR: sticky row, swaps the whole page in place ──
 let allCollectionsCache=null;
 async function loadIconBar(){
   const box=document.getElementById('colIconScroll');
@@ -345,6 +320,8 @@ function highlightIconBar(){
     if(active)el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
   });
 }
+// Swaps to a different collection IN PLACE (no full page reload). URL still
+// updates via pushState so back/forward and sharing links keep working.
 function switchCollection(slug){
   if(!slug||slug===collectionSlug)return;
   collectionSlug=slug;
