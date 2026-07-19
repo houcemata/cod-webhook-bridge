@@ -29,6 +29,12 @@ img{display:block;max-width:100%}
 .back-link{font:700 .8rem/1 'Changa',sans-serif;color:var(--mu);padding:8px 16px;border:1px solid var(--ln);border-radius:999px;transition:.2s}
 .back-link:hover{border-color:var(--y);color:var(--y)}
 
+/* STAT HERO */
+.stat-hero{position:relative;z-index:1;padding:28px 0 20px;text-align:center;border-bottom:1px solid var(--ln)}
+.stat-number{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2.4rem,7vw,4rem);color:var(--y);line-height:1;letter-spacing:-.02em}
+.stat-label{font:700 .78rem/1.5 'Changa',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);margin-top:6px}
+.stat-sub{font:600 .88rem/1.6 'Changa',sans-serif;color:rgba(244,244,244,.65);margin-top:10px;max-width:440px;margin-inline:auto}
+
 /* COLLECTION ICON BAR */
 .col-icon-bar{position:sticky;top:68px;z-index:35;background:rgba(8,8,8,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--ln);padding:10px 0}
 .col-icon-scroll{display:flex;gap:14px;overflow-x:auto;padding:2px;scrollbar-width:none}
@@ -41,12 +47,12 @@ img{display:block;max-width:100%}
 .col-icon-item.active .col-icon-circle{border-color:var(--y);box-shadow:0 0 0 2px rgba(245,197,0,.18)}
 .col-icon-item.active .col-icon-name{color:var(--y);font-weight:700}
 
-/* HEADER */
-.col-head{position:relative;z-index:1;padding:28px 0 12px;text-align:center}
-.col-head h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,6vw,3rem);line-height:1}
-.col-head .en{display:block;margin-top:8px;font:700 .76rem/1 'Changa',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--mu)}
+/* COLLECTION HEADER */
+.col-head{position:relative;z-index:1;padding:24px 0 10px;text-align:center}
+.col-head h1{font:800 clamp(1.8rem,5vw,2.8rem)/1 'Changa',sans-serif;color:var(--tx)}
+.col-head .en{display:block;margin-top:6px;font:700 .74rem/1 'Changa',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--mu)}
 
-/* TOOLBAR: search + filter toggle */
+/* TOOLBAR */
 .toolbar{display:flex;gap:10px;align-items:center;margin:12px 0 4px;flex-wrap:wrap}
 .col-search{flex:1;min-width:200px}
 .col-search .search-box{display:flex;align-items:center;gap:9px;padding:10px 16px;border-radius:999px;border:1px solid var(--ln);background:rgba(255,255,255,.04);transition:.2s}
@@ -54,14 +60,12 @@ img{display:block;max-width:100%}
 .col-search .search-box svg{width:17px;height:17px;stroke:var(--mu);flex-shrink:0}
 .col-search .search-box input{flex:1;background:none;border:none;outline:none;color:var(--tx);font:600 .9rem/1 'Changa',sans-serif}
 .col-search .search-box input::placeholder{color:var(--mu)}
-
-/* SPLIT/SINGLE FILTER */
 .split-filter{display:flex;border-radius:999px;border:1.5px solid var(--ln);overflow:hidden;flex-shrink:0}
 .split-filter button{padding:9px 18px;background:none;border:none;color:var(--mu);font:700 .8rem/1 'Changa',sans-serif;cursor:pointer;transition:.2s;white-space:nowrap}
 .split-filter button.active{background:var(--y);color:#080808}
 .split-filter button:not(:last-child){border-left:1.5px solid var(--ln)}
 
-/* SUBCOLLECTION FILTER BAR */
+/* SUBCOLLECTION CHIPS */
 .subbar{display:flex;gap:9px;overflow-x:auto;padding:10px 0 6px;scrollbar-width:none}
 .subbar::-webkit-scrollbar{display:none}
 .subchip{flex-shrink:0;padding:8px 18px;border-radius:999px;border:1.5px solid var(--ln);background:rgba(255,255,255,.03);color:var(--tx);font:600 .86rem/1 'Changa',sans-serif;cursor:pointer;transition:.2s;white-space:nowrap}
@@ -81,28 +85,109 @@ img{display:block;max-width:100%}
 .porder{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:var(--y);display:inline-flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3)}
 .porder svg{width:16px;height:16px;stroke:#080808;stroke-width:2.4;fill:none}
 .split-card .pthumb{aspect-ratio:8/4.8}
-
 .state{position:relative;z-index:1;min-height:40vh;display:grid;place-items:center;text-align:center;color:var(--mu);font-size:1rem}
 
 /* PAGINATION */
-.pager{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:14px;padding:18px 0 50px}
+.pager{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:14px;padding:18px 0 10px}
 .pager button{padding:10px 22px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--ln);color:var(--tx);font:600 .84rem/1 'Changa',sans-serif;cursor:pointer;transition:.2s}
 .pager button:hover:not(:disabled){border-color:var(--y);color:var(--y)}
 .pager button:disabled{opacity:.35;cursor:not-allowed}
 .pager .info{font:600 .84rem/1 'Changa',sans-serif;color:var(--mu)}
 
+/* DIVIDER */
+.divider{border:none;border-top:1px solid var(--ln);margin:0}
+
+/* ── BOTTOM SECTIONS (shared styles) ── */
+.sec{position:relative;z-index:1;padding:36px 0}
+.sec-title-wrap{text-align:center;margin-bottom:22px}
+.sec-title{display:inline-block;font:800 clamp(1.6rem,4vw,2.4rem)/1 'Changa',sans-serif;color:var(--y)}
+.sec-sub{display:block;margin-top:8px;font:700 .74rem/1.4 'Changa',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--mu)}
+
+/* TESTIMONIALS */
+.testimonials-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tcard{border-radius:var(--r);overflow:hidden;border:1px solid var(--ln);aspect-ratio:5/7;background:var(--dk2)}
+.tcard img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+
+/* WHY US */
+.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.why-card{padding:20px 16px;border-radius:var(--r);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(13,13,13,.94));border:1px solid var(--ln);text-align:center;transition:.22s}
+.why-card:hover{border-color:var(--ln2);transform:translateY(-4px)}
+.why-ic{width:50px;height:50px;margin:0 auto 12px;border-radius:14px;display:grid;place-items:center;background:rgba(245,197,0,.1);border:1px solid rgba(245,197,0,.15)}
+.why-ic svg{width:26px;height:26px;stroke:var(--y);fill:none;stroke-width:1.8}
+.why-card h3{font:800 1rem/1.3 'Changa',sans-serif;margin-bottom:8px}
+.why-card p{color:var(--mu);line-height:1.65;font-size:.78rem}
+
+/* HOW IT WORKS */
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;position:relative}
+.how-grid::before{content:'';position:absolute;top:36px;right:12.5%;left:12.5%;height:1px;background:linear-gradient(90deg,transparent,var(--ln2),transparent);pointer-events:none}
+.how-step{text-align:center;padding:0 8px}
+.how-num{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--y),#ffd84d);color:#080808;font:900 1.4rem/1 'Changa',sans-serif;display:grid;place-items:center;margin:0 auto 14px;box-shadow:0 6px 20px rgba(245,197,0,.25)}
+.how-step h3{font:800 .95rem/1.4 'Changa',sans-serif;margin-bottom:8px}
+.how-step p{font:400 .78rem/1.7 'Changa',sans-serif;color:var(--mu)}
+.how-note{margin-top:24px;padding:16px 20px;border-radius:14px;background:rgba(245,197,0,.06);border:1px solid var(--ln2);text-align:center;font:600 .84rem/1.7 'Changa',sans-serif;color:rgba(244,244,244,.75)}
+.how-note strong{color:var(--y)}
+
+/* CUSTOM DESIGN CTA */
+.custom-cta{border-radius:24px;background:linear-gradient(135deg,rgba(245,197,0,.08),rgba(245,197,0,.02));border:1px solid var(--ln2);padding:36px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.custom-cta-text h2{font:800 clamp(1.6rem,3.5vw,2.2rem)/1.1 'Changa',sans-serif;color:var(--tx);margin-bottom:10px}
+.custom-cta-text h2 em{color:var(--y);font-style:normal}
+.custom-cta-text p{font:400 .9rem/1.8 'Changa',sans-serif;color:var(--mu);max-width:400px}
+.custom-cta-btn{flex-shrink:0;padding:14px 28px;border-radius:999px;background:var(--y);color:#080808;font:800 .95rem/1 'Changa',sans-serif;display:inline-flex;align-items:center;gap:10px;transition:.2s;white-space:nowrap}
+.custom-cta-btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.custom-cta-btn svg{width:21px;height:21px;fill:#080808;flex-shrink:0}
+
+/* FAQ */
+.faq-wrap{max-width:720px;margin:0 auto;display:grid;gap:8px}
+.faq-item{border:1px solid var(--ln);border-radius:16px;background:rgba(255,255,255,.02);overflow:hidden}
+.faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 18px;background:none;border:none;color:var(--tx);font:700 .92rem/1.4 'Changa',sans-serif;cursor:pointer;text-align:right}
+.faq-q .chev{flex-shrink:0;width:22px;height:22px;stroke:var(--y);transition:transform .25s}
+.faq-item.open .chev{transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;color:var(--mu);line-height:1.9;font-size:.9rem}
+.faq-a div{padding:0 20px 18px}
+.faq-item.open .faq-a{max-height:400px}
+
+/* FOOTER */
+.footer{position:relative;z-index:1;padding:18px 0 44px}
+.footer-inner{border:1px solid var(--ln);background:rgba(255,255,255,.02);border-radius:24px;padding:28px 30px}
+.footer-top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:24px}
+.footer-brand strong{font:900 2rem/1 'Changa',sans-serif;letter-spacing:.08em;color:var(--y)}
+.footer-brand p{color:var(--mu);font-size:.84rem;margin-top:6px;max-width:240px;line-height:1.6}
+.footer-brand small{color:#4a4a4a;font-size:.76rem;display:block;margin-top:8px}
+.footer-cols{display:flex;gap:40px;flex-wrap:wrap}
+.footer-col h4{font:800 .78rem/1 'Changa',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);margin-bottom:14px}
+.footer-col a{display:block;font:600 .86rem/1 'Changa',sans-serif;color:rgba(244,244,244,.6);margin-bottom:10px;transition:.18s}
+.footer-col a:hover{color:var(--y)}
+.footer-bottom{border-top:1px solid var(--ln);padding-top:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.footer-socials{display:flex;gap:10px}
+.footer-social{width:36px;height:36px;border-radius:50%;border:1px solid var(--ln);display:grid;place-items:center;color:var(--mu);font:700 .72rem/1 'Changa',sans-serif;transition:.18s}
+.footer-social:hover{border-color:var(--y);color:var(--y)}
+.footer-copy{font:600 .76rem/1 'Changa',sans-serif;color:#4a4a4a}
+
+/* WHATSAPP FAB */
 .wa-fab{position:fixed;bottom:20px;left:20px;z-index:50;height:52px;padding:0 18px 0 14px;border-radius:999px;background:#25D366;display:inline-flex;align-items:center;gap:9px;color:#fff;font:800 .94rem/1 'Changa',sans-serif;box-shadow:0 10px 30px rgba(37,211,102,.38);transition:.2s}
 .wa-fab:hover{transform:scale(1.05)}
 .wa-fab svg{width:26px;height:26px;fill:#fff;flex-shrink:0}
 
+@media(max-width:900px){
+  .why-grid{grid-template-columns:repeat(2,1fr)}
+  .how-grid{grid-template-columns:repeat(2,1fr)}
+  .how-grid::before{display:none}
+}
 @media(max-width:640px){
   .grid{grid-template-columns:repeat(2,1fr);gap:10px}
-  .col-head{padding:20px 0 10px}
+  .col-head{padding:18px 0 8px}
   .toolbar{gap:8px}
   .split-filter button{padding:8px 12px;font-size:.72rem}
+  .testimonials-grid{grid-template-columns:1fr}
+  .why-grid{grid-template-columns:repeat(2,1fr);gap:9px}
+  .how-grid{grid-template-columns:1fr 1fr}
+  .custom-cta{flex-direction:column;padding:24px 18px}
+  .footer-top{flex-direction:column}
+  .footer-cols{gap:24px}
+  .footer-bottom{flex-direction:column;align-items:flex-start}
 }
 @media(hover:none),(pointer:coarse){
-  .pcard:hover{transform:none}
+  .pcard:hover,.why-card:hover{transform:none}
   .pcard:hover .pthumb img{transform:none}
   a,button{-webkit-tap-highlight-color:transparent}
 }
@@ -125,6 +210,14 @@ img{display:block;max-width:100%}
   </div>
 </header>
 
+<!-- STAT HERO — above the collection selector -->
+<div class="stat-hero wrap">
+  <div class="stat-number">+6,000</div>
+  <div class="stat-label">منزل جزائري تم تزيينه</div>
+  <p class="stat-sub">من الجزائر العاصمة إلى تمنراست — ARCO هي العلامة الأولى للوحات الخشبية الفاخرة في الجزائر.</p>
+</div>
+
+<!-- COLLECTION ICON BAR -->
 <div class="col-icon-bar">
   <div class="wrap"><div class="col-icon-scroll" id="colIconScroll"><div class="state" style="min-height:0;padding:10px;font-size:.8rem">...</div></div></div>
 </div>
@@ -151,11 +244,152 @@ img{display:block;max-width:100%}
   <div class="subbar" id="subbar"></div>
 </div>
 
+<!-- PRODUCTS -->
 <div class="wrap">
   <div class="grid" id="grid"><div class="state">جاري التحميل...</div></div>
   <div class="pager" id="pager"></div>
 </div>
 
+<!-- ═══════════════════════════════════════ -->
+<!-- BOTTOM TRUST SECTIONS                  -->
+<!-- ═══════════════════════════════════════ -->
+
+<hr class="divider">
+
+<!-- TESTIMONIALS -->
+<section class="sec wrap">
+  <div class="sec-title-wrap">
+    <span class="sec-title">ماذا يقول زبائننا</span>
+    <span class="sec-sub">آراء حقيقية من زبائن حقيقيين</span>
+  </div>
+  <div class="testimonials-grid">
+    <div class="tcard"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6069.jpeg" alt="تقييم زبون ARCO" loading="lazy"></div>
+    <div class="tcard"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6070.jpeg" alt="تقييم زبون ARCO" loading="lazy"></div>
+    <div class="tcard"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6071.jpeg" alt="تقييم زبون ARCO" loading="lazy"></div>
+    <div class="tcard"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6072.jpeg" alt="تقييم زبون ARCO" loading="lazy"></div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- WHY CHOOSE ARCO -->
+<section class="sec wrap">
+  <div class="sec-title-wrap">
+    <span class="sec-title">لماذا تختار ARCO</span>
+  </div>
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="why-ic"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+      <h3>جودة عالية مضمونة</h3>
+      <p>لوحات خشبية مطبوعة بورق فاخر عالي الدقة. كل قطعة تخرج من بين أيدينا بعناية تامة قبل أن تصلك.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div>
+      <h3>تصاميم مخصصة حسب طلبك</h3>
+      <p>أرسل لنا صورتك أو فكرتك عبر واتساب ونصنع لك لوحة خشبية لا تشبه أي شيء آخر في العالم.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-ic"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8zM5.5 21a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM18.5 21a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></div>
+      <h3>توصيل سريع لجميع الولايات الـ 58</h3>
+      <p>من أدرار إلى عنابة — نوصلولك في 2 إلى 4 أيام إلى باب دارك، مع الدفع عند الاستلام.</p>
+    </div>
+    <div class="why-card">
+      <div class="why-ic"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+      <h3>أفضل نسبة جودة/سعر في الجزائر</h3>
+      <p>لوحات فنية بمستوى عالمي بأسعار مناسبة للجزائري. الفخامة ما تحتاجش تكون باهظة الثمن.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- HOW IT WORKS -->
+<section class="sec wrap">
+  <div class="sec-title-wrap">
+    <span class="sec-title">كيف يعمل الطلب</span>
+    <span class="sec-sub">بسيط، آمن، وبدون مخاطرة</span>
+  </div>
+  <div class="how-grid">
+    <div class="how-step"><div class="how-num">1</div><h3>اختر تصميمك</h3><p>تصفح مئات التصاميم الحصرية أو اطلب تصميماً مخصصاً يعكس شخصيتك.</p></div>
+    <div class="how-step"><div class="how-num">2</div><h3>اطلب بالدفع عند الاستلام</h3><p>أكمل طلبك بدون دفع مسبق. لا بطاقة بنكية مطلوبة — الدفع عند الاستلام فقط.</p></div>
+    <div class="how-step"><div class="how-num">3</div><h3>نتصل بك لتأكيد طلبك</h3><p>فريقنا يتواصل معك في أقرب وقت لتأكيد التفاصيل وموعد التسليم المناسب.</p></div>
+    <div class="how-step"><div class="how-num">4</div><h3>استقبل وافحص قبل الدفع</h3><p>تصل اللوحة إلى بابك — افحصها أولاً، وادفع فقط إذا كنت راضياً تماماً.</p></div>
+  </div>
+  <div class="how-note"><strong>ما هي لوحات ARCO؟</strong> — لوحات خشبية مميزة مطبوعة بورق فاخر عالي الجودة. تُعلَّق على الجدار بدون أي حفر أو تثقيب. فنٌّ حقيقي لكل منزل.</div>
+</section>
+
+<hr class="divider">
+
+<!-- CUSTOM DESIGN CTA -->
+<section class="sec wrap">
+  <div class="custom-cta">
+    <div class="custom-cta-text">
+      <h2>صمّم <em>لوحتك</em> الخاصة</h2>
+      <p>أرسل صورتك أو فكرتك عبر واتساب — فريقنا يصمم لك لوحة خشبية مخصصة 100% تعكس شخصيتك وذوقك.</p>
+    </div>
+    <a class="custom-cta-btn" href="https://wa.me/213550374607?text=السلام+عليكم،+أريد+طلب+تصميم+مخصص" target="_blank" rel="noreferrer">
+      <svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"/></svg>
+      <span>ابدأ تصميمك الآن</span>
+    </a>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FAQ -->
+<section class="sec wrap">
+  <div class="sec-title-wrap">
+    <span class="sec-title">أسئلة شائعة</span>
+  </div>
+  <div class="faq-wrap" id="faqWrap"></div>
+</section>
+
+<hr class="divider">
+
+<!-- FOOTER -->
+<footer class="footer wrap">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <strong>ARCO</strong>
+        <p>حوّل جدارك إلى لوحة فنية — لوحات خشبية فاخرة لكل منزل جزائري.</p>
+        <small>&copy; <span id="yr"></span> ARCO — جميع الحقوق محفوظة</small>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4>روابط سريعة</h4>
+          <a href="/">الرئيسية</a>
+          <a href="/#custom">تصميم مخصص</a>
+          <a href="/#faq">الأسئلة الشائعة</a>
+        </div>
+        <div class="footer-col">
+          <h4>السياسات</h4>
+          <a href="/shipping">سياسة التوصيل</a>
+          <a href="/returns">سياسة الاستبدال</a>
+          <a href="/terms">الشروط والأحكام</a>
+        </div>
+        <div class="footer-col">
+          <h4>تواصل معنا</h4>
+          <a href="https://wa.me/213550374607" target="_blank" rel="noreferrer">WhatsApp</a>
+          <a href="https://www.instagram.com/arcoartt" target="_blank" rel="noreferrer">Instagram</a>
+          <a href="#" target="_blank" rel="noreferrer">Facebook</a>
+          <a href="#" target="_blank" rel="noreferrer">TikTok</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 ARCO — جميع الحقوق محفوظة</span>
+      <div class="footer-socials">
+        <a class="footer-social" href="https://www.instagram.com/arcoartt" target="_blank" rel="noreferrer" aria-label="Instagram">IG</a>
+        <a class="footer-social" href="#" target="_blank" rel="noreferrer" aria-label="Facebook">FB</a>
+        <a class="footer-social" href="#" target="_blank" rel="noreferrer" aria-label="TikTok">TK</a>
+        <a class="footer-social" href="https://wa.me/213550374607" target="_blank" rel="noreferrer" aria-label="WhatsApp">WA</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- WHATSAPP FAB -->
 <a class="wa-fab" href="https://wa.me/213550374607" target="_blank" rel="noreferrer" aria-label="واتساب">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"/></svg>
   <span>أحكي معانا</span>
@@ -213,10 +447,7 @@ function renderSubbar(){
   const subs=collection&&Array.isArray(collection.subs)?collection.subs:[];
   if(!subs.length){bar.style.display='none';bar.innerHTML='';return;}
   bar.style.display='';
-  const hasAll=subs.some(s=>s.slug==='all');
-  const chips=[];
-  if(!hasAll)chips.push({slug:'all',name_ar:'الكل'});
-  chips.push(...subs);
+  const chips=subs.some(s=>s.slug==='all')?[...subs]:[{slug:'all',name_ar:'الكل'},...subs];
   bar.innerHTML=chips.map(s=>`<button class="subchip${activeSub===s.slug?' active':''}" onclick="selectSub('${esc(s.slug)}')">${esc(s.name_ar||s.name_en||s.slug)}</button>`).join('');
 }
 
@@ -244,8 +475,7 @@ async function load(){
   highlightIconBar();
   try{
     const r=await fetch(`${SB}/collections?select=*&slug=eq.${encodeURIComponent(collectionSlug)}&limit=1`,{headers:H});
-    const data=await r.json();
-    collection=data[0]||null;
+    const data=await r.json();collection=data[0]||null;
   }catch(e){collection=null;}
   if(collection){
     document.getElementById('col-title').textContent=collection.name_ar||collectionSlug;
@@ -259,8 +489,7 @@ async function load(){
   renderSubbar();
   try{
     const r=await fetch(`${SB}/products?select=*&active=eq.true&collection=eq.${encodeURIComponent(collectionSlug)}&order=sort_order.asc,created_at.desc`,{headers:H});
-    const data=await r.json();
-    allItems=Array.isArray(data)?data:[];
+    const data=await r.json();allItems=Array.isArray(data)?data:[];
   }catch(e){allItems=[];}
   renderGrid();
   window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
@@ -270,17 +499,10 @@ let allColsCache=null;
 async function loadIconBar(){
   const box=document.getElementById('colIconScroll');
   try{
-    if(!allColsCache){
-      const r=await fetch(`${SB}/collections?select=*&active=eq.true&order=sort_order.asc`,{headers:H});
-      allColsCache=await r.json();
-    }
+    if(!allColsCache){const r=await fetch(`${SB}/collections?select=*&active=eq.true&order=sort_order.asc`,{headers:H});allColsCache=await r.json();}
     const cols=Array.isArray(allColsCache)?allColsCache:[];
     if(!cols.length){box.innerHTML='';return;}
-    box.innerHTML=cols.map(c=>`
-      <button class="col-icon-item" data-slug="${esc(c.slug)}" onclick="switchCollection('${esc(c.slug)}')">
-        <div class="col-icon-circle">${c.icon_url?`<img src="${esc(c.icon_url)}" alt="${esc(c.name_ar)}" loading="lazy">`:`<span class="ph">${esc((c.name_en||'A')[0])}</span>`}</div>
-        <span class="col-icon-name">${esc(c.name_ar)}</span>
-      </button>`).join('');
+    box.innerHTML=cols.map(c=>`<button class="col-icon-item" data-slug="${esc(c.slug)}" onclick="switchCollection('${esc(c.slug)}')"><div class="col-icon-circle">${c.icon_url?`<img src="${esc(c.icon_url)}" alt="${esc(c.name_ar)}" loading="lazy">`:`<span class="ph">${esc((c.name_en||'A')[0])}</span>`}</div><span class="col-icon-name">${esc(c.name_ar)}</span></button>`).join('');
     highlightIconBar();
   }catch(e){box.innerHTML='';}
 }
@@ -304,11 +526,22 @@ window.addEventListener('popstate',e=>{
   if(s&&s!==collectionSlug){collectionSlug=s;load();}
 });
 
-let _st;
-document.getElementById('colSearchInput').addEventListener('input',e=>{
-  clearTimeout(_st);_st=setTimeout(()=>{searchQuery=e.target.value;page=1;renderGrid();},180);
-});
+/* FAQ */
+const FAQ=[
+  {q:'ما هي لوحات ARCO؟',a:'لوحات خشبية مميزة مطبوعة بورق فاخر عالي الجودة، تُعلَّق على الجدار بدون أي حفر أو تثقيب.'},
+  {q:'كم مدة التوصيل؟',a:'من 2 إلى 4 أيام لجميع ولايات الجزائر الـ 58. التوصيل إلى باب دارك مع الدفع عند الاستلام.'},
+  {q:'هل يمكنني الفحص قبل الدفع؟',a:'نعم، هذا حقك. تصل اللوحة إلى بابك، تفحصها أولاً، وتدفع فقط إذا كنت راضياً تماماً عن الجودة.'},
+  {q:'ما هي سياسة الاستبدال؟',a:'بعد قبول المنتج والدفع، لا يمكن الاسترجاع. في حالة وجود عيب مصنعي، نستبدل المنتج فقط.'},
+  {q:'كيف أطلب تصميماً مخصصاً؟',a:'تواصل معنا عبر واتساب على 213550374607+ وأرسل لنا صورتك أو فكرتك.'},
+  {q:'هل تقبلون الطلبات بالجملة؟',a:'نعم، نوفر أسعاراً خاصة للطلبات بالجملة. تواصل معنا عبر واتساب.'}
+];
+document.getElementById('faqWrap').innerHTML=FAQ.map((f,i)=>`<div class="faq-item" data-i="${i}"><button class="faq-q" onclick="toggleFaq(${i})" aria-expanded="false"><span>${esc(f.q)}</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button><div class="faq-a"><div>${esc(f.a)}</div></div></div>`).join('');
+function toggleFaq(i){const el=document.querySelector(`.faq-item[data-i="${i}"]`);const o=el.classList.toggle('open');el.querySelector('.faq-q').setAttribute('aria-expanded',o);}
 
+let _st;
+document.getElementById('colSearchInput').addEventListener('input',e=>{clearTimeout(_st);_st=setTimeout(()=>{searchQuery=e.target.value;page=1;renderGrid();},180);});
+
+document.getElementById('yr').textContent=new Date().getFullYear();
 load();
 loadIconBar();
 </script>
