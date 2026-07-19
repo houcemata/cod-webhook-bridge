@@ -8,14 +8,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Changa:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ── TOKENS ── */
 :root{
   --y:#F5C500;--bk:#080808;--dk:#111;--dk2:#0d0d0d;
   --tx:#f4f4f4;--mu:#9a9a9a;
   --ln:rgba(255,255,255,.07);--ln2:rgba(245,197,0,.22);
   --sh2:0 8px 32px rgba(0,0,0,.32);--r:20px;
 }
-[data-lang="fr"]{direction:ltr;text-align:left}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
 body{min-height:100vh;background:var(--bk);color:var(--tx);font-family:'Changa',sans-serif;overflow-x:hidden}
@@ -23,17 +21,16 @@ a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
 .wrap{width:min(1240px,calc(100% - 32px));margin:0 auto}
 
-/* ── ORBS ── */
 .orbs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
 .orb{position:absolute;border-radius:50%;filter:blur(80px)}
 .orb-1{width:480px;height:480px;background:rgba(245,197,0,.05);top:-180px;left:-120px}
 .orb-2{width:340px;height:340px;background:rgba(225,29,72,.03);top:18%;right:-100px}
 
-/* ── ANNOUNCE ── */
+/* ANNOUNCE */
 .announce{position:relative;z-index:30;background:var(--bk);border-bottom:1px solid var(--ln);text-align:center;padding:8px 12px}
 .announce span{font:700 .78rem/1 'Changa',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--y)}
 
-/* ── TOPBAR ── */
+/* TOPBAR */
 .topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(24px);background:rgba(8,8,8,.86);border-bottom:1px solid var(--ln)}
 .topbar-inner{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:14px}
 .brand img{height:44px;width:auto;display:block}
@@ -45,30 +42,26 @@ img{display:block;max-width:100%}
 .search-box input{flex:1;background:none;border:none;outline:none;color:var(--tx);font:600 .9rem/1 'Changa',sans-serif}
 .search-box input::placeholder{color:var(--mu)}
 .search-sub{font:700 .7rem/1 'Changa',sans-serif;color:var(--y);letter-spacing:.02em}
-
-/* lang toggle */
 .lang-btn{flex-shrink:0;padding:8px 14px;border-radius:999px;border:1px solid var(--ln);background:transparent;color:var(--mu);font:700 .75rem/1 'Changa',sans-serif;letter-spacing:.08em;cursor:pointer;transition:.2s}
 .lang-btn:hover{border-color:var(--y);color:var(--y)}
 
-/* ── HERO ── */
+/* HERO */
 .hero-banner{position:relative;z-index:1}
 .hero-banner img{width:100%;height:auto;display:block}
-
-/* ── PROMO STRIP ── */
 .promo-strip{position:relative;z-index:1;background:linear-gradient(90deg,var(--y),#ffd84d,var(--y));color:#080808;text-align:center;padding:12px 14px}
 .promo-strip span{font:800 clamp(.95rem,3.4vw,1.35rem)/1.2 'Changa',sans-serif;display:inline-block;animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
 
-/* ── STAT HERO ── */
+/* STAT HERO */
 .stat-hero{position:relative;z-index:1;padding:40px 0 10px;text-align:center}
 .stat-number{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(3rem,9vw,5.5rem);color:var(--y);line-height:1;letter-spacing:-.02em}
 .stat-label{font:700 .9rem/1.5 'Changa',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);margin-top:8px}
 .stat-sub{font:600 1rem/1.6 'Changa',sans-serif;color:rgba(244,244,244,.7);margin-top:12px;max-width:480px;margin-inline:auto}
 
-/* ── SECTION TITLES ── */
+/* SECTION TITLES */
 .sec{position:relative;z-index:1;padding:28px 0}
 .sec-title-wrap{text-align:center;margin-bottom:20px}
-.sec-title{display:inline-block;font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(1.8rem,4.5vw,2.8rem);color:var(--y);letter-spacing:.01em}
+.sec-title{display:inline-block;font-family:'Changa',sans-serif;font-weight:800;font-size:clamp(1.8rem,4.5vw,2.6rem);color:var(--y);letter-spacing:.01em}
 .sec-sub{display:block;margin-top:8px;font:700 .75rem/1.4 'Changa',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--mu)}
 
 /* collection rail row header */
@@ -78,7 +71,7 @@ img{display:block;max-width:100%}
 .see-all{flex-shrink:0;padding:8px 18px;border-radius:999px;background:var(--y);font:800 .78rem/1 'Changa',sans-serif;letter-spacing:.06em;color:#080808;transition:.2s}
 .see-all:hover{filter:brightness(1.08)}
 
-/* ── COLLECTIONS CIRCLES ── */
+/* COLLECTIONS CIRCLES */
 .col-scroll{display:flex;gap:13px;overflow-x:auto;padding:4px 2px 10px;scrollbar-width:none}
 .col-scroll::-webkit-scrollbar{display:none}
 .col-item{flex-shrink:0;width:90px;display:grid;justify-items:center;gap:8px;cursor:pointer}
@@ -89,7 +82,7 @@ img{display:block;max-width:100%}
 .col-name{font:600 .8rem/1.2 'Changa',sans-serif;text-align:center;color:var(--tx)}
 .col-item.active .col-name{color:var(--y);font-weight:700}
 
-/* ── PRODUCT RAILS ── */
+/* PRODUCT RAILS */
 .rail{display:flex;gap:11px;overflow-x:auto;padding:14px 2px 10px;scrollbar-width:none;scroll-snap-type:x mandatory}
 .rail::-webkit-scrollbar{display:none}
 @media(max-width:640px){
@@ -110,17 +103,12 @@ img{display:block;max-width:100%}
 .porder svg{width:16px;height:16px;stroke:#080808;stroke-width:2.4;fill:none}
 .rail-loader,.rail-empty{flex-shrink:0;width:100%;min-height:150px;display:grid;place-items:center;color:var(--mu);font-size:.9rem;border:1px dashed var(--ln);border-radius:var(--r)}
 
-/* ── TESTIMONIALS ── */
-.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.tcard{padding:20px;border-radius:var(--r);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(13,13,13,.94));border:1px solid var(--ln)}
-.tcard-stars{color:var(--y);font-size:1rem;letter-spacing:2px;margin-bottom:10px}
-.tcard-text{font:400 .88rem/1.8 'Changa',sans-serif;color:rgba(244,244,244,.8);margin-bottom:14px}
-.tcard-author{display:flex;align-items:center;gap:10px}
-.tcard-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--y),#ffd84d);display:grid;place-items:center;font:800 1rem/1 'Changa',sans-serif;color:#080808;flex-shrink:0}
-.tcard-name{font:700 .88rem/1.2 'Changa',sans-serif}
-.tcard-city{font:600 .72rem/1 'Changa',sans-serif;color:var(--mu);margin-top:2px}
+/* TESTIMONIALS — 2×2 real screenshot grid, 5:7 ratio */
+.testimonials-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.tcard{border-radius:var(--r);overflow:hidden;border:1px solid var(--ln);aspect-ratio:5/7;background:var(--dk2)}
+.tcard img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
 
-/* ── WHY US ── */
+/* WHY US */
 .why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 .why-card{padding:20px 16px;border-radius:var(--r);background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(13,13,13,.94));border:1px solid var(--ln);text-align:center;transition:.22s}
 .why-card:hover{border-color:var(--ln2);transform:translateY(-4px)}
@@ -129,56 +117,26 @@ img{display:block;max-width:100%}
 .why-card h3{font:800 1.05rem/1.3 'Changa',sans-serif;margin-bottom:8px}
 .why-card p{color:var(--mu);line-height:1.65;font-size:.78rem}
 
-/* ── HOW IT WORKS ── */
+/* HOW IT WORKS */
 .how-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;position:relative}
 .how-grid::before{content:'';position:absolute;top:36px;right:12.5%;left:12.5%;height:1px;background:linear-gradient(90deg,transparent,var(--ln2),transparent);pointer-events:none}
-[data-lang="fr"] .how-grid::before{left:12.5%;right:12.5%}
 .how-step{text-align:center;padding:0 8px}
-.how-num{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--y),#ffd84d);color:#080808;font:900 1.4rem/1 'Playfair Display',serif;display:grid;place-items:center;margin:0 auto 14px;box-shadow:0 6px 20px rgba(245,197,0,.25)}
+.how-num{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--y),#ffd84d);color:#080808;font:900 1.4rem/1 'Changa',sans-serif;display:grid;place-items:center;margin:0 auto 14px;box-shadow:0 6px 20px rgba(245,197,0,.25)}
 .how-step h3{font:800 .95rem/1.4 'Changa',sans-serif;margin-bottom:8px}
 .how-step p{font:400 .78rem/1.7 'Changa',sans-serif;color:var(--mu)}
 .how-note{margin-top:24px;padding:16px 20px;border-radius:14px;background:rgba(245,197,0,.06);border:1px solid var(--ln2);text-align:center;font:600 .84rem/1.7 'Changa',sans-serif;color:rgba(244,244,244,.75)}
 .how-note strong{color:var(--y)}
 
-/* ── CUSTOM DESIGN SECTION ── */
+/* CUSTOM DESIGN */
 .custom-cta{position:relative;border-radius:24px;overflow:hidden;background:linear-gradient(135deg,rgba(245,197,0,.08),rgba(245,197,0,.02));border:1px solid var(--ln2);padding:40px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
-.custom-cta-text h2{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(1.8rem,4vw,2.6rem);color:var(--tx);line-height:1.1;margin-bottom:12px}
+.custom-cta-text h2{font-family:'Changa',sans-serif;font-weight:800;font-size:clamp(1.8rem,4vw,2.5rem);color:var(--tx);line-height:1.1;margin-bottom:12px}
 .custom-cta-text h2 em{color:var(--y);font-style:normal}
 .custom-cta-text p{font:400 .92rem/1.8 'Changa',sans-serif;color:var(--mu);max-width:420px}
 .custom-cta-btn{flex-shrink:0;padding:15px 30px;border-radius:999px;background:var(--y);color:#080808;font:800 1rem/1 'Changa',sans-serif;letter-spacing:.04em;display:inline-flex;align-items:center;gap:10px;transition:.2s;white-space:nowrap}
 .custom-cta-btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
 .custom-cta-btn svg{width:22px;height:22px;fill:#080808;flex-shrink:0}
 
-/* ── BUNDLE DEALS ── */
-.bundles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
-.bundle-card{border-radius:var(--r);overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(13,13,13,.96));border:1px solid var(--ln);transition:.26s}
-.bundle-card:hover{border-color:rgba(245,197,0,.35);transform:translateY(-5px)}
-.bundle-imgs{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:var(--dk2)}
-.bundle-imgs div{aspect-ratio:1;background:var(--dk2);overflow:hidden}
-.bundle-imgs div img{width:100%;height:100%;object-fit:cover}
-.bundle-body{padding:14px}
-.bundle-tag{display:inline-block;padding:4px 10px;border-radius:999px;background:rgba(245,197,0,.12);border:1px solid var(--ln2);color:var(--y);font:700 .68rem/1 'Changa',sans-serif;letter-spacing:.06em;margin-bottom:10px}
-.bundle-name{font:800 1rem/1.3 'Changa',sans-serif;margin-bottom:6px}
-.bundle-price-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
-.bundle-price{font:800 1.2rem/1 'Changa',sans-serif;color:var(--y)}
-.bundle-save{padding:4px 10px;border-radius:999px;background:rgba(34,197,94,.14);border:1px solid rgba(34,197,94,.24);color:#4ade80;font:700 .68rem/1 'Changa',sans-serif}
-.bundle-btn{width:100%;margin-top:12px;padding:10px;border-radius:10px;background:var(--y);color:#080808;font:800 .82rem/1 'Changa',sans-serif;border:none;cursor:pointer;transition:.2s}
-.bundle-btn:hover{filter:brightness(1.07)}
-
-/* ── REFERRAL ── */
-.referral-card{border-radius:24px;background:linear-gradient(135deg,rgba(245,197,0,.07),rgba(13,13,13,.98));border:1px solid var(--ln2);padding:32px;text-align:center}
-.referral-card h2{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(1.6rem,3.5vw,2.2rem);color:var(--y);margin-bottom:10px}
-.referral-card p{font:400 .9rem/1.8 'Changa',sans-serif;color:var(--mu);max-width:480px;margin:0 auto 20px}
-.referral-steps{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:24px}
-.ref-step{text-align:center;max-width:130px}
-.ref-step .ref-ic{width:48px;height:48px;border-radius:50%;background:rgba(245,197,0,.1);border:1px solid var(--ln2);display:grid;place-items:center;margin:0 auto 10px}
-.ref-step .ref-ic svg{width:22px;height:22px;stroke:var(--y);fill:none;stroke-width:1.8}
-.ref-step p{font:600 .8rem/1.5 'Changa',sans-serif;color:rgba(244,244,244,.7)}
-.ref-badge{display:inline-block;padding:8px 20px;border-radius:999px;background:var(--y);color:#080808;font:800 1.1rem/1 'Changa',sans-serif;margin-bottom:6px}
-.ref-cta{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;background:var(--y);color:#080808;font:800 .92rem/1 'Changa',sans-serif;transition:.2s}
-.ref-cta:hover{filter:brightness(1.07);transform:translateY(-2px)}
-
-/* ── FAQ ── */
+/* FAQ */
 .faq-wrap{max-width:720px;margin:0 auto;display:grid;gap:8px}
 .faq-item{border:1px solid var(--ln);border-radius:16px;background:rgba(255,255,255,.02);overflow:hidden}
 .faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 18px;background:none;border:none;color:var(--tx);font:700 .92rem/1.4 'Changa',sans-serif;cursor:pointer;text-align:right}
@@ -188,11 +146,11 @@ img{display:block;max-width:100%}
 .faq-a div{padding:0 20px 18px}
 .faq-item.open .faq-a{max-height:400px}
 
-/* ── FOOTER ── */
+/* FOOTER */
 .footer{position:relative;z-index:1;padding:18px 0 44px}
 .footer-inner{border:1px solid var(--ln);background:rgba(255,255,255,.02);border-radius:24px;padding:28px 30px}
 .footer-top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:24px}
-.footer-brand strong{font:900 2rem/1 'Playfair Display',serif;letter-spacing:.04em;color:var(--y)}
+.footer-brand strong{font:900 2rem/1 'Changa',sans-serif;letter-spacing:.08em;color:var(--y)}
 .footer-brand p{color:var(--mu);font-size:.84rem;margin-top:6px;max-width:240px;line-height:1.6}
 .footer-brand small{color:#4a4a4a;font-size:.76rem;display:block;margin-top:8px}
 .footer-cols{display:flex;gap:40px;flex-wrap:wrap}
@@ -205,32 +163,31 @@ img{display:block;max-width:100%}
 .footer-social:hover{border-color:var(--y);color:var(--y)}
 .footer-copy{font:600 .76rem/1 'Changa',sans-serif;color:#4a4a4a}
 
-/* ── WHATSAPP FAB ── */
+/* WHATSAPP FAB */
 .wa-fab{position:fixed;bottom:20px;left:20px;z-index:50;height:52px;padding:0 18px 0 14px;border-radius:999px;background:#25D366;display:inline-flex;align-items:center;gap:9px;color:#fff;font:800 .94rem/1 'Changa',sans-serif;box-shadow:0 10px 30px rgba(37,211,102,.38);transition:.2s}
 .wa-fab:hover{transform:scale(1.05)}
 .wa-fab svg{width:26px;height:26px;fill:#fff;flex-shrink:0}
 
-/* ── EXIT POPUP ── */
+/* EXIT POPUP */
 .exit-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:none;place-items:center;padding:20px;backdrop-filter:blur(4px)}
 .exit-overlay.show{display:grid}
 .exit-box{background:#111;border:1px solid var(--ln2);border-radius:24px;padding:32px 28px;max-width:400px;width:100%;text-align:center;position:relative}
-.exit-box .exit-close{position:absolute;top:14px;left:14px;background:none;border:none;color:var(--mu);font-size:1.3rem;cursor:pointer;line-height:1}
-.exit-box .exit-badge{display:inline-block;padding:8px 20px;border-radius:999px;background:linear-gradient(90deg,var(--y),#ffd84d);color:#080808;font:900 1.6rem/1 'Playfair Display',serif;margin-bottom:14px}
+.exit-close{position:absolute;top:14px;left:14px;background:none;border:none;color:var(--mu);font-size:1.3rem;cursor:pointer;line-height:1}
+.exit-badge{display:inline-block;padding:8px 20px;border-radius:999px;background:linear-gradient(90deg,var(--y),#ffd84d);color:#080808;font:900 1.6rem/1 'Changa',sans-serif;margin-bottom:14px}
 .exit-box h3{font:800 1.3rem/1.3 'Changa',sans-serif;margin-bottom:10px}
 .exit-box p{font:400 .86rem/1.7 'Changa',sans-serif;color:var(--mu);margin-bottom:20px}
-.exit-box .exit-cta{display:block;width:100%;padding:13px;border-radius:12px;background:var(--y);color:#080808;font:800 .95rem/1 'Changa',sans-serif;border:none;cursor:pointer;transition:.2s}
-.exit-box .exit-cta:hover{filter:brightness(1.07)}
-.exit-box .exit-dismiss{display:block;margin-top:10px;font:600 .78rem/1 'Changa',sans-serif;color:var(--mu);cursor:pointer;background:none;border:none;width:100%}
+.exit-cta{display:block;width:100%;padding:13px;border-radius:12px;background:var(--y);color:#080808;font:800 .95rem/1 'Changa',sans-serif;border:none;cursor:pointer;transition:.2s}
+.exit-cta:hover{filter:brightness(1.07)}
+.exit-dismiss{display:block;margin-top:10px;font:600 .78rem/1 'Changa',sans-serif;color:var(--mu);cursor:pointer;background:none;border:none;width:100%}
 
-/* ── DIVIDER ── */
+/* DIVIDER */
 .divider{position:relative;z-index:1;border:none;border-top:1px solid var(--ln);width:min(1240px,calc(100% - 32px));margin:0 auto}
 
-/* ── RESPONSIVE ── */
+/* RESPONSIVE */
 @media(max-width:900px){
   .why-grid{grid-template-columns:repeat(2,1fr)}
   .how-grid{grid-template-columns:repeat(2,1fr)}
   .how-grid::before{display:none}
-  .testimonials-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:640px){
   .topbar-inner{flex-wrap:wrap;min-height:0;padding:10px 0;gap:10px}
@@ -240,15 +197,13 @@ img{display:block;max-width:100%}
   .sec{padding:20px 0}
   .why-grid{grid-template-columns:repeat(2,1fr);gap:9px}
   .how-grid{grid-template-columns:1fr 1fr}
-  .testimonials-grid{grid-template-columns:1fr}
   .custom-cta{flex-direction:column;padding:26px 20px}
-  .bundles-grid{grid-template-columns:repeat(2,1fr);gap:10px}
   .footer-top{flex-direction:column}
   .footer-cols{gap:24px}
   .footer-bottom{flex-direction:column;align-items:flex-start}
 }
 @media(hover:none),(pointer:coarse){
-  .pcard:hover,.col-item:hover .col-circle,.why-card:hover,.bundle-card:hover{transform:none}
+  .pcard:hover,.col-item:hover .col-circle,.why-card:hover{transform:none}
   .pcard:hover .pthumb img{transform:none}
   a,button{-webkit-tap-highlight-color:transparent}
 }
@@ -261,19 +216,19 @@ img{display:block;max-width:100%}
 <div class="orbs" aria-hidden="true"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
 
 <!-- EXIT POPUP -->
-<div class="exit-overlay" id="exitOverlay" role="dialog" aria-modal="true" aria-label="عرض خاص">
+<div class="exit-overlay" id="exitOverlay" role="dialog" aria-modal="true">
   <div class="exit-box">
     <button class="exit-close" onclick="closeExit()" aria-label="إغلاق">✕</button>
-    <div class="exit-badge" data-ar="-10%" data-fr="-10%">-10%</div>
-    <h3 data-ar="لا تغادر بدون عرضك" data-fr="Ne partez pas sans votre offre">لا تغادر بدون عرضك</h3>
-    <p data-ar="احصل على خصم 10% على كل طلب فوق 2000 دج — الدفع عند الاستلام كما دائماً." data-fr="Obtenez 10% de réduction sur toute commande supérieure à 2000 DZD.">احصل على خصم 10% على كل طلب فوق 2000 دج — الدفع عند الاستلام كما دائماً.</p>
-    <button class="exit-cta" onclick="closeExit(); window.scrollTo({top:0,behavior:'smooth'});" data-ar="تسوق الآن واستفد من العرض" data-fr="Profiter de l'offre">تسوق الآن واستفد من العرض</button>
-    <button class="exit-dismiss" onclick="closeExit()" data-ar="لا شكراً، سأتابع لاحقاً" data-fr="Non merci">لا شكراً، سأتابع لاحقاً</button>
+    <div class="exit-badge">-10%</div>
+    <h3>لا تغادر بدون عرضك</h3>
+    <p>احصل على خصم 10% على كل طلب فوق 2000 دج — الدفع عند الاستلام كما دائماً.</p>
+    <button class="exit-cta" onclick="closeExit();window.scrollTo({top:0,behavior:'smooth'})">تسوق الآن واستفد من العرض</button>
+    <button class="exit-dismiss" onclick="closeExit()">لا شكراً، سأتابع لاحقاً</button>
   </div>
 </div>
 
 <!-- ANNOUNCEMENT -->
-<div class="announce"><span data-ar="الدفع عند الاستلام — توصيل لجميع الولايات الـ 58 — حق الفحص قبل الدفع" data-fr="Paiement à la livraison — Livraison dans les 58 wilayas — Inspection avant paiement">الدفع عند الاستلام — توصيل لجميع الولايات الـ 58 — حق الفحص قبل الدفع</span></div>
+<div class="announce"><span>الدفع عند الاستلام — توصيل لجميع الولايات الـ 58 — حق الفحص قبل الدفع</span></div>
 
 <!-- TOPBAR -->
 <header class="topbar">
@@ -287,7 +242,7 @@ img{display:block;max-width:100%}
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <input id="searchInput" type="search" placeholder="ابحث عن تصميم..." aria-label="بحث">
         </div>
-        <span class="search-sub" data-ar="ابحث عن ستايلك" data-fr="Cherchez votre style">ابحث عن ستايلك</span>
+        <span class="search-sub">ابحث عن ستايلك</span>
       </div>
       <button class="lang-btn" id="langBtn" onclick="toggleLang()" aria-label="تغيير اللغة">FR</button>
     </div>
@@ -295,16 +250,16 @@ img{display:block;max-width:100%}
 </header>
 
 <!-- HERO BANNER -->
-<section class="hero-banner" aria-label="ARCO — لوحات خشبية فاخرة">
+<section class="hero-banner" aria-label="ARCO">
   <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/hero-banner_0000_6000%2B-%D8%B2%D8%A8%D9%88%D9%86-%D8%B1%D8%A7%D8%B6%D9%8A-copy-2.png" alt="ARCO — حوّل جدارك إلى لوحة فنية" loading="eager">
 </section>
-<div class="promo-strip"><span data-ar="اشترِ لوحتين والثالثة مجاناً" data-fr="Achetez 2 tableaux, le 3ème est offert">اشترِ لوحتين والثالثة مجاناً</span></div>
+<div class="promo-strip"><span>اشترِ لوحتين والثالثة مجاناً</span></div>
 
 <!-- STAT HERO -->
 <section class="stat-hero wrap">
-  <div class="stat-number" data-ar="+10,000" data-fr="+10 000">+10,000</div>
-  <div class="stat-label" data-ar="منزل جزائري تم تزيينه" data-fr="foyers algériens décorés">منزل جزائري تم تزيينه</div>
-  <p class="stat-sub" data-ar="من الجزائر العاصمة إلى تمنراست — ARCO هي العلامة الأولى للوحات الخشبية الفاخرة في الجزائر." data-fr="D'Alger à Tamanrasset — ARCO est la première marque de tableaux en bois de luxe en Algérie.">من الجزائر العاصمة إلى تمنراست — ARCO هي العلامة الأولى للوحات الخشبية الفاخرة في الجزائر.</p>
+  <div class="stat-number" id="statNumber">+6,000</div>
+  <div class="stat-label">منزل جزائري تم تزيينه</div>
+  <p class="stat-sub">من الجزائر العاصمة إلى تمنراست — ARCO هي العلامة الأولى للوحات الخشبية الفاخرة في الجزائر.</p>
 </section>
 
 <hr class="divider">
@@ -312,8 +267,8 @@ img{display:block;max-width:100%}
 <!-- COLLECTIONS -->
 <section class="sec wrap" id="collections">
   <div class="sec-title-wrap">
-    <span class="sec-title" data-ar="تصاميم متنوعة" data-fr="Nos collections">تصاميم متنوعة</span>
-    <span class="sec-sub" data-ar="لقا التصميم اللي يعكس شخصيتك" data-fr="Trouvez le design qui vous ressemble">لقا التصميم اللي يعكس شخصيتك</span>
+    <span class="sec-title">تصاميم متنوعة</span>
+    <span class="sec-sub">لقا التصميم اللي يعكس شخصيتك</span>
   </div>
   <div class="col-scroll" id="colScroll"><div class="rail-loader">...</div></div>
 </section>
@@ -322,41 +277,50 @@ img{display:block;max-width:100%}
 
 <!-- COLLECTION RAILS -->
 <section class="sec wrap collection-rail" data-collection="football">
-  <div class="sec-title-wrap"><a class="see-all" href="/c/football" data-ar="شوف الكل" data-fr="Voir tout">شوف الكل</a><div class="sec-titles"><span class="sec-title" data-ar="كرة القدم" data-fr="Football">كرة القدم</span><span class="sec-sub">Football</span></div></div>
+  <div class="sec-title-wrap"><a class="see-all" href="/c/football">شوف الكل</a><div class="sec-titles"><span class="sec-title">كرة القدم</span></div></div>
   <div class="rail-wrap"><div class="rail"><div class="rail-loader">...</div></div></div>
 </section>
 <hr class="divider">
 <section class="sec wrap collection-rail" data-collection="cars">
-  <div class="sec-title-wrap"><a class="see-all" href="/c/cars" data-ar="شوف الكل" data-fr="Voir tout">شوف الكل</a><div class="sec-titles"><span class="sec-title" data-ar="السيارات" data-fr="Voitures">السيارات</span><span class="sec-sub">Cars</span></div></div>
+  <div class="sec-title-wrap"><a class="see-all" href="/c/cars">شوف الكل</a><div class="sec-titles"><span class="sec-title">السيارات</span></div></div>
   <div class="rail-wrap"><div class="rail"><div class="rail-loader">...</div></div></div>
 </section>
 <hr class="divider">
 <section class="sec wrap collection-rail" data-collection="tv">
-  <div class="sec-title-wrap"><a class="see-all" href="/c/tv" data-ar="شوف الكل" data-fr="Voir tout">شوف الكل</a><div class="sec-titles"><span class="sec-title" data-ar="المسلسلات" data-fr="Séries TV">المسلسلات</span><span class="sec-sub">TV Shows</span></div></div>
+  <div class="sec-title-wrap"><a class="see-all" href="/c/tv">شوف الكل</a><div class="sec-titles"><span class="sec-title">المسلسلات</span></div></div>
   <div class="rail-wrap"><div class="rail"><div class="rail-loader">...</div></div></div>
 </section>
 <hr class="divider">
 <section class="sec wrap collection-rail" data-collection="games">
-  <div class="sec-title-wrap"><a class="see-all" href="/c/games" data-ar="شوف الكل" data-fr="Voir tout">شوف الكل</a><div class="sec-titles"><span class="sec-title" data-ar="ألعاب الفيديو" data-fr="Jeux Vidéo">ألعاب الفيديو</span><span class="sec-sub">Video Games</span></div></div>
+  <div class="sec-title-wrap"><a class="see-all" href="/c/games">شوف الكل</a><div class="sec-titles"><span class="sec-title">ألعاب الفيديو</span></div></div>
   <div class="rail-wrap"><div class="rail"><div class="rail-loader">...</div></div></div>
 </section>
 <hr class="divider">
 <section class="sec wrap collection-rail" data-collection="anime">
-  <div class="sec-title-wrap"><a class="see-all" href="/c/anime" data-ar="شوف الكل" data-fr="Voir tout">شوف الكل</a><div class="sec-titles"><span class="sec-title" data-ar="أنمي" data-fr="Anime">أنمي</span><span class="sec-sub">Anime</span></div></div>
+  <div class="sec-title-wrap"><a class="see-all" href="/c/anime">شوف الكل</a><div class="sec-titles"><span class="sec-title">أنمي</span></div></div>
   <div class="rail-wrap"><div class="rail"><div class="rail-loader">...</div></div></div>
 </section>
 <hr class="divider">
 
-<!-- TESTIMONIALS -->
+<!-- TESTIMONIALS — 4 real screenshots, 2 columns × 2 rows, 5:7 ratio -->
 <section class="sec wrap" id="testimonials">
   <div class="sec-title-wrap">
-    <span class="sec-title" data-ar="ماذا يقول زبائننا" data-fr="Ils nous font confiance">ماذا يقول زبائننا</span>
-    <span class="sec-sub" data-ar="آراء حقيقية من منازل جزائرية" data-fr="Avis authentiques de clients algériens">آراء حقيقية من منازل جزائرية</span>
+    <span class="sec-title">ماذا يقول زبائننا</span>
+    <span class="sec-sub">آراء حقيقية من زبائن حقيقيين</span>
   </div>
   <div class="testimonials-grid">
-    <div class="tcard"><div class="tcard-stars">★★★★★</div><p class="tcard-text" data-ar="لوحات رائعة، جودة عالية وتفصيل دقيق. وصلتلي في وقت قياسي وكانت مغلفة مزيان. أشريت 3 لوحات وما ندمتش." data-fr="Des tableaux magnifiques, haute qualité et détail précis. Livré rapidement et bien emballé.">لوحات رائعة، جودة عالية وتفصيل دقيق. وصلتلي في وقت قياسي وكانت مغلفة مزيان. أشريت 3 لوحات وما ندمتش.</p><div class="tcard-author"><div class="tcard-avatar">ي</div><div><div class="tcard-name">ياسين م.</div><div class="tcard-city">الجزائر العاصمة</div></div></div></div>
-    <div class="tcard"><div class="tcard-stars">★★★★★</div><p class="tcard-text" data-ar="طلبت لوحة مخصصة بصورة عائلتي وجاءت تحفة. الخدمة ممتازة والتواصل عبر واتساب سهل وسريع." data-fr="J'ai commandé un tableau personnalisé avec une photo de famille, le résultat est magnifique.">طلبت لوحة مخصصة بصورة عائلتي وجاءت تحفة. الخدمة ممتازة والتواصل عبر واتساب سهل وسريع.</p><div class="tcard-author"><div class="tcard-avatar">س</div><div><div class="tcard-name">سارة ب.</div><div class="tcard-city">وهران</div></div></div></div>
-    <div class="tcard"><div class="tcard-stars">★★★★★</div><p class="tcard-text" data-ar="ما توقعتش تجي بهالجودة بهذا السعر. غرفتي تبدلت بالكامل. الدفع عند الاستلام راحة بال كبيرة." data-fr="Je n'attendais pas cette qualité à ce prix. Ma chambre a été complètement transformée.">ما توقعتش تجي بهالجودة بهذا السعر. غرفتي تبدلت بالكامل. الدفع عند الاستلام راحة بال كبيرة.</p><div class="tcard-author"><div class="tcard-avatar">ع</div><div><div class="tcard-name">عبدالرحمان ق.</div><div class="tcard-city">قسنطينة</div></div></div></div>
+    <div class="tcard">
+      <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6069.jpeg" alt="تقييم زبون ARCO" loading="lazy">
+    </div>
+    <div class="tcard">
+      <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6070.jpeg" alt="تقييم زبون ARCO" loading="lazy">
+    </div>
+    <div class="tcard">
+      <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6071.jpeg" alt="تقييم زبون ARCO" loading="lazy">
+    </div>
+    <div class="tcard">
+      <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6072.jpeg" alt="تقييم زبون ARCO" loading="lazy">
+    </div>
   </div>
 </section>
 
@@ -365,28 +329,28 @@ img{display:block;max-width:100%}
 <!-- WHY CHOOSE ARCO -->
 <section class="sec wrap" id="why">
   <div class="sec-title-wrap">
-    <span class="sec-title" data-ar="لماذا تختار ARCO" data-fr="Pourquoi choisir ARCO">لماذا تختار ARCO</span>
+    <span class="sec-title">لماذا تختار ARCO</span>
   </div>
   <div class="why-grid">
     <div class="why-card">
       <div class="why-ic"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
-      <h3 data-ar="جودة عالية مضمونة" data-fr="Qualité premium garantie">جودة عالية مضمونة</h3>
-      <p data-ar="لوحات خشبية مطبوعة بورق فاخر عالي الدقة. كل قطعة تخرج من بين أيدينا بعناية تامة قبل أن تصلك." data-fr="Tableaux en bois imprimés avec du papier haute résolution. Chaque pièce est soigneusement contrôlée.">لوحات خشبية مطبوعة بورق فاخر عالي الدقة. كل قطعة تخرج من بين أيدينا بعناية تامة قبل أن تصلك.</p>
+      <h3>جودة عالية مضمونة</h3>
+      <p>لوحات خشبية مطبوعة بورق فاخر عالي الدقة. كل قطعة تخرج من بين أيدينا بعناية تامة قبل أن تصلك.</p>
     </div>
     <div class="why-card">
       <div class="why-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg></div>
-      <h3 data-ar="تصاميم مخصصة حسب طلبك" data-fr="Designs personnalisés sur commande">تصاميم مخصصة حسب طلبك</h3>
-      <p data-ar="أرسل لنا صورتك أو فكرتك عبر واتساب ونصنع لك لوحة خشبية لا تشبه أي شيء آخر في العالم." data-fr="Envoyez-nous votre photo ou votre idée via WhatsApp et nous créons pour vous un tableau unique.">أرسل لنا صورتك أو فكرتك عبر واتساب ونصنع لك لوحة خشبية لا تشبه أي شيء آخر في العالم.</p>
+      <h3>تصاميم مخصصة حسب طلبك</h3>
+      <p>أرسل لنا صورتك أو فكرتك عبر واتساب ونصنع لك لوحة خشبية لا تشبه أي شيء آخر في العالم.</p>
     </div>
     <div class="why-card">
       <div class="why-ic"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8zM5.5 21a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM18.5 21a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg></div>
-      <h3 data-ar="توصيل سريع لجميع الولايات الـ 58" data-fr="Livraison rapide dans les 58 wilayas">توصيل سريع لجميع الولايات الـ 58</h3>
-      <p data-ar="من أدرار إلى عنابة — نوصلولك في 2 إلى 4 أيام إلى باب دارك، مع الدفع عند الاستلام." data-fr="D'Adrar à Annaba — nous livrons en 2 à 4 jours à votre porte, avec paiement à la livraison.">من أدرار إلى عنابة — نوصلولك في 2 إلى 4 أيام إلى باب دارك، مع الدفع عند الاستلام.</p>
+      <h3>توصيل سريع لجميع الولايات الـ 58</h3>
+      <p>من أدرار إلى عنابة — نوصلولك في 2 إلى 4 أيام إلى باب دارك، مع الدفع عند الاستلام.</p>
     </div>
     <div class="why-card">
       <div class="why-ic"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
-      <h3 data-ar="أفضل نسبة جودة/سعر في الجزائر" data-fr="Meilleur rapport qualité/prix en Algérie">أفضل نسبة جودة/سعر في الجزائر</h3>
-      <p data-ar="لوحات فنية بمستوى عالمي بأسعار مناسبة للجزائري. الفخامة ما تحتاجش تكون باهظة الثمن." data-fr="Un art de niveau mondial à des prix accessibles pour les Algériens. Le luxe n'a pas à être cher.">لوحات فنية بمستوى عالمي بأسعار مناسبة للجزائري. الفخامة ما تحتاجش تكون باهظة الثمن.</p>
+      <h3>أفضل نسبة جودة/سعر في الجزائر</h3>
+      <p>لوحات فنية بمستوى عالمي بأسعار مناسبة للجزائري. الفخامة ما تحتاجش تكون باهظة الثمن.</p>
     </div>
   </div>
 </section>
@@ -396,69 +360,31 @@ img{display:block;max-width:100%}
 <!-- HOW IT WORKS -->
 <section class="sec wrap" id="how">
   <div class="sec-title-wrap">
-    <span class="sec-title" data-ar="كيف يعمل الطلب" data-fr="Comment ça marche">كيف يعمل الطلب</span>
-    <span class="sec-sub" data-ar="بسيط، آمن، وبدون مخاطرة" data-fr="Simple, sécurisé et sans risque">بسيط، آمن، وبدون مخاطرة</span>
+    <span class="sec-title">كيف يعمل الطلب</span>
+    <span class="sec-sub">بسيط، آمن، وبدون مخاطرة</span>
   </div>
   <div class="how-grid">
-    <div class="how-step"><div class="how-num">1</div><h3 data-ar="اختر تصميمك" data-fr="Choisissez votre design">اختر تصميمك</h3><p data-ar="تصفح مئات التصاميم الحصرية أو اطلب تصميماً مخصصاً يعكس شخصيتك." data-fr="Parcourez des centaines de designs exclusifs ou commandez un design personnalisé.">تصفح مئات التصاميم الحصرية أو اطلب تصميماً مخصصاً يعكس شخصيتك.</p></div>
-    <div class="how-step"><div class="how-num">2</div><h3 data-ar="اطلب بالدفع عند الاستلام" data-fr="Commandez — paiement à la livraison">اطلب بالدفع عند الاستلام</h3><p data-ar="أكمل طلبك بدون دفع مسبق. لا بطاقة بنكية مطلوبة — الدفع عند الاستلام فقط." data-fr="Finalisez votre commande sans paiement anticipé. Aucune carte bancaire requise.">أكمل طلبك بدون دفع مسبق. لا بطاقة بنكية مطلوبة — الدفع عند الاستلام فقط.</p></div>
-    <div class="how-step"><div class="how-num">3</div><h3 data-ar="نتصل بك لتأكيد طلبك" data-fr="Nous vous appelons pour confirmer">نتصل بك لتأكيد طلبك</h3><p data-ar="فريقنا يتواصل معك في أقرب وقت لتأكيد التفاصيل وموعد التسليم المناسب." data-fr="Notre équipe vous contacte rapidement pour confirmer les détails et la date de livraison.">فريقنا يتواصل معك في أقرب وقت لتأكيد التفاصيل وموعد التسليم المناسب.</p></div>
-    <div class="how-step"><div class="how-num">4</div><h3 data-ar="استقبل وافحص قبل الدفع" data-fr="Recevez et inspectez avant de payer">استقبل وافحص قبل الدفع</h3><p data-ar="تصل اللوحة إلى بابك — افحصها أولاً، وادفع فقط إذا كنت راضياً تماماً." data-fr="Le tableau arrive à votre porte — inspectez-le d'abord, payez seulement si vous êtes satisfait.">تصل اللوحة إلى بابك — افحصها أولاً، وادفع فقط إذا كنت راضياً تماماً.</p></div>
+    <div class="how-step"><div class="how-num">1</div><h3>اختر تصميمك</h3><p>تصفح مئات التصاميم الحصرية أو اطلب تصميماً مخصصاً يعكس شخصيتك.</p></div>
+    <div class="how-step"><div class="how-num">2</div><h3>اطلب بالدفع عند الاستلام</h3><p>أكمل طلبك بدون دفع مسبق. لا بطاقة بنكية مطلوبة — الدفع عند الاستلام فقط.</p></div>
+    <div class="how-step"><div class="how-num">3</div><h3>نتصل بك لتأكيد طلبك</h3><p>فريقنا يتواصل معك في أقرب وقت لتأكيد التفاصيل وموعد التسليم المناسب.</p></div>
+    <div class="how-step"><div class="how-num">4</div><h3>استقبل وافحص قبل الدفع</h3><p>تصل اللوحة إلى بابك — افحصها أولاً، وادفع فقط إذا كنت راضياً تماماً.</p></div>
   </div>
-  <div class="how-note">
-    <span data-ar="" data-fr=""></span>
-    <strong data-ar="ما هي لوحات ARCO؟" data-fr="Qu'est-ce que les tableaux ARCO ?">ما هي لوحات ARCO؟</strong>
-    <span data-ar=" — لوحات خشبية مميزة مطبوعة بورق فاخر عالي الجودة. تُعلَّق على الجدار بدون أي حفر أو تثقيب. فنٌّ حقيقي لكل منزل." data-fr=" — Tableaux en bois distinctifs imprimés sur papier de luxe haute qualité. Se fixent au mur sans perçage. Un art véritable pour chaque maison."> — لوحات خشبية مميزة مطبوعة بورق فاخر عالي الجودة. تُعلَّق على الجدار بدون أي حفر أو تثقيب. فنٌّ حقيقي لكل منزل.</span>
-  </div>
+  <div class="how-note"><strong>ما هي لوحات ARCO؟</strong> — لوحات خشبية مميزة مطبوعة بورق فاخر عالي الجودة. تُعلَّق على الجدار بدون أي حفر أو تثقيب. فنٌّ حقيقي لكل منزل.</div>
 </section>
 
 <hr class="divider">
 
-<!-- CUSTOM DESIGN SECTION -->
+<!-- CUSTOM DESIGN -->
 <section class="sec wrap" id="custom">
   <div class="custom-cta">
     <div class="custom-cta-text">
-      <h2 data-ar="صمّم <em>لوحتك</em> الخاصة" data-fr="Créez <em>votre</em> tableau unique">صمّم <em>لوحتك</em> الخاصة</h2>
-      <p data-ar="أرسل صورتك أو فكرتك عبر واتساب — فريقنا يصمم لك لوحة خشبية مخصصة 100% تعكس شخصيتك وذوقك. مثالية كهدية أو لتزيين منزلك بلمسة فريدة." data-fr="Envoyez votre photo ou votre idée via WhatsApp — notre équipe crée pour vous un tableau en bois personnalisé à 100%. Parfait comme cadeau ou pour décorer votre maison.">أرسل صورتك أو فكرتك عبر واتساب — فريقنا يصمم لك لوحة خشبية مخصصة 100% تعكس شخصيتك وذوقك. مثالية كهدية أو لتزيين منزلك بلمسة فريدة.</p>
+      <h2>صمّم <em>لوحتك</em> الخاصة</h2>
+      <p>أرسل صورتك أو فكرتك عبر واتساب — فريقنا يصمم لك لوحة خشبية مخصصة 100% تعكس شخصيتك وذوقك. مثالية كهدية أو لتزيين منزلك بلمسة فريدة.</p>
     </div>
     <a class="custom-cta-btn" href="https://wa.me/213550374607?text=السلام+عليكم،+أريد+طلب+تصميم+مخصص" target="_blank" rel="noreferrer">
       <svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"/></svg>
-      <span data-ar="ابدأ تصميمك الآن" data-fr="Commencer votre design">ابدأ تصميمك الآن</span>
+      <span>ابدأ تصميمك الآن</span>
     </a>
-  </div>
-</section>
-
-<hr class="divider">
-
-<!-- BUNDLE DEALS -->
-<section class="sec wrap" id="bundles">
-  <div class="sec-title-wrap">
-    <span class="sec-title" data-ar="باقات تزيين الجدران" data-fr="Packs décoration murale">باقات تزيين الجدران</span>
-    <span class="sec-sub" data-ar="وفّر أكثر عندما تجمع تصاميم متناسقة" data-fr="Économisez plus en combinant des designs assortis">وفّر أكثر عندما تجمع تصاميم متناسقة</span>
-  </div>
-  <div class="bundles-grid" id="bundlesGrid">
-    <div class="bundle-card"><div class="bundle-imgs"><div></div><div></div><div></div></div><div class="bundle-body"><span class="bundle-tag" data-ar="باقة" data-fr="Pack">باقة</span><div class="bundle-name" data-ar="عشاق كرة القدم" data-fr="Fans de football">عشاق كرة القدم</div><div class="bundle-price-row"><span class="bundle-price">5,500 DZD</span><span class="bundle-save" data-ar="وفّر 1,000 دج" data-fr="Économisez 1000 DZD">وفّر 1,000 دج</span></div><button class="bundle-btn" onclick="window.location.href='https://wa.me/213550374607?text=أريد+باقة+عشاق+كرة+القدم'" data-ar="اطلب الباقة" data-fr="Commander le pack">اطلب الباقة</button></div></div>
-    <div class="bundle-card"><div class="bundle-imgs"><div></div><div></div><div></div></div><div class="bundle-body"><span class="bundle-tag" data-ar="باقة" data-fr="Pack">باقة</span><div class="bundle-name" data-ar="عشاق السيارات" data-fr="Fans de voitures">عشاق السيارات</div><div class="bundle-price-row"><span class="bundle-price">5,500 DZD</span><span class="bundle-save" data-ar="وفّر 1,000 دج" data-fr="Économisez 1000 DZD">وفّر 1,000 دج</span></div><button class="bundle-btn" onclick="window.location.href='https://wa.me/213550374607?text=أريد+باقة+عشاق+السيارات'" data-ar="اطلب الباقة" data-fr="Commander le pack">اطلب الباقة</button></div></div>
-    <div class="bundle-card"><div class="bundle-imgs"><div></div><div></div><div></div></div><div class="bundle-body"><span class="bundle-tag" data-ar="باقة" data-fr="Pack">باقة</span><div class="bundle-name" data-ar="الأنمي" data-fr="Anime">الأنمي</div><div class="bundle-price-row"><span class="bundle-price">5,500 DZD</span><span class="bundle-save" data-ar="وفّر 1,000 دج" data-fr="Économisez 1000 DZD">وفّر 1,000 دج</span></div><button class="bundle-btn" onclick="window.location.href='https://wa.me/213550374607?text=أريد+باقة+الأنمي'" data-ar="اطلب الباقة" data-fr="Commander le pack">اطلب الباقة</button></div></div>
-    <div class="bundle-card"><div class="bundle-imgs"><div></div><div></div><div></div></div><div class="bundle-body"><span class="bundle-tag" data-ar="باقة" data-fr="Pack">باقة</span><div class="bundle-name" data-ar="الألعاب" data-fr="Gaming">الألعاب</div><div class="bundle-price-row"><span class="bundle-price">5,500 DZD</span><span class="bundle-save" data-ar="وفّر 1,000 دج" data-fr="Économisez 1000 DZD">وفّر 1,000 دج</span></div><button class="bundle-btn" onclick="window.location.href='https://wa.me/213550374607?text=أريد+باقة+الألعاب'" data-ar="اطلب الباقة" data-fr="Commander le pack">اطلب الباقة</button></div></div>
-    <div class="bundle-card"><div class="bundle-imgs"><div></div><div></div><div></div></div><div class="bundle-body"><span class="bundle-tag" data-ar="باقة" data-fr="Pack">باقة</span><div class="bundle-name" data-ar="التحفيز" data-fr="Motivation">التحفيز</div><div class="bundle-price-row"><span class="bundle-price">5,500 DZD</span><span class="bundle-save" data-ar="وفّر 1,000 دج" data-fr="Économisez 1000 DZD">وفّر 1,000 دج</span></div><button class="bundle-btn" onclick="window.location.href='https://wa.me/213550374607?text=أريد+باقة+التحفيز'" data-ar="اطلب الباقة" data-fr="Commander le pack">اطلب الباقة</button></div></div>
-  </div>
-</section>
-
-<hr class="divider">
-
-<!-- REFERRAL PROGRAM -->
-<section class="sec wrap" id="referral">
-  <div class="referral-card">
-    <h2 data-ar="ادعُ صديقك واربحا معاً" data-fr="Parrainez un ami et gagnez ensemble">ادعُ صديقك واربحا معاً</h2>
-    <p data-ar="كل ما يطلب صديقك بإحالتك، تحصلا معاً على خصم 500 دج على طلبكما القادم." data-fr="Chaque fois qu'un ami commande via votre parrainage, vous gagnez tous les deux 500 DZD de réduction.">كل ما يطلب صديقك بإحالتك، تحصلا معاً على خصم 500 دج على طلبكما القادم.</p>
-    <div class="referral-steps">
-      <div class="ref-step"><div class="ref-ic"><svg viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></div><p data-ar="شارك رابط إحالتك مع صديقك" data-fr="Partagez votre lien de parrainage">شارك رابط إحالتك مع صديقك</p></div>
-      <div class="ref-step"><div class="ref-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg></div><p data-ar="يطلب صديقك أي منتج من ARCO" data-fr="Votre ami commande chez ARCO">يطلب صديقك أي منتج من ARCO</p></div>
-      <div class="ref-step"><div class="ref-ic"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div><p data-ar="تحصلا معاً على 500 دج خصم لكل منكما" data-fr="Vous gagnez tous les deux 500 DZD">تحصلا معاً على 500 دج خصم لكل منكما</p></div>
-    </div>
-    <div class="ref-badge">500 DZD</div><br><br>
-    <a class="ref-cta" href="https://wa.me/213550374607?text=أريد+الاشتراك+في+برنامج+الإحالة" target="_blank" rel="noreferrer" data-ar="ابدأ الآن عبر واتساب" data-fr="Commencer via WhatsApp">ابدأ الآن عبر واتساب</a>
   </div>
 </section>
 
@@ -467,7 +393,7 @@ img{display:block;max-width:100%}
 <!-- FAQ -->
 <section class="sec wrap" id="faq">
   <div class="sec-title-wrap">
-    <span class="sec-title" data-ar="أسئلة شائعة" data-fr="Questions fréquentes">أسئلة شائعة</span>
+    <span class="sec-title">أسئلة شائعة</span>
   </div>
   <div class="faq-wrap" id="faqWrap"></div>
 </section>
@@ -480,25 +406,24 @@ img{display:block;max-width:100%}
     <div class="footer-top">
       <div class="footer-brand">
         <strong>ARCO</strong>
-        <p data-ar="حوّل جدارك إلى لوحة فنية — لوحات خشبية فاخرة لكل منزل جزائري." data-fr="Transformez votre mur en œuvre d'art — tableaux en bois de luxe pour chaque foyer algérien.">حوّل جدارك إلى لوحة فنية — لوحات خشبية فاخرة لكل منزل جزائري.</p>
-        <small>&copy; <span id="yr"></span> ARCO — <span data-ar="جميع الحقوق محفوظة" data-fr="Tous droits réservés">جميع الحقوق محفوظة</span></small>
+        <p>حوّل جدارك إلى لوحة فنية — لوحات خشبية فاخرة لكل منزل جزائري.</p>
+        <small>&copy; <span id="yr"></span> ARCO — جميع الحقوق محفوظة</small>
       </div>
       <div class="footer-cols">
         <div class="footer-col">
-          <h4 data-ar="روابط سريعة" data-fr="Liens rapides">روابط سريعة</h4>
-          <a href="/#collections" data-ar="المجموعات" data-fr="Collections">المجموعات</a>
-          <a href="/#custom" data-ar="تصميم مخصص" data-fr="Design personnalisé">تصميم مخصص</a>
-          <a href="/#bundles" data-ar="الباقات" data-fr="Packs">الباقات</a>
-          <a href="/#faq" data-ar="الأسئلة الشائعة" data-fr="FAQ">الأسئلة الشائعة</a>
+          <h4>روابط سريعة</h4>
+          <a href="/#collections">المجموعات</a>
+          <a href="/#custom">تصميم مخصص</a>
+          <a href="/#faq">الأسئلة الشائعة</a>
         </div>
         <div class="footer-col">
-          <h4 data-ar="السياسات" data-fr="Politiques">السياسات</h4>
-          <a href="/shipping" data-ar="سياسة التوصيل" data-fr="Politique de livraison">سياسة التوصيل</a>
-          <a href="/returns" data-ar="سياسة الاستبدال" data-fr="Politique de retour">سياسة الاستبدال</a>
-          <a href="/terms" data-ar="الشروط والأحكام" data-fr="Conditions générales">الشروط والأحكام</a>
+          <h4>السياسات</h4>
+          <a href="/shipping">سياسة التوصيل</a>
+          <a href="/returns">سياسة الاستبدال</a>
+          <a href="/terms">الشروط والأحكام</a>
         </div>
         <div class="footer-col">
-          <h4 data-ar="تواصل معنا" data-fr="Nous contacter">تواصل معنا</h4>
+          <h4>تواصل معنا</h4>
           <a href="https://wa.me/213550374607" target="_blank" rel="noreferrer">WhatsApp</a>
           <a href="https://www.instagram.com/arcoartt" target="_blank" rel="noreferrer">Instagram</a>
           <a href="#" target="_blank" rel="noreferrer">Facebook</a>
@@ -507,7 +432,7 @@ img{display:block;max-width:100%}
       </div>
     </div>
     <div class="footer-bottom">
-      <span class="footer-copy" data-ar="© 2026 ARCO — جميع الحقوق محفوظة" data-fr="© 2026 ARCO — Tous droits réservés">© 2026 ARCO — جميع الحقوق محفوظة</span>
+      <span class="footer-copy">© 2026 ARCO — جميع الحقوق محفوظة</span>
       <div class="footer-socials">
         <a class="footer-social" href="https://www.instagram.com/arcoartt" target="_blank" rel="noreferrer" aria-label="Instagram">IG</a>
         <a class="footer-social" href="#" target="_blank" rel="noreferrer" aria-label="Facebook">FB</a>
@@ -519,124 +444,110 @@ img{display:block;max-width:100%}
 </footer>
 
 <!-- WHATSAPP FAB -->
-<a class="wa-fab" href="https://wa.me/213550374607" target="_blank" rel="noreferrer" aria-label="واتساب — تحدث معنا">
+<a class="wa-fab" href="https://wa.me/213550374607" target="_blank" rel="noreferrer" aria-label="واتساب">
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"/></svg>
-  <span data-ar="أحكي معانا" data-fr="Discutons">أحكي معانا</span>
+  <span>أحكي معانا</span>
 </a>
 
 <script>
-/* ── SUPABASE ── */
 const SB='https://mpkpehuatqsubohltssi.supabase.co/rest/v1';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
 const H={apikey:SK,Authorization:'Bearer '+SK};
 
-/* ── UTILS ── */
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const money=v=>Number(v||0).toLocaleString('fr-DZ')+' DZD';
 function productUrl(s){return s==='liquid-football'?'/p/liquid-football.html':s==='barber-shop'?'/p/barber-shop.html':'/p/'+encodeURIComponent(s);}
 function pImages(p){const b=Array.isArray(p.images)?p.images:(p.images?[p.images]:[]);const v=Array.isArray(p.variants)?p.variants.map(x=>x.image).filter(Boolean):[];return[...new Set([...b,...v])];}
 function minPrice(p){const pr=Array.isArray(p.variants)?p.variants.map(v=>Number(v.price||0)).filter(v=>v>0):[];return pr.length?Math.min(...pr):Number(p.price||0);}
 
-/* ── LANGUAGE TOGGLE ── */
 let LANG='ar';
+const FR={
+  announce:'Paiement à la livraison — 58 wilayas — Inspection avant paiement',
+  searchPlaceholder:'Cherchez un design...',searchSub:'Trouvez votre style',
+  statLabel:'foyers algériens décorés',
+  statSub:"D'Alger à Tamanrasset — ARCO est la première marque de tableaux en bois de luxe en Algérie.",
+  colTitle:'Nos collections',colSub:'Trouvez le design qui vous ressemble',
+  promoStrip:'Achetez 2 tableaux, le 3ème est offert',
+  testimonialTitle:'Ils nous font confiance',testimonialSub:'Avis authentiques de clients algériens',
+  whyTitle:'Pourquoi choisir ARCO',
+  howTitle:'Comment ça marche',howSub:'Simple, sécurisé et sans risque',
+  customTitle:"Créez <em>votre</em> tableau unique",
+  customP:"Envoyez votre photo ou votre idée via WhatsApp — notre équipe crée pour vous un tableau en bois personnalisé à 100%.",
+  customBtn:'Commencer votre design',
+  faqTitle:'Questions fréquentes',
+  footerTagline:"Transformez votre mur en œuvre d'art — tableaux en bois pour chaque foyer algérien.",
+  footerCopy:'© 2026 ARCO — Tous droits réservés',
+  waLabel:'Discutons',
+  exitTitle:'Ne partez pas sans votre offre',
+  exitBody:'Obtenez 10% de réduction sur toute commande supérieure à 2000 DZD.',
+  exitCta:"Profiter de l'offre",exitDismiss:'Non merci'
+};
 function toggleLang(){
   LANG=LANG==='ar'?'fr':'ar';
-  const root=document.getElementById('html-root');
-  root.setAttribute('lang',LANG==='ar'?'ar':'fr');
-  root.setAttribute('dir',LANG==='ar'?'rtl':'ltr');
-  document.getElementById('langBtn').textContent=LANG==='ar'?'FR':'عربي';
-  document.querySelectorAll('[data-ar]').forEach(el=>{
-    const val=el.getAttribute('data-'+LANG);
-    if(val!==null){
-      if(el.tagName==='INPUT'&&el.placeholder!==undefined)el.placeholder=val;
-      else if(el.tagName==='SPAN'||el.tagName==='P'||el.tagName==='SMALL')el.textContent=val;
-      else el.innerHTML=val;
-    }
-  });
-  // update search placeholder
-  const si=document.getElementById('searchInput');
-  if(si)si.placeholder=LANG==='ar'?'ابحث عن تصميم...':'Cherchez un design...';
+  const isFR=LANG==='fr';
+  document.getElementById('html-root').setAttribute('lang',isFR?'fr':'ar');
+  document.getElementById('html-root').setAttribute('dir',isFR?'ltr':'rtl');
+  document.getElementById('langBtn').textContent=isFR?'عربي':'FR';
+  if(isFR)applyFR(); else location.reload();
+}
+function applyFR(){
+  const s=(sel,txt,html)=>{const el=document.querySelector(sel);if(!el)return;html?el.innerHTML=txt:el.textContent=txt;};
+  document.getElementById('searchInput').placeholder=FR.searchPlaceholder;
+  s('.search-sub',FR.searchSub);s('.announce span',FR.announce);s('.promo-strip span',FR.promoStrip);
+  s('#statNumber','+6 000');s('.stat-label',FR.statLabel);s('.stat-sub',FR.statSub);
+  const cSecs=document.querySelectorAll('#collections .sec-title');if(cSecs[0])cSecs[0].textContent=FR.colTitle;
+  const cSubs=document.querySelectorAll('#collections .sec-sub');if(cSubs[0])cSubs[0].textContent=FR.colSub;
+  s('#testimonials .sec-title',FR.testimonialTitle);s('#testimonials .sec-sub',FR.testimonialSub);
+  s('#why .sec-title',FR.whyTitle);s('#how .sec-title',FR.howTitle);s('#how .sec-sub',FR.howSub);
+  s('#faq .sec-title',FR.faqTitle);
+  s('.custom-cta-text h2',FR.customTitle,true);s('.custom-cta-text p',FR.customP);s('.custom-cta-btn span',FR.customBtn);
+  s('.wa-fab span',FR.waLabel);s('.footer-brand p',FR.footerTagline);s('.footer-copy',FR.footerCopy);
+  s('.exit-box h3',FR.exitTitle);s('.exit-box p',FR.exitBody);s('.exit-cta',FR.exitCta);s('.exit-dismiss',FR.exitDismiss);
+  loadFAQ();
 }
 
-/* ── CARD HTML ── */
 function cardHTML(p){
-  const img=pImages(p)[0];
-  const sale=p.original_price&&p.original_price>minPrice(p);
-  return`<article class="pcard">
-    <a class="pthumb" href="${productUrl(p.slug)}">
-      ${img?`<img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy">`:''}
-      <div class="poverlay">
-        <div class="pprice">${money(minPrice(p))}${sale?`<span class="old">${money(p.original_price)}</span>`:''}</div>
-        <span class="porder" aria-label="اطلب"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg></span>
-      </div>
-    </a>
-  </article>`;
+  const img=pImages(p)[0];const sale=p.original_price&&p.original_price>minPrice(p);
+  return`<article class="pcard"><a class="pthumb" href="${productUrl(p.slug)}">${img?`<img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy">`:''}
+    <div class="poverlay"><div class="pprice">${money(minPrice(p))}${sale?`<span class="old">${money(p.original_price)}</span>`:''}</div>
+    <span class="porder" aria-label="اطلب"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg></span></div></a></article>`;
 }
 
-/* ── ALL PRODUCTS (one fetch, split by collection) ── */
 let ALL=[];
 async function loadAll(){
-  try{
-    const r=await fetch(`${SB}/products?select=*&active=eq.true&order=sort_order.asc,created_at.desc`,{headers:H});
-    ALL=await r.json();
-    if(!Array.isArray(ALL))ALL=[];
-  }catch(e){ALL=[];}
-  fillRails();
-}
-function fillRails(){
+  try{const r=await fetch(`${SB}/products?select=*&active=eq.true&order=sort_order.asc,created_at.desc`,{headers:H});ALL=await r.json();if(!Array.isArray(ALL))ALL=[];}catch(e){ALL=[];}
   const featured=ALL.filter(p=>p.featured===true);
   document.querySelectorAll('.collection-rail').forEach(sec=>{
-    const slug=sec.dataset.collection;
     const rail=sec.querySelector('.rail');
-    const items=featured.filter(p=>(p.collection||'')===slug).slice(0,12);
-    if(!items.length){
-      sec.style.display='none';
-      const nx=sec.nextElementSibling;
-      if(nx&&nx.classList.contains('divider'))nx.style.display='none';
-      return;
-    }
+    const items=featured.filter(p=>(p.collection||'')===sec.dataset.collection).slice(0,12);
+    if(!items.length){sec.style.display='none';const nx=sec.nextElementSibling;if(nx&&nx.classList.contains('divider'))nx.style.display='none';return;}
     rail.innerHTML=items.map(cardHTML).join('');
   });
 }
 
-/* ── COLLECTIONS ── */
 async function loadCollections(){
   const box=document.getElementById('colScroll');
   try{
     const r=await fetch(`${SB}/collections?select=*&active=eq.true&order=sort_order.asc`,{headers:H});
     const cols=await r.json();
     if(!Array.isArray(cols)||!cols.length){box.innerHTML='';return;}
-    box.innerHTML=cols.map(c=>`
-      <a class="col-item" href="/c/${esc(c.slug)}" data-slug="${esc(c.slug)}">
-        <div class="col-circle">${c.icon_url?`<img src="${esc(c.icon_url)}" alt="${esc(c.name_ar)}" loading="lazy">`:`<span class="ph">${esc((c.name_en||'A')[0])}</span>`}</div>
-        <span class="col-name">${esc(c.name_ar)}</span>
-      </a>`).join('');
+    box.innerHTML=cols.map(c=>`<a class="col-item" href="/c/${esc(c.slug)}" data-slug="${esc(c.slug)}"><div class="col-circle">${c.icon_url?`<img src="${esc(c.icon_url)}" alt="${esc(c.name_ar)}" loading="lazy">`:`<span class="ph">${esc((c.name_en||'A')[0])}</span>`}</div><span class="col-name">${esc(c.name_ar)}</span></a>`).join('');
     const saved=new URLSearchParams(location.search).get('c')||localStorage.getItem('arco_last_collection')||'';
-    if(saved){document.querySelectorAll('.col-item[data-slug]').forEach(el=>{if(el.dataset.slug===saved){el.classList.add('active');el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});}});}
+    if(saved)document.querySelectorAll('.col-item[data-slug]').forEach(el=>{if(el.dataset.slug===saved){el.classList.add('active');el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});}});
   }catch(e){box.innerHTML='';}
 }
 
-/* ── SEARCH ── */
 function runSearch(q){
   const query=(q||'').trim().toLowerCase();
   const rails=document.querySelectorAll('.collection-rail');
   let box=document.getElementById('searchResults');
   if(!query){
     if(box)box.style.display='none';
-    rails.forEach(s=>{
-      const h=s.querySelector('.rail')&&!s.querySelector('.rail-empty');
-      s.style.display=h?'':'none';
-      const nx=s.nextElementSibling;if(nx&&nx.classList.contains('divider'))nx.style.display=h?'':'none';
-    });
+    rails.forEach(s=>{const h=s.querySelector('.rail')&&!s.querySelector('.rail-empty');s.style.display=h?'':'none';const nx=s.nextElementSibling;if(nx&&nx.classList.contains('divider'))nx.style.display=h?'':'none';});
     return;
   }
   rails.forEach(s=>{s.style.display='none';const nx=s.nextElementSibling;if(nx&&nx.classList.contains('divider'))nx.style.display='none';});
-  if(!box){
-    box=document.createElement('section');
-    box.id='searchResults';box.className='sec wrap';
-    const col=document.getElementById('collections');
-    col.parentNode.insertBefore(box,col.nextSibling);
-  }
+  if(!box){box=document.createElement('section');box.id='searchResults';box.className='sec wrap';document.getElementById('collections').parentNode.insertBefore(box,document.getElementById('collections').nextSibling);}
   box.style.display='';
   const matches=ALL.filter(p=>(p.name||'').toLowerCase().includes(query)).slice(0,40);
   box.innerHTML=`<div class="sec-title-wrap"><span class="sec-title">نتائج البحث</span><span class="sec-sub">${matches.length} نتيجة</span></div>${matches.length?`<div class="search-grid">${matches.map(cardHTML).join('')}</div>`:'<div class="rail-empty">لا توجد نتائج</div>'}`;
@@ -644,61 +555,39 @@ function runSearch(q){
 let _st;
 document.getElementById('searchInput').addEventListener('input',e=>{clearTimeout(_st);_st=setTimeout(()=>runSearch(e.target.value),180);});
 
-/* ── FAQ ── */
 const FAQ_DATA={
   ar:[
     {q:'ما هي لوحات ARCO؟',a:'لوحات خشبية مميزة مطبوعة بورق فاخر عالي الجودة، تُعلَّق على الجدار بدون أي حفر أو تثقيب. تحوّل جدارك إلى لوحة فنية بلمسة بسيطة.'},
-    {q:'كم مدة التوصيل؟',a:'من 2 إلى 4 أيام لجميع ولايات الجزائر الـ 58، من أدرار إلى عنابة. التوصيل إلى باب دارك مع الدفع عند الاستلام.'},
+    {q:'كم مدة التوصيل؟',a:'من 2 إلى 4 أيام لجميع ولايات الجزائر الـ 58. التوصيل إلى باب دارك مع الدفع عند الاستلام.'},
     {q:'هل يمكنني الفحص قبل الدفع؟',a:'نعم، هذا حقك. تصل اللوحة إلى بابك، تفحصها أولاً، وتدفع فقط إذا كنت راضياً تماماً عن الجودة.'},
     {q:'ما هي سياسة الاستبدال؟',a:'بعد قبول المنتج والدفع، لا يمكن الاسترجاع. في حالة وجود عيب مصنعي، نستبدل المنتج فقط — ترجعلنا اللوحة القديمة ونرسللك بديل جديد وسليم.'},
     {q:'كيف أطلب تصميماً مخصصاً؟',a:'تواصل معنا عبر واتساب على 213550374607+ وأرسل لنا صورتك أو فكرتك، وسنتولى تصميم لوحتك الخاصة.'},
     {q:'هل تقبلون الطلبات بالجملة؟',a:'نعم، نوفر أسعاراً خاصة للطلبات بالجملة والمحلات التجارية. تواصل معنا عبر واتساب لمناقشة التفاصيل.'}
   ],
   fr:[
-    {q:'Que sont les tableaux ARCO ?',a:"Des tableaux en bois distinctifs imprimés sur papier de luxe haute qualité, qui s'accrochent au mur sans perçage. Transformez votre mur en œuvre d'art."},
-    {q:'Quel est le délai de livraison ?',a:'De 2 à 4 jours dans les 58 wilayas d\'Algérie. Livraison à votre porte avec paiement à la livraison.'},
-    {q:'Puis-je inspecter avant de payer ?',a:'Oui, c\'est votre droit. Le tableau arrive à votre porte, vous l\'inspectez d\'abord et vous payez seulement si vous êtes entièrement satisfait.'},
-    {q:'Quelle est la politique d\'échange ?',a:'Après acceptation du produit et paiement, aucun remboursement. En cas de défaut de fabrication, nous échangeons uniquement — retournez l\'ancien tableau et nous en envoyons un nouveau.'},
+    {q:'Que sont les tableaux ARCO ?',a:"Des tableaux en bois imprimés sur papier de luxe haute qualité, qui s'accrochent au mur sans perçage."},
+    {q:'Quel est le délai de livraison ?',a:"De 2 à 4 jours dans les 58 wilayas d'Algérie. Livraison à votre porte avec paiement à la livraison."},
+    {q:'Puis-je inspecter avant de payer ?',a:"Oui, c'est votre droit. Vous inspectez d'abord et payez seulement si vous êtes entièrement satisfait."},
+    {q:"Quelle est la politique d'échange ?",a:"Après acceptation et paiement, aucun remboursement. En cas de défaut de fabrication, nous échangeons uniquement."},
     {q:'Comment commander un design personnalisé ?',a:'Contactez-nous via WhatsApp au +213550374607 et envoyez-nous votre photo ou votre idée.'},
-    {q:'Acceptez-vous les commandes en gros ?',a:'Oui, nous proposons des prix spéciaux pour les commandes en gros et les magasins. Contactez-nous via WhatsApp.'}
+    {q:'Acceptez-vous les commandes en gros ?',a:'Oui, prix spéciaux pour les commandes en gros. Contactez-nous via WhatsApp.'}
   ]
 };
 function loadFAQ(){
   const list=FAQ_DATA[LANG]||FAQ_DATA.ar;
-  document.getElementById('faqWrap').innerHTML=list.map((f,i)=>`
-    <div class="faq-item" data-i="${i}">
-      <button class="faq-q" onclick="toggleFaq(${i})" aria-expanded="false">
-        <span>${esc(f.q)}</span>
-        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2.5" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
-      <div class="faq-a"><div>${esc(f.a)}</div></div>
-    </div>`).join('');
+  document.getElementById('faqWrap').innerHTML=list.map((f,i)=>`<div class="faq-item" data-i="${i}"><button class="faq-q" onclick="toggleFaq(${i})" aria-expanded="false"><span>${esc(f.q)}</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button><div class="faq-a"><div>${esc(f.a)}</div></div></div>`).join('');
 }
-function toggleFaq(i){
-  const el=document.querySelector(`.faq-item[data-i="${i}"]`);
-  const open=el.classList.toggle('open');
-  el.querySelector('.faq-q').setAttribute('aria-expanded',open);
-}
+function toggleFaq(i){const el=document.querySelector(`.faq-item[data-i="${i}"]`);const o=el.classList.toggle('open');el.querySelector('.faq-q').setAttribute('aria-expanded',o);}
 
-/* ── EXIT INTENT POPUP ── */
 let exitShown=false;
 function showExit(){if(exitShown)return;exitShown=true;document.getElementById('exitOverlay').classList.add('show');}
 function closeExit(){document.getElementById('exitOverlay').classList.remove('show');}
-// Trigger on mouse leave (desktop)
 document.addEventListener('mouseleave',e=>{if(e.clientY<=0)showExit();});
-// Trigger on Android back gesture / page hide
 window.addEventListener('pagehide',()=>showExit());
 
-/* ── INIT ── */
 document.getElementById('yr').textContent=new Date().getFullYear();
-loadCollections();
-loadFAQ();
-loadAll();
-// expose for collection page
-window.ARCOSelectCollection=function(slug){
-  try{if(slug)localStorage.setItem('arco_last_collection',slug);}catch(e){}
-  document.getElementById('collections')?.scrollIntoView({behavior:'smooth'});
-};
+loadCollections();loadFAQ();loadAll();
+window.ARCOSelectCollection=function(slug){try{if(slug)localStorage.setItem('arco_last_collection',slug);}catch(e){}document.getElementById('collections')?.scrollIntoView({behavior:'smooth'});};
 </script>
 </body>
 </html>
