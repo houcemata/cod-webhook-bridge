@@ -917,12 +917,12 @@ function isPoster(){return String(product?.type||'').toLowerCase()==='poster';}
 function isSet(){return String(product?.type||'').toLowerCase()==='set';}
 function cartBtnHTML(){
   if(isPoster())return`<button class="order-btn" id="addcart-btn" onclick="addCurrentToCart()" style="background:#fff;color:#080808;margin-bottom:0">🛒 أضف إلى السلة — اشترِ 2 و الثالثة مجاناً</button>`;
-  if(isSet())return`<button class="order-btn" id="addcart-btn" onclick="addCurrentToCart()" style="background:#fff;color:#080808;margin-bottom:0">🛒 أضف إلى السلة — كلما زدت وفّرت أكثر</button>`;
+  if(isSet())return`<button class="order-btn" id="addcart-btn" onclick="addCurrentToCart()" style="background:#fff;color:#080808;margin-bottom:0">🛒 أضف إلى السلة — أشري كثر  تربح كثر </button>`;
   return'';
 }
 function upsellBannerHTML(){
   if(isPoster())return`<div class="upsell-banner"><p>🎁 <strong>اشترِ 2 لوحات والثالثة مجاناً!</strong> أضفهم للسلة والخصم يتطبق تلقائياً.</p></div>`;
-  if(isSet())return`<div class="upsell-banner"><p>💰 <strong>اشري ب 300ألف → اربح 50ألف</strong> · <strong>اشري ب 600ألف → اربح 100ألف</strong> · <strong>اشري ب 950ألف → اربح 200ألف</strong></p></div>`;
+  if(isSet())return`<div class="upsell-banner"><p>💰 <strong>اشري ب 300ألف ← اربح 50ألف</strong> · <strong>اشري ب 600ألف ← اربح 100ألف</strong> · <strong>اشري ب 950ألف ← اربح 200ألف</strong></p></div>`;
   return'';
 }
 function updateStickyUpsell(){
