@@ -556,8 +556,8 @@ body.kids-theme::before{background:none;opacity:0}
     <p>شكراً <span id="success-name"></span>! سيتصل بك فريقنا قريباً لتأكيد التفاصيل.</p>
     <p id="success-id" style="color:#888;font-size:13px;margin-top:6px"></p>
     <div style="margin-top:18px;background:rgba(245,197,0,.08);border:1px solid rgba(245,197,0,.22);border-radius:12px;padding:14px">
-      <p style="color:#F5C500;font-weight:900;font-size:15px;margin-bottom:6px">🛒 تصفح وأضف لوحة ثانية</p>
-      <p style="color:#ccc;font-size:13px;line-height:1.7">طلبك وصل — لكن بإمكانك إضافة لوحة ثانية وتوفير على طلبك — كلما أضفت أكثر وفرت أكثر.</p>
+      <p style="color:#F5C500;font-weight:900;font-size:15px;margin-bottom:6px">🛒 تصفح واطلب المزيد</p>
+      <p style="color:#ccc;font-size:13px;line-height:1.7">طلبك وصل — زيد كوموندي تنقص سومة! — دير لافار.</p>
     </div>
     <div class="success-browse-wrap">
       <a class="success-browse-btn" id="success-browse-btn" href="/">&#128443; تصفح باقي التصاميم</a>
@@ -922,13 +922,13 @@ function cartBtnHTML(){
 }
 function upsellBannerHTML(){
   if(isPoster())return`<div class="upsell-banner"><p>🎁 <strong>اشترِ 2 لوحات والثالثة مجاناً!</strong> أضفهم للسلة والخصم يتطبق تلقائياً.</p></div>`;
-  if(isSet())return`<div class="upsell-banner"><p>💰 <strong>2 مجموعات → خصم 500 دج</strong> · <strong>3 مجموعات → خصم 1000 دج</strong> · <strong>4+ مجموعات → خصم 2000 دج</strong></p></div>`;
+  if(isSet())return`<div class="upsell-banner"><p>💰 <strong>اشري ب 300ألف → اربح 50ألف</strong> · <strong>اشري ب 600ألف → اربح 100ألف</strong> · <strong>اشري ب 950ألف → اربح 200ألف</strong></p></div>`;
   return'';
 }
 function updateStickyUpsell(){
   const el=document.getElementById('sticky-upsell');if(!el)return;
   if(isPoster())el.textContent='🎁 اشترِ 2 والثالثة مجاناً';
-  else if(isSet())el.textContent='💰 أضف أكثر وفّر أكثر';
+  else if(isSet())el.textContent='💰 أشري اكثر اربح اكثر';
 }
 function loadRelated(){
   const col=product?.collection||'';
