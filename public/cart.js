@@ -1,11 +1,11 @@
-/* ARCO cart.js — multi-product cart for POSTER and SET products.
-   Posters: buy 2 get the cheapest of every 3 free.
-   All items: threshold discount applied on top.
-     ≥ 3 000 DZD → − 500 DZD
-     ≥ 6 000 DZD → −1 000 DZD
-     ≥ 9 500 DZD → −2 000 DZD
-     ≥13 000 DZD → −3 000 DZD
-   Both discounts stack on a mixed cart. */
+/* ARCO cart.js - multi-product cart for POSTER and SET products.
+   Posters: every 3 posters, cheapest is free.
+   Threshold discount applies after poster freebies.
+   >= 3 000 DZD -> -500 DZD
+   >= 6 000 DZD -> -1 000 DZD
+   >= 9 500 DZD -> -2 000 DZD
+   >=13 000 DZD -> -3 000 DZD
+   Both discounts stack on a mixed cart, but threshold uses the discounted subtotal. */
 (function () {
   "use strict";
   const SB_URL = 'https://mpkpehuatqsubohltssi.supabase.co/rest/v1';
@@ -17,10 +17,18 @@
   function write(c) { localStorage.setItem(KEY, JSON.stringify(c)); renderBadge(); }
   function money(v) { return Number(v || 0).toLocaleString('fr-DZ') + ' DZD'; }
   function esc(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+  
+  function normalizeType(item) {
+    return String(item?.product_type || item?.type || item?.productType || "").trim().toLowerCase();
+  }
+  function isPoster(item) {
+    return normalizeType(item) === "poster";
+  }
+  
 
   // ── Poster discount: cheapest of every 3 is free ──
   function computePosterDiscount(cart) {
-    const posters = cart.filter(i => (i.product_type || '') !== 'set');
+    const posters = cart.filter(isPoster);
     const prices = posters.map(i => Number(i.price || 0));
     const freeCount = Math.floor(posters.length / 3);
     const sorted = posters.map((_, i) => i).sort((a, b) => prices[a] - prices[b]);
@@ -29,12 +37,12 @@
     posters.forEach((_, i) => { if (freeIdx.has(i)) discount += prices[i]; });
     // Map free indices back to full cart indices
     const posterCartIdx = [];
-    cart.forEach((it, i) => { if ((it.product_type || '') !== 'set') posterCartIdx.push(i); });
+    cart.forEach((it, i) => { if (isPoster(it)) posterCartIdx.push(i); });
     const freeCartIdx = new Set([...freeIdx].map(pi => posterCartIdx[pi]));
     return { posterFreeDiscount: discount, freeCartIdx, freeCount };
   }
 
-  // ── Threshold discount on raw subtotal ──
+  // â”€â”€ Threshold discount on subtotal after poster freebies â”€â”€
   const THRESHOLDS = [
     { min: 13000, off: 3000 },
     { min: 9500,  off: 2000 },
@@ -56,8 +64,8 @@
   function computeTotals(cart) {
     const subtotal = cart.reduce((s, i) => s + Number(i.price || 0), 0);
     const { posterFreeDiscount, freeCartIdx, freeCount } = computePosterDiscount(cart);
-    const afterPosters = subtotal - posterFreeDiscount;
-    const thresh = thresholdDiscount(subtotal);
+    const afterPosters = Math.max(0, subtotal - posterFreeDiscount);
+    const thresh = thresholdDiscount(afterPosters);
     const totalDiscount = posterFreeDiscount + thresh;
     return {
       subtotal,
@@ -185,7 +193,7 @@
     if (t.freeCount > 0) {
       lines.push({ type: 'green', msg: `🎉 عندك ${t.freeCount} لوحة مجانية! وفّرت ${money(t.posterFreeDiscount)}` });
     } else {
-      const posters = cart.filter(i => (i.product_type || '') !== 'set');
+      const posters = cart.filter(isPoster);
       const need = (3 - (posters.length % 3)) % 3;
       if (posters.length > 0 && need > 0) {
         lines.push({ type: 'near', msg: `🔥 زيد ${need === 1 ? 'لوحة وحدة' : `${need} لوحات`} و اللوحة الثالثة بااااطل!` });
@@ -195,9 +203,9 @@
     if (t.thresholdDiscount > 0) {
       lines.push({ type: 'thresh active', msg: `💥 خصم ${money(t.thresholdDiscount)} مطبّق على طلبك!` });
     } else {
-      const nx = nextThreshold(t.subtotal);
+      const nx = nextThreshold(Math.max(0, t.subtotal - t.posterFreeDiscount));
       if (nx) {
-        const missing = nx.min - t.subtotal;
+        const missing = nx.min - Math.max(0, t.subtotal - t.posterFreeDiscount);
         lines.push({ type: 'thresh', msg: `زيد بـ ${money(missing)} فقط وتوفر ${money(nx.off)} خصم!` });
       }
     }
