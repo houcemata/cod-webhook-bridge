@@ -20,9 +20,13 @@ img{display:block;max-width:100%}
 .orb{position:absolute;border-radius:50%;filter:blur(80px)}
 .orb-1{width:480px;height:480px;background:rgba(245,197,0,.05);top:-180px;left:-120px}
 
-/* ANNOUNCE + TOPBAR */
-.announce{position:relative;z-index:30;background:var(--bk);border-bottom:1px solid var(--ln);text-align:center;padding:8px 12px}
-.announce span{font:700 .78rem/1 'Changa',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--y)}
+/* ANNOUNCE — sliding marquee */
+.announce{position:relative;z-index:30;background:var(--bk);border-bottom:1px solid var(--ln);overflow:hidden;padding:0;height:34px;display:flex;align-items:center}
+.announce-track{display:flex;white-space:nowrap;animation:marquee 28s linear infinite;will-change:transform}
+.announce-track:hover{animation-play-state:paused}
+.announce-item{display:inline-flex;align-items:center;gap:0;padding:0 32px;font:700 .76rem/1 'Changa',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--y)}
+.announce-sep{color:rgba(245,197,0,.35);font-size:.6rem;margin:0 4px}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(24px);background:rgba(8,8,8,.86);border-bottom:1px solid var(--ln)}
 .topbar-inner{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:14px}
 .brand img{height:40px;width:auto;display:block}
@@ -199,7 +203,18 @@ img{display:block;max-width:100%}
 
 <div class="orbs" aria-hidden="true"><div class="orb orb-1"></div></div>
 
-<div class="announce"><span>الدفع عند الاستلام — توصيل لجميع الولايات الـ 58 — حق الفحص قبل الدفع</span></div>
+<div class="announce" aria-label="إعلانات">
+  <div class="announce-track">
+    <span class="announce-item">🚚 توصيل لجميع الولايات الـ 58 <span class="announce-sep">✦</span></span>
+    <span class="announce-item">💳 الدفع عند الاستلام فقط <span class="announce-sep">✦</span></span>
+    <span class="announce-item">👀 حق الفحص قبل الدفع <span class="announce-sep">✦</span></span>
+    <span class="announce-item">🎁 اشترِ لوحتين والثالثة مجاناً <span class="announce-sep">✦</span></span>
+    <span class="announce-item">🚚 توصيل لجميع الولايات الـ 58 <span class="announce-sep">✦</span></span>
+    <span class="announce-item">💳 الدفع عند الاستلام فقط <span class="announce-sep">✦</span></span>
+    <span class="announce-item">👀 حق الفحص قبل الدفع <span class="announce-sep">✦</span></span>
+    <span class="announce-item">🎁 اشترِ لوحتين والثالثة مجاناً <span class="announce-sep">✦</span></span>
+  </div>
+</div>
 
 <header class="topbar">
   <div class="wrap topbar-inner">
