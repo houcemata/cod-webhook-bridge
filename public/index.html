@@ -26,9 +26,12 @@ img{display:block;max-width:100%}
 .orb-1{width:480px;height:480px;background:rgba(245,197,0,.05);top:-180px;left:-120px}
 .orb-2{width:340px;height:340px;background:rgba(225,29,72,.03);top:18%;right:-100px}
 
-/* ANNOUNCE */
-.announce{position:relative;z-index:30;background:var(--bk);border-bottom:1px solid var(--ln);text-align:center;padding:8px 12px}
-.announce span{font:700 .78rem/1 'Changa',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--y)}
+/* ANNOUNCE — sliding marquee */
+.announce{position:relative;z-index:30;background:var(--bk);border-bottom:1px solid var(--ln);overflow:hidden;padding:0;height:34px;display:flex;align-items:center}
+.announce-track{display:flex;white-space:nowrap;animation:marquee 28s linear infinite;will-change:transform}
+.announce-track:hover{animation-play-state:paused}
+.announce-item{display:inline-flex;align-items:center;padding:0 32px;font:700 .76rem/1 'Changa',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--y)}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* TOPBAR */
 .topbar{position:sticky;top:0;z-index:40;backdrop-filter:blur(24px);background:rgba(8,8,8,.86);border-bottom:1px solid var(--ln)}
@@ -228,7 +231,18 @@ img{display:block;max-width:100%}
 </div>
 
 <!-- ANNOUNCEMENT -->
-<div class="announce"><span>الدفع عند الاستلام — توصيل لجميع الولايات الـ 58 — حق الفحص قبل الدفع</span></div>
+<div class="announce">
+  <div class="announce-track">
+    <span class="announce-item">🚚 توصيل لـ 58 ولاية ✦</span>
+    <span class="announce-item">💳 الدفع عند الاستلام ✦</span>
+    <span class="announce-item">👀 حق الفحص قبل الدفع ✦</span>
+    <span class="announce-item">🎁 اشترِ 2 والثالثة مجاناً ✦</span>
+    <span class="announce-item">🚚 توصيل لـ 58 ولاية ✦</span>
+    <span class="announce-item">💳 الدفع عند الاستلام ✦</span>
+    <span class="announce-item">👀 حق الفحص قبل الدفع ✦</span>
+    <span class="announce-item">🎁 اشترِ 2 والثالثة مجاناً ✦</span>
+  </div>
+</div>
 
 <!-- TOPBAR -->
 <header class="topbar">
@@ -493,7 +507,8 @@ function toggleLang(){
 function applyFR(){
   const s=(sel,txt,html)=>{const el=document.querySelector(sel);if(!el)return;html?el.innerHTML=txt:el.textContent=txt;};
   document.getElementById('searchInput').placeholder=FR.searchPlaceholder;
-  s('.search-sub',FR.searchSub);s('.announce span',FR.announce);s('.promo-strip span',FR.promoStrip);
+  s('.search-sub',FR.searchSub);s('.promo-strip span',FR.promoStrip);
+  document.querySelectorAll('.announce-item').forEach((el,i)=>{const msgs=['🚚 Livraison dans 58 wilayas ✦','💳 Paiement à la livraison ✦','👀 Inspection avant paiement ✦','🎁 Achetez 2, le 3ème offert ✦'];el.innerHTML=(msgs[i%4]||msgs[0]);});
   s('#statNumber','+6 000');s('.stat-label',FR.statLabel);s('.stat-sub',FR.statSub);
   const cSecs=document.querySelectorAll('#collections .sec-title');if(cSecs[0])cSecs[0].textContent=FR.colTitle;
   const cSubs=document.querySelectorAll('#collections .sec-sub');if(cSubs[0])cSubs[0].textContent=FR.colSub;
