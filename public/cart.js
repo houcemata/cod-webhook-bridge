@@ -22,10 +22,10 @@
     return String(item?.product_type || item?.type || item?.productType || "").trim().toLowerCase();
   }
   function isPoster(item) {
-    return normalizeType(item) === "poster";
+    const type = normalizeType(item);
+    const price = Number(item?.price || 0);
+    return type === "poster" || (type !== "set" && price > 0 && price < 2900);
   }
-  
-
   // ── Poster discount: cheapest of every 3 is free ──
   function computePosterDiscount(cart) {
     const posters = cart.filter(isPoster);
