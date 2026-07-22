@@ -252,7 +252,7 @@ img{display:block;max-width:100%}
     </div>
     <div class="split-filter" id="splitFilter" role="group" aria-label="نوع اللوحة">
       <button class="active" onclick="setTypeFilter('all')" id="filterAll">الكل</button>
-      <button onclick="setTypeFilter('set')" id="filterSingle">باقة ثلاثية</button>
+      <button onclick="setTypeFilter('set')" id="filterSingle">باقة ثلاثية (Set)</button>
       <button onclick="setTypeFilter('poster')" id="filterSplit">لوحة واحدة</button>
     </div>
   </div>
@@ -502,28 +502,24 @@ async function load(){
   ['filterAll','filterSingle','filterSplit'].forEach(id=>document.getElementById(id).classList.remove('active'));
   document.getElementById('filterAll').classList.add('active');
   renderSubbar();
-  // Fetch products + all non-canceled orders in parallel
+  // Fetch products and order counts in parallel
   try{
-    const [prodRes,ordRes]=await Promise.all([
-      fetch(`${SB}/products?select=*&active=eq.true&collection=eq.${encodeURIComponent(collectionSlug)}&order=sort_order.asc,created_at.desc`,{headers:H}),
-      fetch(`${SB}/orders?select=product&status=neq.canceled&status=neq.returned&status=neq.duplicated`,{headers:H})
+    const enc=encodeURIComponent(collectionSlug);
+    const [prodRes,countRes]=await Promise.all([
+      fetch(`${SB}/products?select=*&active=eq.true&collection=eq.${enc}&limit=500`,{headers:H}),
+      fetch(`${SB}/product_order_counts?select=slug,order_count&collection=eq.${enc}&limit=500`,{headers:H})
     ]);
     const products=await prodRes.json();
-    // Build order-count map keyed by lowercase product name
+    // Build slug→order_count map from the view
     let orderCounts={};
     try{
-      const orderRows=await ordRes.json();
-      if(Array.isArray(orderRows)){
-        orderRows.forEach(o=>{
-          const key=(o.product||'').toLowerCase();
-          orderCounts[key]=(orderCounts[key]||0)+1;
-        });
-      }
+      const counts=await countRes.json();
+      if(Array.isArray(counts))counts.forEach(r=>{orderCounts[r.slug]=Number(r.order_count)||0;});
     }catch(e){}
     // Attach count and sort: most-ordered first, sort_order as tiebreaker
     allItems=Array.isArray(products)?products.map(p=>({
       ...p,
-      _order_count:orderCounts[(p.name||'').toLowerCase()]||0
+      _order_count:orderCounts[p.slug]||0
     })).sort((a,b)=>b._order_count-a._order_count||(a.sort_order??999)-(b.sort_order??999)):[];
   }catch(e){allItems=[];}
   renderGrid();
