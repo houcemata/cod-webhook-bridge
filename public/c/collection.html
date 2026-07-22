@@ -252,8 +252,8 @@ img{display:block;max-width:100%}
     </div>
     <div class="split-filter" id="splitFilter" role="group" aria-label="نوع اللوحة">
       <button class="active" onclick="setTypeFilter('all')" id="filterAll">الكل</button>
-      <button onclick="setTypeFilter('single')" id="filterSingle">لوحة واحدة</button>
-      <button onclick="setTypeFilter('split')" id="filterSplit">سبليت</button>
+      <button onclick="setTypeFilter('set')" id="filterSingle">باقة ثلاثية</button>
+      <button onclick="setTypeFilter('poster')" id="filterSplit">لوحة واحدة</button>
     </div>
   </div>
   <div class="subbar" id="subbar"></div>
@@ -443,8 +443,8 @@ function cardHTML(p){
 function filteredItems(){
   let list=allItems;
   if(activeSub!=='all')list=list.filter(p=>(p.subcollection||'')===activeSub);
-  if(typeFilter==='single')list=list.filter(p=>!(p.type||p.product_type||'').toLowerCase().includes('split'));
-  if(typeFilter==='split')list=list.filter(p=>(p.type||p.product_type||'').toLowerCase().includes('split'));
+  if(typeFilter==='set')list=list.filter(p=>(p.type||'').toLowerCase()==='set');
+  if(typeFilter==='poster')list=list.filter(p=>(p.type||'').toLowerCase()==='poster');
   const q=(searchQuery||'').trim().toLowerCase();
   if(q)list=list.filter(p=>(p.name||'').toLowerCase().includes(q));
   return list;
@@ -453,7 +453,7 @@ function filteredItems(){
 function setTypeFilter(t){
   typeFilter=t;page=1;
   ['filterAll','filterSingle','filterSplit'].forEach(id=>document.getElementById(id).classList.remove('active'));
-  document.getElementById(t==='all'?'filterAll':t==='single'?'filterSingle':'filterSplit').classList.add('active');
+  document.getElementById(t==='all'?'filterAll':t==='set'?'filterSingle':'filterSplit').classList.add('active');
   renderGrid();
 }
 
@@ -502,9 +502,29 @@ async function load(){
   ['filterAll','filterSingle','filterSplit'].forEach(id=>document.getElementById(id).classList.remove('active'));
   document.getElementById('filterAll').classList.add('active');
   renderSubbar();
+  // Fetch products + all non-canceled orders in parallel
   try{
-    const r=await fetch(`${SB}/products?select=*&active=eq.true&collection=eq.${encodeURIComponent(collectionSlug)}&order=sort_order.asc,created_at.desc`,{headers:H});
-    const data=await r.json();allItems=Array.isArray(data)?data:[];
+    const [prodRes,ordRes]=await Promise.all([
+      fetch(`${SB}/products?select=*&active=eq.true&collection=eq.${encodeURIComponent(collectionSlug)}&order=sort_order.asc,created_at.desc`,{headers:H}),
+      fetch(`${SB}/orders?select=product&status=neq.canceled&status=neq.returned&status=neq.duplicated`,{headers:H})
+    ]);
+    const products=await prodRes.json();
+    // Build order-count map keyed by lowercase product name
+    let orderCounts={};
+    try{
+      const orderRows=await ordRes.json();
+      if(Array.isArray(orderRows)){
+        orderRows.forEach(o=>{
+          const key=(o.product||'').toLowerCase();
+          orderCounts[key]=(orderCounts[key]||0)+1;
+        });
+      }
+    }catch(e){}
+    // Attach count and sort: most-ordered first, sort_order as tiebreaker
+    allItems=Array.isArray(products)?products.map(p=>({
+      ...p,
+      _order_count:orderCounts[(p.name||'').toLowerCase()]||0
+    })).sort((a,b)=>b._order_count-a._order_count||(a.sort_order??999)-(b.sort_order??999)):[];
   }catch(e){allItems=[];}
   renderGrid();
   window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
