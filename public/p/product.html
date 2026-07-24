@@ -959,6 +959,7 @@ function loadRelated(){
       }).join('');
     }).catch(()=>{const s=document.getElementById('related-section');if(s)s.style.display='none';});
 }
+function updateStickyCartBadge(){const badge=document.getElementById('sticky-cart-badge');if(!badge)return;const count=window.ARCOCart?.count?.()||0;badge.textContent=count;badge.classList.toggle('zero',count===0);}
 function addCurrentToCart(){
   if(!product||!window.ARCOCart)return;
   const v=findSelectedVariant()||variant||variants()[0];
@@ -972,6 +973,7 @@ function addCurrentToCart(){
     price:Number((v&&v.price)||product.price||0),
     image:img
   });
+  updateStickyCartBadge();
 }
 async function loadProduct(){
   const slug=slugFromPath();if(!slug){missing();return;}
@@ -1114,7 +1116,7 @@ async function loadDesks(){
 }
 function shippingCost(){return delivery==='home'?Number(shipping.home_delivery||0):Number(shipping.stop_desk||0);}
 function total(){return Number(variant.price||0)+shippingCost();}
-function updateTotals(){['sum-product','base-price'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=money(variant.price)});const s=document.getElementById('sum-ship'),t=document.getElementById('sum-total'),st=document.getElementById('sticky-total'),sticky=document.getElementById('sticky');if(s)s.textContent=money(shippingCost());if(t)t.textContent=money(total());if(st)st.textContent=money(total());if(sticky)sticky.classList.toggle('visible',!!product);if(isKidsProduct())updateKidsMeta();}
+function updateTotals(){['sum-product','base-price'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=money(variant.price)});const s=document.getElementById('sum-ship'),t=document.getElementById('sum-total'),st=document.getElementById('sticky-total'),sticky=document.getElementById('sticky');if(s)s.textContent=money(shippingCost());if(t)t.textContent=money(total());if(st)st.textContent=money(total());if(sticky)sticky.classList.toggle('visible',!!product);updateStickyCartBadge();if(isKidsProduct())updateKidsMeta();}
 function scrollToOrder(){document.getElementById('order').scrollIntoView({behavior:'smooth'});}
 function trackProductCheckout(){
   if(checkoutTracked||!window.ARCOMeta||!product)return;
