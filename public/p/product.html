@@ -47,8 +47,12 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
 /* STAT HERO */
 .prod-stat{text-align:center;padding:22px 0 14px;border-bottom:1px solid var(--line)}
 .prod-stat-num{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.6rem,8vw,4.4rem);color:var(--yellow);line-height:1;letter-spacing:-.02em}
-.prod-stat-lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;color:#888;margin-top:5px}
+.prod-stat-lbl{font-family:'Cairo',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:0;color:#888;margin-top:5px}
 .prod-stat-sub{color:rgba(255,255,255,.6);font-size:.9rem;line-height:1.6;margin-top:8px;max-width:400px;margin-inline:auto}
+.prod-stat.offer-stat{padding:18px 0 14px}
+.offer-stat .offer-headline{font-family:'Cairo',sans-serif;font-size:clamp(1.35rem,5vw,2rem);font-weight:900;line-height:1.55;color:var(--yellow);text-wrap:balance}
+.offer-stat .offer-sub{font-family:'Cairo',sans-serif;color:#e7e7e7;font-size:.92rem;font-weight:700;line-height:1.7;margin-top:4px}
+.offer-stat .prod-stat-lbl{font-size:.78rem;color:#888;margin-top:8px}
 /* TRUST BADGES */
 .trust-strip{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:16px 0 0}
 .trust-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid rgba(245,197,0,.28);border-radius:999px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.06em;color:var(--yellow);background:rgba(245,197,0,.06)}
@@ -58,7 +62,7 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
 .upsell-banner strong{color:var(--yellow)}
 /* RELATED PRODUCTS */
 .related-section{margin-top:32px;padding-top:24px;border-top:1px solid var(--line)}
-.related-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:1px;color:var(--yellow);margin-bottom:14px}
+.related-title{font-family:'Cairo',sans-serif;font-size:1.45rem;font-weight:900;letter-spacing:0;color:var(--yellow);margin-bottom:14px}
 .related-rail{display:flex;gap:11px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
 .related-rail::-webkit-scrollbar{display:none}
 .rcard{flex-shrink:0;width:150px;border-radius:12px;overflow:hidden;background:#111;border:1px solid var(--line);text-decoration:none;color:#fff;transition:.2s}
@@ -66,12 +70,12 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
 .rcard-img{aspect-ratio:4/5;overflow:hidden;background:#1a1a1a}
 .rcard-img img{width:100%;height:100%;object-fit:cover;display:block}
 .rcard-info{padding:8px 10px}
-.rcard-name{font-size:.8rem;font-weight:700;line-height:1.3;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rcard-name{font-family:'Cairo',sans-serif;font-size:.8rem;font-weight:700;line-height:1.45;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rcard-price{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--yellow)}
 /* TESTIMONIALS */
 .prod-testi{margin-top:32px;padding-top:24px;border-top:1px solid var(--line)}
-.prod-section-title{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:1px;color:var(--yellow);margin-bottom:16px;text-align:center}
-.prod-section-sub{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:#666;text-align:center;margin-top:-10px;margin-bottom:16px}
+.prod-section-title{font-family:'Cairo',sans-serif;font-size:1.5rem;font-weight:900;letter-spacing:0;color:var(--yellow);margin-bottom:16px;text-align:center}
+.prod-section-sub{font-family:'Cairo',sans-serif;font-weight:600;font-size:.78rem;letter-spacing:0;color:#888;text-align:center;margin-top:-10px;margin-bottom:16px}
 .testi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .tcard{border-radius:12px;overflow:hidden;background:#111;border:1px solid var(--line)}
 .tcard img{width:100%;height:auto;display:block}
@@ -82,14 +86,14 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
 .why-card-p .why-ic{width:36px;height:36px;background:rgba(245,197,0,.1);border-radius:8px;display:grid;place-items:center;margin-bottom:10px}
 .why-card-p .why-ic svg{width:18px;height:18px;stroke:var(--yellow);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .why-card-p h3{font-family:'Cairo',sans-serif;font-weight:900;font-size:.9rem;margin-bottom:5px;color:#fff}
-.why-card-p p{font-size:.8rem;color:#999;line-height:1.6}
+.why-card-p p{font-family:'Cairo',sans-serif;font-size:.8rem;color:#999;line-height:1.7}
 /* HOW */
 .prod-how{margin-top:32px;padding-top:24px;border-top:1px solid var(--line)}
 .how-grid-p{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
 .how-step-p{background:#111;border:1px solid var(--line);border-radius:12px;padding:14px;position:relative}
 .how-num-p{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:rgba(245,197,0,.25);line-height:1;margin-bottom:6px}
 .how-step-p h3{font-family:'Cairo',sans-serif;font-weight:900;font-size:.88rem;margin-bottom:4px}
-.how-step-p p{font-size:.78rem;color:#888;line-height:1.6}
+.how-step-p p{font-family:'Cairo',sans-serif;font-size:.78rem;color:#888;line-height:1.7}
 /* SUCCESS BROWSE */
 .success-browse-wrap{margin-top:18px;display:grid;gap:10px}
 .success-browse-btn{display:block;background:var(--yellow);color:var(--black);border:0;border-radius:8px;padding:13px 22px;font-weight:900;font-size:16px;cursor:pointer;font-family:'Cairo',sans-serif;text-decoration:none;text-align:center}
@@ -547,7 +551,7 @@ body.kids-theme::before{background:none;opacity:0}
   </header>
   <div class="loader">Loading product...</div>
 </main>
-<div class="sticky" id="sticky"><div style="display:flex;flex-direction:column;gap:2px"><strong id="sticky-total">0 DZD</strong><span id="sticky-upsell" style="font-size:11px;color:rgba(245,197,0,.7);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.04em"></span></div><button id="sticky-cta" type="button" onclick="scrollToOrder()">اطلب الآن</button></div>
+<div class="sticky" id="sticky"><div style="display:flex;flex-direction:column;gap:2px"><strong id="sticky-total">0 DZD</strong><span id="sticky-upsell" style="font-size:11px;color:rgba(245,197,0,.7);font-family:'Cairo',sans-serif;font-weight:700;letter-spacing:0"></span></div><button id="sticky-cta" type="button" onclick="scrollToOrder()">اطلب الآن</button></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="success" id="success">
   <div class="success-box">
@@ -915,21 +919,25 @@ function renderKidsPage(){
 }
 function isPoster(){return String(product?.type||'').toLowerCase()==='poster';}
 function isSet(){return String(product?.type||'').toLowerCase()==='set';}
+function statHeroHTML(){
+  if(isPoster())return`<div class="prod-stat offer-stat"><div class="offer-headline">🎁 عرض خاص: اطلب لوحتين وخذ الثالثة مجانا</div><div class="offer-sub">أضف تصاميم أخرى لطلبك واستفد أكثر</div><div class="prod-stat-lbl">+6,000 منزل جزائري تم تزيينه</div></div>`;
+  return`<div class="prod-stat"><div class="prod-stat-num">+6,000</div><div class="prod-stat-lbl">منزل جزائري تم تزيينه</div><p class="prod-stat-sub">من الجزائر العاصمة إلى تمنراست — ARCO هي العلامة الأولى للوحات الخشبية في الجزائر.</p></div>`;
+}
 function cartBtnHTML(){
-  if(isPoster())return`<button type="button" class="order-btn bundle-primary" id="addcart-btn" onclick="addCurrentToCart()">🛒 أضف للسلة واستفد من عرض 3 لوحات</button><div class="offer-note">أضف 3 لوحات — الأرخص بينهم مجاناً</div>`;
+  if(isPoster())return`<button type="button" class="order-btn bundle-primary" id="addcart-btn" onclick="addCurrentToCart()">أضف للسلة واستفد من العرض</button>`;
   if(isSet())return`<button type="button" class="order-btn bundle-primary" id="addcart-btn" onclick="addCurrentToCart()">🛒 أضف للسلة ووفّر أكثر</button><div class="offer-note">الخصم يتحسب تلقائياً حسب مجموع طلبك</div>`;
   return'';
 }
 function upsellBannerHTML(){
-  if(isPoster())return`<div class="upsell-banner"><p>🎁 <strong>أفضل قيمة: 3 لوحات في نفس الطلب</strong><span class="offer-saving">اللوحة الأرخص مجاناً — أضف تصاميم أخرى من نفس المجموعة</span></p></div>`;
+  if(isPoster())return`<div class="upsell-banner"><p>🎁 <strong>عرض خاص: اطلب لوحتين وخذ الثالثة مجانا</strong><span class="offer-saving">أضف تصاميم أخرى لطلبك واستفد أكثر</span></p></div>`;
   if(isSet())return`<div class="upsell-banner"><p>💰 <strong>اطلب أكثر، وفّر أكثر</strong><span class="offer-saving">3,000 دج ← 500 دج تخفيض · 6,000 دج ← 1,000 دج · 9,500 دج ← 2,000 دج</span></p></div>`;
   return'';
 }
 function updateStickyUpsell(){
   const el=document.getElementById('sticky-upsell');if(!el)return;
   const cta=document.getElementById('sticky-cta');
-  if(isPoster()){el.textContent='🎁 الأرخص مجاناً عند إضافة 3 لوحات';if(cta)cta.textContent='أضف للسلة واستفد';}
-  else if(isSet()){el.textContent='💰 اطلب أكثر، وفّر أكثر';if(cta)cta.textContent='أضف للسلة واستفد';}
+  if(isPoster()){el.textContent='اطلب اثنين وخذ الثالثة مجانا';if(cta)cta.textContent='طلباتي';}
+  else if(isSet()){el.textContent='اطلب أكثر، وفّر أكثر';if(cta)cta.textContent='طلباتي';}
   else if(cta)cta.textContent='اطلب الآن';
 }
 function loadRelated(){
@@ -985,7 +993,7 @@ function render(){
   const imgs=images();document.title=product.name+' - ARCO';
   document.getElementById('app').innerHTML=`
     <header class="topbar"><a class="brand" href="/"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/ACRO%20logo%20shopiy-03.png" alt="ARCO"></a><a class="back" href="/">تصفح</a></header>
-    <div class="prod-stat"><div class="prod-stat-num">+6,000</div><div class="prod-stat-lbl">منزل جزائري تم تزيينه</div><p class="prod-stat-sub">من الجزائر العاصمة إلى تمنراست — ARCO هي العلامة الأولى للوحات الخشبية في الجزائر.</p></div>
+    ${statHeroHTML()}
     <section class="product-layout">
       <div class="gallery">
         <div class="main-img">${imgs[0]?`<img id="main-img" src="${esc(imgs[0])}" alt="${esc(product.name)}">`:''}</div>
@@ -1020,7 +1028,7 @@ function render(){
     </section>
     <div class="shell" style="padding-top:0">
       <div class="related-section" id="related-section">
-        <div class="related-title">قد يعجبك أيضاً</div>
+        <div class="related-title">تصاميم قد تعجبك</div>
         <div class="related-rail" id="related-rail"><div style="color:#555;font-size:13px;padding:10px">جاري التحميل...</div></div>
       </div>
       <div class="prod-testi">
