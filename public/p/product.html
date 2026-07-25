@@ -59,7 +59,7 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
 .trust-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid rgba(245,197,0,.28);border-radius:999px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.06em;color:var(--yellow);background:rgba(245,197,0,.06)}
 /* UPSELL BANNER */
 .upsell-banner{background:rgba(245,197,0,.07);border:1px solid rgba(245,197,0,.22);border-radius:10px;padding:12px 14px;margin-top:14px;text-align:center}
-.upsell-banner p{font-family:'Cairo',sans-serif;font-size:.88rem;color:#ddd;line-height:1.6}.upsell-banner .offer-saving{display:block;margin-top:4px;color:#8ff0ae;font-size:.8rem;font-weight:700}
+.upsell-banner p{font-family:'Cairo',sans-serif;font-size:.88rem;color:#ddd;line-height:1.6}.upsell-banner .offer-saving{display:block;margin-top:4px;color:#8ff0ae;font-size:.8rem;font-weight:700;line-height:1.85}.upsell-banner .offer-line{display:block}
 .upsell-banner strong{color:var(--yellow)}
 /* RELATED PRODUCTS */
 .related-section{margin-top:32px;padding-top:24px;border-top:1px solid var(--line)}
@@ -934,6 +934,16 @@ function upsellBannerHTML(){
   if(isSet())return`<div class="upsell-banner"><p>💰 <strong>اطلب أكثر، وفّر أكثر</strong><span class="offer-saving">3,000 دج ← 500 دج تخفيض · 6,000 دج ← 1,000 دج · 9,500 دج ← 2,000 دج</span></p></div>`;
   return'';
 }
+function statHeroHTML(){
+  if(isPoster())return`<div class="prod-stat offer-stat"><div class="offer-headline">🎁 عرض خاص: اطلب لوحتين وخذ الثالثة مجانا</div><div class="offer-sub">+ تخفيضات تصل إلى 3000 دج حسب الكمية</div><div class="prod-stat-lbl">+6,000 منزل جزائري تم تزيينه</div></div>`;
+  if(isSet())return`<div class="prod-stat offer-stat"><div class="offer-headline">ثلاث لوحات بسعر لوحتين</div><div class="offer-sub">+ تخفيضات تصل إلى 3000 دج حسب الكمية</div><div class="prod-stat-lbl">+6,000 منزل جزائري تم تزيينه</div></div>`;
+  return`<div class="prod-stat"><div class="prod-stat-num">+6,000</div><div class="prod-stat-lbl">منزل جزائري تم تزيينه</div><p class="prod-stat-sub">من الجزائر العاصمة إلى تمنراست — ARCO هي العلامة الأولى للوحات الخشبية في الجزائر.</p></div>`;
+}
+function upsellBannerHTML(){
+  if(isPoster())return`<div class="upsell-banner"><p>🎁 <strong>عرض خاص: اطلب لوحتين وخذ الثالثة مجانا</strong><span class="offer-saving">+ تخفيضات تصل إلى 3000 دج حسب الكمية</span></p></div>`;
+  if(isSet())return`<div class="upsell-banner"><p>💰 <strong>ثلاث لوحات بسعر لوحتين</strong><span class="offer-saving"><span class="offer-line">اشري ب3000دج اربح 500دج</span><span class="offer-line">اشري ب6000دج واربح 1000دج</span><span class="offer-line">اشري ب9500دج واربح 3000دج</span></span></p></div>`;
+  return'';
+}
 function updateStickyUpsell(){
   const el=document.getElementById('sticky-upsell');if(!el)return;
   const cta=document.getElementById('sticky-cta');
@@ -1025,7 +1035,7 @@ function render(){
           <div class="summary"><div class="sum-row"><span>المنتج</span><strong id="sum-product">${money(variant.price)}</strong></div><div class="sum-row"><span>التوصيل</span><strong id="sum-ship">0 DZD</strong></div><div class="sum-row total"><span>المجموع</span><strong id="sum-total">${money(variant.price)}</strong></div></div>
           ${upsellBannerHTML()}
           ${cartBtnHTML()}
-           <button type="button" class="order-btn single-order-btn" id="order-btn" onclick="submitOrder()">اطلب لوحة واحدة فقط</button>
+           <button type="button" class="order-btn single-order-btn" id="order-btn" onclick="submitOrder()">${isSet()?'اطلب مجموعة واحدة فقط':'اطلب لوحة واحدة فقط'}</button>
         </div>
       </div>
     </section>
