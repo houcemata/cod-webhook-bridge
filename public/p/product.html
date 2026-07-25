@@ -54,6 +54,15 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
 .offer-stat .offer-headline{font-family:'Cairo',sans-serif;font-size:clamp(1.35rem,5vw,2rem);font-weight:900;line-height:1.55;color:var(--yellow);text-wrap:balance}
 .offer-stat .offer-sub{font-family:'Cairo',sans-serif;color:#e7e7e7;font-size:.92rem;font-weight:700;line-height:1.7;margin-top:4px}
 .offer-stat .prod-stat-lbl{font-size:.78rem;color:#888;margin-top:8px}
+.product-offer-main{margin:0 14px;padding:18px 16px;border:1px solid rgba(245,197,0,.36);border-radius:16px;background:linear-gradient(135deg,rgba(245,197,0,.14),rgba(245,197,0,.035));box-shadow:0 10px 28px rgba(0,0,0,.16)}
+.product-offer-headline{font-family:'Cairo',sans-serif;font-size:clamp(1.1rem,4.5vw,1.7rem);font-weight:900;line-height:1.45;color:var(--yellow);text-wrap:balance}
+.product-offer-sub{margin-top:6px;font-family:'Cairo',sans-serif;font-size:.84rem;font-weight:700;line-height:1.6;color:#eee}
+.product-offer-trust{margin-top:12px;font-family:'Cairo',sans-serif;font-size:1.35rem;font-weight:900;line-height:1;color:var(--yellow)}
+.product-promos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.product-promo{min-height:54px;padding:9px 8px;border:1px solid var(--line);border-radius:11px;background:rgba(8,8,8,.42);display:grid;align-content:center;gap:2px;font-family:'Cairo',sans-serif;font-size:.72rem;font-weight:700;line-height:1.35;color:#eee}
+.product-promo strong{color:var(--yellow);font-size:.78rem}
+.product-promo span{color:rgba(255,255,255,.7)}
+@media(max-width:520px){.product-offer-main{margin:0 8px;padding:15px 12px}.product-offer-headline{font-size:1.08rem}.product-offer-sub{font-size:.75rem}.product-promo{min-height:48px;font-size:.68rem}}
 /* TRUST BADGES */
 .trust-strip{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:16px 0 0}
 .trust-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:1px solid rgba(245,197,0,.28);border-radius:999px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.06em;color:var(--yellow);background:rgba(245,197,0,.06)}
@@ -935,8 +944,8 @@ function upsellBannerHTML(){
   return'';
 }
 function statHeroHTML(){
-  if(isPoster())return`<div class="prod-stat offer-stat"><div class="offer-headline">🎁 عرض خاص: اطلب لوحتين وخذ الثالثة مجانا</div><div class="offer-sub">+ تخفيضات تصل إلى 3000 دج حسب الكمية</div><div class="prod-stat-lbl">+6,000 منزل جزائري تم تزيينه</div></div>`;
-  if(isSet())return`<div class="prod-stat offer-stat"><div class="offer-headline">ثلاث لوحات بسعر لوحتين</div><div class="offer-sub">+ تخفيضات تصل إلى 3000 دج حسب الكمية</div><div class="prod-stat-lbl">+6,000 منزل جزائري تم تزيينه</div></div>`;
+  if(isPoster())return`<div class="prod-stat offer-stat"><div class="product-offer-main"><div class="product-offer-headline">🎁 عرض خاص: اطلب لوحتين وخذ الثالثة مجاناً</div><div class="product-offer-sub">للوحات الفردية — أضف تصاميم أخرى واستفد أكثر</div><div class="product-offer-trust">+</div><div class="product-promos" aria-label="عروض الكمية"><div class="product-promo"><strong>خصم 500 دج</strong><span>ابتداءً من 3000 دج</span></div><div class="product-promo"><strong>خصم 1000 دج</strong><span>ابتداءً من 6000 دج</span></div><div class="product-promo"><strong>خصم 2000 دج</strong><span>ابتداءً من 9500 دج</span></div><div class="product-promo"><strong>خصم 3000 دج</strong><span>ابتداءً من 13000 دج</span></div></div></div></div>`;
+  if(isSet())return`<div class="prod-stat offer-stat"><div class="product-offer-main"><div class="product-offer-headline">ثلاث لوحات بسعر لوحتين</div><div class="product-offer-sub">للمجموعات — استفد من خصومات الكمية</div><div class="product-offer-trust">+</div><div class="product-promos" aria-label="عروض الكمية"><div class="product-promo"><strong>خصم 500 دج</strong><span>ابتداءً من 3000 دج</span></div><div class="product-promo"><strong>خصم 1000 دج</strong><span>ابتداءً من 6000 دج</span></div><div class="product-promo"><strong>خصم 2000 دج</strong><span>ابتداءً من 9500 دج</span></div><div class="product-promo"><strong>خصم 3000 دج</strong><span>ابتداءً من 13000 دج</span></div></div></div></div>`;
   return`<div class="prod-stat"><div class="prod-stat-num">+6,000</div><div class="prod-stat-lbl">منزل جزائري تم تزيينه</div><p class="prod-stat-sub">من الجزائر العاصمة إلى تمنراست — ARCO هي العلامة الأولى للوحات الخشبية في الجزائر.</p></div>`;
 }
 function upsellBannerHTML(){
