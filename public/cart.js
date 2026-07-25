@@ -179,11 +179,13 @@
   }
 
   function renderBadge() {
-    const b = document.getElementById('arco-cart-badge');
-    if (!b) return;
     const n = read().length;
-    b.textContent = n;
-    b.classList.toggle('zero', n === 0);
+    ['arco-cart-badge', 'sticky-cart-badge'].forEach(id => {
+      const b = document.getElementById(id);
+      if (!b) return;
+      b.textContent = n;
+      b.classList.toggle('zero', n === 0);
+    });
   }
 
   function promoLines(cart) {
@@ -401,6 +403,7 @@
       commune: coDelivery === 'home' ? commune.trim() : '',
       delivery_type: coDelivery, station_code: coDelivery === 'pickup' ? desk : null,
       event_source_url: location.href,
+      attribution: window.ARCOAttribution?.getPayload?.(),
       cart_discount: t.totalDiscount,
       items: cart.map(it => ({ product_slug: it.product_slug, variant_label: it.variant, selected_options: it.selected_options || null }))
     };

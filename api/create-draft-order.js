@@ -1,6 +1,7 @@
 import { getServiceClient } from "./_auth.js";
 import { getCustomCatalogProduct } from "./_catalog.js";
 import { clientIpFromRequest, checkIpCountry, IP_BLOCKED_MESSAGE } from "./_ip.js";
+import { buildAttribution } from "./_attribution.js";
 
 function normalizeText(value) {
   return String(value || "").trim();
@@ -74,6 +75,7 @@ export default async function handler(req, res) {
     const body = req.body || {};
     const productSlug = normalizeText(body.product_slug);
     const phone = normalizePhone(body.phone);
+    const attribution = buildAttribution(body.attribution, body.event_source_url, req.headers.referer);
 
     if (!productSlug) return res.status(400).json({ error: "Product is required" });
     if (!/^0[567]\d{8}$/.test(phone)) return res.status(400).json({ error: "Invalid phone number" });
@@ -112,6 +114,7 @@ export default async function handler(req, res) {
       from_draft: true,
       notes: normalizeText(body.notes) || "draft lead",
       ip_address: ip,
+      ...attribution,
     };
     const orderData = { order_id: createOrderId(), ...draftData };
 

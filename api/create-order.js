@@ -1,6 +1,7 @@
 import { sendAllAnalytics } from "./_analytics.js";
 import { getServiceClient } from "./_auth.js";
 import { getCustomCatalogProduct } from "./_catalog.js";
+import { buildAttribution } from "./_attribution.js";
 
 function normalizeVariants(raw) {
   if (!raw) return [];
@@ -197,6 +198,7 @@ async function handleCartOrder(req, res, supabase, body) {
   const wilayaId = Number(body.wilaya_id);
   const items = Array.isArray(body.items) ? body.items : [];
   const clientIp = clientIpFromRequest(req);
+  const attribution = buildAttribution(body.attribution, body.event_source_url, req.headers.referer);
 
   if (!name) return res.status(400).json({ error: "Name is required" });
   if (!/^0[567]\d{8}$/.test(phone)) return res.status(400).json({ error: "Invalid phone number" });
@@ -295,6 +297,7 @@ async function handleCartOrder(req, res, supabase, body) {
     items: itemsForStore,
     order_id: orderId,
     ip_address: clientIp || null,
+    ...attribution,
   };
 
   const { error: insertError } = await supabase.from("orders").insert(finalOrderData);
@@ -415,6 +418,7 @@ export default async function handler(req, res) {
     const total = Number(resolvedVariant.price) + shippingCost;
     const orderId = createOrderId();
     const clientIp = clientIpFromRequest(req);
+    const attribution = buildAttribution(body.attribution, body.event_source_url, req.headers.referer);
 
     // ── IP gate (null + non-DZ + rate limit) ──
     const blocked = await checkIpGate(req, res, supabase);
@@ -434,6 +438,7 @@ export default async function handler(req, res) {
       status: "pending",
       notes,
       ip_address: clientIp || null,
+      ...attribution,
     };
     const finalOrderData = { ...orderData, order_id: orderId };
 
@@ -476,6 +481,7 @@ export default async function handler(req, res) {
           from_draft: true,
           notes,
           ip_address: clientIp || null,
+          ...attribution,
         })
         .eq("id", draftRow.id);
 

@@ -98,6 +98,12 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 
 /* STATUS BADGES */
 .badge{display:inline-block;padding:3px 10px;border-radius:99px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap}
+.source-badge{display:inline-block;margin-inline-start:5px;padding:3px 8px;border-radius:99px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:10px;letter-spacing:.5px;white-space:nowrap;border:1px solid rgba(255,255,255,.12)}
+.source-meta{color:#8ab4ff;background:rgba(66,133,244,.12);border-color:rgba(66,133,244,.28)}
+.source-tiktok{color:#ff7eb3;background:rgba(255,45,142,.12);border-color:rgba(255,45,142,.28)}
+.source-organic{color:#86efac;background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.24)}
+.source-direct{color:#d1d5db;background:rgba(156,163,175,.1)}
+.source-other,.source-unknown{color:#fbbf24;background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.24)}
 .badge-draft{background:#14161f;color:#c4b5fd;border:1px solid #8b5cf633}
 .badge-pending{background:#1a1200;color:#f59e0b;border:1px solid #f59e0b33}
 .badge-to_recall{background:#1a0f00;color:#fb923c;border:1px solid #fb923c33}
@@ -501,6 +507,14 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
           </select>
           <select class="filter-select" id="order-product" onchange="filterOrders()">
             <option value="">All Products</option>
+          </select>
+          <select class="filter-select" id="order-source" onchange="filterOrders()">
+            <option value="">All Sources</option>
+            <option value="meta">Meta</option>
+            <option value="tiktok">TikTok</option>
+            <option value="organic">Organic</option>
+            <option value="direct">Direct</option>
+            <option value="unknown">Unknown</option>
           </select>
           <select class="filter-select" id="order-period" onchange="filterOrders()">
             <option value="all">All Time</option>
@@ -1637,11 +1651,13 @@ function renderRecentOrders(){
 function filterOrders(){
   const q=(document.getElementById('order-search').value||'').toLowerCase().trim();
   const status=document.getElementById('order-status').value;
-  const product=document.getElementById('order-product').value;
+    const product=document.getElementById('order-product').value;
+  const source=document.getElementById('order-source').value;
   const period=document.getElementById('order-period').value;
   filteredOrders=allOrders.filter(o=>{
     if(status&&o.status!==status)return false;
     if(product&&o.product!==product)return false;
+    if(source&&(o.attribution_source||'unknown')!==source)return false;
     if(q&&!(o.name||'').toLowerCase().includes(q)&&!(o.phone||'').includes(q))return false;
     if(period!=='all'&&!inPeriod(o,period))return false;
     return true;
@@ -1675,7 +1691,7 @@ function renderOrdersTable(){
         <td><div style="font-size:13px">${esc(o.product)}</div><div style="font-size:11px;color:var(--gray)">${esc(o.variable||'')}</div></td>
         <td style="font-size:13px;color:var(--gray)">${esc(o.wilaya)}</td>
         <td style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--yellow)">${Number(o.prix_total||0).toLocaleString()} DZD</td>
-        <td><span class="badge badge-${o.status}">${statusLabel(o.status)}</span></td>
+         <td><span class="badge badge-${o.status}">${statusLabel(o.status)}</span>${sourceBadge(o.attribution_source)}</td>
         <td style="font-size:12px;color:var(--gray)">${o.created_at?new Date(o.created_at).toLocaleDateString('fr-DZ'):'—'}</td>
         <td><button class="btn btn-ghost btn-sm" onclick="openOrderDetail(${o.id})">View</button></td>
       </tr>`).join('')
@@ -1703,7 +1719,7 @@ function openOrderDetail(id){
         <div style="display:flex;justify-content:space-between;font-family:'Bebas Neue',sans-serif;font-size:20px"><span>TOTAL</span><span style="color:var(--yellow)">${Number(o.prix_total||0).toLocaleString()} DZD</span></div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <span class="badge badge-${o.status}" style="font-size:13px;padding:5px 14px">${statusLabel(o.status)}</span>
+         <span class="badge badge-${o.status}" style="font-size:13px;padding:5px 14px">${statusLabel(o.status)}</span>${sourceBadge(o.attribution_source)}
         <span style="font-size:12px;color:var(--gray)">#${esc(o.order_id)}</span>
       </div>
       ${o.notes?`<div style="background:rgba(245,197,0,0.05);border:1px solid rgba(245,197,0,0.15);border-radius:12px;padding:12px;font-size:13px;color:var(--gray)">📝 ${esc(o.notes)}</div>`:''}
@@ -1712,8 +1728,8 @@ function openOrderDetail(id){
   document.getElementById('order-modal').classList.add('open');
 }
 function exportOrders(){
-  const headers=['Order ID','Name','Phone','Wilaya','Commune','Product','Variant','Total','Shipping','Status','Date'];
-  const rows=filteredOrders.map(o=>[o.order_id,o.name,o.phone,o.wilaya,o.commune||'',o.product,o.variable||'',o.prix_total,o.shipping_cost,o.status,o.created_at?new Date(o.created_at).toLocaleDateString('fr-DZ'):'']);
+  const headers=['Order ID','Name','Phone','Wilaya','Commune','Product','Variant','Total','Shipping','Status','Source','Campaign','Date'];
+  const rows=filteredOrders.map(o=>[o.order_id,o.name,o.phone,o.wilaya,o.commune||'',o.product,o.variable||'',o.prix_total,o.shipping_cost,o.status,o.attribution_source||'unknown',o.attribution_campaign||'',o.created_at?new Date(o.created_at).toLocaleDateString('fr-DZ'):'']);
   const csv=[headers,...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
   const blob=new Blob([csv],{type:'text/csv'});
   const url=URL.createObjectURL(blob);
@@ -3599,6 +3615,7 @@ async function deleteCategory(id){
 }
 
 function esc(v){if(v==null)return'';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function sourceBadge(source){const key=String(source||'unknown').toLowerCase();const label={meta:'META',tiktok:'TIKTOK',organic:'ORGANIC',direct:'DIRECT',other:'OTHER',unknown:'UNKNOWN'}[key]||'UNKNOWN';return `<span class="source-badge source-${['meta','tiktok','organic','direct','other'].includes(key)?key:'unknown'}">${label}</span>`;}
 let _tt;
 function toast(msg,isErr=false){
   const el=document.getElementById('toast');

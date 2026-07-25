@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
 <script src="/meta-pixel.js"></script>
 <script src="/tiktok-pixel.js"></script>
+<script src="/attribution.js"></script>
 <script src="/draft-capture.js"></script>
 <script src="/cart.js"></script>
 <style>
@@ -1087,7 +1088,7 @@ function render(){
   bindDraftCapture();
   loadRelated();
 }
-function bindDraftCapture(){if(draftCaptureBound||!window.ARCODraft||!product)return;draftCaptureBound=window.ARCODraft.bindDraftCapture({phoneInputId:'f-phone',watchInputIds:['f-name','f-phone','f-wilaya','f-commune','f-desk'],buildPayload:()=>({product_slug:product.slug,name:document.getElementById('f-name')?.value||'',phone:document.getElementById('f-phone')?.value||'',wilaya:document.getElementById('f-wilaya')?.value.split('|')[1]||'',wilaya_id:Number((document.getElementById('f-wilaya')?.value||'').split('|')[0]||0)||0,commune:document.getElementById('f-commune')?.value||'',delivery_type:delivery,station_code:delivery==='pickup'?selectedDesk:null,variant_label:variant?.label||variant?.name||'Standard',selected_options:selectedOptions,product_name:product.name,shipping_cost:shippingCost(),notes:'draft lead'})});}
+function bindDraftCapture(){if(draftCaptureBound||!window.ARCODraft||!product)return;draftCaptureBound=window.ARCODraft.bindDraftCapture({phoneInputId:'f-phone',watchInputIds:['f-name','f-phone','f-wilaya','f-commune','f-desk'],buildPayload:()=>({product_slug:product.slug,name:document.getElementById('f-name')?.value||'',phone:document.getElementById('f-phone')?.value||'',wilaya:document.getElementById('f-wilaya')?.value.split('|')[1]||'',wilaya_id:Number((document.getElementById('f-wilaya')?.value||'').split('|')[0]||0)||0,commune:document.getElementById('f-commune')?.value||'',delivery_type:delivery,station_code:delivery==='pickup'?selectedDesk:null,variant_label:variant?.label||variant?.name||'Standard',selected_options:selectedOptions,product_name:product.name,shipping_cost:shippingCost(),event_source_url:location.href,attribution:window.ARCOAttribution?.getPayload?.(),notes:'draft lead'})});}
 function setImage(btn,src){document.querySelectorAll('.thumb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('main-img').src=src;}
 function selectVariant(i,btn){variant=variants()[i];document.querySelectorAll('#variant-choices .choice').forEach(b=>b.classList.remove('active'));btn.classList.add('active');if(variant.image&&document.getElementById('main-img'))document.getElementById('main-img').src=variant.image;updateTotals();updateKidsMeta();window.ARCODraft?.triggerCapture?.();}
 function selectOption(name,value,btn){
@@ -1161,7 +1162,7 @@ async function submitOrder(){
   const [wilayaId,wilaya]=wilayaVal.split('|');
   btn.classList.add('loading');
   if(btnAr){btnAr.textContent='جاري الإرسال...';} else if(btn){btn.textContent='جاري الإرسال...';}
-  const payload={product_slug:product.slug,name,phone,wilaya,wilaya_id:Number(wilayaId),commune:delivery==='home'?commune:'',delivery_type:delivery==='home'?'home':'pickup',station_code:delivery==='pickup'?selectedDesk:null,variant_label:variant.label,selected_options:selectedOptions,event_source_url:location.href,draft_order_id:(window.ARCODraft?.getStoredDraftId({product_slug:product.slug,phone,variant_label:variant?.label||variant?.name||'Standard',delivery_type:delivery})||undefined)};
+  const payload={product_slug:product.slug,name,phone,wilaya,wilaya_id:Number(wilayaId),commune:delivery==='home'?commune:'',delivery_type:delivery==='home'?'home':'pickup',station_code:delivery==='pickup'?selectedDesk:null,variant_label:variant.label,selected_options:selectedOptions,event_source_url:location.href,attribution:window.ARCOAttribution?.getPayload?.(),draft_order_id:(window.ARCODraft?.getStoredDraftId({product_slug:product.slug,phone,variant_label:variant?.label||variant?.name||'Standard',delivery_type:delivery})||undefined)};
   try{
     const r=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const result=await r.json().catch(()=>({}));

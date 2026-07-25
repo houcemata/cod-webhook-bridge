@@ -50,8 +50,11 @@ img{display:block;max-width:100%}
 
 /* COLLECTION ICON BAR */
 .col-icon-bar{position:sticky;top:68px;z-index:35;background:rgba(8,8,8,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--ln);padding:10px 0}
+.col-icon-bar::before{content:'';position:absolute;top:0;bottom:0;left:0;width:52px;background:linear-gradient(90deg,rgba(8,8,8,.98),transparent);pointer-events:none;z-index:2}
 .col-icon-scroll{display:flex;gap:14px;overflow-x:auto;padding:2px;scrollbar-width:none}
 .col-icon-scroll::-webkit-scrollbar{display:none}
+.col-scroll-hint{position:absolute;left:8px;top:50%;z-index:3;transform:translateY(-50%);padding:5px 8px;border:1px solid rgba(245,197,0,.35);border-radius:999px;background:rgba(8,8,8,.86);color:var(--y);font:700 .66rem/1 'Changa',sans-serif;white-space:nowrap;pointer-events:none;transition:opacity .2s,transform .2s}
+.col-scroll-hint.hidden{opacity:0;transform:translate(-6px,-50%)}
 .col-icon-item{flex-shrink:0;width:60px;display:grid;justify-items:center;gap:5px;cursor:pointer;background:none;border:none;font-family:'Changa',sans-serif}
 .col-icon-circle{width:52px;height:52px;border-radius:50%;overflow:hidden;background:linear-gradient(160deg,rgba(245,197,0,.12),var(--dk2));border:2px solid var(--ln);display:grid;place-items:center;transition:.2s}
 .col-icon-circle img{width:100%;height:100%;object-fit:cover}
@@ -213,6 +216,7 @@ img{display:block;max-width:100%}
 </style>
 <script src="/meta-pixel.js" defer></script>
 <script src="/tiktok-pixel.js" defer></script>
+<script src="/attribution.js" defer></script>
 </head>
 <body>
 
@@ -257,7 +261,8 @@ img{display:block;max-width:100%}
 
 <!-- COLLECTION ICON BAR -->
 <div class="col-icon-bar">
-  <div class="wrap"><div class="col-icon-scroll" id="colIconScroll"><div class="state" style="min-height:0;padding:10px;font-size:.8rem">...</div></div></div>
+  <div class="wrap"><div class="col-icon-scroll" id="colIconScroll"><div class="state" style="min-height:0;padding:10px;font-size:.8rem">…</div></div></div>
+  <span class="col-scroll-hint" id="colScrollHint" aria-hidden="true">اسحب للمزيد ←</span>
 </div>
 
 <section class="col-head wrap">
@@ -555,10 +560,25 @@ async function loadIconBar(){
   try{
     if(!allColsCache){const r=await fetch(`${SB}/collections?select=*&active=eq.true&order=sort_order.asc`,{headers:H});allColsCache=await r.json();}
     const cols=Array.isArray(allColsCache)?allColsCache:[];
-    if(!cols.length){box.innerHTML='';return;}
+    if(!cols.length){box.innerHTML='';document.getElementById('colScrollHint')?.classList.add('hidden');return;}
     box.innerHTML=cols.map(c=>`<button class="col-icon-item" data-slug="${esc(c.slug)}" onclick="switchCollection('${esc(c.slug)}')"><div class="col-icon-circle">${c.icon_url?`<img src="${esc(c.icon_url)}" alt="${esc(c.name_ar)}" loading="lazy">`:`<span class="ph">${esc((c.name_en||'A')[0])}</span>`}</div><span class="col-icon-name">${esc(c.name_ar)}</span></button>`).join('');
     highlightIconBar();
-  }catch(e){box.innerHTML='';}
+    setupIconScrollHint();
+  }catch(e){box.innerHTML='';document.getElementById('colScrollHint')?.classList.add('hidden');}
+}
+
+function setupIconScrollHint(){
+  const box=document.getElementById('colIconScroll');
+  const hint=document.getElementById('colScrollHint');
+  if(!box||!hint)return;
+  if(box.dataset.hintBound!=='1'){
+    const hide=()=>hint.classList.add('hidden');
+    box.addEventListener('wheel',hide,{passive:true});
+    box.addEventListener('touchstart',hide,{passive:true});
+    box.addEventListener('pointerdown',hide,{passive:true});
+    box.dataset.hintBound='1';
+  }
+  hint.classList.toggle('hidden',box.scrollWidth<=box.clientWidth);
 }
 
 function highlightIconBar(){
