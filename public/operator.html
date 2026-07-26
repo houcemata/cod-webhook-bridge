@@ -226,11 +226,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ── Searchable product dropdown ── */
 .prod-dropdown-wrap{position:relative;flex:1}
-.prod-search-input{width:100%;box-sizing:border-box;background:#1a1a1a;color:#ddd;border:1px solid #333;border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit}
+.prod-picker-control{display:flex;align-items:center;gap:7px}
+.prod-picker-thumb{width:34px;height:34px;flex:0 0 34px;border-radius:7px;overflow:hidden;background:#111;border:1px solid #333;display:grid;place-items:center}
+.prod-picker-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.prod-search-input{width:100%;min-width:0;flex:1;box-sizing:border-box;background:#1a1a1a;color:#ddd;border:1px solid #333;border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit}
 .prod-search-input:focus{outline:none;border-color:#F5C500}
 .prod-dropdown-list{display:none;position:absolute;z-index:9999;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid #333;border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;margin-top:2px}
 .prod-dropdown-list.open{display:block}
-.prod-dropdown-item{padding:7px 10px;font-size:13px;cursor:pointer;color:#ddd;border-bottom:1px solid #111}
+.prod-dropdown-item{display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:13px;cursor:pointer;color:#ddd;border-bottom:1px solid #111}
+.prod-dropdown-item img{width:34px;height:34px;flex:0 0 34px;object-fit:cover;border-radius:6px;background:#111}
+.prod-dropdown-item span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .prod-dropdown-item:hover,.prod-dropdown-item.active{background:#F5C500;color:#000}
 </style>
 <style>
@@ -1851,7 +1856,7 @@ async function openEdit(){
     // Fetch product list for dropdowns (cached)
     if(!window.__productList){
       try{
-        const r=await sbFetch('products?select=name,slug&active=eq.true&order=name.asc');
+        const r=await sbFetch('products?select=name,slug,images&active=eq.true&order=name.asc');
         if(r.ok) window.__productList=await r.json();
       }catch{}
       if(!window.__productList) window.__productList=[];
@@ -1904,9 +1909,15 @@ async function openEdit(){
       // Init a searchable picker for each row
       editItems.forEach((it,i)=>{
         const currentName=it.product||it.product_slug||it.slug||'';
+        const matched=window.__productList.find(p=>p.name===currentName||p.slug===(it.product_slug||it.slug));
         const pickerId=`prod-picker-cart-${i}`;
-        makeProductPicker(pickerId, currentName, (name)=>{
-          document.getElementById('edit-modal').__editItems[i].product=name;
+        makeProductPicker(pickerId, matched?.name||currentName, (name,product)=>{
+          const item=document.getElementById('edit-modal').__editItems[i];
+          item.product=name;
+          if(product?.slug)item.product_slug=product.slug;
+          const image=productImage(product);
+          if(image)item.image=image;
+          else delete item.image;
         });
       });
     }
@@ -1921,7 +1932,7 @@ async function openEdit(){
     // Fetch product list if not cached yet
     if(!window.__productList){
       try{
-        const r=await sbFetch('products?select=name,slug&active=eq.true&order=name.asc');
+        const r=await sbFetch('products?select=name,slug,images&active=eq.true&order=name.asc');
         if(r.ok) window.__productList=await r.json();
       }catch{}
       if(!window.__productList) window.__productList=[];
@@ -1963,8 +1974,14 @@ async function openEdit(){
       renderNonCartRows();
       const items=document.getElementById('edit-modal').__editItems;
       items.forEach((it,i)=>{
-        makeProductPicker(`prod-picker-nc-${i}`,it.product,(name)=>{
-          document.getElementById('edit-modal').__editItems[i].product=name;
+        const matched=window.__productList.find(p=>p.name===it.product||p.slug===(it.product_slug||it.slug));
+        makeProductPicker(`prod-picker-nc-${i}`,matched?.name||it.product,(name,product)=>{
+          const item=document.getElementById('edit-modal').__editItems[i];
+          item.product=name;
+          if(product?.slug)item.product_slug=product.slug;
+          const image=productImage(product);
+          if(image)item.image=image;
+          else delete item.image;
         });
       });
     }
@@ -2285,42 +2302,72 @@ function doExportXLSX(rows){
 }
 
 // ── Searchable product picker ──────────────────────────────────────────────
+function productImage(product){
+  const raw=product?.images;
+  const images=Array.isArray(raw)?raw:(raw?[raw]:[]);
+  const first=images[0];
+  return typeof first==='string'?first:(first?.url||first?.src||'');
+}
 function makeProductPicker(containerId, initialValue, onChange){
   const wrap = document.getElementById(containerId);
   if(!wrap) return;
   const pl = (window.__productList||[]);
-  const names = pl.map(p=>p.name);
+  const names = pl.map(p=>p.name).filter(Boolean);
 
   let selected = initialValue || (names[0]||'');
 
   wrap.innerHTML =
-    '<input type="text" class="prod-search-input" autocomplete="off" placeholder="Search product…"/>' +
+    '<div class="prod-picker-control"><div class="prod-picker-thumb"></div><input type="text" class="prod-search-input" autocomplete="off" placeholder="Search product…"/></div>' +
     '<div class="prod-dropdown-list"></div>';
 
   const input = wrap.querySelector('input');
+  const thumb = wrap.querySelector('.prod-picker-thumb');
   const list  = wrap.querySelector('.prod-dropdown-list');
+
+  function findProduct(name){return pl.find(p=>p.name===name)||null;}
+  function updateThumb(product){
+    thumb.innerHTML='';
+    const src=productImage(product);
+    if(!src)return;
+    const img=document.createElement('img');
+    img.src=src;img.alt='';img.loading='lazy';
+    img.onerror=()=>{thumb.innerHTML='';};
+    thumb.appendChild(img);
+  }
 
   function renderList(filter){
     const q = (filter||'').toLowerCase();
-    const filtered = q ? names.filter(n=>n.toLowerCase().includes(q)) : names;
+    const filtered = q ? pl.filter(p=>String(p.name||'').toLowerCase().includes(q)) : pl;
     list.innerHTML = '';
-    filtered.forEach(function(n){
+    filtered.forEach(function(product){
+      const n=product.name;
       const item = document.createElement('div');
       item.className = 'prod-dropdown-item' + (n===selected?' active':'');
-      item.textContent = n;
+      const src=productImage(product);
+      if(src){
+        const img=document.createElement('img');
+        img.src=src;img.alt='';img.loading='lazy';
+        item.appendChild(img);
+      }
+      const label=document.createElement('span');
+      label.textContent=n;
+      item.appendChild(label);
       item.addEventListener('mousedown', function(e){ e.preventDefault(); });
       item.addEventListener('click', function(){
         selected = n;
         input.value = n;
+        updateThumb(product);
         list.classList.remove('open');
-        onChange(n);
+        onChange(n,product);
       });
       list.appendChild(item);
     });
   }
 
   input.value = selected;
-  onChange(selected);
+  const initialProduct=findProduct(selected);
+  updateThumb(initialProduct);
+  onChange(selected,initialProduct);
 
   input.addEventListener('focus', function(){
     renderList(input.value);
@@ -2333,8 +2380,8 @@ function makeProductPicker(containerId, initialValue, onChange){
   input.addEventListener('blur', function(){
     setTimeout(function(){
       list.classList.remove('open');
-      const match = names.find(n=>n.toLowerCase()===input.value.toLowerCase());
-      if(match){ selected=match; input.value=match; onChange(match); }
+      const match = pl.find(p=>String(p.name||'').toLowerCase()===input.value.toLowerCase());
+      if(match){ selected=match.name; input.value=match.name; updateThumb(match); onChange(match.name,match); }
       else{ input.value=selected; }
     }, 150);
   });
