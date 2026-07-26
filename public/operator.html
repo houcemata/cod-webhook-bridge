@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<link rel="icon" type="image/png" href="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/exec-200b409c-40d2-49a0-a930-b2e9da4d6862.png">
 <title>ARCO CRM</title>
 <script>document.title='ARCO CRM';</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1244,7 +1245,7 @@ function updateDailyTarget(){
 function updateKPIs(){
   const orders=allOrders.filter(o=>inPeriod(o));
   const total=orders.length;
-  const nonDraftOrders=orders.filter(o=>o.status!=='draft');
+  const nonDraftOrders=orders.filter(o=>o.from_draft!==true);
   const realOrders=orders.filter(o=>o.from_draft!==true);
   const nonDraftTotal=realOrders.length;
   const delivered=orders.filter(o=>o.status==='delivered').length;
