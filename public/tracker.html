@@ -87,15 +87,15 @@ button,input{font:inherit}
       <button class="kpi-card" data-kpi="cpl" type="button"><span class="kpi-name">Cost per lead</span><span class="kpi-number" id="cpl">â€”</span><span class="kpi-unit">DZD / order</span></button>
       <button class="kpi-card" data-kpi="cpc" type="button"><span class="kpi-name">Cost per confirmed</span><span class="kpi-number" id="cpc">â€”</span><span class="kpi-unit">DZD / order</span></button>
       <button class="kpi-card" data-kpi="cpo" type="button"><span class="kpi-name">Cost per delivered</span><span class="kpi-number" id="cpo">â€”</span><span class="kpi-unit">DZD / order</span></button>
+      <div class="kpi-card delivered-now" aria-label="Delivered today"><span class="kpi-name">Delivered today</span><span class="kpi-number" id="period-delivered">—</span><span class="kpi-unit">orders</span></div>
     </section>
     <section class="chart-card" aria-label="KPI trend chart">
       <div class="chart-head"><div><div class="chart-title" id="chart-title">Total orders</div><div class="chart-summary" id="chart-summary">â€”</div><div class="chart-summary-note" id="chart-note">Trend for the selected period</div></div><div class="live-pill"><span class="live-dot"></span>LIVE</div></div>
       <div class="chart-wrap" id="chart-wrap"><div class="chart-tooltip" id="chart-tooltip"></div><div id="chart-empty" class="chart-empty hidden">No trend data for this period</div><svg id="trend-chart" viewBox="0 0 600 220" role="img" aria-label="KPI trend"></svg></div>
       <div class="chart-controls"><button class="chart-mode active" data-chart-mode="trend" type="button">Trend</button></div>
     </section>
-    <div class="aov-editor hidden" aria-hidden="true"><select class="aov-filter" id="aov-filter"><option value="all">All</option><option value="confirmed">Confirmed</option><option value="delivered">Delivered</option></select></div>
-    <h2 class="section-title legacy-orders">Orders</h2>
-    <section class="grid legacy-orders">
+    <h2 class="section-title">Orders</h2>
+    <section class="grid">
       <div class="card highlight"><div class="card-label">Total orders<br>(excluding drafts)</div><div class="card-value" id="total">—</div><div class="card-note">Orders created in period</div></div>
       <div class="card"><div class="card-label">Confirmed orders</div><div class="card-value" id="confirmed">—</div><div class="card-note">Confirmed → shipped → delivered</div></div>
       <div class="card good"><div class="card-label">Delivered from this cohort</div><div class="card-value" id="cohort-delivered">—</div><div class="card-note">Placed in period, delivered eventually</div></div>
@@ -115,8 +115,8 @@ button,input{font:inherit}
       <div class="metric"><div class="metric-label">Delivered rate settled</div><div class="metric-value" id="settled-rate">—</div><div class="metric-note">Delivered / delivered + returned</div></div>
     </section>
 
-    <h2 class="section-title legacy-acquisition">Spend details</h2>
-    <section class="spend-card legacy-acquisition">
+    <h2 class="section-title">Spend details</h2>
+    <section class="spend-card">
       <div class="card highlight spend-main"><div class="card-label">Meta ad spend</div><div class="card-value" id="spend">—</div><div class="meta-note">Meta USD spend × 255 = DZD</div></div>
       <div class="card highlight tiktok-card"><div class="card-label">TikTok ad spend</div><div class="card-value" id="tiktok-spend">—</div><div class="card-note" id="tiktok-note">Manual spend · USD converted at 255</div><div class="tiktok-entry"><input id="tiktok-input" type="number" min="0" step="0.01" inputmode="decimal" placeholder="USD" aria-label="TikTok spend in US dollars"><button id="tiktok-save" type="button">Save</button></div><div class="tiktok-help" id="tiktok-help">Enter spend for this day only</div></div>
       <div class="card"><div class="card-label">Total ad spend</div><div class="card-value" id="total-spend">—</div><div class="card-note">Meta + TikTok</div></div>
@@ -159,7 +159,7 @@ function showPeriod(){
 function fmt(n){return Number(n||0).toLocaleString('fr-DZ')}
 function dzd(n){return `${fmt(Math.round(Number(n)||0))} DZD`}
 function pct(n,d){return d?`${(n/d*100).toFixed(1)}%`:'0.0%'}
-function set(id,value){$(id).textContent=value}
+function set(id,value){document.querySelectorAll(`[id="${id}"]`).forEach(el=>{el.textContent=value})}
 function toast(message,error=false){const el=$('toast');el.textContent=message;el.className='toast show'+(error?' error':'');clearTimeout(timer);timer=setTimeout(()=>el.className='toast',3000)}
 function readTikTok(){try{const value=JSON.parse(localStorage.getItem(TIKTOK_KEY)||'{}');return value&&typeof value==='object'?value:{}}catch{return {}}}
 function tiktokForRange(r){const saved=readTikTok();let total=0;for(let key=r.fromKey;;key=shiftKey(key,1)){total+=Math.max(0,Number(saved[key])||0);if(key===r.toKey)break}return total}
