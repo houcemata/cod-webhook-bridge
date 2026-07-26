@@ -2,6 +2,7 @@ import { sendAllAnalytics } from "./_analytics.js";
 import { getServiceClient } from "./_auth.js";
 import { getCustomCatalogProduct } from "./_catalog.js";
 import { buildAttribution } from "./_attribution.js";
+import { sendNewOrderPush } from "./_push.js";
 
 function normalizeVariants(raw) {
   if (!raw) return [];
@@ -307,6 +308,7 @@ async function handleCartOrder(req, res, supabase, body) {
   }
 
   await sendOrderNotification(finalOrderData);
+  await sendNewOrderPush(finalOrderData).catch((error) => console.error("[create-order] web push failed:", error.message || error));
   await sendAllAnalytics({
     event_name: "Purchase",
     order_id: orderId,
@@ -506,6 +508,7 @@ export default async function handler(req, res) {
     }
 
     await sendOrderNotification(finalOrderData);
+    await sendNewOrderPush(finalOrderData).catch((error) => console.error("[create-order] web push failed:", error.message || error));
     await sendAllAnalytics({
       event_name: "Purchase",
       order_id: finalOrderData.order_id,

@@ -1,0 +1,15 @@
+{
+  "name": "ARCO Operations",
+  "short_name": "ARCO Ops",
+  "description": "ARCO order and performance operations dashboard",
+  "start_url": "/tracker.html",
+  "scope": "/",
+  "id": "/tracker.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#08090d",
+  "background_color": "#08090d",
+  "icons": [
+    { "src": "/arco-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

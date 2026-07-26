@@ -1,4 +1,5 @@
 import { getServiceClient, requireRole } from "./_auth.js";
+import { sendNewOrderPush } from "./_push.js";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -99,6 +100,8 @@ export default async function handler(req, res) {
       console.error("[operator-create-order] insert failed:", insertError);
       return res.status(500).json({ error: "Failed to save order" });
     }
+
+    await sendNewOrderPush(order).catch((error) => console.error("[operator-create-order] web push failed:", error.message || error));
 
     return res.status(200).json({ ok: true, order_id: order.order_id });
   } catch (error) {
