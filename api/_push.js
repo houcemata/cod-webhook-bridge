@@ -33,11 +33,12 @@ export async function sendNewOrderPush(order) {
     return { sent: 0, skipped: true };
   }
 
+  const productPrice = Math.max(0, Number(order.prix_total || 0) - Number(order.shipping_cost || 0));
   const payload = JSON.stringify({
-    title: "ARCO — New order",
-    body: `#${order.order_id} · ${order.name || "Customer"} · ${order.prix_total || 0} DZD`,
-    icon: "/arco-icon.png",
-    badge: "/arco-icon.png",
+    title: "New Lead",
+    body: `${order.name || "Customer"} \u00b7 ${Math.round(productPrice)} DZD`,
+    icon: "/arco-icon.svg",
+    badge: "/arco-badge.svg",
     tag: `arco-order-${order.order_id}`,
     url: `/operator.html?order=${encodeURIComponent(order.order_id)}`,
   });

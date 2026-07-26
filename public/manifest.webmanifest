@@ -10,6 +10,6 @@
   "theme_color": "#08090d",
   "background_color": "#08090d",
   "icons": [
-    { "src": "/arco-icon.png", "sizes": "1600x1600", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/arco-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }
