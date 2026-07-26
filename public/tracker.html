@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>ARCO — Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--yellow:#f5c500;--yellow-soft:#ffd84d;--black:#060608;--panel:#101015;--panel2:#17171e;--line:rgba(255,255,255,.08);--muted:#8888a0;--red:#e11d48;--green:#22c55e;--blue:#60a5fa;--purple:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;background:radial-gradient(circle at 0 0,rgba(245,197,0,.13),transparent 30%),radial-gradient(circle at 100% 100%,rgba(139,92,246,.1),transparent 35%),var(--black);color:#fff;font-family:Cairo,sans-serif}
+button,input{font:inherit}
+.hidden{display:none!important}
+#login{min-height:100vh;display:grid;place-items:center;padding:24px}
+.login-card{width:min(100%,380px);padding:30px;border:1px solid var(--line);border-radius:26px;background:rgba(255,255,255,.035);box-shadow:0 24px 70px #0008}
+.logo{font:56px/1 'Bebas Neue',sans-serif;letter-spacing:8px;color:var(--yellow);text-align:center;text-shadow:0 0 40px #f5c50055}
+.login-sub{text-align:center;color:var(--muted);font-size:12px;margin:8px 0 26px}
+.field{display:grid;gap:7px;margin-bottom:14px}.field label{font:700 11px 'Barlow Condensed',sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+.field input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:12px;outline:0;background:#ffffff08;color:#fff}
+.field input:focus{border-color:#f5c50088}.error{min-height:20px;color:#fb7185;font-size:12px;margin:8px 0}
+.btn{border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:900}.btn-primary{background:var(--yellow);color:#0a0a0a}.btn-secondary{background:#ffffff0a;border:1px solid var(--line);color:#fff}.btn:disabled{opacity:.55;cursor:wait}
+#app{display:none;max-width:760px;margin:0 auto;padding-bottom:34px}.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 16px 13px;background:#060608eF;backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.brand{font:30px/1 'Bebas Neue',sans-serif;letter-spacing:4px;color:var(--yellow)}.top-actions{display:flex;gap:7px}.top-actions button{padding:8px 11px;font-size:12px}
+.content{padding:16px}.eyebrow{font:700 11px 'Barlow Condensed',sans-serif;letter-spacing:2px;color:var(--muted);text-transform:uppercase}.title{font:42px/1 'Bebas Neue',sans-serif;letter-spacing:1.5px;margin-top:4px}.subtitle{color:var(--muted);font-size:12px;margin-top:5px}
+.period-card{margin-top:18px;padding:12px;border:1px solid var(--line);border-radius:18px;background:#ffffff04}.period-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.period-tab{padding:10px 5px;border-radius:10px;border:1px solid transparent;background:#ffffff06;color:var(--muted);font-size:11px;font-weight:800;cursor:pointer}.period-tab.active{background:var(--yellow);color:#0a0a0a}.custom{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.custom input{min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;background:#ffffff08;color:#fff;color-scheme:dark;outline:0;font-size:12px}.period-label{text-align:center;color:var(--muted);font-size:11px;margin-top:9px}
+.run{width:100%;margin-top:12px;display:flex;justify-content:center;align-items:center;gap:8px}.run-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+.section-title{font:18px 'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--muted);margin:25px 0 10px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.card{padding:15px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,#ffffff08,#ffffff02);min-width:0}.card.highlight{border-color:#f5c50055;background:linear-gradient(145deg,#f5c50016,#ffffff03)}.card.good{border-color:#22c55e44}.card-label{font-size:11px;color:var(--muted);font-weight:700;line-height:1.35}.card-value{font:34px/1 'Bebas Neue',sans-serif;letter-spacing:1px;margin-top:8px;color:#fff}.card.highlight .card-value{color:var(--yellow)}.card.good .card-value{color:var(--green)}.card-note{font-size:10px;color:#66667b;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{padding:14px;border-radius:15px;background:#ffffff05;border:1px solid var(--line)}.metric-label{font-size:11px;color:var(--muted);line-height:1.35}.metric-value{font:30px/1 'Bebas Neue',sans-serif;color:var(--yellow);margin-top:8px}.metric-note{font-size:10px;color:#66667b;margin-top:4px}
+.status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.status{padding:12px 10px;border:1px solid var(--line);border-radius:13px;background:#ffffff04}.status b{display:block;font:26px/1 'Bebas Neue',sans-serif;margin-bottom:5px}.status span{font-size:10px;color:var(--muted)}.status.pending b{color:#f59e0b}.status.shipped b{color:var(--purple)}.status.shipping b{color:#c4b5fd}.status.cancelled b{color:#fb7185}.status.returned b{color:#fbbf24}.status.notdelivered b{color:#f87171}
+.spend-card{display:grid;grid-template-columns:1fr 1fr;gap:10px}.spend-main{grid-column:1/-1}.spend-main .card-value{font-size:44px}.meta-note{font-size:11px;color:var(--muted);margin-top:4px}.stamp{text-align:center;color:#5e5e71;font-size:10px;margin-top:20px}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);padding:11px 17px;border-radius:999px;background:#1b1b24;border:1px solid var(--line);box-shadow:0 10px 35px #0008;color:#fff;font-size:12px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}.toast.show{opacity:1}.toast.error{border-color:#e11d4888;color:#fecdd3}
+@media(min-width:600px){.content{padding:22px}.grid{grid-template-columns:repeat(4,1fr)}.metric-grid{grid-template-columns:repeat(4,1fr)}.status-grid{grid-template-columns:repeat(6,1fr)}.spend-card{grid-template-columns:repeat(3,1fr)}.spend-main{grid-column:auto}.title{font-size:52px}}
+</style>
+</head>
+<body>
+<section id="login">
+  <div class="login-card">
+    <div class="logo">ARCO</div><div class="login-sub">PERFORMANCE TRACKER</div>
+    <div class="field"><label>Email</label><input id="email" type="email" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div>
+    <div class="error" id="login-error"></div><button class="btn btn-primary" id="login-btn" style="width:100%">Sign in</button>
+  </div>
+</section>
+<main id="app">
+  <header class="topbar"><div class="brand">ARCO</div><div class="top-actions"><button class="btn btn-secondary" id="admin-btn">Admin</button><button class="btn btn-secondary" id="logout-btn">Logout</button></div></header>
+  <div class="content">
+    <div class="eyebrow">Overview</div><h1 class="title">PERFORMANCE</h1><p class="subtitle">Aggregated operating KPIs for the selected period</p>
+    <section class="period-card">
+      <div class="period-tabs">
+        <button class="period-tab active" data-period="today">Today</button><button class="period-tab" data-period="yesterday">Yesterday</button><button class="period-tab" data-period="7days">Last 7d</button><button class="period-tab" data-period="custom">Custom</button>
+      </div>
+      <div class="custom hidden" id="custom-wrap"><input type="date" id="date-from"><input type="date" id="date-to"></div>
+      <div class="period-label" id="period-label">Today</div>
+      <button class="btn btn-primary run" id="run-btn"><span class="run-dot"></span><span>Run Tracker &amp; Refresh</span></button>
+    </section>
+
+    <div class="section-title">Orders</div>
+    <section class="grid">
+      <div class="card highlight"><div class="card-label">Total orders<br>(excluding drafts)</div><div class="card-value" id="total">—</div><div class="card-note">Orders created in period</div></div>
+      <div class="card"><div class="card-label">Confirmed orders</div><div class="card-value" id="confirmed">—</div><div class="card-note">Confirmed → shipped → delivered</div></div>
+      <div class="card good"><div class="card-label">Delivered from this cohort</div><div class="card-value" id="cohort-delivered">—</div><div class="card-note">Placed in period, delivered eventually</div></div>
+      <div class="card good"><div class="card-label">Delivered during period</div><div class="card-value" id="period-delivered">—</div><div class="card-note">Delivery completed in period</div></div>
+    </section>
+    <div class="section-title">Current status breakdown</div>
+    <section class="status-grid">
+      <div class="status pending"><b id="pending">—</b><span>Pending</span></div><div class="status shipped"><b id="shipped">—</b><span>Shipped</span></div><div class="status shipping"><b id="shipping">—</b><span>Out for delivery</span></div><div class="status cancelled"><b id="cancelled">—</b><span>Canceled</span></div><div class="status returned"><b id="returned">—</b><span>Returned</span></div><div class="status notdelivered"><b id="not-delivered">—</b><span>Not delivered</span></div>
+    </section>
+
+    <div class="section-title">Rates</div>
+    <section class="metric-grid">
+      <div class="metric"><div class="metric-label">Delivery rate</div><div class="metric-value" id="delivery-rate">—</div><div class="metric-note">Delivered / total orders</div></div>
+      <div class="metric"><div class="metric-label">Confirmation rate</div><div class="metric-value" id="confirmation-rate">—</div><div class="metric-note">Confirmed flow / total</div></div>
+      <div class="metric"><div class="metric-label">Delivered out of shipped</div><div class="metric-value" id="shipped-rate">—</div><div class="metric-note">Delivered / shipped + returned + delivered</div></div>
+      <div class="metric"><div class="metric-label">Delivered rate settled</div><div class="metric-value" id="settled-rate">—</div><div class="metric-note">Delivered / delivered + returned</div></div>
+    </section>
+
+    <div class="section-title">Acquisition cost</div>
+    <section class="spend-card">
+      <div class="card highlight spend-main"><div class="card-label">Meta ad spend</div><div class="card-value" id="spend">—</div><div class="meta-note">Meta USD spend × 255 = DZD</div></div>
+      <div class="card"><div class="card-label">Cost per delivered order</div><div class="card-value" id="cpo">—</div><div class="card-note">Spend / delivered cohort</div></div>
+      <div class="card"><div class="card-label">Cost per lead</div><div class="card-value" id="cpl">—</div><div class="card-note">Spend / non-draft orders</div></div>
+      <div class="card"><div class="card-label">Cost per confirmed order</div><div class="card-value" id="cpc">—</div><div class="card-note">Spend / confirmed flow</div></div>
+    </section>
+    <div class="stamp" id="updated">Not loaded yet</div>
+  </div>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const SB_PROJECT='https://mpkpehuatqsubohltssi.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
+const SB_URL=SB_PROJECT+'/rest/v1';const sb=supabase.createClient(SB_PROJECT,SB_KEY);const USD_TO_DZD=255;
+const CONFIRMED=new Set(['confirmed','shipped','returned','delivered']);
+let session=null,period=localStorage.getItem('arco_tracker_period')||'today',timer=null;
+const $=id=>document.getElementById(id);
+function pad(n){return String(n).padStart(2,'0')}
+function dateKey(d){return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`}
+function shiftKey(key,days){const p=key.split('-').map(Number),d=new Date(Date.UTC(p[0],p[1]-1,p[2]));d.setUTCDate(d.getUTCDate()+days);return dateKey(d)}
+function todayKey(){const d=new Date(Date.now()+3600000);return dateKey(new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate())))}
+function utcStart(key){const p=key.split('-').map(Number);return new Date(Date.UTC(p[0],p[1]-1,p[2])-3600000)}
+function getRange(){
+  let fromKey,toKey;const today=todayKey();
+  if(period==='today'){fromKey=today;toKey=today}
+  else if(period==='yesterday'){fromKey=shiftKey(today,-1);toKey=fromKey}
+  else if(period==='7days'){fromKey=shiftKey(today,-6);toKey=today}
+  else if(period==='custom'){fromKey=$('date-from').value;toKey=$('date-to').value||fromKey}
+  else {fromKey=today;toKey=today}
+  if(!fromKey||!toKey)return null;
+  const from=utcStart(fromKey),to=new Date(utcStart(shiftKey(toKey,1)).getTime());
+  return {fromKey,toKey,from,to,adFrom:fromKey,adTo:toKey};
+}
+function showPeriod(){
+  document.querySelectorAll('.period-tab').forEach(b=>b.classList.toggle('active',b.dataset.period===period));
+  $('custom-wrap').classList.toggle('hidden',period!=='custom');
+  const r=getRange();$('period-label').textContent=r?(r.fromKey===r.toKey?r.fromKey:`${r.fromKey} → ${r.toKey}`):'Choose dates';
+}
+function fmt(n){return Number(n||0).toLocaleString('fr-DZ')}
+function dzd(n){return `${fmt(Math.round(Number(n)||0))} DZD`}
+function pct(n,d){return d?`${(n/d*100).toFixed(1)}%`:'0.0%'}
+function set(id,value){$(id).textContent=value}
+function toast(message,error=false){const el=$('toast');el.textContent=message;el.className='toast show'+(error?' error':'');clearTimeout(timer);timer=setTimeout(()=>el.className='toast',3000)}
+async function authHeaders(){const {data:{session:s}}=await sb.auth.getSession();session=s;return {apikey:SB_KEY,Authorization:`Bearer ${s?.access_token||SB_KEY}`,'Content-Type':'application/json'} }
+async function fetchRows(resource,query){
+  const headers=await authHeaders();let all=[],start=0;const page=1000;
+  while(true){const res=await fetch(`${SB_URL}/${resource}?${query}&limit=${page}`,{headers:{...headers,Range:`${start}-${start+page-1}`}});const data=await res.json().catch(()=>[]);if(!res.ok)throw new Error(data?.message||data?.error||`Could not load ${resource}`);if(!Array.isArray(data)||!data.length)break;all=all.concat(data);if(data.length<page)break;start+=page}
+  return all;
+}
+async function loadOrders(r){
+  const q=`select=id,order_id,status,from_draft,created_at&created_at=gte.${encodeURIComponent(r.from.toISOString())}&created_at=lt.${encodeURIComponent(r.to.toISOString())}&order=created_at.desc`;
+  return fetchRows('orders',q);
+}
+async function loadDeliveryEvents(r){
+  const q=`select=order_id,changed_at,new_status&new_status=eq.delivered&changed_at=gte.${encodeURIComponent(r.from.toISOString())}&changed_at=lt.${encodeURIComponent(r.to.toISOString())}&order=changed_at.desc`;
+  return fetchRows('order_history',q);
+}
+async function loadMetaSpend(r){
+  const headers=await authHeaders();const res=await fetch(`/api/ad-performance?from=${r.adFrom}&to=${r.adTo}`,{headers});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||'Meta spend unavailable');return Number(data?.meta?.total_spend||0);
+}
+async function runTracker(){
+  const btn=$('run-btn');btn.disabled=true;btn.querySelector('span:last-child').textContent='Updating Noest…';
+  try{const headers=await authHeaders();const res=await fetch('/api/track-orders',{headers});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||'Tracker failed');toast(`Tracker updated ${data.orders_updated||0} orders`);await loadDashboard()}catch(e){toast(e.message||'Tracker failed',true)}finally{btn.disabled=false;btn.querySelector('span:last-child').textContent='Run Tracker & Refresh'}
+}
+function render(orders,events,spend,r){
+  const real=orders.filter(o=>o.status!=='draft');const total=real.length;const confirmed=real.filter(o=>CONFIRMED.has(o.status)).length;const cohortDelivered=real.filter(o=>o.status==='delivered').length;const deliveredEvents=new Set(events.map(e=>e.order_id)).size;
+  const shipped=real.filter(o=>o.status==='shipped').length;const shipping=real.filter(o=>o.status==='shipping').length;const pending=real.filter(o=>o.status==='pending').length;const cancelled=real.filter(o=>o.status==='canceled').length;const returned=real.filter(o=>o.status==='returned').length;const notDelivered=real.filter(o=>o.status==='not_delivered').length;
+  set('total',fmt(total));set('confirmed',fmt(confirmed));set('cohort-delivered',fmt(cohortDelivered));set('period-delivered',fmt(deliveredEvents));set('pending',fmt(pending));set('shipped',fmt(shipped));set('shipping',fmt(shipping));set('cancelled',fmt(cancelled));set('returned',fmt(returned));set('not-delivered',fmt(notDelivered));
+  set('delivery-rate',pct(cohortDelivered,total));set('confirmation-rate',pct(confirmed,total));set('shipped-rate',pct(cohortDelivered,shipped+returned+cohortDelivered));set('settled-rate',pct(cohortDelivered,cohortDelivered+returned));
+  set('spend',dzd(spend));set('cpo',dzd(cohortDelivered?spend/cohortDelivered:0));set('cpl',dzd(total?spend/total:0));set('cpc',dzd(confirmed?spend/confirmed:0));$('updated').textContent=`Updated ${new Date().toLocaleTimeString('en-DZ',{hour:'2-digit',minute:'2-digit'})} · Meta spend converted at ${USD_TO_DZD} DZD/USD`;
+}
+async function loadDashboard(){
+  const r=getRange();if(!r){toast('Choose a valid date range',true);return}
+  $('run-btn').disabled=true;try{const [orders,events,spend]=await Promise.all([loadOrders(r),loadDeliveryEvents(r),loadMetaSpend(r)]);render(orders,events,spend,r)}catch(e){toast(e.message||'Unable to load tracker',true)}finally{$('run-btn').disabled=false}}
+async function login(){const email=$('email').value.trim(),password=$('password').value,btn=$('login-btn');if(!email||!password){$('login-error').textContent='Enter email and password';return}btn.disabled=true;try{const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;const {data:role}=await sb.from('user_roles').select('role').eq('user_id',data.user.id).eq('role','admin').maybeSingle();if(!role)throw new Error('Admin access required');session=data.session;$('login').classList.add('hidden');$('app').style.display='block';showPeriod();await loadDashboard()}catch(e){$('login-error').textContent=e.message||'Sign in failed'}finally{btn.disabled=false}}
+async function boot(){const {data:{session:s}}=await sb.auth.getSession();if(s){session=s;const {data:role}=await sb.from('user_roles').select('role').eq('user_id',s.user.id).eq('role','admin').maybeSingle();if(role){$('login').classList.add('hidden');$('app').style.display='block';showPeriod();await loadDashboard()}}}
+document.querySelectorAll('.period-tab').forEach(btn=>btn.addEventListener('click',()=>{period=btn.dataset.period;localStorage.setItem('arco_tracker_period',period);showPeriod();if(period!=='custom')loadDashboard()}));
+$('date-from').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('date-to').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('run-btn').addEventListener('click',runTracker);$('login-btn').addEventListener('click',login);$('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('admin-btn').addEventListener('click',()=>location.href='/admin.html');$('logout-btn').addEventListener('click',async()=>{await sb.auth.signOut();location.reload()});boot();
+</script>
+</body>
+</html>
