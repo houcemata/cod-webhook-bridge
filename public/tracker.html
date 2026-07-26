@@ -29,6 +29,8 @@ button,input{font:inherit}
 .run{width:100%;margin-top:12px;display:flex;justify-content:center;align-items:center;gap:8px}.run-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
 .section-title{font:18px 'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--muted);margin:25px 0 10px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.card{padding:15px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,#ffffff08,#ffffff02);min-width:0}.card.highlight{border-color:#f5c50055;background:linear-gradient(145deg,#f5c50016,#ffffff03)}.card.good{border-color:#22c55e44}.card-label{font-size:11px;color:var(--muted);font-weight:700;line-height:1.35}.card-value{font:34px/1 'Bebas Neue',sans-serif;letter-spacing:1px;margin-top:8px;color:#fff}.card.highlight .card-value{color:var(--yellow)}.card.good .card-value{color:var(--green)}.card-note{font-size:10px;color:#66667b;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{padding:14px;border-radius:15px;background:#ffffff05;border:1px solid var(--line)}.metric-label{font-size:11px;color:var(--muted);line-height:1.35}.metric-value{font:30px/1 'Bebas Neue',sans-serif;color:var(--yellow);margin-top:8px}.metric-note{font-size:10px;color:#66667b;margin-top:4px}
+.aov-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.aov-filter{background:#ffffff0a;color:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 8px;font-size:11px;outline:0}.aov-filter:focus{border-color:#f5c50088}
+.tiktok-card{position:relative}.tiktok-entry{display:flex;gap:7px;margin-top:10px}.tiktok-entry input{min-width:0;flex:1;padding:8px 9px;border:1px solid var(--line);border-radius:9px;background:#ffffff08;color:#fff;outline:0;font-size:12px}.tiktok-entry input:focus{border-color:#f5c50088}.tiktok-entry button{padding:8px 10px;border:0;border-radius:9px;background:var(--yellow);color:#0a0a0a;font-size:11px;font-weight:900;cursor:pointer}.tiktok-entry button:disabled{opacity:.45;cursor:not-allowed}.tiktok-help{font-size:10px;color:#66667b;margin-top:6px;line-height:1.35}
 .status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.status{padding:12px 10px;border:1px solid var(--line);border-radius:13px;background:#ffffff04}.status b{display:block;font:26px/1 'Bebas Neue',sans-serif;margin-bottom:5px}.status span{font-size:10px;color:var(--muted)}.status.pending b{color:#f59e0b}.status.shipped b{color:var(--purple)}.status.shipping b{color:#c4b5fd}.status.cancelled b{color:#fb7185}.status.returned b{color:#fbbf24}.status.notdelivered b{color:#f87171}
 .spend-card{display:grid;grid-template-columns:1fr 1fr;gap:10px}.spend-main{grid-column:1/-1}.spend-main .card-value{font-size:44px}.meta-note{font-size:11px;color:var(--muted);margin-top:4px}.stamp{text-align:center;color:#5e5e71;font-size:10px;margin-top:20px}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);padding:11px 17px;border-radius:999px;background:#1b1b24;border:1px solid var(--line);box-shadow:0 10px 35px #0008;color:#fff;font-size:12px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}.toast.show{opacity:1}.toast.error{border-color:#e11d4888;color:#fecdd3}
 @media(min-width:600px){.content{padding:22px}.grid{grid-template-columns:repeat(4,1fr)}.metric-grid{grid-template-columns:repeat(4,1fr)}.status-grid{grid-template-columns:repeat(6,1fr)}.spend-card{grid-template-columns:repeat(3,1fr)}.spend-main{grid-column:auto}.title{font-size:52px}}
@@ -62,6 +64,7 @@ button,input{font:inherit}
       <div class="card"><div class="card-label">Confirmed orders</div><div class="card-value" id="confirmed">—</div><div class="card-note">Confirmed → shipped → delivered</div></div>
       <div class="card good"><div class="card-label">Delivered from this cohort</div><div class="card-value" id="cohort-delivered">—</div><div class="card-note">Placed in period, delivered eventually</div></div>
       <div class="card good"><div class="card-label">Delivered during period</div><div class="card-value" id="period-delivered">—</div><div class="card-note">Delivery completed in period</div></div>
+      <div class="card highlight"><div class="aov-head"><div class="card-label">Average order value</div><select class="aov-filter" id="aov-filter"><option value="all">All</option><option value="confirmed">Confirmed</option><option value="delivered">Delivered</option></select></div><div class="card-value" id="aov">—</div><div class="card-note" id="aov-note">Product price only · shipping excluded</div></div>
     </section>
     <div class="section-title">Current status breakdown</div>
     <section class="status-grid">
@@ -79,6 +82,8 @@ button,input{font:inherit}
     <div class="section-title">Acquisition cost</div>
     <section class="spend-card">
       <div class="card highlight spend-main"><div class="card-label">Meta ad spend</div><div class="card-value" id="spend">—</div><div class="meta-note">Meta USD spend × 255 = DZD</div></div>
+      <div class="card highlight tiktok-card"><div class="card-label">TikTok ad spend</div><div class="card-value" id="tiktok-spend">—</div><div class="card-note" id="tiktok-note">Manual spend · USD converted at 255</div><div class="tiktok-entry"><input id="tiktok-input" type="number" min="0" step="0.01" inputmode="decimal" placeholder="USD"><button id="tiktok-save" type="button">Save</button></div><div class="tiktok-help" id="tiktok-help">Enter spend for this day only</div></div>
+      <div class="card"><div class="card-label">Total ad spend</div><div class="card-value" id="total-spend">—</div><div class="card-note">Meta + TikTok</div></div>
       <div class="card"><div class="card-label">Cost per delivered order</div><div class="card-value" id="cpo">—</div><div class="card-note">Spend / delivered cohort</div></div>
       <div class="card"><div class="card-label">Cost per lead</div><div class="card-value" id="cpl">—</div><div class="card-note">Spend / non-draft orders</div></div>
       <div class="card"><div class="card-label">Cost per confirmed order</div><div class="card-value" id="cpc">—</div><div class="card-note">Spend / confirmed flow</div></div>
@@ -91,8 +96,8 @@ button,input{font:inherit}
 const SB_PROJECT='https://mpkpehuatqsubohltssi.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
 const SB_URL=SB_PROJECT+'/rest/v1';const sb=supabase.createClient(SB_PROJECT,SB_KEY);const USD_TO_DZD=255;
-const CONFIRMED=new Set(['confirmed','shipped','returned','delivered']);
-let session=null,period=localStorage.getItem('arco_tracker_period')||'today',timer=null;
+const CONFIRMED=new Set(['confirmed','shipped','returned','delivered']);const TIKTOK_KEY='arco_tracker_tiktok_spend';
+let session=null,period=localStorage.getItem('arco_tracker_period')||'today',aovFilter=localStorage.getItem('arco_tracker_aov')||'all',timer=null;
 const $=id=>document.getElementById(id);
 function pad(n){return String(n).padStart(2,'0')}
 function dateKey(d){return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`}
@@ -120,6 +125,9 @@ function dzd(n){return `${fmt(Math.round(Number(n)||0))} DZD`}
 function pct(n,d){return d?`${(n/d*100).toFixed(1)}%`:'0.0%'}
 function set(id,value){$(id).textContent=value}
 function toast(message,error=false){const el=$('toast');el.textContent=message;el.className='toast show'+(error?' error':'');clearTimeout(timer);timer=setTimeout(()=>el.className='toast',3000)}
+function readTikTok(){try{const value=JSON.parse(localStorage.getItem(TIKTOK_KEY)||'{}');return value&&typeof value==='object'?value:{}}catch{return {}}}
+function tiktokForRange(r){const saved=readTikTok();let total=0;for(let key=r.fromKey;;key=shiftKey(key,1)){total+=Math.max(0,Number(saved[key])||0);if(key===r.toKey)break}return total}
+function syncTikTokEditor(r){const single=r&&r.fromKey===r.toKey;const input=$('tiktok-input'),button=$('tiktok-save'),saved=readTikTok();input.disabled=!single;button.disabled=!single;$('tiktok-help').textContent=single?`Enter USD spend for ${r.fromKey}`:'Select one specific day to edit spend; this range shows the saved daily total';input.value=single&&saved[r.fromKey]!=null?saved[r.fromKey]:''}
 async function authHeaders(){const {data:{session:s}}=await sb.auth.getSession();session=s;return {apikey:SB_KEY,Authorization:`Bearer ${s?.access_token||SB_KEY}`,'Content-Type':'application/json'} }
 async function fetchRows(resource,query){
   const headers=await authHeaders();let all=[],start=0;const page=1000;
@@ -127,7 +135,7 @@ async function fetchRows(resource,query){
   return all;
 }
 async function loadOrders(r){
-  const q=`select=id,order_id,status,from_draft,created_at&created_at=gte.${encodeURIComponent(r.from.toISOString())}&created_at=lt.${encodeURIComponent(r.to.toISOString())}&order=created_at.desc`;
+  const q=`select=id,order_id,status,from_draft,created_at,prix_total,shipping_cost&created_at=gte.${encodeURIComponent(r.from.toISOString())}&created_at=lt.${encodeURIComponent(r.to.toISOString())}&order=created_at.desc`;
   return fetchRows('orders',q);
 }
 async function loadDeliveryEvents(r){
@@ -141,19 +149,24 @@ async function runTracker(){
   const btn=$('run-btn');btn.disabled=true;btn.querySelector('span:last-child').textContent='Updating Noest…';
   try{const headers=await authHeaders();const res=await fetch('/api/track-orders',{headers});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||'Tracker failed');toast(`Tracker updated ${data.orders_updated||0} orders`);await loadDashboard()}catch(e){toast(e.message||'Tracker failed',true)}finally{btn.disabled=false;btn.querySelector('span:last-child').textContent='Run Tracker & Refresh'}
 }
-function render(orders,events,spend,r){
+function render(orders,events,spend,tiktokSpend,r){
   const real=orders.filter(o=>o.status!=='draft');const total=real.length;const confirmed=real.filter(o=>CONFIRMED.has(o.status)).length;const cohortDelivered=real.filter(o=>o.status==='delivered').length;const deliveredEvents=new Set(events.map(e=>e.order_id)).size;
   const shipped=real.filter(o=>o.status==='shipped').length;const shipping=real.filter(o=>o.status==='shipping').length;const pending=real.filter(o=>o.status==='pending').length;const cancelled=real.filter(o=>o.status==='canceled').length;const returned=real.filter(o=>o.status==='returned').length;const notDelivered=real.filter(o=>o.status==='not_delivered').length;
   set('total',fmt(total));set('confirmed',fmt(confirmed));set('cohort-delivered',fmt(cohortDelivered));set('period-delivered',fmt(deliveredEvents));set('pending',fmt(pending));set('shipped',fmt(shipped));set('shipping',fmt(shipping));set('cancelled',fmt(cancelled));set('returned',fmt(returned));set('not-delivered',fmt(notDelivered));
   set('delivery-rate',pct(cohortDelivered,total));set('confirmation-rate',pct(confirmed,total));set('shipped-rate',pct(cohortDelivered,shipped+returned+cohortDelivered));set('settled-rate',pct(cohortDelivered,cohortDelivered+returned));
-  set('spend',dzd(spend));set('cpo',dzd(cohortDelivered?spend/cohortDelivered:0));set('cpl',dzd(total?spend/total:0));set('cpc',dzd(confirmed?spend/confirmed:0));$('updated').textContent=`Updated ${new Date().toLocaleTimeString('en-DZ',{hour:'2-digit',minute:'2-digit'})} · Meta spend converted at ${USD_TO_DZD} DZD/USD`;
+  const aovOrders=aovFilter==='confirmed'?real.filter(o=>CONFIRMED.has(o.status)):aovFilter==='delivered'?real.filter(o=>o.status==='delivered'):real;
+  const productRevenue=aovOrders.reduce((sum,o)=>sum+Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0)),0);
+  set('aov',aovOrders.length?dzd(productRevenue/aovOrders.length):'0 DZD');set('aov-note',`${fmt(aovOrders.length)} orders · shipping excluded`);
+  const totalSpend=spend+tiktokSpend;set('spend',dzd(spend));set('tiktok-spend',dzd(tiktokSpend));set('total-spend',dzd(totalSpend));set('cpo',dzd(cohortDelivered?totalSpend/cohortDelivered:0));set('cpl',dzd(total?totalSpend/total:0));set('cpc',dzd(confirmed?totalSpend/confirmed:0));syncTikTokEditor(r);$('updated').textContent=`Updated ${new Date().toLocaleTimeString('en-DZ',{hour:'2-digit',minute:'2-digit'})} · Ad spend converted at ${USD_TO_DZD} DZD/USD`;
 }
 async function loadDashboard(){
   const r=getRange();if(!r){toast('Choose a valid date range',true);return}
-  $('run-btn').disabled=true;try{const [orders,events,spend]=await Promise.all([loadOrders(r),loadDeliveryEvents(r),loadMetaSpend(r)]);render(orders,events,spend,r)}catch(e){toast(e.message||'Unable to load tracker',true)}finally{$('run-btn').disabled=false}}
+  $('run-btn').disabled=true;try{const [orders,events,spend]=await Promise.all([loadOrders(r),loadDeliveryEvents(r),loadMetaSpend(r)]);render(orders,events,spend,tiktokForRange(r),r)}catch(e){toast(e.message||'Unable to load tracker',true)}finally{$('run-btn').disabled=false}}
 async function login(){const email=$('email').value.trim(),password=$('password').value,btn=$('login-btn');if(!email||!password){$('login-error').textContent='Enter email and password';return}btn.disabled=true;try{const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;const {data:role}=await sb.from('user_roles').select('role').eq('user_id',data.user.id).eq('role','admin').maybeSingle();if(!role)throw new Error('Admin access required');session=data.session;$('login').classList.add('hidden');$('app').style.display='block';showPeriod();await loadDashboard()}catch(e){$('login-error').textContent=e.message||'Sign in failed'}finally{btn.disabled=false}}
 async function boot(){const {data:{session:s}}=await sb.auth.getSession();if(s){session=s;const {data:role}=await sb.from('user_roles').select('role').eq('user_id',s.user.id).eq('role','admin').maybeSingle();if(role){$('login').classList.add('hidden');$('app').style.display='block';showPeriod();await loadDashboard()}}}
 document.querySelectorAll('.period-tab').forEach(btn=>btn.addEventListener('click',()=>{period=btn.dataset.period;localStorage.setItem('arco_tracker_period',period);showPeriod();if(period!=='custom')loadDashboard()}));
+$('aov-filter').value=aovFilter;$('aov-filter').addEventListener('change',e=>{aovFilter=e.target.value;localStorage.setItem('arco_tracker_aov',aovFilter);loadDashboard()});
+$('tiktok-save').addEventListener('click',()=>{const r=getRange();if(!r||r.fromKey!==r.toKey){toast('Select one specific day before saving TikTok spend',true);return}const amount=Number($('tiktok-input').value);if(!Number.isFinite(amount)||amount<0){toast('Enter a valid TikTok spend in USD',true);return}const saved=readTikTok();saved[r.fromKey]=amount;localStorage.setItem(TIKTOK_KEY,JSON.stringify(saved));toast('TikTok spend saved');loadDashboard()});
 $('date-from').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('date-to').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('run-btn').addEventListener('click',runTracker);$('login-btn').addEventListener('click',login);$('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('admin-btn').addEventListener('click',()=>location.href='/admin.html');$('logout-btn').addEventListener('click',async()=>{await sb.auth.signOut();location.reload()});boot();
 </script>
 </body>
