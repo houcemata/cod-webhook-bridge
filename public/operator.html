@@ -229,6 +229,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .prod-picker-control{display:flex;align-items:center;gap:7px}
 .prod-picker-thumb{width:34px;height:34px;flex:0 0 34px;border-radius:7px;overflow:hidden;background:#111;border:1px solid #333;display:grid;place-items:center}
 .prod-picker-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.prod-picker-thumb:has(img){cursor:zoom-in}
 .prod-search-input{width:100%;min-width:0;flex:1;box-sizing:border-box;background:#1a1a1a;color:#ddd;border:1px solid #333;border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit}
 .prod-search-input:focus{outline:none;border-color:#F5C500}
 .prod-dropdown-list{display:none;position:absolute;z-index:9999;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid #333;border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;margin-top:2px}
@@ -237,6 +238,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .prod-dropdown-item img{width:34px;height:34px;flex:0 0 34px;object-fit:cover;border-radius:6px;background:#111}
 .prod-dropdown-item span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .prod-dropdown-item:hover,.prod-dropdown-item.active{background:#F5C500;color:#000}
+.product-image-preview{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.78);display:grid;place-items:center;padding:24px;cursor:zoom-out}
+.product-image-preview[hidden]{display:none}
+.product-image-preview img{max-width:min(88vw,520px);max-height:78vh;object-fit:contain;border-radius:14px;box-shadow:0 18px 60px rgba(0,0,0,.65);cursor:default}
 </style>
 <style>
 :root{
@@ -962,7 +966,7 @@ async function loadOrders(){
   const pageSize = 1000;
   let all = [];
   let from = 0;
-  const params=new URLSearchParams({select:'id,order_id,name,phone,wilaya,commune,type_livraison,station_code,product,variable,items,prix_total,shipping_cost,status,notes,call_count,created_at,confirmed_at,tracking_number,shipping_agency,attribution_source',order:'created_at.desc',limit:String(pageSize)});
+  const params=new URLSearchParams({select:'id,order_id,name,phone,wilaya,commune,type_livraison,station_code,product,variable,items,prix_total,shipping_cost,status,from_draft,notes,call_count,created_at,confirmed_at,tracking_number,shipping_agency,attribution_source',order:'created_at.desc',limit:String(pageSize)});
   const range=getOrderDateRange();
   if(range?.from)params.append('created_at',`gte.${range.from}`);
   if(range?.to)params.append('created_at',`lt.${range.to}`);
@@ -1239,7 +1243,8 @@ function updateKPIs(){
   const orders=allOrders.filter(o=>inPeriod(o));
   const total=orders.length;
   const nonDraftOrders=orders.filter(o=>o.status!=='draft');
-  const nonDraftTotal=nonDraftOrders.length;
+  const realOrders=orders.filter(o=>o.status!=='draft'&&o.from_draft!==true);
+  const nonDraftTotal=realOrders.length;
   const delivered=orders.filter(o=>o.status==='delivered').length;
   const confirmed=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
   const nonDraft=nonDraftOrders.length;
@@ -2308,6 +2313,23 @@ function productImage(product){
   const first=images[0];
   return typeof first==='string'?first:(first?.url||first?.src||'');
 }
+function openProductImagePreview(src,alt){
+  let overlay=document.getElementById('product-image-preview');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='product-image-preview';
+    overlay.className='product-image-preview';
+    overlay.hidden=true;
+    overlay.addEventListener('click',()=>{overlay.hidden=true;});
+    const img=document.createElement('img');
+    img.addEventListener('click',event=>event.stopPropagation());
+    overlay.appendChild(img);
+    document.body.appendChild(overlay);
+  }
+  const img=overlay.querySelector('img');
+  img.src=src;img.alt=alt||'';
+  overlay.hidden=false;
+}
 function makeProductPicker(containerId, initialValue, onChange){
   const wrap = document.getElementById(containerId);
   if(!wrap) return;
@@ -2327,12 +2349,14 @@ function makeProductPicker(containerId, initialValue, onChange){
   function findProduct(name){return pl.find(p=>p.name===name)||null;}
   function updateThumb(product){
     thumb.innerHTML='';
+    thumb.onclick=null;
     const src=productImage(product);
     if(!src)return;
     const img=document.createElement('img');
     img.src=src;img.alt='';img.loading='lazy';
     img.onerror=()=>{thumb.innerHTML='';};
     thumb.appendChild(img);
+    thumb.onclick=event=>{event.stopPropagation();openProductImagePreview(src,product?.name||'');};
   }
 
   function renderList(filter){
