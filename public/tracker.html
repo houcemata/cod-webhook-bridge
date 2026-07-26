@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#08090d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ARCO Ops">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/arco-icon.svg">
 <title>ARCO — Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,16 +22,17 @@ button,input{font:inherit}
 .hidden{display:none!important}
 #login{min-height:100vh;display:grid;place-items:center;padding:24px}
 .login-card{width:min(100%,380px);padding:30px;border:1px solid var(--line);border-radius:26px;background:rgba(255,255,255,.035);box-shadow:0 24px 70px #0008}
-.logo{font:56px/1 'Bebas Neue',sans-serif;letter-spacing:8px;color:var(--yellow);text-align:center;text-shadow:0 0 40px #f5c50055}
+.logo{font:56px/1 'Bebas Neue',sans-serif;letter-spacing:8px;color:var(--yellow);text-align:center;text-shadow:0 0 40px #f5c50055}.login-mark{display:block;width:74px;height:74px;margin:0 auto 13px;filter:drop-shadow(0 0 22px #f5c50044)}
 .login-sub{text-align:center;color:var(--muted);font-size:12px;margin:8px 0 26px}
 .field{display:grid;gap:7px;margin-bottom:14px}.field label{font:700 11px 'Barlow Condensed',sans-serif;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
 .field input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:12px;outline:0;background:#ffffff08;color:#fff}
 .field input:focus{border-color:#f5c50088}.error{min-height:20px;color:#fb7185;font-size:12px;margin:8px 0}
-.btn{border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:900}.btn-primary{background:var(--yellow);color:#0a0a0a}.btn-secondary{background:#ffffff0a;border:1px solid var(--line);color:#fff}.btn:disabled{opacity:.55;cursor:wait}
-#app{display:none;max-width:760px;margin:0 auto;padding-bottom:34px}.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 16px 13px;background:#060608eF;backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
-.brand{font:30px/1 'Bebas Neue',sans-serif;letter-spacing:4px;color:var(--yellow)}.top-actions{display:flex;gap:7px}.top-actions button{padding:8px 11px;font-size:12px}
+.btn{border:0;border-radius:12px;min-height:44px;padding:12px 16px;cursor:pointer;font-weight:900;transition:transform .18s ease,background .18s ease,opacity .18s ease}.btn:active{transform:scale(.98)}.btn:focus-visible,.period-tab:focus-visible,.aov-filter:focus-visible,.tiktok-entry input:focus-visible{outline:3px solid #f5c50066;outline-offset:2px}.btn-primary{background:var(--yellow);color:#0a0a0a}.btn-secondary{background:#ffffff0a;border:1px solid var(--line);color:#fff}.btn:disabled{opacity:.55;cursor:wait}
+#app{display:none;max-width:760px;margin:0 auto;padding-bottom:calc(34px + env(safe-area-inset-bottom))}.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 16px 13px;background:#060608eF;backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.brand-lockup{display:flex;align-items:center;gap:9px}.brand-mark{width:34px;height:34px;filter:drop-shadow(0 0 12px #f5c50055)}.brand{font:26px/1 'Bebas Neue',sans-serif;letter-spacing:3px;color:var(--yellow)}.brand small{display:block;font:700 8px/1 Cairo,sans-serif;letter-spacing:1.5px;color:var(--muted);margin-top:3px}.top-actions{display:flex;gap:7px}.top-actions button{padding:8px 11px;font-size:12px}
 .content{padding:16px}.eyebrow{font:700 11px 'Barlow Condensed',sans-serif;letter-spacing:2px;color:var(--muted);text-transform:uppercase}.title{font:42px/1 'Bebas Neue',sans-serif;letter-spacing:1.5px;margin-top:4px}.subtitle{color:var(--muted);font-size:12px;margin-top:5px}
 .period-card{margin-top:18px;padding:12px;border:1px solid var(--line);border-radius:18px;background:#ffffff04}.period-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.period-tab{padding:10px 5px;border-radius:10px;border:1px solid transparent;background:#ffffff06;color:var(--muted);font-size:11px;font-weight:800;cursor:pointer}.period-tab.active{background:var(--yellow);color:#0a0a0a}.custom{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.custom input{min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;background:#ffffff08;color:#fff;color-scheme:dark;outline:0;font-size:12px}.period-label{text-align:center;color:var(--muted);font-size:11px;margin-top:9px}
+.app-tools{margin-top:12px;padding:14px;border:1px solid #f5c50044;border-radius:18px;background:linear-gradient(135deg,#f5c50015,#ffffff03);display:flex;align-items:center;justify-content:space-between;gap:12px}.app-tools-copy{min-width:0}.app-tools-title{font-size:13px;font-weight:900;color:#fff}.app-tools-note{font-size:10px;color:var(--muted);line-height:1.45;margin-top:3px}.app-tools-actions{display:flex;gap:7px;flex-shrink:0}.app-tools-actions .btn{padding:9px 11px;font-size:11px}.app-status{font-size:10px;color:var(--muted);margin-top:7px}.app-status.good{color:var(--green)}.app-status.warn{color:#fbbf24}
 .run{width:100%;margin-top:12px;display:flex;justify-content:center;align-items:center;gap:8px}.run-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
 .section-title{font:18px 'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--muted);margin:25px 0 10px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.card{padding:15px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,#ffffff08,#ffffff02);min-width:0}.card.highlight{border-color:#f5c50055;background:linear-gradient(145deg,#f5c50016,#ffffff03)}.card.good{border-color:#22c55e44}.card-label{font-size:11px;color:var(--muted);font-weight:700;line-height:1.35}.card-value{font:34px/1 'Bebas Neue',sans-serif;letter-spacing:1px;margin-top:8px;color:#fff}.card.highlight .card-value{color:var(--yellow)}.card.good .card-value{color:var(--green)}.card-note{font-size:10px;color:#66667b;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{padding:14px;border-radius:15px;background:#ffffff05;border:1px solid var(--line)}.metric-label{font-size:11px;color:var(--muted);line-height:1.35}.metric-value{font:30px/1 'Bebas Neue',sans-serif;color:var(--yellow);margin-top:8px}.metric-note{font-size:10px;color:#66667b;margin-top:4px}
@@ -34,19 +41,21 @@ button,input{font:inherit}
 .status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.status{padding:12px 10px;border:1px solid var(--line);border-radius:13px;background:#ffffff04}.status b{display:block;font:26px/1 'Bebas Neue',sans-serif;margin-bottom:5px}.status span{font-size:10px;color:var(--muted)}.status.pending b{color:#f59e0b}.status.shipped b{color:var(--purple)}.status.shipping b{color:#c4b5fd}.status.cancelled b{color:#fb7185}.status.returned b{color:#fbbf24}.status.notdelivered b{color:#f87171}
 .spend-card{display:grid;grid-template-columns:1fr 1fr;gap:10px}.spend-main{grid-column:1/-1}.spend-main .card-value{font-size:44px}.meta-note{font-size:11px;color:var(--muted);margin-top:4px}.stamp{text-align:center;color:#5e5e71;font-size:10px;margin-top:20px}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);padding:11px 17px;border-radius:999px;background:#1b1b24;border:1px solid var(--line);box-shadow:0 10px 35px #0008;color:#fff;font-size:12px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}.toast.show{opacity:1}.toast.error{border-color:#e11d4888;color:#fecdd3}
 @media(min-width:600px){.content{padding:22px}.grid{grid-template-columns:repeat(4,1fr)}.metric-grid{grid-template-columns:repeat(4,1fr)}.status-grid{grid-template-columns:repeat(6,1fr)}.spend-card{grid-template-columns:repeat(3,1fr)}.spend-main{grid-column:auto}.title{font-size:52px}}
+@media(max-width:480px){.app-tools{align-items:flex-start;flex-direction:column}.app-tools-actions{width:100%}.app-tools-actions .btn{flex:1}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
 </style>
 </head>
 <body>
 <section id="login">
   <div class="login-card">
-    <div class="logo">ARCO</div><div class="login-sub">PERFORMANCE TRACKER</div>
+    <img class="login-mark" src="/arco-icon.svg" alt="ARCO"><div class="logo">ARCO</div><div class="login-sub">OPERATIONS TRACKER</div>
     <div class="field"><label>Email</label><input id="email" type="email" autocomplete="username"></div>
     <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div>
     <div class="error" id="login-error"></div><button class="btn btn-primary" id="login-btn" style="width:100%">Sign in</button>
   </div>
 </section>
 <main id="app">
-  <header class="topbar"><div class="brand">ARCO</div><div class="top-actions"><button class="btn btn-secondary" id="admin-btn">Admin</button><button class="btn btn-secondary" id="logout-btn">Logout</button></div></header>
+  <header class="topbar"><div class="brand-lockup"><img class="brand-mark" src="/arco-icon.svg" alt=""><div class="brand">ARCO<small>OPS</small></div></div><div class="top-actions"><button class="btn btn-secondary" id="admin-btn">Admin</button><button class="btn btn-secondary" id="logout-btn">Logout</button></div></header>
   <div class="content">
     <div class="eyebrow">Overview</div><h1 class="title">PERFORMANCE</h1><p class="subtitle">Aggregated operating KPIs for the selected period</p>
     <section class="period-card">
@@ -56,6 +65,10 @@ button,input{font:inherit}
       <div class="custom hidden" id="custom-wrap"><input type="date" id="date-from"><input type="date" id="date-to"></div>
       <div class="period-label" id="period-label">Today</div>
       <button class="btn btn-primary run" id="run-btn"><span class="run-dot"></span><span>Run Tracker &amp; Refresh</span></button>
+    </section>
+    <section class="app-tools" aria-label="App and notification setup">
+      <div class="app-tools-copy"><div class="app-tools-title">ARCO Ops on your phone</div><div class="app-tools-note">Install the app and enable audible new-order alerts on this device.</div><div class="app-status" id="app-status">Checking app readiness…</div></div>
+      <div class="app-tools-actions"><button class="btn btn-secondary" id="install-btn" type="button">Install app</button><button class="btn btn-primary" id="notify-btn" type="button">Enable alerts</button></div>
     </section>
 
     <div class="section-title">Orders</div>
@@ -82,7 +95,7 @@ button,input{font:inherit}
     <div class="section-title">Acquisition cost</div>
     <section class="spend-card">
       <div class="card highlight spend-main"><div class="card-label">Meta ad spend</div><div class="card-value" id="spend">—</div><div class="meta-note">Meta USD spend × 255 = DZD</div></div>
-      <div class="card highlight tiktok-card"><div class="card-label">TikTok ad spend</div><div class="card-value" id="tiktok-spend">—</div><div class="card-note" id="tiktok-note">Manual spend · USD converted at 255</div><div class="tiktok-entry"><input id="tiktok-input" type="number" min="0" step="0.01" inputmode="decimal" placeholder="USD"><button id="tiktok-save" type="button">Save</button></div><div class="tiktok-help" id="tiktok-help">Enter spend for this day only</div></div>
+      <div class="card highlight tiktok-card"><div class="card-label">TikTok ad spend</div><div class="card-value" id="tiktok-spend">—</div><div class="card-note" id="tiktok-note">Manual spend · USD converted at 255</div><div class="tiktok-entry"><input id="tiktok-input" type="number" min="0" step="0.01" inputmode="decimal" placeholder="USD" aria-label="TikTok spend in US dollars"><button id="tiktok-save" type="button">Save</button></div><div class="tiktok-help" id="tiktok-help">Enter spend for this day only</div></div>
       <div class="card"><div class="card-label">Total ad spend</div><div class="card-value" id="total-spend">—</div><div class="card-note">Meta + TikTok</div></div>
       <div class="card"><div class="card-label">Cost per delivered order</div><div class="card-value" id="cpo">—</div><div class="card-note">Spend / delivered cohort</div></div>
       <div class="card"><div class="card-label">Cost per lead</div><div class="card-value" id="cpl">—</div><div class="card-note">Spend / non-draft orders</div></div>
@@ -97,7 +110,7 @@ const SB_PROJECT='https://mpkpehuatqsubohltssi.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
 const SB_URL=SB_PROJECT+'/rest/v1';const sb=supabase.createClient(SB_PROJECT,SB_KEY);const USD_TO_DZD=255;
 const CONFIRMED=new Set(['confirmed','shipped','returned','delivered']);const TIKTOK_KEY='arco_tracker_tiktok_spend';
-let session=null,period=localStorage.getItem('arco_tracker_period')||'today',aovFilter=localStorage.getItem('arco_tracker_aov')||'all',timer=null;
+let session=null,period=localStorage.getItem('arco_tracker_period')||'today',aovFilter=localStorage.getItem('arco_tracker_aov')||'all',timer=null,installPrompt=null;
 const $=id=>document.getElementById(id);
 function pad(n){return String(n).padStart(2,'0')}
 function dateKey(d){return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`}
@@ -128,6 +141,33 @@ function toast(message,error=false){const el=$('toast');el.textContent=message;e
 function readTikTok(){try{const value=JSON.parse(localStorage.getItem(TIKTOK_KEY)||'{}');return value&&typeof value==='object'?value:{}}catch{return {}}}
 function tiktokForRange(r){const saved=readTikTok();let total=0;for(let key=r.fromKey;;key=shiftKey(key,1)){total+=Math.max(0,Number(saved[key])||0);if(key===r.toKey)break}return total}
 function syncTikTokEditor(r){const single=r&&r.fromKey===r.toKey;const input=$('tiktok-input'),button=$('tiktok-save'),saved=readTikTok();input.disabled=!single;button.disabled=!single;$('tiktok-help').textContent=single?`Enter USD spend for ${r.fromKey}`:'Select one specific day to edit spend; this range shows the saved daily total';input.value=single&&saved[r.fromKey]!=null?saved[r.fromKey]:''}
+function setAppStatus(message,tone=''){const el=$('app-status');el.textContent=message;el.className=`app-status${tone?` ${tone}`:''}`}
+function isStandalone(){return window.matchMedia?.('(display-mode: standalone)').matches||window.navigator.standalone===true}
+function base64ToBytes(value){const pad='='.repeat((4-value.length%4)%4),raw=atob((value+pad).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(raw,c=>c.charCodeAt(0))}
+async function setupPwa(){
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('/push-sw.js').catch(()=>{});
+  window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;$('install-btn').disabled=false;});
+  const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  $('install-btn').disabled=isStandalone();
+  if(isStandalone())setAppStatus('Installed as an app on this device.','good');
+  else if(ios)setAppStatus('On iPhone: Share → Add to Home Screen, then open ARCO Ops.','warn');
+  else setAppStatus('Install ARCO Ops for faster access and alerts.');
+  if('serviceWorker' in navigator&&'PushManager' in window){try{const registration=await navigator.serviceWorker.ready;if(await registration.pushManager.getSubscription()){$('notify-btn').textContent='Alerts on';setAppStatus('This device is subscribed to ARCO alerts.','good')}}catch{}}
+}
+async function enableAlerts(){
+  const button=$('notify-btn');button.disabled=true;
+  try{
+    if(!('Notification' in window)||!('serviceWorker' in navigator)||!('PushManager' in window))throw new Error('Push alerts are not supported in this browser');
+    if(!isStandalone()&&/iPad|iPhone|iPod/.test(navigator.userAgent))throw new Error('Add ARCO Ops to your Home Screen first');
+    const permission=Notification.permission==='granted'?'granted':await Notification.requestPermission();
+    if(permission!=='granted')throw new Error('Notification permission was not granted');
+    const configResponse=await fetch('/api/push-config');const config=await configResponse.json().catch(()=>({}));if(!configResponse.ok)throw new Error(config.error||'Push alerts are not configured yet');
+    const registration=await navigator.serviceWorker.ready;let subscription=await registration.pushManager.getSubscription();
+    if(!subscription)subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:base64ToBytes(config.publicKey)});
+    const headers=await authHeaders();const response=await fetch('/api/push-subscribe',{method:'POST',headers,body:JSON.stringify({subscription:subscription.toJSON()})});const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.error||'Could not save this device');
+    setAppStatus('Alerts enabled — new orders will use the system sound.','good');button.textContent='Alerts on';toast('Alerts enabled for this device');
+  }catch(error){setAppStatus(error.message||'Could not enable alerts','warn');toast(error.message||'Could not enable alerts',true)}finally{button.disabled=false}
+}
 async function authHeaders(){const {data:{session:s}}=await sb.auth.getSession();session=s;return {apikey:SB_KEY,Authorization:`Bearer ${s?.access_token||SB_KEY}`,'Content-Type':'application/json'} }
 async function fetchRows(resource,query){
   const headers=await authHeaders();let all=[],start=0;const page=1000;
@@ -157,7 +197,7 @@ function render(orders,events,spend,tiktokSpend,r){
   const aovOrders=aovFilter==='confirmed'?real.filter(o=>CONFIRMED.has(o.status)):aovFilter==='delivered'?real.filter(o=>o.status==='delivered'):real;
   const productRevenue=aovOrders.reduce((sum,o)=>sum+Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0)),0);
   set('aov',aovOrders.length?dzd(productRevenue/aovOrders.length):'0 DZD');set('aov-note',`${fmt(aovOrders.length)} orders · shipping excluded`);
-  const totalSpend=spend+tiktokSpend;set('spend',dzd(spend));set('tiktok-spend',dzd(tiktokSpend));set('total-spend',dzd(totalSpend));set('cpo',dzd(cohortDelivered?totalSpend/cohortDelivered:0));set('cpl',dzd(total?totalSpend/total:0));set('cpc',dzd(confirmed?totalSpend/confirmed:0));syncTikTokEditor(r);$('updated').textContent=`Updated ${new Date().toLocaleTimeString('en-DZ',{hour:'2-digit',minute:'2-digit'})} · Ad spend converted at ${USD_TO_DZD} DZD/USD`;
+  const tiktokDzd=tiktokSpend*USD_TO_DZD;const totalSpend=spend+tiktokDzd;set('spend',dzd(spend));set('tiktok-spend',dzd(tiktokDzd));set('tiktok-note',`${fmt(tiktokSpend)} USD × ${USD_TO_DZD} = ${dzd(tiktokDzd)}`);set('total-spend',dzd(totalSpend));set('cpo',dzd(cohortDelivered?totalSpend/cohortDelivered:0));set('cpl',dzd(total?totalSpend/total:0));set('cpc',dzd(confirmed?totalSpend/confirmed:0));syncTikTokEditor(r);$('updated').textContent=`Updated ${new Date().toLocaleTimeString('en-DZ',{hour:'2-digit',minute:'2-digit'})} · Ad spend converted at ${USD_TO_DZD} DZD/USD`;
 }
 async function loadDashboard(){
   const r=getRange();if(!r){toast('Choose a valid date range',true);return}
@@ -167,7 +207,7 @@ async function boot(){const {data:{session:s}}=await sb.auth.getSession();if(s){
 document.querySelectorAll('.period-tab').forEach(btn=>btn.addEventListener('click',()=>{period=btn.dataset.period;localStorage.setItem('arco_tracker_period',period);showPeriod();if(period!=='custom')loadDashboard()}));
 $('aov-filter').value=aovFilter;$('aov-filter').addEventListener('change',e=>{aovFilter=e.target.value;localStorage.setItem('arco_tracker_aov',aovFilter);loadDashboard()});
 $('tiktok-save').addEventListener('click',()=>{const r=getRange();if(!r||r.fromKey!==r.toKey){toast('Select one specific day before saving TikTok spend',true);return}const amount=Number($('tiktok-input').value);if(!Number.isFinite(amount)||amount<0){toast('Enter a valid TikTok spend in USD',true);return}const saved=readTikTok();saved[r.fromKey]=amount;localStorage.setItem(TIKTOK_KEY,JSON.stringify(saved));toast('TikTok spend saved');loadDashboard()});
-$('date-from').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('date-to').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('run-btn').addEventListener('click',runTracker);$('login-btn').addEventListener('click',login);$('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('admin-btn').addEventListener('click',()=>location.href='/admin.html');$('logout-btn').addEventListener('click',async()=>{await sb.auth.signOut();location.reload()});boot();
+$('date-from').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('date-to').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('run-btn').addEventListener('click',runTracker);$('login-btn').addEventListener('click',login);$('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('admin-btn').addEventListener('click',()=>location.href='/admin.html');$('logout-btn').addEventListener('click',async()=>{await sb.auth.signOut();location.reload()});$('notify-btn').addEventListener('click',enableAlerts);$('install-btn').addEventListener('click',async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;$('install-btn').disabled=true;return}setAppStatus(/iPad|iPhone|iPod/.test(navigator.userAgent)?'Use Safari Share → Add to Home Screen.':'This app is already installed or your browser controls installation.','warn')});setupPwa();boot();
 </script>
 </body>
 </html>
