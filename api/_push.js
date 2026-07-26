@@ -36,8 +36,8 @@ export async function sendNewOrderPush(order) {
   const payload = JSON.stringify({
     title: "ARCO — New order",
     body: `#${order.order_id} · ${order.name || "Customer"} · ${order.prix_total || 0} DZD`,
-    icon: "/arco-icon.svg",
-    badge: "/arco-badge.svg",
+    icon: "/arco-icon.png",
+    badge: "/arco-icon.png",
     tag: `arco-order-${order.order_id}`,
     url: `/operator.html?order=${encodeURIComponent(order.order_id)}`,
   });

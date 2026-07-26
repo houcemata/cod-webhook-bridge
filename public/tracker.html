@@ -8,16 +8,16 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ARCO Ops">
 <link rel="manifest" href="/manifest.webmanifest">
-<link rel="apple-touch-icon" href="/arco-icon.svg">
+<link rel="apple-touch-icon" href="/arco-icon.png">
 <title>ARCO — Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;600;700;900&family=Fira+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--yellow:#f5c500;--yellow-soft:#ffd84d;--black:#060608;--panel:#101015;--panel2:#17171e;--line:rgba(255,255,255,.08);--muted:#8888a0;--red:#e11d48;--green:#22c55e;--blue:#60a5fa;--purple:#a78bfa}
+:root{--yellow:#f5c500;--yellow-soft:#ffd84d;--black:#07080b;--panel:#10131a;--panel2:#171b24;--line:rgba(255,255,255,.09);--muted:#8f98aa;--muted2:#667085;--red:#fb7185;--green:#34d399;--blue:#60a5fa;--purple:#a78bfa;--cyan:#67e8f9}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{min-height:100vh;background:radial-gradient(circle at 0 0,rgba(245,197,0,.13),transparent 30%),radial-gradient(circle at 100% 100%,rgba(139,92,246,.1),transparent 35%),var(--black);color:#fff;font-family:Cairo,sans-serif}
+html{background:var(--black);scroll-behavior:smooth}body{min-height:100vh;background:radial-gradient(circle at 8% -8%,rgba(245,197,0,.16),transparent 26%),radial-gradient(circle at 100% 35%,rgba(96,165,250,.09),transparent 28%),linear-gradient(180deg,#090a0f 0%,#07080b 55%,#0b0d12 100%);color:#fff;font-family:'Fira Sans',Cairo,sans-serif;line-height:1.45;overscroll-behavior-y:contain}
 button,input{font:inherit}
 .hidden{display:none!important}
 #login{min-height:100vh;display:grid;place-items:center;padding:24px}
@@ -28,19 +28,19 @@ button,input{font:inherit}
 .field input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:12px;outline:0;background:#ffffff08;color:#fff}
 .field input:focus{border-color:#f5c50088}.error{min-height:20px;color:#fb7185;font-size:12px;margin:8px 0}
 .btn{border:0;border-radius:12px;min-height:44px;padding:12px 16px;cursor:pointer;font-weight:900;transition:transform .18s ease,background .18s ease,opacity .18s ease}.btn:active{transform:scale(.98)}.btn:focus-visible,.period-tab:focus-visible,.aov-filter:focus-visible,.tiktok-entry input:focus-visible{outline:3px solid #f5c50066;outline-offset:2px}.btn-primary{background:var(--yellow);color:#0a0a0a}.btn-secondary{background:#ffffff0a;border:1px solid var(--line);color:#fff}.btn:disabled{opacity:.55;cursor:wait}
-#app{display:none;max-width:760px;margin:0 auto;padding-bottom:calc(34px + env(safe-area-inset-bottom))}.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 16px 13px;background:#060608eF;backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+#app{display:none;max-width:760px;margin:0 auto;padding-bottom:calc(34px + env(safe-area-inset-bottom))}.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 16px 13px;background:rgba(7,8,11,.88);backdrop-filter:blur(22px);border-bottom:1px solid var(--line)}
 .brand-lockup{display:flex;align-items:center;gap:9px}.brand-mark{width:34px;height:34px;filter:drop-shadow(0 0 12px #f5c50055)}.brand{font:26px/1 'Bebas Neue',sans-serif;letter-spacing:3px;color:var(--yellow)}.brand small{display:block;font:700 8px/1 Cairo,sans-serif;letter-spacing:1.5px;color:var(--muted);margin-top:3px}.top-actions{display:flex;gap:7px}.top-actions button{padding:8px 11px;font-size:12px}
-.content{padding:16px}.eyebrow{font:700 11px 'Barlow Condensed',sans-serif;letter-spacing:2px;color:var(--muted);text-transform:uppercase}.title{font:42px/1 'Bebas Neue',sans-serif;letter-spacing:1.5px;margin-top:4px}.subtitle{color:var(--muted);font-size:12px;margin-top:5px}
-.period-card{margin-top:18px;padding:12px;border:1px solid var(--line);border-radius:18px;background:#ffffff04}.period-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.period-tab{padding:10px 5px;border-radius:10px;border:1px solid transparent;background:#ffffff06;color:var(--muted);font-size:11px;font-weight:800;cursor:pointer}.period-tab.active{background:var(--yellow);color:#0a0a0a}.custom{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.custom input{min-width:0;padding:10px;border:1px solid var(--line);border-radius:10px;background:#ffffff08;color:#fff;color-scheme:dark;outline:0;font-size:12px}.period-label{text-align:center;color:var(--muted);font-size:11px;margin-top:9px}
-.app-tools{margin-top:12px;padding:14px;border:1px solid #f5c50044;border-radius:18px;background:linear-gradient(135deg,#f5c50015,#ffffff03);display:flex;align-items:center;justify-content:space-between;gap:12px}.app-tools-copy{min-width:0}.app-tools-title{font-size:13px;font-weight:900;color:#fff}.app-tools-note{font-size:10px;color:var(--muted);line-height:1.45;margin-top:3px}.app-tools-actions{display:flex;gap:7px;flex-shrink:0}.app-tools-actions .btn{padding:9px 11px;font-size:11px}.app-status{font-size:10px;color:var(--muted);margin-top:7px}.app-status.good{color:var(--green)}.app-status.warn{color:#fbbf24}
+.content{padding:20px 16px}.eyebrow{font:700 11px 'Fira Code',monospace;letter-spacing:1.2px;color:var(--yellow);text-transform:uppercase}.title{font:46px/1 'Bebas Neue',sans-serif;letter-spacing:2px;margin-top:5px}.subtitle{color:var(--muted);font-size:13px;margin-top:7px;max-width:420px}.hero-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}.live-pill{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid #34d39944;border-radius:999px;color:#9ae6c2;background:#34d3990d;font:600 10px 'Fira Code',monospace;white-space:nowrap}.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px #34d39922,0 0 14px #34d399}
+.period-card{margin-top:22px;padding:14px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,#171a23cc,#0c0e13dd);box-shadow:0 16px 45px #0003}.period-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.period-tab{min-height:44px;padding:10px 5px;border-radius:12px;border:1px solid transparent;background:#ffffff07;color:var(--muted);font-size:11px;font-weight:800;cursor:pointer}.period-tab.active{background:var(--yellow);color:#0a0a0a;box-shadow:0 8px 18px #f5c5002b}.custom{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.custom input{min-height:44px;min-width:0;padding:10px;border:1px solid var(--line);border-radius:12px;background:#ffffff08;color:#fff;color-scheme:dark;outline:0;font-size:12px}.period-label{text-align:center;color:var(--muted);font:500 11px 'Fira Code',monospace;margin-top:10px}
+.app-tools{margin-top:12px;padding:15px;border:1px solid #f5c5003d;border-radius:20px;background:linear-gradient(135deg,#f5c50016,#ffffff03);display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 12px 32px #0002}.app-tools-copy{min-width:0}.app-tools-title{font-size:14px;font-weight:800;color:#fff}.app-tools-note{font-size:11px;color:var(--muted);line-height:1.45;margin-top:3px}.app-tools-actions{display:flex;gap:8px;flex-shrink:0}.app-tools-actions .btn{padding:9px 12px;font-size:11px}.app-status{font-size:10px;color:var(--muted);margin-top:7px}.app-status.good{color:var(--green)}.app-status.warn{color:#fbbf24}
 .run{width:100%;margin-top:12px;display:flex;justify-content:center;align-items:center;gap:8px}.run-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
-.section-title{font:18px 'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--muted);margin:25px 0 10px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.card{padding:15px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,#ffffff08,#ffffff02);min-width:0}.card.highlight{border-color:#f5c50055;background:linear-gradient(145deg,#f5c50016,#ffffff03)}.card.good{border-color:#22c55e44}.card-label{font-size:11px;color:var(--muted);font-weight:700;line-height:1.35}.card-value{font:34px/1 'Bebas Neue',sans-serif;letter-spacing:1px;margin-top:8px;color:#fff}.card.highlight .card-value{color:var(--yellow)}.card.good .card-value{color:var(--green)}.card-note{font-size:10px;color:#66667b;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.section-title{font:20px 'Bebas Neue',sans-serif;letter-spacing:2.5px;color:#dce2ec;margin:30px 0 11px;display:flex;align-items:center;gap:10px}.section-title::after{content:"";height:1px;flex:1;background:linear-gradient(90deg,var(--line),transparent)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{padding:16px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#151821d9,#0d0f14d9);min-width:0;box-shadow:0 9px 25px #0002}.card.highlight{border-color:#f5c50055;background:linear-gradient(145deg,#f5c5001d,#ffffff03)}.card.good{border-color:#34d39955;background:linear-gradient(145deg,#34d39912,#ffffff03)}.card-label{font:700 11px/1.35 'Fira Sans',Cairo,sans-serif;color:var(--muted);letter-spacing:.1px}.card-value{font:36px/1 'Bebas Neue',sans-serif;letter-spacing:1px;margin-top:9px;color:#fff}.card.highlight .card-value{color:var(--yellow)}.card.good .card-value{color:var(--green)}.card-note{font-size:10px;color:var(--muted2);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{padding:14px;border-radius:15px;background:#ffffff05;border:1px solid var(--line)}.metric-label{font-size:11px;color:var(--muted);line-height:1.35}.metric-value{font:30px/1 'Bebas Neue',sans-serif;color:var(--yellow);margin-top:8px}.metric-note{font-size:10px;color:#66667b;margin-top:4px}
 .aov-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.aov-filter{background:#ffffff0a;color:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 8px;font-size:11px;outline:0}.aov-filter:focus{border-color:#f5c50088}
 .tiktok-card{position:relative}.tiktok-entry{display:flex;gap:7px;margin-top:10px}.tiktok-entry input{min-width:0;flex:1;padding:8px 9px;border:1px solid var(--line);border-radius:9px;background:#ffffff08;color:#fff;outline:0;font-size:12px}.tiktok-entry input:focus{border-color:#f5c50088}.tiktok-entry button{padding:8px 10px;border:0;border-radius:9px;background:var(--yellow);color:#0a0a0a;font-size:11px;font-weight:900;cursor:pointer}.tiktok-entry button:disabled{opacity:.45;cursor:not-allowed}.tiktok-help{font-size:10px;color:#66667b;margin-top:6px;line-height:1.35}
-.status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.status{padding:12px 10px;border:1px solid var(--line);border-radius:13px;background:#ffffff04}.status b{display:block;font:26px/1 'Bebas Neue',sans-serif;margin-bottom:5px}.status span{font-size:10px;color:var(--muted)}.status.pending b{color:#f59e0b}.status.shipped b{color:var(--purple)}.status.shipping b{color:#c4b5fd}.status.cancelled b{color:#fb7185}.status.returned b{color:#fbbf24}.status.notdelivered b{color:#f87171}
+.status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.status{padding:13px 11px;border:1px solid var(--line);border-radius:15px;background:#ffffff05}.status b{display:block;font:28px/1 'Bebas Neue',sans-serif;margin-bottom:6px}.status span{font-size:10px;color:var(--muted)}.status.pending b{color:#fbbf24}.status.shipped b{color:var(--purple)}.status.shipping b{color:#c4b5fd}.status.cancelled b{color:var(--red)}.status.returned b{color:#fbbf24}.status.notdelivered b{color:#f87171}
 .spend-card{display:grid;grid-template-columns:1fr 1fr;gap:10px}.spend-main{grid-column:1/-1}.spend-main .card-value{font-size:44px}.meta-note{font-size:11px;color:var(--muted);margin-top:4px}.stamp{text-align:center;color:#5e5e71;font-size:10px;margin-top:20px}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);padding:11px 17px;border-radius:999px;background:#1b1b24;border:1px solid var(--line);box-shadow:0 10px 35px #0008;color:#fff;font-size:12px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}.toast.show{opacity:1}.toast.error{border-color:#e11d4888;color:#fecdd3}
-@media(min-width:600px){.content{padding:22px}.grid{grid-template-columns:repeat(4,1fr)}.metric-grid{grid-template-columns:repeat(4,1fr)}.status-grid{grid-template-columns:repeat(6,1fr)}.spend-card{grid-template-columns:repeat(3,1fr)}.spend-main{grid-column:auto}.title{font-size:52px}}
+@media(min-width:600px){.content{padding:28px}.grid{grid-template-columns:repeat(4,1fr)}.grid .card:first-child{grid-column:span 2}.metric-grid{grid-template-columns:repeat(4,1fr)}.status-grid{grid-template-columns:repeat(6,1fr)}.spend-card{grid-template-columns:repeat(3,1fr)}.spend-main{grid-column:auto}.title{font-size:56px}}
 @media(max-width:480px){.app-tools{align-items:flex-start;flex-direction:column}.app-tools-actions{width:100%}.app-tools-actions .btn{flex:1}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
 </style>
@@ -48,16 +48,16 @@ button,input{font:inherit}
 <body>
 <section id="login">
   <div class="login-card">
-    <img class="login-mark" src="/arco-icon.svg" alt="ARCO"><div class="logo">ARCO</div><div class="login-sub">OPERATIONS TRACKER</div>
+    <img class="login-mark" src="/arco-icon.png" alt="ARCO"><div class="logo">ARCO</div><div class="login-sub">OPERATIONS TRACKER</div>
     <div class="field"><label>Email</label><input id="email" type="email" autocomplete="username"></div>
     <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div>
     <div class="error" id="login-error"></div><button class="btn btn-primary" id="login-btn" style="width:100%">Sign in</button>
   </div>
 </section>
 <main id="app">
-  <header class="topbar"><div class="brand-lockup"><img class="brand-mark" src="/arco-icon.svg" alt=""><div class="brand">ARCO<small>OPS</small></div></div><div class="top-actions"><button class="btn btn-secondary" id="admin-btn">Admin</button><button class="btn btn-secondary" id="logout-btn">Logout</button></div></header>
+  <header class="topbar"><div class="brand-lockup"><img class="brand-mark" src="/arco-icon.png" alt=""><div class="brand">ARCO<small>OPS</small></div></div><div class="top-actions"><button class="btn btn-secondary" id="admin-btn">Admin</button><button class="btn btn-secondary" id="logout-btn">Logout</button></div></header>
   <div class="content">
-    <div class="eyebrow">Overview</div><h1 class="title">PERFORMANCE</h1><p class="subtitle">Aggregated operating KPIs for the selected period</p>
+    <div class="hero-head"><div><div class="eyebrow">ARCO OPS / LIVE OVERVIEW</div><h1 class="title">PERFORMANCE</h1><p class="subtitle">A focused view of orders, delivery health, and acquisition cost.</p></div><div class="live-pill"><span class="live-dot"></span>LIVE</div></div>
     <section class="period-card">
       <div class="period-tabs">
         <button class="period-tab active" data-period="today">Today</button><button class="period-tab" data-period="yesterday">Yesterday</button><button class="period-tab" data-period="7days">Last 7d</button><button class="period-tab" data-period="custom">Custom</button>
@@ -71,7 +71,7 @@ button,input{font:inherit}
       <div class="app-tools-actions"><button class="btn btn-secondary" id="install-btn" type="button">Install app</button><button class="btn btn-primary" id="notify-btn" type="button">Enable alerts</button></div>
     </section>
 
-    <div class="section-title">Orders</div>
+    <h2 class="section-title">Orders</h2>
     <section class="grid">
       <div class="card highlight"><div class="card-label">Total orders<br>(excluding drafts)</div><div class="card-value" id="total">—</div><div class="card-note">Orders created in period</div></div>
       <div class="card"><div class="card-label">Confirmed orders</div><div class="card-value" id="confirmed">—</div><div class="card-note">Confirmed → shipped → delivered</div></div>
@@ -79,12 +79,12 @@ button,input{font:inherit}
       <div class="card good"><div class="card-label">Delivered during period</div><div class="card-value" id="period-delivered">—</div><div class="card-note">Delivery completed in period</div></div>
       <div class="card highlight"><div class="aov-head"><div class="card-label">Average order value</div><select class="aov-filter" id="aov-filter"><option value="all">All</option><option value="confirmed">Confirmed</option><option value="delivered">Delivered</option></select></div><div class="card-value" id="aov">—</div><div class="card-note" id="aov-note">Product price only · shipping excluded</div></div>
     </section>
-    <div class="section-title">Current status breakdown</div>
+    <h2 class="section-title">Current status breakdown</h2>
     <section class="status-grid">
       <div class="status pending"><b id="pending">—</b><span>Pending</span></div><div class="status shipped"><b id="shipped">—</b><span>Shipped</span></div><div class="status shipping"><b id="shipping">—</b><span>Out for delivery</span></div><div class="status cancelled"><b id="cancelled">—</b><span>Canceled</span></div><div class="status returned"><b id="returned">—</b><span>Returned</span></div><div class="status notdelivered"><b id="not-delivered">—</b><span>Not delivered</span></div>
     </section>
 
-    <div class="section-title">Rates</div>
+    <h2 class="section-title">Rates</h2>
     <section class="metric-grid">
       <div class="metric"><div class="metric-label">Delivery rate</div><div class="metric-value" id="delivery-rate">—</div><div class="metric-note">Delivered / total orders</div></div>
       <div class="metric"><div class="metric-label">Confirmation rate</div><div class="metric-value" id="confirmation-rate">—</div><div class="metric-note">Confirmed flow / total</div></div>
@@ -92,7 +92,7 @@ button,input{font:inherit}
       <div class="metric"><div class="metric-label">Delivered rate settled</div><div class="metric-value" id="settled-rate">—</div><div class="metric-note">Delivered / delivered + returned</div></div>
     </section>
 
-    <div class="section-title">Acquisition cost</div>
+    <h2 class="section-title">Acquisition cost</h2>
     <section class="spend-card">
       <div class="card highlight spend-main"><div class="card-label">Meta ad spend</div><div class="card-value" id="spend">—</div><div class="meta-note">Meta USD spend × 255 = DZD</div></div>
       <div class="card highlight tiktok-card"><div class="card-label">TikTok ad spend</div><div class="card-value" id="tiktok-spend">—</div><div class="card-note" id="tiktok-note">Manual spend · USD converted at 255</div><div class="tiktok-entry"><input id="tiktok-input" type="number" min="0" step="0.01" inputmode="decimal" placeholder="USD" aria-label="TikTok spend in US dollars"><button id="tiktok-save" type="button">Save</button></div><div class="tiktok-help" id="tiktok-help">Enter spend for this day only</div></div>
@@ -144,12 +144,13 @@ function syncTikTokEditor(r){const single=r&&r.fromKey===r.toKey;const input=$('
 function setAppStatus(message,tone=''){const el=$('app-status');el.textContent=message;el.className=`app-status${tone?` ${tone}`:''}`}
 function isStandalone(){return window.matchMedia?.('(display-mode: standalone)').matches||window.navigator.standalone===true}
 function base64ToBytes(value){const pad='='.repeat((4-value.length%4)%4),raw=atob((value+pad).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(raw,c=>c.charCodeAt(0))}
+function hideInstall(){const button=$('install-btn');button.classList.add('hidden');button.setAttribute('aria-hidden','true')}
 async function setupPwa(){
   if('serviceWorker' in navigator)navigator.serviceWorker.register('/push-sw.js').catch(()=>{});
-  window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;$('install-btn').disabled=false;});
+  window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;$('install-btn').disabled=false;$('install-btn').classList.remove('hidden')});
+  window.addEventListener('appinstalled',()=>{installPrompt=null;hideInstall();setAppStatus('Installed as an app on this device.','good')});
   const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
-  $('install-btn').disabled=isStandalone();
-  if(isStandalone())setAppStatus('Installed as an app on this device.','good');
+  if(isStandalone()){hideInstall();setAppStatus('Installed as an app on this device.','good');}
   else if(ios)setAppStatus('On iPhone: Share → Add to Home Screen, then open ARCO Ops.','warn');
   else setAppStatus('Install ARCO Ops for faster access and alerts.');
   if('serviceWorker' in navigator&&'PushManager' in window){try{const registration=await navigator.serviceWorker.ready;if(await registration.pushManager.getSubscription()){$('notify-btn').textContent='Alerts on';setAppStatus('This device is subscribed to ARCO alerts.','good')}}catch{}}
@@ -207,7 +208,7 @@ async function boot(){const {data:{session:s}}=await sb.auth.getSession();if(s){
 document.querySelectorAll('.period-tab').forEach(btn=>btn.addEventListener('click',()=>{period=btn.dataset.period;localStorage.setItem('arco_tracker_period',period);showPeriod();if(period!=='custom')loadDashboard()}));
 $('aov-filter').value=aovFilter;$('aov-filter').addEventListener('change',e=>{aovFilter=e.target.value;localStorage.setItem('arco_tracker_aov',aovFilter);loadDashboard()});
 $('tiktok-save').addEventListener('click',()=>{const r=getRange();if(!r||r.fromKey!==r.toKey){toast('Select one specific day before saving TikTok spend',true);return}const amount=Number($('tiktok-input').value);if(!Number.isFinite(amount)||amount<0){toast('Enter a valid TikTok spend in USD',true);return}const saved=readTikTok();saved[r.fromKey]=amount;localStorage.setItem(TIKTOK_KEY,JSON.stringify(saved));toast('TikTok spend saved');loadDashboard()});
-$('date-from').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('date-to').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('run-btn').addEventListener('click',runTracker);$('login-btn').addEventListener('click',login);$('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('admin-btn').addEventListener('click',()=>location.href='/admin.html');$('logout-btn').addEventListener('click',async()=>{await sb.auth.signOut();location.reload()});$('notify-btn').addEventListener('click',enableAlerts);$('install-btn').addEventListener('click',async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;$('install-btn').disabled=true;return}setAppStatus(/iPad|iPhone|iPod/.test(navigator.userAgent)?'Use Safari Share → Add to Home Screen.':'This app is already installed or your browser controls installation.','warn')});setupPwa();boot();
+ $('date-from').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('date-to').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('run-btn').addEventListener('click',runTracker);$('login-btn').addEventListener('click',login);$('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('admin-btn').addEventListener('click',()=>location.href='/admin.html');$('logout-btn').addEventListener('click',async()=>{await sb.auth.signOut();location.reload()});$('notify-btn').addEventListener('click',enableAlerts);$('install-btn').addEventListener('click',async()=>{if(installPrompt){installPrompt.prompt();const choice=await installPrompt.userChoice;installPrompt=null;if(choice.outcome==='accepted')hideInstall();return}setAppStatus(/iPad|iPhone|iPod/.test(navigator.userAgent)?'Use Safari Share → Add to Home Screen.':'This app is already installed or your browser controls installation.','warn')});setupPwa();boot();
 </script>
 </body>
 </html>
