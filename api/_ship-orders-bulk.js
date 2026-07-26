@@ -6,7 +6,7 @@ import {
   isCommuneValidationError,
   updateSupabase,
   logHistory,
-} from "./ship-order.js";
+} from "./_ship-order.js";
 
 function changedByOf(auth) {
   return auth.role?.name || auth.role?.email || auth.user?.email || auth.role?.role || "operator";

@@ -6,6 +6,10 @@
     }
   ],
   "rewrites": [
+    { "source": "/api/push-config", "destination": "/api/push?action=config" },
+    { "source": "/api/push-subscribe", "destination": "/api/push?action=subscribe" },
+    { "source": "/api/ship-order", "destination": "/api/shipping?mode=single" },
+    { "source": "/api/ship-orders-bulk", "destination": "/api/shipping?mode=bulk" },
     { "source": "/p/zikr-kids", "destination": "/p/product.html?slug=zikr-kids" },
     { "source": "/p/barber-shop", "destination": "/p/barber-shop.html" },
     { "source": "/p/:slug", "destination": "/p/product.html?slug=:slug" },
