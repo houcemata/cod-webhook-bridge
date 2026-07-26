@@ -103,6 +103,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
 .source-tiktok{color:#ff7eb3;background:rgba(255,45,142,.12);border-color:rgba(255,45,142,.28)}
 .source-organic{color:#86efac;background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.24)}
 .source-direct{color:#d1d5db;background:rgba(156,163,175,.1)}
+.source-operator{color:#c4b5fd;background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.28)}
 .source-other,.source-unknown{color:#fbbf24;background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.24)}
 .badge-draft{background:#14161f;color:#c4b5fd;border:1px solid #8b5cf633}
 .badge-pending{background:#1a1200;color:#f59e0b;border:1px solid #f59e0b33}
@@ -514,6 +515,7 @@ body{font-family:'Cairo',sans-serif;background:var(--black);color:var(--white);m
             <option value="tiktok">TikTok</option>
             <option value="organic">Organic</option>
             <option value="direct">Direct</option>
+            <option value="operator">Operator</option>
             <option value="unknown">Unknown</option>
           </select>
           <select class="filter-select" id="order-period" onchange="filterOrders()">
@@ -3615,7 +3617,7 @@ async function deleteCategory(id){
 }
 
 function esc(v){if(v==null)return'';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function sourceBadge(source){const key=String(source||'unknown').toLowerCase();const label={meta:'META',tiktok:'TIKTOK',organic:'ORGANIC',direct:'DIRECT',other:'OTHER',unknown:'UNKNOWN'}[key]||'UNKNOWN';return `<span class="source-badge source-${['meta','tiktok','organic','direct','other'].includes(key)?key:'unknown'}">${label}</span>`;}
+function sourceBadge(source){const key=String(source||'unknown').toLowerCase();const label={meta:'META',tiktok:'TIKTOK',organic:'ORGANIC',direct:'DIRECT',operator:'OPERATOR',other:'OTHER',unknown:'UNKNOWN'}[key]||'UNKNOWN';return `<span class="source-badge source-${['meta','tiktok','organic','direct','operator','other'].includes(key)?key:'unknown'}">${label}</span>`;}
 let _tt;
 function toast(msg,isErr=false){
   const el=document.getElementById('toast');

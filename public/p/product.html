@@ -964,12 +964,15 @@ function updateStickyUpsell(){
 function loadRelated(){
   const col=product?.collection||'';
   const sl=product?.slug||'';
-  const rail=document.getElementById('related-rail');if(!rail)return;
-  fetch(`${SB_URL}/products?select=slug,name,images,variants,price&active=eq.true&featured=eq.true${col?`&collection=eq.${encodeURIComponent(col)}`:''}&limit=12`,{headers:H})
+  const section=document.getElementById('related-section');
+  const rail=document.getElementById('related-rail');
+  if(!section||!rail)return;
+  if(!col){section.style.display='none';return;}
+  fetch(`${SB_URL}/products?select=slug,name,images,variants,price&active=eq.true&collection=eq.${encodeURIComponent(col)}&limit=12`,{headers:H})
     .then(r=>r.json()).then(data=>{
-      if(!Array.isArray(data))return;
+      if(!Array.isArray(data)){section.style.display='none';return;}
       const items=data.filter(p=>p.slug!==sl).slice(0,6);
-      if(!items.length){const s=document.getElementById('related-section');if(s)s.style.display='none';return;}
+      if(!items.length){section.style.display='none';return;}
       rail.innerHTML=items.map(p=>{
         const im=Array.isArray(p.images)?p.images:(p.images?[p.images]:[]);
         const img=im[0]||'';
@@ -977,7 +980,7 @@ function loadRelated(){
         const minP=vars.length?Math.min(...vars.map(v=>Number(v.price||0)).filter(v=>v>0)):Number(p.price||0);
         return`<a class="rcard" href="/p/${encodeURIComponent(p.slug)}"><div class="rcard-img">${img?`<img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy">`:''}</div><div class="rcard-info"><div class="rcard-name">${esc(p.name)}</div><div class="rcard-price">${money(minP)}</div></div></a>`;
       }).join('');
-    }).catch(()=>{const s=document.getElementById('related-section');if(s)s.style.display='none';});
+    }).catch(()=>{section.style.display='none';});
 }
 function updateStickyCartBadge(){const badge=document.getElementById('sticky-cart-badge');if(!badge)return;const count=window.ARCOCart?.count?.()||0;badge.textContent=count;badge.classList.toggle('zero',count===0);}
 function addCurrentToCart(){
