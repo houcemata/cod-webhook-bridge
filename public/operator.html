@@ -1243,7 +1243,7 @@ function updateKPIs(){
   const orders=allOrders.filter(o=>inPeriod(o));
   const total=orders.length;
   const nonDraftOrders=orders.filter(o=>o.status!=='draft');
-  const realOrders=orders.filter(o=>o.status!=='draft'&&o.from_draft!==true);
+  const realOrders=orders.filter(o=>o.from_draft!==true);
   const nonDraftTotal=realOrders.length;
   const delivered=orders.filter(o=>o.status==='delivered').length;
   const confirmed=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
