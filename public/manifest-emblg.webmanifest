@@ -1,0 +1,15 @@
+{
+  "name": "ARCO Emblg",
+  "short_name": "ARCO Emblg",
+  "start_url": "/emblg",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "description": "ARCO packaging queue",
+  "icons": [{
+    "src": "https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/exec-571b7e34-603b-412a-9949-5d24d6250e33.png",
+    "sizes": "1024x1024",
+    "type": "image/png",
+    "purpose": "any maskable"
+  }]
+}

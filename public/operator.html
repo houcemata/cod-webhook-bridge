@@ -97,6 +97,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .bulk-bar{display:none;padding:10px 14px;background:#0a0a0a;border-bottom:1px solid #1a1a1a;align-items:center;gap:10px}
 .bulk-bar.show{display:flex}
 .select-all-btn{background:#111;border:1px solid #333;color:#fff;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.bulk-package-btn{background:#f5c500;border:none;color:#080808;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .2s,opacity .2s}
+.bulk-package-btn:active{transform:scale(.94);opacity:.85}
+.bulk-package-btn:disabled{opacity:.45;cursor:wait}
+.bulk-package-btn svg{width:22px;height:22px}
 .bulk-ship-btn{flex:1;background:#3b82f6;border:none;color:#fff;padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer}
 .bulk-ship-btn:active{opacity:.8}
 .bulk-count{font-size:12px;color:#888}
@@ -730,6 +734,9 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
     <div class="bulk-bar" id="bulk-bar">
       <button class="select-all-btn" onclick="toggleSelectAll()">Select All</button>
       <span class="bulk-count" id="bulk-count">0 selected</span>
+      <button class="bulk-package-btn" onclick="sendToPackaging()" aria-label="Send selected orders to ARCO Emblg" title="Send selected orders to ARCO Emblg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 8-9-5-9 5 9 5-9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/><path d="m7.5 5.25 9 5"/></svg>
+      </button>
       <button class="bulk-ship-btn" onclick="bulkShip()">Bulk Ship</button>
       <button class="bulk-ship-btn" style="background:#16a34a;flex:0 0 auto;padding:10px 14px;" onclick="exportConfirmedXLSX()">⬇ Export Print List</button>
     </div>
@@ -1401,6 +1408,51 @@ function toggleSelectAll(){
   renderOrdersList();
 }
 function updateBulkCount(){document.getElementById('bulk-count').textContent=`${selectedIds.size} selected`;}
+
+// ARCO Emblg packaging snapshots
+async function loadPackagingCatalog(){
+  if(window.__packagingCatalog)return window.__packagingCatalog;
+  const r=await sbFetch('products?select=name,slug,variants,images,price&active=eq.true&order=name.asc');
+  if(!r.ok)throw new Error('Could not load the product catalog');
+  window.__packagingCatalog=await r.json();
+  return window.__packagingCatalog;
+}
+function packagingSize(item){
+  const raw=String(item?.size||item?.variant||item?.label||'');
+  if(/^M$/i.test(raw)||/30\s*[×x*]\s*40/i.test(raw))return 'M';
+  if(/^L$/i.test(raw)||/40\s*[×x*]\s*60/i.test(raw))return 'L';
+  return raw;
+}
+function packagingImage(item,catalog){
+  if(item?.image)return item.image;
+  const slug=item?.product_slug||item?.slug||'';
+  const name=item?.product||'';
+  const product=catalog.find(p=>p.slug===slug||p.name===name);
+  if(!product)return '';
+  const variants=Array.isArray(product.variants)?product.variants:Object.values(product.variants||{});
+  const size=packagingSize(item);
+  const variant=variants.find(v=>packagingSize(v)===size)||variants[0];
+  return variant?.image||(Array.isArray(product.images)?product.images[0]:'')||'';
+}
+function packagingItems(order,catalog){
+  const raw=Array.isArray(order.items)&&order.items.length?order.items:[{product:order.product,product_slug:order.product_slug,variant:order.variable,size:packagingSize({variant:order.variable})}];
+  return raw.map(item=>({...item,size:packagingSize(item),image:packagingImage(item,catalog)}));
+}
+async function sendToPackaging(){
+  const orders=[...selectedIds].map(id=>allOrders.find(o=>o.id===id)).filter(o=>o&&o.status==='confirmed');
+  if(!orders.length){toast('Select confirmed orders first',true);return;}
+  const btn=document.querySelector('.bulk-package-btn');
+  if(btn)btn.disabled=true;
+  toast(`Sending ${orders.length} order${orders.length===1?'':'s'} to ARCO Emblg...`);
+  try{
+    const catalog=await loadPackagingCatalog();
+    const rows=orders.map(o=>({source_order_id:o.id,source_order_key:String(o.order_id||o.id),customer_name:o.name||'Unnamed customer',confirmed_at:o.confirmed_at||o.created_at||new Date().toISOString(),items:packagingItems(o,catalog),created_by:currentUser?.id||null}));
+    const r=await sbFetch('packaging_orders',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(rows)});
+    if(!r.ok){const body=await r.text();throw new Error(body||'Packaging transfer failed');}
+    selectedIds.clear();renderOrdersList();toast(`${orders.length} order${orders.length===1?'':'s'} sent to ARCO Emblg`);
+  }catch(e){toast('Packaging error: '+e.message,true);}
+  finally{if(btn)btn.disabled=false;}
+}
 
 // FIX: Stop desk shipping — properly pass station_code
 async function shipSingle(id){
