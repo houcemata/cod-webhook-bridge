@@ -1,4 +1,4 @@
-const CACHE='arco-emblg-shell-v1';
+const CACHE='arco-emblg-shell-v2';
 const SHELL=['/emblg','/emblg.html','/manifest-emblg.webmanifest'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(self.clients.claim()));
