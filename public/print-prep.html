@@ -39,7 +39,7 @@
   <div id="toast" class="toast hidden" role="status"></div>
   <script>
     const SB_PROJECT='https://mpkpehuatqsubohltssi.supabase.co';
-    const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_Av3Kxki8LAymk';
+    const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
     const sb=supabase.createClient(SB_PROJECT,SB_KEY);const BATCH_KEY='arco_print_prep_batch';let session=null,currentUser=null,catalog=[],snapshot=null,batchId=null,plan=[],decision=null,packagingSent=false,printGenerated=false,toastTimer;
     const $=id=>document.getElementById(id);const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
     function toast(msg,error=false){const el=$('toast');el.textContent=msg;el.className='toast'+(error?' error':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.className='toast hidden',3200)}
