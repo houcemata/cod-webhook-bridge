@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-<link rel="icon" type="image/png" href="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/exec-200b409c-40d2-49a0-a930-b2e9da4d6862.png">
 <title>ARCO CRM</title>
 <script>document.title='ARCO CRM';</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,9 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-x:none}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#000;color:#fff;min-height:100vh}
-#app,#login-screen{width:100%;max-width:100%;min-width:0;overflow-x:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#000;color:#fff;min-height:100vh;overflow-x:hidden}
 
 /* LOGIN */
 #login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:18px;padding:32px}
@@ -99,6 +96,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .select-all-btn{background:#111;border:1px solid #333;color:#fff;padding:8px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
 .bulk-ship-btn{flex:1;background:#3b82f6;border:none;color:#fff;padding:10px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer}
 .bulk-ship-btn:active{opacity:.8}
+.bulk-package-btn{background:#f5c500;border:none;color:#080808;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .2s,opacity .2s}
+.bulk-package-btn:active{transform:scale(.94);opacity:.85}
+.bulk-package-btn:disabled{opacity:.45;cursor:wait}
+.bulk-package-btn svg{width:22px;height:22px}
 .bulk-count{font-size:12px;color:#888}
 .orders-scroll{flex:1;overflow-y:auto;padding:6px 14px 0}
 
@@ -128,7 +129,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .source-tiktok{color:#ff7eb3;background:rgba(255,45,142,.12);border-color:rgba(255,45,142,.28)}
 .source-organic{color:#86efac;background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.24)}
 .source-direct{color:#d1d5db;background:rgba(156,163,175,.1)}
-.source-operator{color:#c4b5fd;background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.28)}
 .source-other,.source-unknown{color:#fbbf24;background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.24)}
 .status-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-top:6px}
 .card-actions{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
@@ -229,21 +229,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ── Searchable product dropdown ── */
 .prod-dropdown-wrap{position:relative;flex:1}
-.prod-picker-control{display:flex;align-items:center;gap:7px}
-.prod-picker-thumb{width:34px;height:34px;flex:0 0 34px;border-radius:7px;overflow:hidden;background:#111;border:1px solid #333;display:grid;place-items:center}
-.prod-picker-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-.prod-picker-thumb:has(img){cursor:zoom-in}
-.prod-search-input{width:100%;min-width:0;flex:1;box-sizing:border-box;background:#1a1a1a;color:#ddd;border:1px solid #333;border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit}
+.prod-search-input{width:100%;box-sizing:border-box;background:#1a1a1a;color:#ddd;border:1px solid #333;border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit}
 .prod-search-input:focus{outline:none;border-color:#F5C500}
 .prod-dropdown-list{display:none;position:absolute;z-index:9999;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid #333;border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;margin-top:2px}
 .prod-dropdown-list.open{display:block}
-.prod-dropdown-item{display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:13px;cursor:pointer;color:#ddd;border-bottom:1px solid #111}
-.prod-dropdown-item img{width:34px;height:34px;flex:0 0 34px;object-fit:cover;border-radius:6px;background:#111}
-.prod-dropdown-item span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prod-dropdown-item{padding:7px 10px;font-size:13px;cursor:pointer;color:#ddd;border-bottom:1px solid #111}
 .prod-dropdown-item:hover,.prod-dropdown-item.active{background:#F5C500;color:#000}
-.product-image-preview{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.78);display:grid;place-items:center;padding:24px;cursor:zoom-out}
-.product-image-preview[hidden]{display:none}
-.product-image-preview img{max-width:min(88vw,520px);max-height:78vh;object-fit:contain;border-radius:14px;box-shadow:0 18px 60px rgba(0,0,0,.65);cursor:default}
 </style>
 <style>
 :root{
@@ -687,29 +678,27 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
           <option value="tiktok">TikTok</option>
           <option value="organic">Organic</option>
           <option value="direct">Direct</option>
-          <option value="operator">Operator</option>
           <option value="unknown">Unknown</option>
         </select>
         <select class="filter-select" id="filter-period" onchange="onPeriodChange()">
-          <option value="all">All Time</option>
+          <option value="all" selected>All Time</option>
           <option value="today">Today</option>
           <option value="yesterday">Yesterday</option>
-          <option value="7days" selected>Last 7 Days</option>
+          <option value="7days">Last 7 Days</option>
           <option value="30days">Last 30 Days</option>
           <option value="month">This Month</option>
           <option value="custom">Custom Date</option>
         </select>
       </div>
       <div class="custom-date-row" id="custom-date-row">
-        <input class="date-input" type="date" id="date-from" onchange="onCustomDateChange()"/>
-        <input class="date-input" type="date" id="date-to" onchange="onCustomDateChange()"/>
+        <input class="date-input" type="date" id="date-from" onchange="onFilterChange()"/>
+        <input class="date-input" type="date" id="date-to" onchange="onFilterChange()"/>
       </div>
     </div>
 
     <!-- Orders toolbar -->
     <div class="orders-toolbar">
       <div class="toolbar-left">
-        <button class="btn-detail" onclick="openCreateOrder()">+ New Order</button>
         <select class="sort-btn" id="sort-field" onchange="applyFilters()" style="padding:7px 10px;font-size:12px;">
           <option value="created_at">Order date</option>
           <option value="confirmed_at">Confirmed date</option>
@@ -730,6 +719,9 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
     <div class="bulk-bar" id="bulk-bar">
       <button class="select-all-btn" onclick="toggleSelectAll()">Select All</button>
       <span class="bulk-count" id="bulk-count">0 selected</span>
+      <button class="bulk-package-btn" onclick="sendToPackaging()" aria-label="Send selected orders to ARCO Emblg" title="Send selected orders to ARCO Emblg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/><path d="m7.5 5.25 9 5"/></svg>
+      </button>
       <button class="bulk-ship-btn" onclick="bulkShip()">Bulk Ship</button>
       <button class="bulk-ship-btn" style="background:#16a34a;flex:0 0 auto;padding:10px 14px;" onclick="exportConfirmedXLSX()">⬇ Export Print List</button>
     </div>
@@ -820,24 +812,6 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
   </div>
 </div>
 
-<!-- Create Order Modal -->
-<div class="modal-overlay" id="create-order-modal">
-  <div class="edit-modal">
-    <div class="modal-title">Create Order <button class="modal-close" onclick="closeModal('create-order-modal')">×</button></div>
-    <div class="edit-field"><div class="edit-label">Customer Name</div><input class="edit-input" id="create-name" autocomplete="name"/></div>
-    <div class="edit-field"><div class="edit-label">Phone</div><input class="edit-input" id="create-phone" type="tel" inputmode="tel" placeholder="05XXXXXXXX"/></div>
-    <div class="edit-field"><div class="edit-label">Product</div><select class="edit-select" id="create-product" onchange="onCreateProductChange()"><option value="">Loading products…</option></select></div>
-    <div class="edit-field"><div class="edit-label">Variant</div><select class="edit-select" id="create-variant"><option value="">Standard</option></select></div>
-    <div class="edit-field"><div class="edit-label">Delivery Type</div><select class="edit-select" id="create-type" onchange="onCreateTypeChange()"><option value="home">Home Delivery</option><option value="pickup">Stop Desk</option></select></div>
-    <div class="edit-field"><div class="edit-label">Wilaya</div><select class="edit-select" id="create-wilaya" onchange="onCreateWilayaChange()"><option value="">Select Wilaya</option></select></div>
-    <div class="edit-field" id="create-commune-wrap"><div class="edit-label">Commune</div><select class="edit-select" id="create-commune"><option value="">Select Commune</option></select></div>
-    <div class="edit-field" id="create-desk-wrap" style="display:none"><div class="edit-label">Stop Desk</div><select class="edit-select" id="create-desk"><option value="">Select Stop Desk</option></select></div>
-    <div class="edit-field"><div class="edit-label">Note</div><textarea class="note-field" id="create-notes" placeholder="Optional note…"></textarea></div>
-    <div class="total-display" id="create-total-display">Total: Select product and wilaya</div>
-    <button class="edit-save-btn" id="create-order-submit" onclick="submitCreateOrder()">Create Order</button>
-  </div>
-</div>
-
 <div id="toast"></div>
 
 <script>
@@ -875,11 +849,7 @@ const SB_H = {
 };
 
 const OPERATOR_TAB_KEY='arco_operator_tab';
-const OPERATOR_FILTER_KEY='arco_operator_filter_period';
-const OPERATOR_DATE_FROM_KEY='arco_operator_date_from';
-const OPERATOR_DATE_TO_KEY='arco_operator_date_to';
 let allOrders=[], filteredOrders=[], currentTab=localStorage.getItem(OPERATOR_TAB_KEY)||'all', currentOrder=null;
-let orderReloadTimer=null;
 let selectedIds=new Set(), currentUser=null, currentRole=null;
 let noestDesks=null;
 
@@ -939,17 +909,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
 });
 
 // ── INIT ──
-function restoreOrderFilters(){
-  const period=localStorage.getItem(OPERATOR_FILTER_KEY)||'7days';
-  const periodSelect=document.getElementById('filter-period');
-  if(periodSelect&&[...periodSelect.options].some(o=>o.value===period))periodSelect.value=period;
-  const from=document.getElementById('date-from');
-  const to=document.getElementById('date-to');
-  if(from)from.value=localStorage.getItem(OPERATOR_DATE_FROM_KEY)||'';
-  if(to)to.value=localStorage.getItem(OPERATOR_DATE_TO_KEY)||'';
-  document.getElementById('custom-date-row').classList.toggle('show',period==='custom');
-}
-async function init(){ buildTabs(); syncTabChrome(); restoreOrderFilters(); await loadOrders(); }
+async function init(){ buildTabs(); syncTabChrome(); await loadOrders(); }
 async function refreshAll(){ await loadOrders(); toast('Refreshed'); }
 
 // ── SUPABASE ──
@@ -964,17 +924,13 @@ async function sbFetch(path,opts={}){
   return fetch(`${SB_URL}/${path}`, { ...opts, headers });
 }
 async function loadOrders(){
-  // Keep the first load small by applying the selected date window in Supabase.
-  // Older history is only requested when the operator explicitly selects it.
+  // Supabase/PostgREST caps unbounded requests at 1000 rows by default. With 1000+ total orders,
+  // paginate through in batches so nothing (especially older orders) gets silently dropped.
   const pageSize = 1000;
   let all = [];
   let from = 0;
-  const params=new URLSearchParams({select:'id,order_id,name,phone,wilaya,commune,type_livraison,station_code,product,variable,items,prix_total,shipping_cost,status,from_draft,notes,call_count,created_at,confirmed_at,tracking_number,shipping_agency,attribution_source',order:'created_at.desc',limit:String(pageSize)});
-  const range=getOrderDateRange();
-  if(range?.from)params.append('created_at',`gte.${range.from}`);
-  if(range?.to)params.append('created_at',`lt.${range.to}`);
   while(true){
-    const r = await sbFetch(`orders?${params.toString()}`, {
+    const r = await sbFetch(`orders?select=*&order=created_at.desc`, {
       headers: { Range: `${from}-${from + pageSize - 1}` }
     });
     const chunk = await r.json();
@@ -991,53 +947,10 @@ async function loadOrders(){
 }
 
 // ── PERIOD ──
-function algeriaMidnightUtc(date){
-  const [year,month,day]=date.split('-').map(Number);
-  return new Date(Date.UTC(year,month-1,day)-60*60*1000);
-}
-function getOrderDateRange(){
-  const period=document.getElementById('filter-period')?.value||'7days';
-  const now=new Date();
-  const algeriaNow=new Date(now.getTime()+60*60*1000);
-  const year=algeriaNow.getUTCFullYear();
-  const month=algeriaNow.getUTCMonth();
-  const day=algeriaNow.getUTCDate();
-  let from=null,to=null;
-  if(period==='today'){
-    from=new Date(Date.UTC(year,month,day)-60*60*1000);
-    to=new Date(from.getTime()+86400000);
-  }else if(period==='yesterday'){
-    to=new Date(Date.UTC(year,month,day)-60*60*1000);
-    from=new Date(to.getTime()-86400000);
-  }else if(period==='7days'){
-    from=new Date(now.getTime()-7*86400000);
-  }else if(period==='30days'){
-    from=new Date(now.getTime()-30*86400000);
-  }else if(period==='month'){
-    from=new Date(Date.UTC(year,month,1)-60*60*1000);
-    to=new Date(Date.UTC(year,month+1,1)-60*60*1000);
-  }else if(period==='custom'){
-    const start=document.getElementById('date-from')?.value;
-    const end=document.getElementById('date-to')?.value;
-    if(start)from=algeriaMidnightUtc(start);
-    if(end)to=new Date(algeriaMidnightUtc(end).getTime()+86400000);
-  }
-  return {from:from?.toISOString(),to:to?.toISOString()};
-}
 function onPeriodChange(){
   const v=document.getElementById('filter-period').value;
-  localStorage.setItem(OPERATOR_FILTER_KEY,v);
   document.getElementById('custom-date-row').classList.toggle('show',v==='custom');
-  if(v==='custom'&&!document.getElementById('date-from').value&&!document.getElementById('date-to').value){
-    allOrders=[];filteredOrders=[];applyFilters();return;
-  }
-  loadOrders();
-}
-function onCustomDateChange(){
-  localStorage.setItem(OPERATOR_DATE_FROM_KEY,document.getElementById('date-from').value||'');
-  localStorage.setItem(OPERATOR_DATE_TO_KEY,document.getElementById('date-to').value||'');
-  clearTimeout(orderReloadTimer);
-  orderReloadTimer=setTimeout(()=>loadOrders(),150);
+  onFilterChange();
 }
 
 // FIX: timezone-safe date comparison using Algeria UTC+1
@@ -1245,23 +1158,19 @@ function updateDailyTarget(){
 function updateKPIs(){
   const orders=allOrders.filter(o=>inPeriod(o));
   const total=orders.length;
-  const nonDraftOrders=orders.filter(o=>o.from_draft!==true);
-  const realOrders=orders.filter(o=>o.from_draft!==true);
-  const nonDraftTotal=realOrders.length;
   const delivered=orders.filter(o=>o.status==='delivered').length;
   const confirmed=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
-  const nonDraft=nonDraftOrders.length;
+  const nonDraft=orders.filter(o=>o.status!=='draft').length;
   const confirmedFunnel=orders.filter(o=>CONFIRMATION_FLOW_STATUSES.has(o.status)).length;
   const shippedFunnel=orders.filter(o=>['shipped','shipping','delivered','returned','not_delivered'].includes(o.status)).length;
   const confRateAll=total?(confirmedFunnel/total*100).toFixed(1):'0.0';
   const confRateNonDraft=nonDraft?(confirmedFunnel/nonDraft*100).toFixed(1):'0.0';
   const delRateConfirmed=shippedFunnel?(delivered/shippedFunnel*100).toFixed(1):'0.0';
   const delRateAll=nonDraft?(delivered/nonDraft*100).toFixed(1):'0.0';
-  let html=`<div class="kpi-card total"><div class="kpi-label"><span class="dot"></span>Total Orders</div><div class="kpi-value">${nonDraftTotal}</div></div>`;
+  let html=`<div class="kpi-card total"><div class="kpi-label"><span class="dot"></span>Total Orders</div><div class="kpi-value">${total}</div></div>`;
   STATUSES.forEach(s=>{
     html+=`<div class="kpi-card"><div class="kpi-label"><span class="dot" style="background:${s.c}"></span>${s.l}</div><div class="kpi-value">${orders.filter(o=>o.status===s.k).length}</div></div>`;
   });
-  html+=`<div class="kpi-card"><div class="kpi-label"><span class="dot"></span>Total</div><div class="kpi-value">${total}</div><div class="kpi-sub">Including drafts</div></div>`;
   html+=`<div class="kpi-card rate"><div class="kpi-label"><span class="dot"></span>Confirmation Rate</div><div class="kpi-value">${confRateAll}%</div><div class="kpi-sub">Confirmed / all leads</div></div>
          <div class="kpi-card rate"><div class="kpi-label"><span class="dot"></span>Confirmation Rate</div><div class="kpi-value">${confRateNonDraft}%</div><div class="kpi-sub">Confirmed / non-draft orders</div></div>
          <div class="kpi-card rate"><div class="kpi-label"><span class="dot"></span>Delivery Rate</div><div class="kpi-value">${delRateConfirmed}%</div><div class="kpi-sub">Delivered / confirmed orders</div></div>
@@ -1401,6 +1310,51 @@ function toggleSelectAll(){
   renderOrdersList();
 }
 function updateBulkCount(){document.getElementById('bulk-count').textContent=`${selectedIds.size} selected`;}
+
+// ── ARCO EMBLG PACKAGING SNAPSHOT ─────────────────────────────────────────
+async function loadPackagingCatalog(){
+  if(window.__packagingCatalog)return window.__packagingCatalog;
+  const r=await sbFetch('products?select=name,slug,variants,images,price&active=eq.true&order=name.asc');
+  if(!r.ok)throw new Error('Could not load the product catalog');
+  window.__packagingCatalog=await r.json();
+  return window.__packagingCatalog;
+}
+function packagingSize(item){
+  const raw=String(item?.size||item?.variant||item?.label||'');
+  if(/^M$/i.test(raw)||/30\s*[×x*]\s*40/i.test(raw))return 'M';
+  if(/^L$/i.test(raw)||/40\s*[×x*]\s*60/i.test(raw))return 'L';
+  return raw;
+}
+function packagingImage(item,catalog){
+  if(item?.image)return item.image;
+  const slug=item?.product_slug||item?.slug||'';
+  const name=item?.product||'';
+  const product=catalog.find(p=>p.slug===slug||p.name===name);
+  if(!product)return '';
+  const variants=Array.isArray(product.variants)?product.variants:Object.values(product.variants||{});
+  const size=packagingSize(item);
+  const variant=variants.find(v=>packagingSize(v)===size)||variants[0];
+  return variant?.image||(Array.isArray(product.images)?product.images[0]:'')||'';
+}
+function packagingItems(order,catalog){
+  const raw=Array.isArray(order.items)&&order.items.length?order.items:[{product:order.product,product_slug:order.product_slug,variant:order.variable,size:packagingSize({variant:order.variable})}];
+  return raw.map(item=>({...item,size:packagingSize(item),image:packagingImage(item,catalog)}));
+}
+async function sendToPackaging(){
+  const orders=[...selectedIds].map(id=>allOrders.find(o=>o.id===id)).filter(o=>o&&o.status==='confirmed');
+  if(!orders.length){toast('Select confirmed orders first',true);return;}
+  const btn=document.querySelector('.bulk-package-btn');
+  if(btn)btn.disabled=true;
+  toast(`Sending ${orders.length} order${orders.length===1?'':'s'} to ARCO Emblg...`);
+  try{
+    const catalog=await loadPackagingCatalog();
+    const rows=orders.map(o=>({source_order_id:o.id,source_order_key:String(o.order_id||o.id),customer_name:o.name||'Unnamed customer',confirmed_at:o.confirmed_at||o.created_at||new Date().toISOString(),items:packagingItems(o,catalog),created_by:currentUser?.id||null}));
+    const r=await sbFetch('packaging_orders',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(rows)});
+    if(!r.ok){const body=await r.text();throw new Error(body||'Packaging transfer failed');}
+    selectedIds.clear();renderOrdersList();toast(`${orders.length} order${orders.length===1?'':'s'} sent to ARCO Emblg`);
+  }catch(e){toast('Packaging error: '+e.message,true);}
+  finally{if(btn)btn.disabled=false;}
+}
 
 // FIX: Stop desk shipping — properly pass station_code
 async function shipSingle(id){
@@ -1727,122 +1681,6 @@ async function openHistory(){
   document.getElementById('history-modal').classList.add('open');
 }
 
-// ── CREATE ORDER ──
-function createWilayaParts(){
-  const value=document.getElementById('create-wilaya')?.value||'';
-  const match=value.match(/^(\d+)\s*-\s*(.*)$/);
-  return {id:match?Number(match[1]):0,name:match?match[2].trim():value};
-}
-function populateCreateWilayas(){
-  const sel=document.getElementById('create-wilaya');
-  if(!sel)return;
-  sel.innerHTML='<option value="">Select Wilaya</option>'+WILAYA_NAMES.map(w=>`<option value="${esc(w)}">${esc(w)}</option>`).join('');
-}
-function populateCreateCommunes(){
-  const sel=document.getElementById('create-commune');
-  const key=document.getElementById('create-wilaya')?.value||'';
-  const names=WILAYA_DATA[key]||[];
-  if(sel)sel.innerHTML='<option value="">Select Commune</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
-}
-async function populateCreateDesks(){
-  const sel=document.getElementById('create-desk');
-  if(!sel)return;
-  if(!noestDesks){try{const r=await fetch('/api/noest-desks');if(r.ok)noestDesks=await r.json();}catch{}}
-  const {id}=createWilayaParts();
-  const entries=Object.entries(noestDesks||{}).filter(([code])=>id&&new RegExp('^'+id+'[A-Z]').test(code));
-  sel.innerHTML='<option value="">Select Stop Desk</option>'+entries.map(([code,d])=>`<option value="${esc(code)}">${esc(d.name||code)}</option>`).join('');
-}
-function createSelectedProduct(){
-  const slug=document.getElementById('create-product')?.value||'';
-  return (window.__operatorProductList||[]).find(p=>p.slug===slug)||null;
-}
-function createProductVariants(product){
-  const raw=product?.variants;
-  if(Array.isArray(raw))return raw;
-  if(raw&&typeof raw==='object')return Object.entries(raw).map(([name,value])=>typeof value==='object'?{name,...value}:{name,price:value});
-  return [{name:'Standard',label:'Standard',price:Number(product?.price||0)}];
-}
-function onCreateProductChange(){
-  const product=createSelectedProduct();
-  const sel=document.getElementById('create-variant');
-  const variants=createProductVariants(product);
-  if(sel)sel.innerHTML=variants.map(v=>{const label=v.label||v.name||'Standard';return `<option value="${esc(label)}">${esc(label)} — ${Number(v.price||product?.price||0).toLocaleString()} DZD</option>`;}).join('');
-  updateCreateTotal();
-}
-function onCreateTypeChange(){
-  const pickup=document.getElementById('create-type')?.value==='pickup';
-  document.getElementById('create-commune-wrap').style.display=pickup?'none':'block';
-  document.getElementById('create-desk-wrap').style.display=pickup?'block':'none';
-  if(pickup)populateCreateDesks();
-  updateCreateTotal();
-}
-async function onCreateWilayaChange(){
-  populateCreateCommunes();
-  const {id}=createWilayaParts();
-  window.__createShipping=null;
-  if(id){
-    try{const r=await sbFetch(`shipping_rates?wilaya_id=eq.${id}&select=home_delivery,stop_desk&limit=1`);const rows=await r.json();window.__createShipping=rows[0]||null;}catch{}
-  }
-  if(document.getElementById('create-type')?.value==='pickup')await populateCreateDesks();
-  updateCreateTotal();
-}
-function createSelectedPrice(){
-  const product=createSelectedProduct();
-  const variant=createProductVariants(product).find(v=>(v.label||v.name||'Standard')===document.getElementById('create-variant')?.value);
-  return Number(variant?.price||product?.price||0);
-}
-function updateCreateTotal(){
-  const el=document.getElementById('create-total-display');
-  if(!el)return;
-  const price=createSelectedPrice();
-  const shipping=window.__createShipping;
-  const type=document.getElementById('create-type')?.value||'home';
-  const ship=Number(shipping?.[type==='pickup'?'stop_desk':'home_delivery']||0);
-  el.textContent=price&&ship?`Total: ${(price+ship).toLocaleString()} DZD`:'Total: Select product and wilaya';
-}
-async function loadCreateProducts(){
-  if(!window.__operatorProductList){
-    try{const r=await sbFetch('products?select=name,slug,price,variants,type&active=eq.true&order=name.asc&limit=500');const rows=await r.json();window.__operatorProductList=r.ok&&Array.isArray(rows)?rows:[];}catch{window.__operatorProductList=[];}
-  }
-  const sel=document.getElementById('create-product');
-  if(sel){sel.innerHTML='<option value="">Select Product</option>'+(window.__operatorProductList||[]).map(p=>`<option value="${esc(p.slug)}">${esc(p.name)}</option>`).join('');}
-}
-async function openCreateOrder(){
-  document.getElementById('create-name').value='';
-  document.getElementById('create-phone').value='';
-  document.getElementById('create-notes').value='';
-  document.getElementById('create-type').value='home';
-  document.getElementById('create-commune-wrap').style.display='block';
-  document.getElementById('create-desk-wrap').style.display='none';
-  populateCreateWilayas();
-  document.getElementById('create-variant').innerHTML='<option value="">Select variant</option>';
-  window.__createShipping=null;
-  document.getElementById('create-total-display').textContent='Total: Select product and wilaya';
-  document.getElementById('create-order-modal').classList.add('open');
-  await loadCreateProducts();
-}
-async function submitCreateOrder(){
-  const btn=document.getElementById('create-order-submit');
-  const product=createSelectedProduct();
-  const {id,wilayaName}=(()=>{const p=createWilayaParts();return {...p,wilayaName:p.name};})();
-  const type=document.getElementById('create-type').value;
-  const name=document.getElementById('create-name').value.trim();
-  const phone=document.getElementById('create-phone').value.replace(/\s/g,'');
-  const commune=document.getElementById('create-commune').value;
-  const desk=document.getElementById('create-desk').value;
-  if(!name||!/^0[567]\d{8}$/.test(phone)||!product||!id||(type==='home'&&!commune)||(type==='pickup'&&!desk)){toast('Complete all order fields first',true);return;}
-  btn.disabled=true;btn.textContent='Creating…';
-  try{
-    const {data:{session}}=await sb.auth.getSession();
-    if(!session?.access_token)throw new Error('Your session expired. Please sign in again.');
-    const r=await fetch('/api/operator-create-order',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({name,phone,wilaya:wilayaName,wilaya_id:id,commune:type==='home'?commune:'',delivery_type:type,station_code:type==='pickup'?desk:null,product_slug:product.slug,variant_label:document.getElementById('create-variant').value,notes:document.getElementById('create-notes').value.trim()})});
-    const result=await r.json().catch(()=>({}));
-    if(!r.ok||!result.ok)throw new Error(result.error||'Failed to create order');
-    closeModal('create-order-modal');await loadOrders();toast(`Order #${result.order_id} created`);
-  }catch(error){toast(error.message||'Failed to create order',true);}
-  finally{btn.disabled=false;btn.textContent='Create Order';}
-}
-
 // ── EDIT MODAL ──
 async function openEdit(){
   const o=currentOrder;
@@ -1864,7 +1702,7 @@ async function openEdit(){
     // Fetch product list for dropdowns (cached)
     if(!window.__productList){
       try{
-        const r=await sbFetch('products?select=name,slug,images&active=eq.true&order=name.asc');
+        const r=await sbFetch('products?select=name,slug&active=eq.true&order=name.asc');
         if(r.ok) window.__productList=await r.json();
       }catch{}
       if(!window.__productList) window.__productList=[];
@@ -1917,15 +1755,9 @@ async function openEdit(){
       // Init a searchable picker for each row
       editItems.forEach((it,i)=>{
         const currentName=it.product||it.product_slug||it.slug||'';
-        const matched=window.__productList.find(p=>p.name===currentName||p.slug===(it.product_slug||it.slug));
         const pickerId=`prod-picker-cart-${i}`;
-        makeProductPicker(pickerId, matched?.name||currentName, (name,product)=>{
-          const item=document.getElementById('edit-modal').__editItems[i];
-          item.product=name;
-          if(product?.slug)item.product_slug=product.slug;
-          const image=productImage(product);
-          if(image)item.image=image;
-          else delete item.image;
+        makeProductPicker(pickerId, currentName, (name)=>{
+          document.getElementById('edit-modal').__editItems[i].product=name;
         });
       });
     }
@@ -1940,7 +1772,7 @@ async function openEdit(){
     // Fetch product list if not cached yet
     if(!window.__productList){
       try{
-        const r=await sbFetch('products?select=name,slug,images&active=eq.true&order=name.asc');
+        const r=await sbFetch('products?select=name,slug&active=eq.true&order=name.asc');
         if(r.ok) window.__productList=await r.json();
       }catch{}
       if(!window.__productList) window.__productList=[];
@@ -1982,14 +1814,8 @@ async function openEdit(){
       renderNonCartRows();
       const items=document.getElementById('edit-modal').__editItems;
       items.forEach((it,i)=>{
-        const matched=window.__productList.find(p=>p.name===it.product||p.slug===(it.product_slug||it.slug));
-        makeProductPicker(`prod-picker-nc-${i}`,matched?.name||it.product,(name,product)=>{
-          const item=document.getElementById('edit-modal').__editItems[i];
-          item.product=name;
-          if(product?.slug)item.product_slug=product.slug;
-          const image=productImage(product);
-          if(image)item.image=image;
-          else delete item.image;
+        makeProductPicker(`prod-picker-nc-${i}`,it.product,(name)=>{
+          document.getElementById('edit-modal').__editItems[i].product=name;
         });
       });
     }
@@ -2249,7 +2075,7 @@ function statusLabel(k){return STATUSES.find(s=>s.k===k)?.l||k;}
 function statusColor(k){return STATUSES.find(s=>s.k===k)?.c||'#ff2d8e';}
 function waIcon(){return `<svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;}
 function esc(v){if(v==null)return '';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function sourceBadge(source){const key=String(source||'unknown').toLowerCase();const label={meta:'META',tiktok:'TIKTOK',organic:'ORGANIC',direct:'DIRECT',operator:'OPERATOR',other:'OTHER',unknown:'UNKNOWN'}[key]||'UNKNOWN';return `<span class="source-badge source-${['meta','tiktok','organic','direct','operator','other'].includes(key)?key:'unknown'}">${label}</span>`;}
+function sourceBadge(source){const key=String(source||'unknown').toLowerCase();const label={meta:'META',tiktok:'TIKTOK',organic:'ORGANIC',direct:'DIRECT',other:'OTHER',unknown:'UNKNOWN'}[key]||'UNKNOWN';return `<span class="source-badge source-${['meta','tiktok','organic','direct','other'].includes(key)?key:'unknown'}">${label}</span>`;}
 function sizeLabel(it){
   if(it&&it.size&&/^(M|L)$/i.test(it.size))return it.size.toUpperCase();
   const norm=String((it&&(it.size||it.variant))||'').toLowerCase().replace(/سم|cm/g,'').replace(/[×*]/g,'x').replace(/\s+/g,'');
@@ -2310,91 +2136,42 @@ function doExportXLSX(rows){
 }
 
 // ── Searchable product picker ──────────────────────────────────────────────
-function productImage(product){
-  const raw=product?.images;
-  const images=Array.isArray(raw)?raw:(raw?[raw]:[]);
-  const first=images[0];
-  return typeof first==='string'?first:(first?.url||first?.src||'');
-}
-function openProductImagePreview(src,alt){
-  let overlay=document.getElementById('product-image-preview');
-  if(!overlay){
-    overlay=document.createElement('div');
-    overlay.id='product-image-preview';
-    overlay.className='product-image-preview';
-    overlay.hidden=true;
-    overlay.addEventListener('click',()=>{overlay.hidden=true;});
-    const img=document.createElement('img');
-    img.addEventListener('click',event=>event.stopPropagation());
-    overlay.appendChild(img);
-    document.body.appendChild(overlay);
-  }
-  const img=overlay.querySelector('img');
-  img.src=src;img.alt=alt||'';
-  overlay.hidden=false;
-}
 function makeProductPicker(containerId, initialValue, onChange){
   const wrap = document.getElementById(containerId);
   if(!wrap) return;
   const pl = (window.__productList||[]);
-  const names = pl.map(p=>p.name).filter(Boolean);
+  const names = pl.map(p=>p.name);
 
   let selected = initialValue || (names[0]||'');
 
   wrap.innerHTML =
-    '<div class="prod-picker-control"><div class="prod-picker-thumb"></div><input type="text" class="prod-search-input" autocomplete="off" placeholder="Search product…"/></div>' +
+    '<input type="text" class="prod-search-input" autocomplete="off" placeholder="Search product…"/>' +
     '<div class="prod-dropdown-list"></div>';
 
   const input = wrap.querySelector('input');
-  const thumb = wrap.querySelector('.prod-picker-thumb');
   const list  = wrap.querySelector('.prod-dropdown-list');
-
-  function findProduct(name){return pl.find(p=>p.name===name)||null;}
-  function updateThumb(product){
-    thumb.innerHTML='';
-    thumb.onclick=null;
-    const src=productImage(product);
-    if(!src)return;
-    const img=document.createElement('img');
-    img.src=src;img.alt='';img.loading='lazy';
-    img.onerror=()=>{thumb.innerHTML='';};
-    thumb.appendChild(img);
-    thumb.onclick=event=>{event.stopPropagation();openProductImagePreview(src,product?.name||'');};
-  }
 
   function renderList(filter){
     const q = (filter||'').toLowerCase();
-    const filtered = q ? pl.filter(p=>String(p.name||'').toLowerCase().includes(q)) : pl;
+    const filtered = q ? names.filter(n=>n.toLowerCase().includes(q)) : names;
     list.innerHTML = '';
-    filtered.forEach(function(product){
-      const n=product.name;
+    filtered.forEach(function(n){
       const item = document.createElement('div');
       item.className = 'prod-dropdown-item' + (n===selected?' active':'');
-      const src=productImage(product);
-      if(src){
-        const img=document.createElement('img');
-        img.src=src;img.alt='';img.loading='lazy';
-        item.appendChild(img);
-      }
-      const label=document.createElement('span');
-      label.textContent=n;
-      item.appendChild(label);
+      item.textContent = n;
       item.addEventListener('mousedown', function(e){ e.preventDefault(); });
       item.addEventListener('click', function(){
         selected = n;
         input.value = n;
-        updateThumb(product);
         list.classList.remove('open');
-        onChange(n,product);
+        onChange(n);
       });
       list.appendChild(item);
     });
   }
 
   input.value = selected;
-  const initialProduct=findProduct(selected);
-  updateThumb(initialProduct);
-  onChange(selected,initialProduct);
+  onChange(selected);
 
   input.addEventListener('focus', function(){
     renderList(input.value);
@@ -2407,8 +2184,8 @@ function makeProductPicker(containerId, initialValue, onChange){
   input.addEventListener('blur', function(){
     setTimeout(function(){
       list.classList.remove('open');
-      const match = pl.find(p=>String(p.name||'').toLowerCase()===input.value.toLowerCase());
-      if(match){ selected=match.name; input.value=match.name; updateThumb(match); onChange(match.name,match); }
+      const match = names.find(n=>n.toLowerCase()===input.value.toLowerCase());
+      if(match){ selected=match; input.value=match; onChange(match); }
       else{ input.value=selected; }
     }, 150);
   });
