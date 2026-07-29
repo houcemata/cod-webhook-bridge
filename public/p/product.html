@@ -111,6 +111,81 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
 .success-browse-btn{display:block;background:var(--yellow);color:var(--black);border:0;border-radius:8px;padding:13px 22px;font-weight:900;font-size:16px;cursor:pointer;font-family:'Cairo',sans-serif;text-decoration:none;text-align:center}
 .success-home-btn{display:block;background:rgba(255,255,255,.07);color:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 22px;font-weight:700;font-size:15px;cursor:pointer;font-family:'Cairo',sans-serif;text-decoration:none;text-align:center;margin-top:6px}
 @media(max-width:860px){.product-layout{grid-template-columns:1fr}.gallery{position:static}.choices{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.choice{padding:9px 8px}.choice strong{font-size:14px}.choice span{font-size:11px;margin-top:2px}.option-group{margin-top:9px}.block{padding-top:13px;margin-top:13px}.form{gap:7px}.field input,.field select,.field textarea{padding:9px}.summary{padding:10px;gap:5px;margin-top:10px}.sticky.visible{display:flex}.shell{padding-top:12px;padding-bottom:96px}.topbar{padding-bottom:8px}.prod-stat.offer-stat{padding-top:6px;padding-bottom:10px}.why-grid-p,.how-grid-p{grid-template-columns:1fr}.testi-grid{grid-template-columns:1fr 1fr}}
+
+/* CRO REVIEW REDESIGN */
+:root{color-scheme:dark}
+html{scroll-behavior:smooth}
+body{padding-bottom:env(safe-area-inset-bottom)}
+.skip-link{position:absolute;top:8px;right:8px;z-index:100;padding:10px 14px;border-radius:10px;background:var(--yellow);color:var(--black);font-weight:900;transform:translateY(-150%);transition:transform .2s ease}
+.skip-link:focus{transform:translateY(0)}
+.shell{width:min(1220px,100%);padding:18px 22px 126px}
+.topbar{min-height:54px;margin-bottom:14px;align-items:center}
+.brand img{height:40px;width:auto}
+.back{border-color:rgba(245,197,0,.3);border-radius:999px;padding:9px 14px;color:#eee;font-family:'Cairo',sans-serif;font-size:.78rem;letter-spacing:0;text-transform:none}
+.product-layout{grid-template-columns:minmax(0,1.08fr) minmax(360px,480px);gap:42px}
+.gallery{top:24px}
+.main-img{aspect-ratio:4/5.2;border-radius:22px;border-color:rgba(245,197,0,.24);box-shadow:0 28px 80px rgba(0,0,0,.4)}
+.main-img img{width:100%;height:100%;object-fit:cover}
+.thumbs{grid-template-columns:repeat(6,1fr);gap:9px;margin-top:12px}
+.thumb{border-radius:12px;border-color:rgba(255,255,255,.14);transition:border-color .2s ease,transform .2s ease}
+.thumb:hover{transform:translateY(-2px);border-color:rgba(245,197,0,.65)}
+.thumb.active{border-color:var(--yellow);box-shadow:0 0 0 2px rgba(245,197,0,.15)}
+.panel{padding:10px 0 0}
+.kicker{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;padding:7px 11px;border:1px solid rgba(245,197,0,.25);border-radius:999px;color:var(--yellow);font-size:.72rem;letter-spacing:.08em}
+h1{font-family:'Cairo',sans-serif;font-size:clamp(2rem,5vw,3.8rem);line-height:1.15;letter-spacing:0;text-wrap:balance}
+.desc{max-width:58ch;margin:14px 0 12px;color:#d8d8d8;font-size:1rem;line-height:1.9}
+.price-row{align-items:baseline;gap:14px;margin:12px 0 14px;direction:rtl;justify-content:flex-start}
+.price{font-family:'Cairo',sans-serif;font-size:clamp(1.9rem,4vw,2.7rem);font-weight:900;letter-spacing:0}
+.old{font-size:1.1rem}
+.trust-strip{justify-content:flex-start;gap:7px;margin:14px 0 18px}
+.trust-chip{padding:9px 12px;border-color:rgba(155,231,177,.25);color:#c8f5d4;background:rgba(41,120,65,.12);font-family:'Cairo',sans-serif;font-size:.72rem;letter-spacing:0}
+.block{border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:20px;margin-top:14px;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015));box-shadow:0 16px 42px rgba(0,0,0,.2)}
+.block#order{scroll-margin-top:22px}
+.label{font-size:1rem;margin-bottom:12px}
+.hint{font-size:.72rem;color:#9be7b1}
+.option-group{margin-top:14px}
+.option-title{font-size:.88rem;color:#e7e7e7}
+.choices{gap:9px}
+.choice{min-height:54px;border-radius:13px;padding:11px 13px;border-color:rgba(255,255,255,.14);background:rgba(8,8,8,.6);transition:border-color .2s ease,background .2s ease,box-shadow .2s ease}
+.choice:hover{border-color:rgba(245,197,0,.65)}
+.choice.active{border-color:var(--yellow);background:rgba(245,197,0,.1);box-shadow:0 0 0 2px rgba(245,197,0,.13)}
+.form{gap:11px}
+.field{gap:7px}
+.field span{font-size:.8rem;color:#eee}
+.field input,.field select,.field textarea{min-height:48px;border-radius:12px;border-color:rgba(255,255,255,.14);background:rgba(8,8,8,.7);padding:12px 13px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(245,197,0,.12)}
+.summary{gap:10px;border-radius:15px;padding:15px;background:rgba(8,8,8,.62);border-color:rgba(245,197,0,.2)}
+.sum-row{font-size:.86rem}
+.sum-row.total{padding-top:12px;font-size:1.05rem}
+.order-btn{border-radius:13px;min-height:58px;font-size:1rem;box-shadow:0 12px 30px rgba(245,197,0,.18);transition:background .2s ease,transform .2s ease,box-shadow .2s ease}
+.order-btn:hover{background:#ffd84d;transform:translateY(-1px);box-shadow:0 16px 34px rgba(245,197,0,.25)}
+.single-order-btn{box-shadow:none;background:transparent;color:#ddd;border-color:rgba(255,255,255,.18)}
+.single-order-btn:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.4);box-shadow:none}
+.upsell-banner{border-radius:15px;padding:14px 16px;margin-top:16px;background:linear-gradient(135deg,rgba(245,197,0,.14),rgba(245,197,0,.035));border-color:rgba(245,197,0,.32)}
+.related-section,.prod-testi,.prod-why,.prod-how{margin-top:42px;padding-top:28px}
+.related-title,.prod-section-title{font-size:1.35rem}
+.rcard{width:168px;border-radius:15px;transition:border-color .2s ease,transform .2s ease}
+.rcard:focus-visible{outline:3px solid rgba(245,197,0,.48);outline-offset:3px}
+.tcard{border-radius:15px}
+.why-card-p,.how-step-p{border-radius:15px;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.015));border-color:rgba(255,255,255,.1)}
+.sticky{padding:12px 18px calc(12px + env(safe-area-inset-bottom));background:rgba(8,8,8,.94);border-top-color:rgba(245,197,0,.32);box-shadow:0 -12px 34px rgba(0,0,0,.34)}
+.sticky strong{font-family:'Cairo',sans-serif;font-size:1.1rem;letter-spacing:0}
+.sticky-actions .sticky-cta{min-height:50px;border-radius:12px;font-family:'Cairo',sans-serif;font-size:.92rem;transition:background .2s ease,transform .2s ease}
+.sticky-actions .sticky-cta:hover{background:#ffd84d;transform:translateY(-1px)}
+.sticky-cart{border-radius:12px}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.001ms!important;transition-duration:.001ms!important}}
+@media(max-width:860px){
+  .shell{padding:12px 14px calc(112px + env(safe-area-inset-bottom))}
+  .product-layout{gap:18px}
+  .gallery{order:0}
+  .panel{order:1;padding-top:0}
+  .main-img{border-radius:18px}
+  .thumbs{grid-template-columns:repeat(5,1fr)}
+  h1{font-size:clamp(1.85rem,8vw,2.8rem)}
+  .desc{font-size:.9rem}
+  .block{padding:16px 13px;border-radius:17px}
+  .trust-strip{justify-content:center}
+}
 </style>
 <style>
 .kids-theme{
@@ -1019,12 +1094,13 @@ function render(){
   if(isKidsProduct()){renderKidsPage();return;}
   const imgs=images();document.title=product.name+' - ARCO';
   document.getElementById('app').innerHTML=`
+    <a class="skip-link" href="#order">تخطى إلى الطلب</a>
     <header class="topbar"><a class="brand" href="/"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/ACRO%20logo%20shopiy-03.png" alt="ARCO"></a><a class="back" href="/">كل تصاميمنا</a></header>
     ${statHeroHTML()}
     <section class="product-layout">
       <div class="gallery">
-        <div class="main-img">${imgs[0]?`<img id="main-img" src="${esc(imgs[0])}" alt="${esc(product.name)}">`:''}</div>
-        ${imgs.length>1?`<div class="thumbs">${imgs.map((img,i)=>`<button class="thumb ${i===0?'active':''}" onclick="setImage(this,'${esc(img)}')"><img src="${esc(img)}" alt=""></button>`).join('')}</div>`:''}
+        <div class="main-img">${imgs[0]?`<img id="main-img" src="${esc(imgs[0])}" alt="${esc(product.name)}" width="900" height="1125" fetchpriority="high">`:''}</div>
+        ${imgs.length>1?`<div class="thumbs">${imgs.map((img,i)=>`<button type="button" class="thumb ${i===0?'active':''}" aria-label="عرض صورة ${i+1} من ${imgs.length}" onclick="setImage(this,'${esc(img)}')"><img src="${esc(img)}" alt="" width="180" height="180" loading="lazy"></button>`).join('')}</div>`:''}
       </div>
       <div class="panel">
         <div class="kicker">ARCO - COD Algeria</div>
@@ -1039,14 +1115,14 @@ function render(){
         <div class="block" id="order">
           <div class="label">معلوماتك <span class="hint">الدفع عند الاستلام فقط</span></div>
           <div class="form">
-            <label class="field"><span>الاسم الكامل</span><input id="f-name" autocomplete="name"></label>
-            <label class="field"><span>رقم الهاتف</span><input id="f-phone" inputmode="tel" placeholder="05XXXXXXXX"></label>
-            <label class="field"><span>الولاية</span><select id="f-wilaya" onchange="onWilayaChange()"><option value="">اختر الولاية</option>${WILAYAS.map(w=>`<option value="${w[0]}|${esc(w[1])}">${w[0]} - ${esc(w[1])}</option>`).join('')}</select></label>
+            <label class="field"><span>الاسم الكامل</span><input id="f-name" name="name" type="text" autocomplete="name"></label>
+            <label class="field"><span>رقم الهاتف</span><input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="05XXXXXXXX"></label>
+            <label class="field"><span>الولاية</span><select id="f-wilaya" name="wilaya" autocomplete="address-level1" onchange="onWilayaChange()"><option value="">اختر الولاية</option>${WILAYAS.map(w=>`<option value="${w[0]}|${esc(w[1])}">${w[0]} - ${esc(w[1])}</option>`).join('')}</select></label>
             <div class="choices"><button class="choice active" onclick="selectDelivery(event,'home')"><strong>إلى المنزل</strong><span id="home-price">اختر الولاية</span></button><button class="choice" onclick="selectDelivery(event,'pickup')"><strong>إلى أقرب مكتب</strong><span id="desk-price">اختر الولاية</span></button></div>
-            <label class="field" id="commune-wrap"><span>البلدية</span><select id="f-commune"><option value="">اختر البلدية</option></select></label>
-            <label class="field" id="desk-wrap" style="display:none"><span>نقطة الاستلام</span><select id="f-desk" onchange="selectedDesk=this.value"><option value="">اختر النقطة</option></select></label>
+            <label class="field" id="commune-wrap"><span>البلدية</span><select id="f-commune" name="commune" autocomplete="address-level2"><option value="">اختر البلدية</option></select></label>
+            <label class="field" id="desk-wrap" style="display:none"><span>نقطة الاستلام</span><select id="f-desk" name="pickup_point" onchange="selectedDesk=this.value"><option value="">اختر النقطة</option></select></label>
           </div>
-          <div class="summary"><div class="sum-row"><span>المنتج</span><strong id="sum-product">${money(variant.price)}</strong></div><div class="sum-row"><span>التوصيل</span><strong id="sum-ship">0 DZD</strong></div><div class="sum-row total"><span>المجموع</span><strong id="sum-total">${money(variant.price)}</strong></div></div>
+          <div class="summary" aria-live="polite"><div class="sum-row"><span>المنتج</span><strong id="sum-product">${money(variant.price)}</strong></div><div class="sum-row"><span>التوصيل</span><strong id="sum-ship">0 DZD</strong></div><div class="sum-row total"><span>المجموع</span><strong id="sum-total">${money(variant.price)}</strong></div></div>
           ${upsellBannerHTML()}
           ${cartBtnHTML()}
            <button type="button" class="order-btn single-order-btn" id="order-btn" onclick="submitOrder()">${isSet()?'اطلب مجموعة واحدة فقط':'اطلب لوحة واحدة فقط'}</button>
