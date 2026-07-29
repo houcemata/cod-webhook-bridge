@@ -272,10 +272,132 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
   .pcta{min-height:42px;font-size:.72rem}
   .porder{width:34px;height:34px}
 }
+/* MOBILE REFERENCE REDESIGN */
+.collection-cart-trigger,.collection-menu-trigger{position:relative;width:42px;height:42px;border:0;background:none;color:#fff;display:grid;place-items:center;cursor:pointer}
+.collection-cart-trigger{font-size:1.25rem;direction:ltr}
+.collection-cart-trigger b{position:absolute;top:1px;right:0;min-width:18px;height:18px;padding:0 4px;border-radius:99px;background:var(--y);color:#080808;font:800 .64rem/18px 'Changa',sans-serif}
+.collection-menu-trigger{gap:4px;align-content:center}
+.collection-menu-trigger span{display:block;width:22px;height:2px;border-radius:99px;background:#fff}
+.topbar-inner{min-height:58px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+.topbar-inner .brand{grid-column:2}
+.topbar-inner .collection-cart-trigger{grid-column:1;justify-self:start}
+.topbar-inner .collection-menu-trigger{grid-column:3;justify-self:end}
+.collection-nav{position:relative;z-index:34;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(8,8,8,.96)}
+.collection-nav-track{display:flex;gap:9px;overflow-x:auto;padding:8px 0;scrollbar-width:none}
+.collection-nav-track::-webkit-scrollbar{display:none}
+.collection-nav-link{flex:0 0 auto;padding:7px 18px;border:1px solid rgba(255,255,255,.1);border-radius:999px;color:#aaa;font:600 .75rem/1 'Changa',sans-serif;white-space:nowrap}
+.collection-nav-link.is-active{border-color:var(--y);color:var(--y);background:rgba(245,197,0,.08)}
+.collection-hero{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-height:360px;overflow:hidden;border-bottom:1px solid rgba(245,197,0,.18);background:radial-gradient(circle at 10% 80%,rgba(245,197,0,.16),transparent 32%),linear-gradient(115deg,#050505,#121212 55%,#070707)}
+.collection-hero-art{position:relative;min-height:360px;order:1;overflow:hidden}
+.collection-hero-art:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,5,5,.9) 0%,rgba(5,5,5,.14) 45%,transparent 75%);pointer-events:none}
+.collection-hero-art img{position:absolute;inset:8% 8% 0;width:84%;height:92%;object-fit:cover;object-position:center;border:1px solid rgba(245,197,0,.48);box-shadow:0 0 42px rgba(245,197,0,.13);transform:perspective(900px) rotateY(-8deg);background:#151515}
+.collection-hero-glow{position:absolute;width:50%;height:70%;left:12%;bottom:-10%;background:rgba(245,197,0,.18);filter:blur(54px);border-radius:50%}
+.collection-hero-copy{order:2;align-self:center;padding:30px 8% 30px 5%;text-align:right;direction:rtl}
+.collection-hero-kicker,.offer-kicker,.section-kicker{color:var(--y);font:800 .68rem/1 'Changa',sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.collection-hero-copy h1{margin:14px 0 10px;font:800 clamp(1.75rem,4.5vw,3.25rem)/1.2 'Changa',sans-serif;color:#fff}
+.collection-hero-copy h1 em{color:var(--y);font-style:normal}
+.collection-hero-copy p{max-width:30ch;color:#c4c4c4;font:500 .92rem/1.8 'Changa',sans-serif}
+.collection-hero-copy strong{display:block;margin-top:13px;color:var(--y);font:800 .92rem/1.7 'Changa',sans-serif}
+.collection-hero-copy strong span{color:#fff}
+.collection-hero-cta{display:inline-flex;align-items:center;gap:16px;margin-top:19px;padding:12px 25px;border-radius:9px;background:var(--y);color:#080808;font:800 .92rem/1 'Changa',sans-serif;box-shadow:0 10px 25px rgba(245,197,0,.2)}
+.collection-hero-cta:hover{background:#ffd84d;transform:translateY(-1px)}
+.collection-offer{padding:20px 0 14px}
+.collection-offer-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,340px);gap:20px;align-items:center;padding:22px;border:1px solid rgba(245,197,0,.34);border-radius:17px;background:radial-gradient(circle at 15% 50%,rgba(245,197,0,.12),transparent 42%),linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.015))}
+.collection-offer-copy{order:2;text-align:right}
+.collection-offer-headline{margin-top:9px;font-size:clamp(1.35rem,4vw,2.2rem);line-height:1.3;color:#fff}
+.collection-offer-headline em{color:var(--y);font-style:normal}
+.collection-offer-sub{font-size:.84rem;color:#aaa}
+.offer-steps{order:1;display:flex;direction:ltr;gap:9px;align-items:center;justify-content:center}
+.offer-step{width:78px;height:86px;display:grid;place-items:center;align-content:center;gap:3px;border:1px solid rgba(245,197,0,.45);background:rgba(6,6,6,.66);color:#fff;box-shadow:inset 0 0 18px rgba(245,197,0,.07)}
+.offer-step b{font:800 1.8rem/1 'Playfair Display',serif;color:var(--y)}
+.offer-step span{font:600 .68rem/1 'Changa',sans-serif;color:#aaa}
+.offer-step-free{border:2px solid var(--y);box-shadow:0 0 25px rgba(245,197,0,.2)}
+.offer-step-free b{font:800 1.05rem/1 'Changa',sans-serif}
+.collection-promos{grid-column:1/-1;margin:0}
+.collection-promo{min-height:0;padding:8px 12px;text-align:center;border:0;background:rgba(245,197,0,.07);border-radius:9px;color:#ddd}
+.collection-promo strong{color:var(--y);font-size:.75rem}
+.collection-promo span{margin-inline-start:6px;font-size:.7rem}
+.trust-strip-collection{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 auto 14px}
+.trust-chip-collection{display:grid;place-items:center;min-height:42px;padding:7px 8px;text-align:center;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#ddd;background:rgba(255,255,255,.035);font-size:.68rem}
+.trust-chip-collection:first-child{color:#b6efc7}
+.col-head{padding:20px 0 8px}
+.section-kicker{display:block;margin-bottom:9px;color:#888;text-align:center;letter-spacing:.08em}
+.col-head h2{font:800 clamp(1.35rem,5vw,2.3rem)/1.2 'Changa',sans-serif;color:#fff}
+.col-head .en{margin-top:5px}
+.products-wrap{position:relative}
+.toolbar{padding:7px;border:1px solid rgba(255,255,255,.1);border-radius:11px;background:rgba(255,255,255,.035)}
+.col-search .search-box{border:0;background:transparent;border-radius:8px}
+.split-filter{width:100%;order:2;border-radius:8px}
+.split-filter button{flex:1;padding:9px 6px;font-size:.68rem}
+.subbar{padding:10px 0 4px}
+.subchip{padding:8px 15px;font-size:.74rem}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-top:14px}
+.pcard{border-radius:10px;box-shadow:0 8px 25px rgba(0,0,0,.3)}
+.pcard:hover{transform:none}
+.pthumb{aspect-ratio:1/1.08}
+.pthumb img{object-fit:cover}
+.poverlay{top:9px;right:9px;left:9px;bottom:auto;align-items:flex-start;padding:0;background:none}
+.pcard-badge{padding:4px 6px;border-radius:6px;background:#0b0b0b;color:#fff;font:700 .55rem/1 'Changa',sans-serif;white-space:nowrap}
+.pcard-favorite{margin-inline-start:auto;color:#eee;font:300 1.65rem/1 Arial,sans-serif;text-shadow:0 1px 6px #000}
+.pbody{gap:5px;padding:9px 8px 10px;text-align:center}
+.pname{min-height:2.6em;font-size:.76rem;line-height:1.35}
+.pmeta{justify-content:center;gap:7px;font-size:.62rem}
+.pmeta .current{font-size:.84rem}
+.pcta{min-height:35px;border-radius:6px;font-size:.68rem}
+.testimonials-grid{display:flex;overflow-x:auto;gap:8px;padding-bottom:4px;scroll-snap-type:x mandatory}
+.tcard{flex:0 0 43%;aspect-ratio:5/6;scroll-snap-align:start}
+.why-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+.why-card{padding:13px 9px;border-radius:11px}
+.why-card h3{font-size:.76rem}
+.why-card p{font-size:.65rem}
+.how-grid{grid-template-columns:repeat(4,1fr);gap:3px}
+.how-step{padding:0 2px}
+.how-num{width:37px;height:37px;font-size:1rem;margin-bottom:8px}
+.how-step h3{font-size:.65rem;line-height:1.4}
+.how-step p{font-size:.58rem;line-height:1.55}
+.faq-wrap{gap:6px}
+.faq-q{padding:12px 13px;font-size:.76rem}
+.faq-a{font-size:.72rem}
+.custom-cta{padding:20px 16px;border-radius:15px;display:grid;gap:15px}
+.custom-cta-text h2{font-size:1.3rem}
+.custom-cta-text p{font-size:.75rem}
+.custom-cta-btn{justify-content:center;padding:13px 20px;border-radius:8px;font-size:.78rem}
+.collection-sticky-cart{position:fixed;right:10px;left:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:55;display:none;grid-template-columns:1fr 1.25fr;gap:7px;padding:7px;border:1px solid rgba(245,197,0,.85);border-radius:12px;background:rgba(8,8,8,.95);box-shadow:0 10px 30px rgba(0,0,0,.5);direction:rtl}
+.collection-sticky-cart.visible{display:grid}
+.collection-sticky-summary{display:flex;align-items:center;gap:8px;border:0;background:none;color:#fff;text-align:right;font-family:'Changa',sans-serif}
+.sticky-cart-icon{font-size:1.25rem}
+.collection-sticky-summary b,.collection-sticky-summary small{display:block;line-height:1.4}
+.collection-sticky-summary b{font-size:.68rem}.collection-sticky-summary small{color:var(--y);font-size:.7rem}
+.collection-sticky-cta{border:0;border-radius:7px;background:var(--y);color:#080808;font:800 .9rem/1 'Changa',sans-serif}
+@media(max-width:640px){
+  .wrap{width:min(100% - 20px,1240px)}
+  .announce{height:28px}.announce-item{font-size:.62rem;padding:0 20px}
+  .collection-nav{display:none}.collection-nav.open{display:block}
+  .collection-hero{width:100%;grid-template-columns:45% 55%;min-height:320px}
+  .collection-hero-art{min-height:320px}
+  .collection-hero-art img{inset:7% 0 0 4%;width:94%;height:91%;transform:none}
+  .collection-hero-art:after{background:linear-gradient(90deg,rgba(5,5,5,.82),transparent 75%)}
+  .collection-hero-copy{padding:24px 10px 24px 7px}
+  .collection-hero-copy h1{font-size:clamp(1.35rem,7vw,2rem);line-height:1.3}
+  .collection-hero-copy p{font-size:.68rem;line-height:1.65}
+  .collection-hero-copy strong{font-size:.68rem;line-height:1.7}
+  .collection-hero-cta{gap:8px;margin-top:13px;padding:10px 12px;font-size:.68rem}
+  .collection-offer-main{grid-template-columns:1fr;gap:12px;padding:17px 12px}
+  .collection-offer-copy{order:1;text-align:center}.offer-steps{order:2}.collection-promos{order:3}
+  .offer-step{width:68px;height:72px}.offer-step b{font-size:1.5rem}
+  .collection-offer-headline{font-size:1.35rem}
+  .collection-offer-sub{font-size:.72rem}
+  .trust-strip-collection{width:min(100% - 20px,1240px);gap:5px}
+  .trust-chip-collection{font-size:.6rem;min-height:41px}
+  .sec{padding:27px 0}
+  .sec-title{font-size:1.3rem}.sec-sub{font-size:.62rem}
+  .footer{padding-bottom:100px}
+}
 </style>
 <script src="/meta-pixel.js" defer></script>
 <script src="/tiktok-pixel.js" defer></script>
 <script src="/attribution.js" defer></script>
+<script src="/cart.js" defer></script>
 </head>
 <body>
 
@@ -298,21 +420,56 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 
 <header class="topbar">
   <div class="wrap topbar-inner">
+    <button class="collection-cart-trigger" type="button" onclick="window.ARCOCart?.open()" aria-label="فتح السلة">
+      <span aria-hidden="true">🛒</span><b id="collectionCartCount">0</b>
+    </button>
     <a class="brand" href="/" aria-label="ARCO">
       <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/ACRO%20logo%20shopiy-03.png" alt="ARCO" width="130" height="40">
     </a>
-    <a class="back-link" href="/">← الرئيسية</a>
+    <button class="collection-menu-trigger" type="button" onclick="toggleCollectionMenu()" aria-label="فتح قائمة التصنيفات" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
+
+<nav class="collection-nav" id="collectionNav" aria-label="التصنيفات الرئيسية">
+  <div class="wrap collection-nav-track">
+    <a href="/" class="collection-nav-link">الرئيسية</a>
+    <a href="#products" class="collection-nav-link is-active">التصاميم</a>
+    <a href="#how-it-works" class="collection-nav-link">كيف نعمل</a>
+    <a href="#faq" class="collection-nav-link">الأسئلة</a>
+  </div>
+</nav>
+
+<section class="collection-hero wrap" id="collectionHero" aria-labelledby="hero-title">
+  <div class="collection-hero-art">
+    <img id="collectionHeroImg" alt="" width="720" height="820" fetchpriority="high">
+    <div class="collection-hero-glow" aria-hidden="true"></div>
+  </div>
+  <div class="collection-hero-copy">
+    <span class="collection-hero-kicker">ARCO COLLECTION</span>
+    <h1 id="hero-title">لوحات ARCO<br><em>لذوقك المختلف</em></h1>
+    <p>اختر التصميم الذي يشبهك، وخلّي جدارك يحكي قصتك.</p>
+    <strong>اطلب بالدفع عند الاستلام<br><span>وافحص قبل الدفع</span></strong>
+    <a class="collection-hero-cta" href="#products">شاهد التصاميم <span aria-hidden="true">←</span></a>
+  </div>
+</section>
 
 <!-- OFFER HERO — above the collection selector -->
 <div class="stat-hero wrap collection-offer">
   <div class="collection-offer-main">
-    <div class="collection-offer-headline">🎁 عرض خاص: اطلب لوحتين وخذ الثالثة مجاناً</div>
-    <div class="collection-offer-sub">اختَر التصميم الذي يشبهك، واطلب بالدفع عند الاستلام. أضف تصاميم أخرى واستفد أكثر.</div>
-    <div class="collection-offer-trust">+</div>
+    <div class="collection-offer-copy">
+      <span class="offer-kicker">عرض لفترة محدودة</span>
+      <div class="collection-offer-headline">اطلب لوحتين<br><em>والثالثة مجاناً</em></div>
+      <div class="collection-offer-sub">أضف لوحة أخرى واستفد أكثر</div>
+    </div>
+    <div class="offer-steps" aria-label="طريقة العرض">
+      <div class="offer-step"><b>1</b><span>لوحة</span></div>
+      <div class="offer-step"><b>2</b><span>لوحتان</span></div>
+      <div class="offer-step offer-step-free"><b>مجانا</b><span>الثالثة</span></div>
+    </div>
     <div class="collection-promos" aria-label="عروض الكمية">
-      <div class="collection-promo"><strong>لوحتان بسعر لوحتين والثالثة مجاناً</strong><span>العرض يتحسب تلقائياً في السلة</span></div>
+      <div class="collection-promo"><strong>العرض يتحسب تلقائياً في السلة</strong><span>بدون كود خصم</span></div>
     </div>
   </div>
 </div>
@@ -330,7 +487,8 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 </div>
 
 <section class="col-head wrap">
-  <h1 id="col-title">المجموعة</h1>
+  <span class="section-kicker">اكتشف مجموعتنا</span>
+  <h2 id="col-title">المجموعة</h2>
   <span class="en" id="col-en"></span>
 </section>
 
@@ -352,7 +510,7 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 </div>
 
 <!-- PRODUCTS -->
-<div class="wrap">
+<div class="wrap products-wrap">
   <div class="grid" id="grid"><div class="state">جاري التحميل...</div></div>
   <div class="pager" id="pager"></div>
 </div>
@@ -411,7 +569,7 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 <hr class="divider">
 
 <!-- HOW IT WORKS -->
-<section class="sec wrap">
+<section class="sec wrap" id="how-it-works">
   <div class="sec-title-wrap">
     <span class="sec-title">كيف يعمل الطلب</span>
     <span class="sec-sub">بسيط، آمن، وبدون مخاطرة</span>
@@ -444,7 +602,7 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 <hr class="divider">
 
 <!-- FAQ -->
-<section class="sec wrap">
+<section class="sec wrap" id="faq">
   <div class="sec-title-wrap">
     <span class="sec-title">أسئلة شائعة</span>
   </div>
@@ -454,6 +612,14 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 <hr class="divider">
 
 <!-- FOOTER -->
+<div class="collection-sticky-cart" id="collectionStickyCart" aria-live="polite">
+  <button type="button" class="collection-sticky-summary" onclick="window.ARCOCart?.open()" aria-label="فتح السلة">
+    <span class="sticky-cart-icon" aria-hidden="true">🛒</span>
+    <span><b><span id="stickyCartCount">0</span> لوحات في السلة</b><small id="stickyCartTotal">0 DZD</small></span>
+  </button>
+  <button type="button" class="collection-sticky-cta" onclick="window.ARCOCart?.open()">إتمام الطلب <span aria-hidden="true">←</span></button>
+</div>
+
 <footer class="footer wrap">
   <div class="footer-inner">
     <div class="footer-top">
@@ -517,15 +683,49 @@ function minPrice(p){const pr=Array.isArray(p.variants)?p.variants.map(v=>Number
 let collectionSlug=new URLSearchParams(location.search).get('slug')||(location.pathname.split('/').filter(Boolean)[1]||'');
 let collection=null,allItems=[],activeSub='all',typeFilter='all',page=1,searchQuery='';
 
+function toggleCollectionMenu(){
+  const nav=document.getElementById('collectionNav');
+  const btn=document.querySelector('.collection-menu-trigger');
+  const open=nav.classList.toggle('open');
+  if(btn)btn.setAttribute('aria-expanded',String(open));
+}
+function renderCollectionHero(){
+  const img=collection?.hero_image||collection?.heroImage||pImages(allItems[0]||{})[0]||'';
+  const image=document.getElementById('collectionHeroImg');
+  const title=document.getElementById('hero-title');
+  if(image&&img){image.src=img;image.alt=collection?.name_ar?`لوحة ${collection.name_ar}`:'لوحة ARCO';}
+  if(title&&collection?.name_ar)title.innerHTML=`لوحات ${esc(collection.name_ar)}<br><em>لذوقك المختلف</em>`;
+}
+function updateCollectionCart(){
+  const count=Number(window.ARCOCart?.count?.()||0);
+  const badge=document.getElementById('collectionCartCount');
+  const sticky=document.getElementById('collectionStickyCart');
+  const stickyCount=document.getElementById('stickyCartCount');
+  if(badge)badge.textContent=count;
+  if(stickyCount)stickyCount.textContent=count;
+  if(sticky)sticky.classList.toggle('visible',count>0);
+  if(count&&window.ARCOCart){
+    try{
+      const cart=JSON.parse(localStorage.getItem('arco_cart_v1')||'[]');
+      const total=cart.reduce((sum,item)=>sum+Number(item.price||0),0);
+      const totalEl=document.getElementById('stickyCartTotal');
+      if(totalEl)totalEl.textContent=money(total);
+    }catch(e){}
+  }
+}
+setInterval(updateCollectionCart,500);
+
 function cardHTML(p){
   const img=pImages(p)[0];
   const sale=p.original_price&&p.original_price>minPrice(p);
   const isSplit=(p.type||p.product_type||'').toLowerCase().includes('split');
+  const isPopular=Number(p._order_count||0)>0;
   return`<article class="pcard${isSplit?' split-card':''}">
     <a class="pthumb" href="${productUrl(p.slug)}">
       ${img?`<img src="${esc(img)}" alt="${esc(p.name)}" width="800" height="960" loading="lazy">`:''}
       <div class="poverlay">
-        <span class="porder" aria-label="فتح تفاصيل ${esc(p.name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg></span>
+        ${isPopular?'<span class="pcard-badge">🔥 الأكثر مبيعاً</span>':''}
+        <span class="pcard-favorite" aria-hidden="true">♡</span>
       </div>
     </a>
     <div class="pbody">
@@ -618,6 +818,7 @@ async function load(){
       _order_count:orderCounts[p.slug]||0
     })).sort((a,b)=>b._order_count-a._order_count||(a.sort_order??999)-(b.sort_order??999)):[];
   }catch(e){allItems=[];}
+  renderCollectionHero();
   renderGrid();
   window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
 }
