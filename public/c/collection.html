@@ -393,8 +393,9 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 .pcard-badge{background:var(--y);color:#080808}
 .pcard-favorite{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(8,8,8,.72);border:1px solid rgba(255,255,255,.18);font-size:1rem;color:#fff}
 .pmeta{min-height:24px}
-.pquick{position:relative}
-.pcta{border:0;cursor:pointer;font-family:'Changa',sans-serif}
+.pquick{position:relative;width:100%}
+.pcta{width:100%;border:0;cursor:pointer;font-family:'Changa',sans-serif;gap:7px}
+.pcta .cart-ic{width:17px;height:17px;stroke:currentColor;stroke-width:2.4;fill:none;flex-shrink:0}
 .variant-pop{position:absolute;left:8px;right:8px;bottom:calc(100% + 8px);z-index:4;display:none;grid-template-columns:1fr 1fr;gap:7px;padding:8px;border:1px solid rgba(245,197,0,.35);border-radius:10px;background:rgba(8,8,8,.96);box-shadow:0 12px 30px rgba(0,0,0,.42)}
 .variant-pop.show{display:grid}
 .variant-pop button{border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.05);color:#fff;padding:8px 6px;font:800 .68rem/1.35 'Changa',sans-serif;cursor:pointer}
@@ -780,7 +781,7 @@ function cardHTML(p){
         <div class="variant-pop" id="variants-${esc(p.slug)}">
           ${quickVars.map((v,i)=>`<button type="button" onclick="addQuickVariant('${esc(p.slug)}',${i})">${esc(variantLabel(v))}<span>${money(variantPrice(p,v))}</span></button>`).join('')}
         </div>
-        <button class="pcta" type="button" onclick="toggleQuickVariants('${esc(p.slug)}')">أضف للسلة <span aria-hidden="true">+</span></button>
+        <button class="pcta" type="button" onclick="toggleQuickVariants('${esc(p.slug)}')"><svg class="cart-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.7"/><circle cx="18" cy="20" r="1.7"/><path d="M3 4h2.2l2.3 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 1.9-1.4L21 8H6.1"/></svg><span>أضف للسلة</span></button>
       </div>
     </div>
   </article>`;
