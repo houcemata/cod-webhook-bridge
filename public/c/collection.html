@@ -396,6 +396,11 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 .pquick{position:relative;width:100%}
 .pcta{width:100%;border:0;cursor:pointer;font-family:'Changa',sans-serif;gap:7px}
 .pcta .cart-ic{width:17px;height:17px;stroke:currentColor;stroke-width:2.4;fill:none;flex-shrink:0}
+.pcard .pbody{padding:0;background:#0d0d0d}
+.pcard .pmeta{position:absolute;right:10px;left:10px;bottom:10px;z-index:2;justify-content:center;gap:8px;min-height:0;padding:7px 10px;border-radius:9px;background:linear-gradient(180deg,rgba(8,8,8,.04),rgba(8,8,8,.78));backdrop-filter:blur(8px);color:rgba(255,255,255,.66);text-shadow:0 1px 6px rgba(0,0,0,.75)}
+.pcard .pmeta .current{font-size:.98rem}
+.pcard .pquick{margin-top:0}
+.pcard .pcta{border-radius:0 0 10px 10px;min-height:44px}
 .variant-pop{position:absolute;left:8px;right:8px;bottom:calc(100% + 8px);z-index:4;display:none;grid-template-columns:1fr 1fr;gap:7px;padding:8px;border:1px solid rgba(245,197,0,.35);border-radius:10px;background:rgba(8,8,8,.96);box-shadow:0 12px 30px rgba(0,0,0,.42)}
 .variant-pop.show{display:grid}
 .variant-pop button{border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.05);color:#fff;padding:8px 6px;font:800 .68rem/1.35 'Changa',sans-serif;cursor:pointer}
@@ -772,10 +777,10 @@ function cardHTML(p){
         ${isPopular?'<span class="pcard-badge">الأكثر مبيعاً</span>':''}
         <span class="pcard-favorite" aria-hidden="true">👁</span>
       </div>
+      <div class="pmeta"><span class="current">${money(minPrice(p))}</span>${sale?`<span class="old">${money(p.original_price)}</span>`:'<span>دفع عند الاستلام</span>'}</div>
     </a>
     <div class="pbody">
       <a class="pname" href="${productUrl(p.slug)}">${esc(p.name)}</a>
-      <div class="pmeta"><span class="current">${money(minPrice(p))}</span>${sale?`<span class="old">${money(p.original_price)}</span>`:'<span>دفع عند الاستلام</span>'}</div>
       <div class="pquick">
         <div class="quick-confirm" id="confirm-${esc(p.slug)}">تمت الإضافة للسلة</div>
         <div class="variant-pop" id="variants-${esc(p.slug)}">
