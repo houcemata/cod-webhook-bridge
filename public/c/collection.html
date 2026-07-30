@@ -278,10 +278,12 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 .collection-cart-trigger b{position:absolute;top:1px;right:0;min-width:18px;height:18px;padding:0 4px;border-radius:99px;background:var(--y);color:#080808;font:800 .64rem/18px 'Changa',sans-serif}
 .collection-menu-trigger{gap:4px;align-content:center}
 .collection-menu-trigger span{display:block;width:22px;height:2px;border-radius:99px;background:#fff}
+.collection-whatsapp-trigger{position:relative;width:42px;height:42px;border:0;background:none;color:#25D366;display:grid;place-items:center;justify-self:end}
+.collection-whatsapp-trigger svg{width:25px;height:25px;fill:currentColor}
 .topbar-inner{min-height:58px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
 .topbar-inner .brand{grid-column:2}
 .topbar-inner .collection-cart-trigger{grid-column:1;justify-self:start}
-.topbar-inner .collection-menu-trigger{grid-column:3;justify-self:end}
+.topbar-inner .collection-menu-trigger,.topbar-inner .collection-whatsapp-trigger{grid-column:3}
 .collection-nav{position:relative;z-index:34;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(8,8,8,.96)}
 .collection-nav-track{display:flex;gap:9px;overflow-x:auto;padding:8px 0;scrollbar-width:none}
 .collection-nav-track::-webkit-scrollbar{display:none}
@@ -369,19 +371,42 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 .collection-sticky-summary b,.collection-sticky-summary small{display:block;line-height:1.4}
 .collection-sticky-summary b{font-size:.68rem}.collection-sticky-summary small{color:var(--y);font-size:.7rem}
 .collection-sticky-cta{border:0;border-radius:7px;background:var(--y);color:#080808;font:800 .9rem/1 'Changa',sans-serif}
+
+/* Static collection hero rollout */
+.announce{display:none!important}
+.collection-hero{display:block;width:min(1240px,calc(100% - 32px));min-height:0;margin:14px auto 0;border:1px solid rgba(245,197,0,.22);border-radius:14px;background:#000;overflow:hidden}
+.collection-hero>a{position:relative;display:block}
+.collection-hero img{position:static!important;inset:auto!important;width:100%!important;height:auto!important;aspect-ratio:1829/1437;object-fit:cover;object-position:center;border:0!important;box-shadow:none!important;transform:none!important;background:#000}
+.collection-hero-art,.collection-hero-copy,.collection-hero-glow,.collection-offer,.trust-strip-collection{display:none!important}
+.col-search{display:none!important}
+.toolbar{justify-content:center}
+.col-icon-bar{top:58px;padding:9px 0}
+.col-icon-bar::before{width:70px;background:linear-gradient(90deg,rgba(8,8,8,1),rgba(8,8,8,.72),transparent)}
+.col-icon-scroll{gap:8px;padding:4px 2px 6px}
+.col-icon-item{width:auto;min-width:max-content;padding:8px 16px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.035);color:#aaa}
+.col-icon-circle{display:none}
+.col-icon-name{max-width:none;font-size:.76rem;color:inherit}
+.col-icon-item.active{border-color:var(--y);background:rgba(245,197,0,.1);color:var(--y)}
+.col-icon-item.active .col-icon-name{color:inherit}
+.pcard{position:relative}
+.pname{display:none!important}
+.pcard-badge{background:var(--y);color:#080808}
+.pcard-favorite{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(8,8,8,.72);border:1px solid rgba(255,255,255,.18);font-size:1rem;color:#fff}
+.pmeta{min-height:24px}
+.pquick{position:relative}
+.pcta{border:0;cursor:pointer;font-family:'Changa',sans-serif}
+.variant-pop{position:absolute;left:8px;right:8px;bottom:calc(100% + 8px);z-index:4;display:none;grid-template-columns:1fr 1fr;gap:7px;padding:8px;border:1px solid rgba(245,197,0,.35);border-radius:10px;background:rgba(8,8,8,.96);box-shadow:0 12px 30px rgba(0,0,0,.42)}
+.variant-pop.show{display:grid}
+.variant-pop button{border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.05);color:#fff;padding:8px 6px;font:800 .68rem/1.35 'Changa',sans-serif;cursor:pointer}
+.variant-pop button span{display:block;margin-top:3px;color:var(--y);font-size:.64rem}
+.quick-confirm{position:absolute;right:10px;left:10px;bottom:48px;z-index:5;display:none;padding:7px 8px;border-radius:8px;background:rgba(34,197,94,.95);color:#08120b;font:900 .68rem/1 'Changa',sans-serif;text-align:center}
+.quick-confirm.show{display:block}
+.collection-sticky-cart.bump{animation:cartBump .42s ease}
+@keyframes cartBump{0%,100%{transform:scale(1)}40%{transform:scale(1.035);box-shadow:0 0 30px rgba(245,197,0,.35)}}
 @media(max-width:640px){
   .wrap{width:min(100% - 20px,1240px)}
-  .announce{height:28px}.announce-item{font-size:.62rem;padding:0 20px}
+  .collection-hero{width:100%;margin-top:8px;border-radius:0;border-left:0;border-right:0}
   .collection-nav{display:none}.collection-nav.open{display:block}
-  .collection-hero{width:100%;grid-template-columns:45% 55%;min-height:320px}
-  .collection-hero-art{min-height:320px}
-  .collection-hero-art img{inset:7% 0 0 4%;width:94%;height:91%;transform:none}
-  .collection-hero-art:after{background:linear-gradient(90deg,rgba(5,5,5,.82),transparent 75%)}
-  .collection-hero-copy{padding:24px 10px 24px 7px}
-  .collection-hero-copy h1{font-size:clamp(1.35rem,7vw,2rem);line-height:1.3}
-  .collection-hero-copy p{font-size:.68rem;line-height:1.65}
-  .collection-hero-copy strong{font-size:.68rem;line-height:1.7}
-  .collection-hero-cta{gap:8px;margin-top:13px;padding:10px 12px;font-size:.68rem}
   .collection-offer-main{grid-template-columns:1fr;gap:12px;padding:17px 12px}
   .collection-offer-copy{order:1;text-align:center}.offer-steps{order:2}.collection-promos{order:3}
   .offer-step{width:68px;height:72px}.offer-step b{font-size:1.5rem}
@@ -426,9 +451,9 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
     <a class="brand" href="/" aria-label="ARCO">
       <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/ACRO%20logo%20shopiy-03.png" alt="ARCO" width="130" height="40">
     </a>
-    <button class="collection-menu-trigger" type="button" onclick="toggleCollectionMenu()" aria-label="فتح قائمة التصنيفات" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
+    <a class="collection-whatsapp-trigger" href="https://wa.me/213550374607" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"/></svg>
+    </a>
   </div>
 </header>
 
@@ -442,17 +467,9 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 </nav>
 
 <section class="collection-hero wrap" id="collectionHero" aria-labelledby="hero-title">
-  <div class="collection-hero-art">
-    <img id="collectionHeroImg" alt="" width="720" height="820" fetchpriority="high">
-    <div class="collection-hero-glow" aria-hidden="true"></div>
-  </div>
-  <div class="collection-hero-copy">
-    <span class="collection-hero-kicker">ARCO COLLECTION</span>
-    <h1 id="hero-title">لوحات ARCO<br><em>لذوقك المختلف</em></h1>
-    <p>اختر التصميم الذي يشبهك، وخلّي جدارك يحكي قصتك.</p>
-    <strong>اطلب بالدفع عند الاستلام<br><span>وافحص قبل الدفع</span></strong>
-    <a class="collection-hero-cta" href="#products">شاهد التصاميم <span aria-hidden="true">←</span></a>
-  </div>
+  <a href="#products" aria-label="شاهد التصاميم">
+    <img id="collectionHeroImg" alt="" width="1829" height="1437" fetchpriority="high">
+  </a>
 </section>
 
 <!-- OFFER HERO — above the collection selector -->
@@ -673,12 +690,38 @@ const SB='https://mpkpehuatqsubohltssi.supabase.co/rest/v1';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
 const H={apikey:SK,Authorization:'Bearer '+SK};
 const PAGE_SIZE=16;
+const HERO_BASE='https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/heroes/collection/';
+const COLLECTION_HERO_IMAGES={
+  anime:'anime.png',
+  cars:'cars.png',
+  football:'football.png',
+  games:'gaming.png',
+  gaming:'gaming.png',
+  girl:'girls.png',
+  girls:'girls.png',
+  motivation:'motivation.png',
+  tv:'tv.png'
+};
 
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const money=v=>Number(v||0).toLocaleString('fr-DZ')+' DZD';
 function productUrl(s){return s==='liquid-football'?'/p/liquid-football.html':s==='barber-shop'?'/p/barber-shop.html':'/p/'+encodeURIComponent(s);}
 function pImages(p){const b=Array.isArray(p.images)?p.images:(p.images?[p.images]:[]);const v=Array.isArray(p.variants)?p.variants.map(x=>x.image).filter(Boolean):[];return[...new Set([...b,...v])];}
 function minPrice(p){const pr=Array.isArray(p.variants)?p.variants.map(v=>Number(v.price||0)).filter(v=>v>0):[];return pr.length?Math.min(...pr):Number(p.price||0);}
+function variantsOf(p){return Array.isArray(p.variants)?p.variants:(p.variants&&typeof p.variants==='object'?Object.values(p.variants):[]);}
+function quickVariantsOf(p){
+  const vars=variantsOf(p);
+  const wanted=vars.filter(v=>/30\s*x\s*40|30x40|40\s*x\s*60|40x60/i.test(variantLabel(v)));
+  const list=(wanted.length?wanted:vars).slice(0,2);
+  return list.length?list:[{label:'30x40cm',price:p.price,image:pImages(p)[0]||''}];
+}
+function variantLabel(v){return String(v?.label||v?.name||v?.title||'Standard');}
+function variantPrice(p,v){return Number(v?.price||p.price||0);}
+function variantImage(p,v){return v?.image||pImages(p)[0]||'';}
+function productType(p){return String(p.type||p.product_type||p.productType||'').trim().toLowerCase();}
+function isSetProduct(p){const t=productType(p);return t==='set'||t.includes('set')||t.includes('split')||t.includes('triptych');}
+function isPosterProduct(p){const t=productType(p);return t==='poster'||(!isSetProduct(p)&&Number(minPrice(p))>0);}
+function heroUrlFor(slug){const file=COLLECTION_HERO_IMAGES[slug];return file?HERO_BASE+file:'';}
 
 let collectionSlug=new URLSearchParams(location.search).get('slug')||(location.pathname.split('/').filter(Boolean)[1]||'');
 let collection=null,allItems=[],activeSub='all',typeFilter='all',page=1,searchQuery='';
@@ -690,10 +733,10 @@ function toggleCollectionMenu(){
   if(btn)btn.setAttribute('aria-expanded',String(open));
 }
 function renderCollectionHero(){
-  const img=collection?.hero_image||collection?.heroImage||pImages(allItems[0]||{})[0]||'';
+  const img=heroUrlFor(collectionSlug)||collection?.hero_image||collection?.heroImage||pImages(allItems[0]||{})[0]||'';
   const image=document.getElementById('collectionHeroImg');
   const title=document.getElementById('hero-title');
-  if(image&&img){image.src=img;image.alt=collection?.name_ar?`لوحة ${collection.name_ar}`:'لوحة ARCO';}
+  if(image&&img){image.src=img;image.alt=collection?.name_ar?`لوحات ${collection.name_ar}`:'لوحات ARCO';}
   if(title&&collection?.name_ar)title.innerHTML=`لوحات ${esc(collection.name_ar)}<br><em>لذوقك المختلف</em>`;
 }
 function updateCollectionCart(){
@@ -719,28 +762,71 @@ function cardHTML(p){
   const img=pImages(p)[0];
   const sale=p.original_price&&p.original_price>minPrice(p);
   const isSplit=(p.type||p.product_type||'').toLowerCase().includes('split');
-  const isPopular=Number(p._order_count||0)>0;
+  const isPopular=allItems.findIndex(item=>item.slug===p.slug)>-1&&allItems.findIndex(item=>item.slug===p.slug)<7;
+  const quickVars=quickVariantsOf(p);
   return`<article class="pcard${isSplit?' split-card':''}">
-    <a class="pthumb" href="${productUrl(p.slug)}">
+    <a class="pthumb" href="${productUrl(p.slug)}" aria-label="${esc(p.name)}">
       ${img?`<img src="${esc(img)}" alt="${esc(p.name)}" width="800" height="960" loading="lazy">`:''}
       <div class="poverlay">
-        ${isPopular?'<span class="pcard-badge">🔥 الأكثر مبيعاً</span>':''}
-        <span class="pcard-favorite" aria-hidden="true">♡</span>
+        ${isPopular?'<span class="pcard-badge">الأكثر مبيعاً</span>':''}
+        <span class="pcard-favorite" aria-hidden="true">👁</span>
       </div>
     </a>
     <div class="pbody">
       <a class="pname" href="${productUrl(p.slug)}">${esc(p.name)}</a>
       <div class="pmeta"><span class="current">${money(minPrice(p))}</span>${sale?`<span class="old">${money(p.original_price)}</span>`:'<span>دفع عند الاستلام</span>'}</div>
-      <a class="pcta" href="${productUrl(p.slug)}">شاهد التفاصيل <span aria-hidden="true">←</span></a>
+      <div class="pquick">
+        <div class="quick-confirm" id="confirm-${esc(p.slug)}">تمت الإضافة للسلة</div>
+        <div class="variant-pop" id="variants-${esc(p.slug)}">
+          ${quickVars.map((v,i)=>`<button type="button" onclick="addQuickVariant('${esc(p.slug)}',${i})">${esc(variantLabel(v))}<span>${money(variantPrice(p,v))}</span></button>`).join('')}
+        </div>
+        <button class="pcta" type="button" onclick="toggleQuickVariants('${esc(p.slug)}')">أضف للسلة <span aria-hidden="true">+</span></button>
+      </div>
     </div>
   </article>`;
+}
+
+function closeQuickVariants(exceptSlug){
+  document.querySelectorAll('.variant-pop.show').forEach(pop=>{
+    if(!exceptSlug||pop.id!==`variants-${exceptSlug}`)pop.classList.remove('show');
+  });
+}
+function toggleQuickVariants(slug){
+  const pop=document.getElementById(`variants-${slug}`);
+  if(!pop)return;
+  const willOpen=!pop.classList.contains('show');
+  closeQuickVariants(slug);
+  pop.classList.toggle('show',willOpen);
+}
+function addQuickVariant(slug,index){
+  const product=allItems.find(p=>p.slug===slug);
+  if(!product||!window.ARCOCart)return;
+  const vars=quickVariantsOf(product);
+  const fallback={label:'30x40cm',price:product.price,image:pImages(product)[0]||''};
+  const v=(vars.length?vars:[fallback])[index]||fallback;
+  if(product.collection){try{localStorage.setItem('arco_last_collection',product.collection);}catch(e){}}
+  window.ARCOCart.add({
+    product_slug:product.slug,
+    product:product.name,
+    variant:variantLabel(v),
+    selected_options:null,
+    price:variantPrice(product,v),
+    image:variantImage(product,v),
+    product_type:productType(product)||product.type||''
+  });
+  closeQuickVariants();
+  updateCollectionCart();
+  const msg=document.getElementById(`confirm-${slug}`);
+  if(msg){msg.classList.add('show');setTimeout(()=>msg.classList.remove('show'),1300);}
+  const sticky=document.getElementById('collectionStickyCart');
+  if(sticky){sticky.classList.remove('bump');void sticky.offsetWidth;sticky.classList.add('bump');}
 }
 
 function filteredItems(){
   let list=allItems;
   if(activeSub!=='all')list=list.filter(p=>(p.subcollection||'')===activeSub);
-  if(typeFilter==='set')list=list.filter(p=>(p.type||'').toLowerCase()==='set');
-  if(typeFilter==='poster')list=list.filter(p=>(p.type||'').toLowerCase()==='poster');
+  if(typeFilter==='set')list=list.filter(isSetProduct);
+  if(typeFilter==='poster')list=list.filter(isPosterProduct);
   const q=(searchQuery||'').trim().toLowerCase();
   if(q)list=list.filter(p=>(p.name||'').toLowerCase().includes(q));
   return list;
@@ -794,7 +880,8 @@ async function load(){
     document.title='ARCO | '+(collection.name_ar||collectionSlug);
   }else{document.getElementById('col-title').textContent=collectionSlug;}
   activeSub='all';page=1;searchQuery='';typeFilter='all';
-  document.getElementById('colSearchInput').value='';
+  const searchInput=document.getElementById('colSearchInput');
+  if(searchInput)searchInput.value='';
   ['filterAll','filterSingle','filterSplit'].forEach(id=>document.getElementById(id).classList.remove('active'));
   document.getElementById('filterAll').classList.add('active');
   renderSubbar();
@@ -830,7 +917,7 @@ async function loadIconBar(){
     if(!allColsCache){const r=await fetch(`${SB}/collections?select=*&active=eq.true&order=sort_order.asc`,{headers:H});allColsCache=await r.json();}
     const cols=Array.isArray(allColsCache)?allColsCache:[];
     if(!cols.length){box.innerHTML='';document.getElementById('colScrollHint')?.classList.add('hidden');return;}
-    box.innerHTML=cols.map(c=>`<button class="col-icon-item" data-slug="${esc(c.slug)}" onclick="switchCollection('${esc(c.slug)}')"><div class="col-icon-circle">${c.icon_url?`<img src="${esc(c.icon_url)}" alt="${esc(c.name_ar)}" loading="lazy">`:`<span class="ph">${esc((c.name_en||'A')[0])}</span>`}</div><span class="col-icon-name">${esc(c.name_ar)}</span></button>`).join('');
+    box.innerHTML=cols.map(c=>`<button class="col-icon-item" data-slug="${esc(c.slug)}" onclick="switchCollection('${esc(c.slug)}')"><span class="col-icon-name">${esc(c.name_ar||c.name_en||c.slug)}</span></button>`).join('');
     highlightIconBar();
     setupIconScrollHint();
   }catch(e){box.innerHTML='';document.getElementById('colScrollHint')?.classList.add('hidden');}
@@ -882,7 +969,7 @@ document.getElementById('faqWrap').innerHTML=FAQ.map((f,i)=>`<div class="faq-ite
 function toggleFaq(i){const el=document.querySelector(`.faq-item[data-i="${i}"]`);const o=el.classList.toggle('open');el.querySelector('.faq-q').setAttribute('aria-expanded',o);}
 
 let _st;
-document.getElementById('colSearchInput').addEventListener('input',e=>{clearTimeout(_st);_st=setTimeout(()=>{searchQuery=e.target.value;page=1;renderGrid();},180);});
+document.getElementById('colSearchInput')?.addEventListener('input',e=>{clearTimeout(_st);_st=setTimeout(()=>{searchQuery=e.target.value;page=1;renderGrid();},180);});
 
 document.getElementById('yr').textContent=new Date().getFullYear();
 load();
