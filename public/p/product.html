@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-<link rel="icon" type="image/png" href="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/exec-200b409c-40d2-49a0-a930-b2e9da4d6862.png">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>ARCO Product</title>
+<link rel="preconnect" href="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev" crossorigin>
+<link rel="preconnect" href="https://mpkpehuatqsubohltssi.supabase.co" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&family=Changa:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="/meta-pixel.js"></script>
@@ -159,6 +161,8 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
 .product-page .variant-pop button span{display:block;margin-top:3px;color:var(--yellow);font-size:.64rem}
 .product-page .quick-confirm{position:absolute;right:10px;left:10px;bottom:48px;z-index:5;display:none;padding:7px 8px;border-radius:8px;background:rgba(34,197,94,.95);color:#08120b;font:900 .68rem/1 'Changa',sans-serif;text-align:center}
 .product-page .quick-confirm.show{display:block}
+.product-page .prod-testi .tcard{aspect-ratio:5/7}
+.product-page .prod-testi .tcard img{width:100%;height:100%;object-fit:cover}
 @media(max-width:520px){
   .product-page .topbar-inner{width:calc(100% - 24px)}
   .product-page .panel{width:calc(100% - 44px)}
@@ -1042,7 +1046,7 @@ function relatedCardHTML(p,index){
   const quickVars=relatedQuickVariants(p);
   return`<article class="pcard${isSplit?' split-card':''}">
     <a class="pthumb" href="${productUrl(p.slug)}" aria-label="${esc(p.name)}">
-      ${img?`<img src="${esc(img)}" alt="${esc(p.name)}" width="800" height="960" loading="lazy">`:''}
+      ${img?`<img src="${esc(img)}" alt="${esc(p.name)}" width="800" height="960" loading="lazy" decoding="async" fetchpriority="low">`:''}
       <div class="poverlay">
         ${index<3?'<span class="pcard-badge">الأكثر مبيعاً</span>':''}
         <span class="pcard-favorite" aria-hidden="true">👁</span>
@@ -1092,6 +1096,26 @@ function addRelatedVariant(slug,index){
   closeRelatedVariants();
   const confirm=document.getElementById(`confirm-${slug}`);
   if(confirm){confirm.classList.add('show');setTimeout(()=>confirm.classList.remove('show'),1400);}
+}
+function runNearViewport(el,cb,rootMargin='500px'){
+  if(!el)return;
+  if('IntersectionObserver'in window){
+    const io=new IntersectionObserver(entries=>{
+      if(entries.some(entry=>entry.isIntersecting)){
+        io.disconnect();
+        cb();
+      }
+    },{rootMargin});
+    io.observe(el);
+  }else{
+    setTimeout(cb,1600);
+  }
+}
+function loadDeferredImages(root){
+  root?.querySelectorAll('img[data-src]').forEach(img=>{
+    img.src=img.dataset.src;
+    img.removeAttribute('data-src');
+  });
 }
 function loadRelated(){
   const col=product?.collection||'';
@@ -1162,14 +1186,14 @@ function render(){
     </header>
     <section class="product-layout">
       <div class="gallery">
-        <div class="main-img">${imgs[0]?`<img id="main-img" src="${esc(imgs[0])}" alt="${esc(product.name)}">`:''}</div>
+        <div class="main-img">${imgs[0]?`<img id="main-img" src="${esc(imgs[0])}" alt="${esc(product.name)}" fetchpriority="high" decoding="async">`:''}</div>
         ${imgs.length>1?`<div class="thumbs">${imgs.map((img,i)=>`<button class="thumb ${i===0?'active':''}" onclick="setImage(this,'${esc(img)}')"><img src="${esc(img)}" alt=""></button>`).join('')}</div>`:''}
       </div>
       <div class="panel">
         <h1>${esc(product.name)}</h1>
         <div class="desc">${esc(product.description_ar||product.description_fr||'لوحات قماشية مميزة للأطفال مع الدفع عند الاستلام فقط.')}</div>
         <div class="price-row">${product.original_price?`<span class="old">${money(product.original_price)}</span>`:''}<span class="price" id="base-price">${money(variant.price)}</span></div>
-        <div class="product-footer-trust"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/product%20page%20footer.webp" alt="اطلب لوحتين وخذ الثالثة مجانا - الدفع عند الاستلام وفحص قبل الدفع وتوصيل للـ58 ولاية" loading="lazy"></div>
+        <div class="product-footer-trust"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/product%20page%20footer.webp" alt="اطلب لوحتين وخذ الثالثة مجانا - الدفع عند الاستلام وفحص قبل الدفع وتوصيل للـ58 ولاية" loading="lazy" decoding="async" fetchpriority="low"></div>
         <div class="block">
           <div class="label">النسخة <span class="hint">اختر النسخة</span></div>
           ${renderVariantControls()}
@@ -1200,10 +1224,10 @@ function render(){
         <div class="prod-section-title">ماذا يقول زبائننا</div>
         <div class="prod-section-sub">آراء حقيقية من زبائن حقيقيين</div>
         <div class="testi-grid">
-          <div class="tcard"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6069.jpeg" alt="تقييم" loading="lazy"></div>
-          <div class="tcard"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6070.jpeg" alt="تقييم" loading="lazy"></div>
-          <div class="tcard"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6071.jpeg" alt="تقييم" loading="lazy"></div>
-          <div class="tcard"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6072.jpeg" alt="تقييم" loading="lazy"></div>
+          <div class="tcard"><img data-src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6069.jpeg" alt="تقييم" loading="lazy" decoding="async" fetchpriority="low"></div>
+          <div class="tcard"><img data-src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6070.jpeg" alt="تقييم" loading="lazy" decoding="async" fetchpriority="low"></div>
+          <div class="tcard"><img data-src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6071.jpeg" alt="تقييم" loading="lazy" decoding="async" fetchpriority="low"></div>
+          <div class="tcard"><img data-src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/IMG_6072.jpeg" alt="تقييم" loading="lazy" decoding="async" fetchpriority="low"></div>
         </div>
       </div>
       <div class="prod-why">
@@ -1228,7 +1252,8 @@ function render(){
   updateTotals();
   updateStickyUpsell();
   bindDraftCapture();
-  loadRelated();
+  runNearViewport(document.getElementById('related-section'),loadRelated,'0px');
+  runNearViewport(document.querySelector('.prod-testi'),()=>loadDeferredImages(document.querySelector('.prod-testi')),'0px');
 }
 function bindDraftCapture(){if(draftCaptureBound||!window.ARCODraft||!product)return;draftCaptureBound=window.ARCODraft.bindDraftCapture({phoneInputId:'f-phone',watchInputIds:['f-name','f-phone','f-wilaya','f-commune','f-desk'],buildPayload:()=>({product_slug:product.slug,name:document.getElementById('f-name')?.value||'',phone:document.getElementById('f-phone')?.value||'',wilaya:document.getElementById('f-wilaya')?.value.split('|')[1]||'',wilaya_id:Number((document.getElementById('f-wilaya')?.value||'').split('|')[0]||0)||0,commune:document.getElementById('f-commune')?.value||'',delivery_type:delivery,station_code:delivery==='pickup'?selectedDesk:null,variant_label:variant?.label||variant?.name||'Standard',selected_options:selectedOptions,product_name:product.name,shipping_cost:shippingCost(),event_source_url:location.href,attribution:window.ARCOAttribution?.getPayload?.(),notes:'draft lead'})});}
 function setImage(btn,src){document.querySelectorAll('.thumb').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('main-img').src=src;}
