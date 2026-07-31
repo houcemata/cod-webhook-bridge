@@ -147,7 +147,7 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
 .product-page .poverlay{position:absolute;top:12px;left:12px;right:12px;display:flex;align-items:flex-start;gap:8px;direction:ltr}
 .product-page .pcard-badge{padding:4px 6px;border-radius:6px;background:var(--yellow);color:#080808;font:700 .55rem/1 'Changa',sans-serif;white-space:nowrap}
 .product-page .pcard-favorite{margin-inline-start:auto;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(8,8,8,.72);border:1px solid rgba(255,255,255,.18);font-size:1rem;color:#fff}
-.product-page .pcard .pmeta{position:absolute;right:10px;left:10px;bottom:10px;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;min-height:0;padding:7px 10px;border-radius:9px;background:linear-gradient(180deg,rgba(8,8,8,.04),rgba(8,8,8,.78));backdrop-filter:blur(8px);color:rgba(255,255,255,.66);text-shadow:0 1px 6px rgba(0,0,0,.75);font-family:'Changa',sans-serif}
+.product-page .pcard .pmeta{position:absolute;right:10px;bottom:10px;z-index:2;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:0;padding:5px 9px;border-radius:999px;background:rgba(8,8,8,.82);border:1px solid rgba(245,197,0,.28);backdrop-filter:blur(8px);color:rgba(255,255,255,.66);text-shadow:0 1px 6px rgba(0,0,0,.75);font-family:'Changa',sans-serif}
 .product-page .pcard .pmeta .current{color:var(--yellow);font-size:.98rem;font-weight:900}
 .product-page .pcard .pmeta .old{text-decoration:line-through;opacity:.65}
 .product-page .pcard .pbody{padding:0;background:#0d0d0d}
@@ -1051,7 +1051,7 @@ function relatedCardHTML(p,index){
         ${index<3?'<span class="pcard-badge">الأكثر مبيعاً</span>':''}
         <span class="pcard-favorite" aria-hidden="true">👁</span>
       </div>
-      <div class="pmeta"><span class="current">${money(relatedMinPrice(p))}</span>${sale?`<span class="old">${money(p.original_price)}</span>`:'<span>الدفع عند الاستلام</span>'}</div>
+      <div class="pmeta"><span class="current">${money(relatedMinPrice(p))}</span>${sale?`<span class="old">${money(p.original_price)}</span>`:''}</div>
     </a>
     <div class="pbody">
       <a class="pname" href="${productUrl(p.slug)}">${esc(p.name)}</a>
