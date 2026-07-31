@@ -6,7 +6,7 @@
 <link rel="icon" type="image/png" href="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/exec-200b409c-40d2-49a0-a930-b2e9da4d6862.png">
 <title>ARCO Product</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&family=Changa:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="/meta-pixel.js"></script>
 <script src="/tiktok-pixel.js"></script>
 <script src="/attribution.js"></script>
@@ -111,6 +111,59 @@ h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(54px,9vw,96px);line-heigh
 .success-browse-btn{display:block;background:var(--yellow);color:var(--black);border:0;border-radius:8px;padding:13px 22px;font-weight:900;font-size:16px;cursor:pointer;font-family:'Cairo',sans-serif;text-decoration:none;text-align:center}
 .success-home-btn{display:block;background:rgba(255,255,255,.07);color:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 22px;font-weight:700;font-size:15px;cursor:pointer;font-family:'Cairo',sans-serif;text-decoration:none;text-align:center;margin-top:6px}
 @media(max-width:860px){.product-layout{grid-template-columns:1fr}.gallery{position:static}.choices{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.choice{padding:9px 8px}.choice strong{font-size:14px}.choice span{font-size:11px;margin-top:2px}.option-group{margin-top:9px}.block{padding-top:13px;margin-top:13px}.form{gap:7px}.field input,.field select,.field textarea{padding:9px}.summary{padding:10px;gap:5px;margin-top:10px}.sticky.visible{display:flex}.shell{padding-top:12px;padding-bottom:96px}.topbar{padding-bottom:8px}.prod-stat.offer-stat{padding-top:6px;padding-bottom:10px}.why-grid-p,.how-grid-p{grid-template-columns:1fr}.testi-grid{grid-template-columns:1fr 1fr}}
+
+/* Product page requested layout */
+.product-page{width:100%;padding:0 0 110px}
+.product-page .topbar{position:sticky;top:0;z-index:40;padding:0;background:rgba(8,8,8,.86);border-bottom:1px solid var(--line);backdrop-filter:blur(24px)}
+.product-page .topbar-inner{width:min(1240px,calc(100% - 32px));min-height:58px;margin:0 auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px}
+.product-page .brand{grid-column:2;justify-self:center}
+.product-page .brand img{height:40px;width:auto}
+.product-page .collection-cart-trigger,.product-page .collection-whatsapp-trigger{position:relative;width:42px;height:42px;border:0;background:none;display:grid;place-items:center}
+.product-page .collection-cart-trigger{grid-column:1;justify-self:start;color:#fff;font-size:1.25rem;direction:ltr}
+.product-page .collection-cart-trigger b{position:absolute;top:1px;right:0;min-width:18px;height:18px;padding:0 4px;border-radius:99px;background:var(--yellow);color:#080808;font:800 .64rem/18px 'Changa',sans-serif}
+.product-page .collection-whatsapp-trigger{grid-column:3;justify-self:end;color:#25D366}
+.product-page .collection-whatsapp-trigger svg{width:25px;height:25px;fill:currentColor}
+.product-page .product-layout{display:block;width:100%;direction:rtl}
+.product-page .gallery{position:relative;top:0;width:100%;margin:0}
+.product-page .main-img{width:100%;height:auto;aspect-ratio:auto;border:0;border-radius:0;background:#050505}
+.product-page .main-img img{width:100%;height:auto;object-fit:contain;object-position:center;display:block}
+.product-page .thumbs{width:min(1160px,calc(100% - 36px));margin:10px auto 0}
+.product-page .panel{width:min(760px,calc(100% - 44px));margin:18px auto 0;text-align:left;direction:ltr}
+.product-page .kicker{display:none}
+.product-page h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.1rem,10vw,4.2rem);line-height:1;letter-spacing:1px;text-align:left;direction:ltr}
+.product-page .desc{text-align:left;direction:rtl}
+.product-page .price-row{justify-content:flex-start;direction:ltr}
+.product-footer-trust{margin:18px auto 0;width:100%;overflow:hidden;border-radius:12px}
+.product-footer-trust img{width:100%;height:auto;display:block}
+.product-page .related-title{font-family:'Changa',sans-serif;text-align:center;color:var(--yellow);font-size:clamp(1.35rem,5vw,2rem);line-height:1.35}
+.product-page .related-rail{gap:12px;padding-bottom:10px}
+.product-page .pcard{position:relative;flex:0 0 190px;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(13,13,13,.96));border:1px solid var(--line);box-shadow:0 8px 25px rgba(0,0,0,.3);text-decoration:none;color:#fff}
+.product-page .pcard:hover{border-color:rgba(245,197,0,.38)}
+.product-page .pthumb{position:relative;display:block;aspect-ratio:4/4.7;background:#0d0d0d;overflow:hidden}
+.product-page .pthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.product-page .split-card .pthumb{aspect-ratio:8/4.8}
+.product-page .poverlay{position:absolute;top:12px;left:12px;right:12px;display:flex;align-items:flex-start;gap:8px;direction:ltr}
+.product-page .pcard-badge{padding:4px 6px;border-radius:6px;background:var(--yellow);color:#080808;font:700 .55rem/1 'Changa',sans-serif;white-space:nowrap}
+.product-page .pcard-favorite{margin-inline-start:auto;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(8,8,8,.72);border:1px solid rgba(255,255,255,.18);font-size:1rem;color:#fff}
+.product-page .pcard .pmeta{position:absolute;right:10px;left:10px;bottom:10px;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;min-height:0;padding:7px 10px;border-radius:9px;background:linear-gradient(180deg,rgba(8,8,8,.04),rgba(8,8,8,.78));backdrop-filter:blur(8px);color:rgba(255,255,255,.66);text-shadow:0 1px 6px rgba(0,0,0,.75);font-family:'Changa',sans-serif}
+.product-page .pcard .pmeta .current{color:var(--yellow);font-size:.98rem;font-weight:900}
+.product-page .pcard .pmeta .old{text-decoration:line-through;opacity:.65}
+.product-page .pcard .pbody{padding:0;background:#0d0d0d}
+.product-page .pname{display:none!important}
+.product-page .pquick{position:relative;width:100%}
+.product-page .pcta{width:100%;min-height:44px;border:0;border-radius:0 0 10px 10px;background:var(--yellow);color:#080808;display:flex;align-items:center;justify-content:center;gap:7px;font:900 .84rem/1 'Changa',sans-serif;cursor:pointer}
+.product-page .pcta .cart-ic{width:17px;height:17px;stroke:currentColor;stroke-width:2.4;fill:none;flex-shrink:0}
+.product-page .variant-pop{position:absolute;left:8px;right:8px;bottom:calc(100% + 8px);z-index:4;display:none;grid-template-columns:1fr 1fr;gap:7px;padding:8px;border:1px solid rgba(245,197,0,.35);border-radius:10px;background:rgba(8,8,8,.96);box-shadow:0 12px 30px rgba(0,0,0,.42)}
+.product-page .variant-pop.show{display:grid}
+.product-page .variant-pop button{border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.05);color:#fff;padding:8px 6px;font:800 .68rem/1.35 'Changa',sans-serif;cursor:pointer}
+.product-page .variant-pop button span{display:block;margin-top:3px;color:var(--yellow);font-size:.64rem}
+.product-page .quick-confirm{position:absolute;right:10px;left:10px;bottom:48px;z-index:5;display:none;padding:7px 8px;border-radius:8px;background:rgba(34,197,94,.95);color:#08120b;font:900 .68rem/1 'Changa',sans-serif;text-align:center}
+.product-page .quick-confirm.show{display:block}
+@media(max-width:520px){
+  .product-page .topbar-inner{width:calc(100% - 24px)}
+  .product-page .panel{width:calc(100% - 44px)}
+  .product-page .pcard{flex-basis:188px}
+}
 </style>
 <style>
 .kids-theme{
@@ -590,7 +643,7 @@ const H={apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'applicat
 const WILAYAS=[['01','Adrar'],['02','Chlef'],['03','Laghouat'],['04','Oum El Bouaghi'],['05','Batna'],['06','Bejaia'],['07','Biskra'],['08','Bechar'],['09','Blida'],['10','Bouira'],['11','Tamanrasset'],['12','Tebessa'],['13','Tlemcen'],['14','Tiaret'],['15','Tizi Ouzou'],['16','Algiers'],['17','Djelfa'],['18','Jijel'],['19','Setif'],['20','Saida'],['21','Skikda'],['22','Sidi Bel Abbes'],['23','Annaba'],['24','Guelma'],['25','Constantine'],['26','Medea'],['27','Mostaganem'],['28',"M'Sila"],['29','Mascara'],['30','Ouargla'],['31','Oran'],['32','El Bayadh'],['33','Illizi'],['34','Bordj Bou Arreridj'],['35','Boumerdes'],['36','El Tarf'],['37','Tindouf'],['38','Tissemsilt'],['39','El Oued'],['40','Khenchela'],['41','Souk Ahras'],['42','Tipaza'],['43','Mila'],['44','Ain Defla'],['45','Naama'],['46','Ain Temouchent'],['47','Ghardaia'],['48','Relizane'],['49','Timimoun'],['50','Bordj Badji Mokhtar'],['51','Ouled Djellal'],['52','Beni Abbes'],['53','In Salah'],['54','In Guezzam'],['55','Touggourt'],['56','Djanet'],['57',"El M'Ghair"],['58','El Menia']];
 const WILAYA_DATA={"01 - Adrar":["Adrar","Akabli","Aougrout","Aoulef","Bouda","Charouine","Deldoul","Fenoughil","Reggane","Sali","Sbaa","Talmine","Tamentit","Timimoun","Tinerkouk","Tit","Tsabit","Zaouiet Kounta"],"02 - Chlef":["Abou El Hassen","Ain Merane","Benairia","Beni Haoua","Beni Rached","Boukadir","Breira","Chettia","Chlef","Dahra","El Hadjadj","El Karimia","El Marsa","Harchoun","Herenfa","Moussadek","Oued Fodda","Oued Sly","Ouled Fares","Sendjas","Sobha","Tadjna","Taougrite","Tenes","Zeboudja"],"03 - Laghouat":["Aflou","Ain Mahdi","Brida","El Ghicha","El Haouaita","Gueltat Sidi Saad","Hadj Mechri","Hassi Delaa","Hassi R'Mel","Ksar El Hirane","Laghouat","Oued M'Zi","Sidi Makhlouf","Tadjmout"],"04 - Oum El Bouaghi":["Ain Beida","Ain Fekroune","Ain Kercha","Ain M'lila","Berriche","El Amiria","El Djazia","Fkirina","Ksar Sbahi","Meskiana","Oum El Bouaghi","Rahia","Sigus","Souk Naamane"],"05 - Batna":["Ain Touta","Arris","Barika","Batna","Bouzina","Chemora","El Madher","Fesdis","Ghassira","Ichmoul","Ksar Belezma","Larbaa","Menaa","Merouana","N Gaous","Oued Chaaba","Ras El Aioun","Seriana","Tazoult","Timgad","Tkout"],"06 - BÃƒÆ’Ã‚Â©jaÃƒÆ’Ã‚Â¯a":["Adekar","Akbou","Akfadou","Amalou","Amizour","Aokas","Barbacha","Bejaia","Beni Ksila","Chemini","Darguina","El Kseur","Feraoun","Ighil Ali","Ighram","Kendira","Kherrata","Melbou","Oued Ghir","Seddouk","Sidi Aich","Souk El Thenine","Tazmalt","Tichi","Toudja"],"07 - Biskra":["Ain Naga","Biskra","Chetma","Djemorah","Doucen","El Kantara","El Outaya","Foughala","Lichana","M'lili","Mchouneche","Ouled Djellal","Oumache","Sidi Khaled","Sidi Okba","Tolga","Zeribet El Oued"],"08 - BÃƒÆ’Ã‚Â©char":["Abadla","Bechar","Beni Abbes","Beni Ounif","Boukais","Igli","Kenedsa","Kerzaz","Lahmar","Mogheul","Taghit","Timoudi"],"09 - Blida":["Ain Romana","Beni Mered","Blida","Bouarfa","Boufarik","Bougara","Bouinan","Chebli","Chiffa","El Affroun","Guerrouaou","Hammam Melouane","Larbaa","Meftah","Mouzaia","Oued El Alleug","Ouled Yaich","Soumaa"],"10 - BouÃƒÆ’Ã‚Â¯ra":["Aghbalou","Ain Bessem","Ain El Hadjar","Bechloul","Bir Ghbalou","Bordj Oukhriss","Bouira","Chorfa","Djebahia","El Adjiba","El Hachimia","El Mokrani","Haizer","Kadiria","Lakhdaria","Mchedallah","Oued El Berdi","Ouled Rached","Saharidj","Souk El Khemis","Sour El Ghozlane","Taghzout"],"11 - Tamanrasset":["Abalessa","Idles","In Amguel","In Ghar","In Guezzam","In Salah","Tamanrasset","Tinzaouatine"],"12 - TÃƒÆ’Ã‚Â©bessa":["Ain Zerga","Bekkaria","Bir El Ater","Bir El Mokadem","Boukhadra","Boulhaf Dyr","Cheria","El Aouinet","El Kouif","El Ma El Biodh","El Meridj","Ferkane","Hammamet","Morsot","Negrine","Ouenza","Oum Ali","Tebessa","Tlidjene"],"13 - Tlemcen":["Ain Fezza","Ain Ghoraba","Ain Nehala","Ain Tallout","Bab El Assa","Beni Bahdel","Beni Boussaid","Beni Mester","Beni Snous","Bensekrane","Chetouane","El Aricha","Fellaoucene","Ghazaouet","Hammam Boughrara","Hennaya","Honaine","Maghnia","Mansourah","Nedroma","Ouled Mimoun","Remchi","Sebdou","Sidi Abdelli","Sidi Djillali","Souahlia","Tlemcen"],"14 - Tiaret":["Ain Bouchekif","Ain Deheb","Ain El Hadid","Chehaima","Dahmouni","Frenda","Guertoufa","Hamadia","Ksar Chellala","Mahdia","Meghila","Naima","Oued Lilli","Rahouia","Rechaiga","Sidi Hosni","Sougueur","Tagdemt","Takhemaret","Tiaret","Tidda","Tousnina"],"15 - Tizi Ouzou":["Ain El Hammam","Ain Zaouia","Azazga","Azzefoun","Beni Yenni","Boghni","Boudjima","Bouzguene","Draa Ben Khedda","Draa El Mizan","Freha","Iferhounene","Iflissen","Larba Nath Irathen","Maatkas","Makouda","Mekla","Ouacif","Ouadhia","Ouaguenoun","Souk El Thenine","Tadmait","Tigzirt","Timizart","Tizi Ouzou","Tizi Rached","Yakourene"],"16 - Algiers":["Ain Benian","Ain Taya","Alger Centre","Bab El Oued","Bab Ezzouar","Baba Hesen","Bachedjerah","Baraki","Ben Aknoun","Bir Mourad Rais","Bir Touta","Birkhadem","Bordj El Bahri","Bordj El Kiffan","Bourouba","Bouzareah","Casbah","Cheraga","Dar El Beida","Dely Ibrahim","Douira","Draria","El Achour","El Biar","El Harrach","El Madania","El Mouradia","Herraoua","Hussein Dey","Hydra","Kheraisia","Kouba","Marsa","Mohamed Belouzdad","Mohammadia","Oued Smar","Ouled Fayet","Rahmania","Reghaia","Rouiba","Sidi M'hamed","Sidi Moussa","Souidania","Zeralda"],"17 - Djelfa":["Ain El Ibel","Ain Oussera","Benhar","Birine","Charef","Djelfa","El Idrissia","El Khemis","Guernini","Had Sahary","Hassi Bahbah","Hassi El Euch","M'Liliha","Messaad","Moudjebara","Sidi Ladjel","Zaafrane"],"18 - Jijel":["Bordj T'her","Chekfa","El Ancer","El Aouana","El Milia","Erraguene","Jijel","Ouadjana","Sidi Abdelaziz","Taher","Texena","Ziamma Mansouriah"],"19 - SÃƒÆ’Ã‚Â©tif":["Ain Abessa","Ain Arnat","Ain El Kebira","Ain Oulmane","Amoucha","Babor","Beni Aziz","Beni Ouartilane","Bir El Arch","Bouandas","Bougaa","Bousselam","Boutaleb","Djemila","El Eulma","El Ouricia","Guenzet","Guidjel","Hamma","Hammam Guergour","Mezloug","Ouled Sabor","Rosfa","Salah Bey","Setif","Taya","Tella"],"20 - SaÃƒÆ’Ã‚Â¯da":["Ain El Hadjar","Ain Sekhouna","Doui Thabet","El Hassasna","Moulay Larbi","Ouled Brahim","Saida","Sidi Boubekeur","Youb"],"21 - Skikda":["Ain Cherchar","Azzaba","Collo","El Harrouch","El Marsa","Kerkera","Ramdane Djamel","Sidi Mezghiche","Skikda","Tamalous","Zitouna"],"22 - Sidi Bel AbbÃƒÆ’Ã‚Â¨s":["Ain El Berd","Belarbi","Ben Badis","Bir El Hammam","Dhaya","Lamtar","Makedra","Marhoum","Merine","Mostefa Ben Brahim","Moulay Slissen","Ras El Ma","Sfissef","Sidi Ali Benyoub","Sidi Bel Abbes","Sidi Brahim","Tabia","Telagh","Tenira","Tessala"],"23 - Annaba":["Ain Berda","Annaba","Berrahel","Chetaibi","El Bouni","El Hadjar","Seraidi","Sidi Amer"],"24 - Guelma":["Ain Ben Beida","Ain Larbi","Ain Makhlouf","Ain Reggada","Belkhir","Bouchegouf","Guelma","Hammam Maskhoutine","Heliopolis","Medjez Amar","Nechmaya","Oued Zenati","Roknia","Tamlouka"],"25 - Constantine":["Ain Abid","Ain Smara","Beni Hamiden","Constantine","Didouche Mourad","El Khroub","Hamma Bouziane","Ibn Badis","Ibn Ziad","Ouled Rahmoune","Zighoud Youcef"],"26 - MÃƒÆ’Ã‚Â©dÃƒÆ’Ã‚Â©a":["Ain Boucif","Berrouaghia","Boghar","Boughezoul","El Hamdania","El Omaria","Ksar El Boukhari","Medea","Meftaha","Mihoub","Ouled Antar","Sedraia","Sidi Naamane","Souagui","Tablat","Zoubiria"],"27 - Mostaganem":["Achaacha","Ain Nouissy","Ain Tadles","Bouguirat","El Hassiane","Hadjadj","Hassi Mameche","Mostaganem","Oued El Kheir","Ouled Boughalem","Safsaf","Sayada","Sidi Ali","Sidi Lakhdar","Stidia","Touahria"],"28 - M'Sila":["Ain El Hadjel","Ain El Melh","Beni Ilmane","Bir Foda","Bou Saada","Chellal","El Hamel","Hammam Dhalaa","M'sila","Maadid","Magra","Medjedel","Ouanougha","Ouled Addi Guebala","Ouled Mansour","Sidi Aissa","Sidi Ameur","Zarzour"],"29 - Mascara":["Ain Fekan","Alaimia","Aouf","Benian","Bou Hanifia","Chorfa","El Bordj","El Hachem","Froha","Ghriss","Hacine","Maoussa","Mascara","Mohammadia","Oggaz","Oued El Abtal","Oued Taria","Sehailia","Sidi Abdelmoumene","Sig","Teghennif","Zahana"],"30 - Ouargla":["Ain Beida","Benaceur","El Allia","El Hadjira","Hassi Ben Abdellah","Hassi Messaoud","Megarine","Nezla","Ngoussa","Ouargla","Rouissat","Sidi Khouiled","Taibet","Tamacine","Touggourt","Zaouia El Abidia"],"31 - Oran":["Ain Biya","Ain Turk","Arzew","Ben Freha","Bethioua","Bir El Djir","Boufatis","Bousfer","Boutlelis","El Karma","Es Senia","Gdyel","Hassi Ben Okba","Hassi Bounif","Mers El Kebir","Messerghin","Oran","Oued Tlelat","Sidi Ben Yebka","Sidi Chami","Tafraoui"],"32 - El Bayadh":["Boualem","Brezina","El Abiodh Sidi Cheikh","El Bayadh","El Bnoud","El Kheither","Ghassoul","Rogassa","Sidi Ameur","Sidi Slimane"],"33 - Illizi":["Bordj El Haouasse","Bordj Omar Driss","Debdeb","Djanet","Illizi","In Amenas"],"34 - Bordj Bou ArrÃƒÆ’Ã‚Â©ridj":["Ain Taghrout","Belimour","Bir Kasdali","Bordj Bou Arreridj","Bordj Ghdir","Bordj Zemoura","Djaafra","El Achir","El Hamadia","El Main","Ghilassa","Hasnaoua","Khelil","Mansoura","Medjana","Ouled Brahem","Ras El Oued","Sidi Embarek","Teniet En Nasr","Tixter"],"35 - BoumerdÃƒÆ’Ã‚Â¨s":["Afir","Ammal","Baghlia","Beni Amrane","Bordj Menaiel","Boudouaou","Boumerdes","Chabet El Ameur","Corso","Dellys","Djinet","El Kharrouba","Hammedi","Isser","Khemis El Khechna","Larbatache","Naciria","Ouled Aissa","Ouled Moussa","Si Mustapha","Sidi Daoud","Souk El Had","Thenia","Tidjelabine","Timezrit","Zemmouri"],"36 - El Tarf":["Ain El Assel","Ben M Hidi","Besbes","Bouhadjar","Bouteldja","Chefia","Drean","El Kala","El Tarf","Oued Zitoun","Zitouna"],"37 - Tindouf":["Oum El Assel","Tindouf"],"38 - Tissemsilt":["Bordj Bou Naama","Boucaid","Khemisti","Lardjem","Layoune","Lazharia","Melaab","Ouled Bessem","Sidi Abed","Sidi Lantri","Sidi Slimane","Theniet El Had","Tissemsilt"],"39 - El Oued":["Bayadha","Debila","Djamaa","El Mghair","El Ogla","El Oued","Guemar","Hassi Khelifa","Kouinine","Mrara","Nakhla","Oued El Alenda","Oum Touyour","Reguiba","Robbah","Sidi Amrane","Sidi Aoun","Still","Taghzout","Taleb Larbi","Tendla"],"40 - Khenchela":["Ain Touila","Babar","Baghai","Bouhmama","Chelia","Cherchar","Djellal","El Hamma","El Mahmal","Kais","Khenchela","Msara","Ouled Rechache","Remila","Tamza","Yabous"],"41 - Souk Ahras":["Ain Soltane","Bir Bouhouche","Haddada","Hanancha","Khedara","Khemissa","M'daourouche","Mechroha","Merahna","Oued Keberit","Ouled Driss","Sedrata","Sidi Fredj","Souk Ahras","Taoura","Tiffech"],"42 - Tipaza":["Ain Tagourait","Attatba","Bou Haroun","Bou Ismail","Bourkika","Cherchell","Damous","Douaouda","Fouka","Gouraya","Hadjout","Khemisti","Kolea","Larhat","Menaceur","Meurad","Sidi Amar","Sidi Ghiles","Sidi Rached","Tipaza"],"43 - Mila":["Ahmed Rachedi","Ain Mellouk","Amira Arras","Chelghoum Laid","El Mechira","Ferdjioua","Grarem Gouga","Mila","Minar Zarza","Oued Athmenia","Oued Endja","Rouached","Sidi Khelifa","Sidi Merouane","Tadjenanet","Telerghma","Zeghaia"],"44 - AÃƒÆ’Ã‚Â¯n Defla":["Ain Benian","Ain Defla","Ain Lechiakh","Arib","Belaas","Bordj Emir Khaled","Boumedfaa","Djelida","Djendel","El Abadia","El Amra","El Attaf","Hammam Righa","Khemis Miliana","Miliana","Oued Chorfa","Rouina","Sidi Lakhdar","Zeddine"],"45 - NaÃƒÆ’Ã‚Â¢ma":["Ain Ben Khelil","Ain Sefra","El Biod","Kasdir","Mechria","Moghrar","Naama","Sfissifa","Tiout"],"46 - AÃƒÆ’Ã‚Â¯n TÃƒÆ’Ã‚Â©mouchent":["Ain El Arbaa","Ain Kihal","Ain Temouchent","Ain Tolba","Beni Saf","Bou Zedjar","El Amria","El Malah","Hammam Bouhadjar","Hassi El Ghella","Oued Berkeche","Ouled Boudjemaa","Ouled Kihal","Sidi Ben Adda","Sidi Boumediene","Sidi Safi","Tamzoura","Terga"],"47 - GhardaÃƒÆ’Ã‚Â¯a":["Berriane","Bounoura","El Atteuf","El Guerrara","El Meniaa","Ghardaia","Hassi Fehal","Mansoura","Metlili","Sebseb","Zelfana"],"48 - Relizane":["Ain Rahma","Ammi Moussa","Bendaoud","Beni Zentis","Djidiouia","El Guettar","El Hamadna","El Matmar","Had Echkalla","Kalaa","Lahlef","Mazouna","Mediouna","Ouarizane","Oued Rhiou","Relizane","Sidi Khettab","Sidi M'hamed Benali","Sidi Saada","Yellel","Zemmoura"],"49 - Timimoun":["Aougrout","Charouine","Deldoul","Metarfa","Ouled Aissa","Talmine","Timimoun","Tinerkouk"],"51 - Ouled Djellal":["Besbes","Chaiba","Doucen","Ouled Djellal","Ras El Miad","Sidi Khaled"],"52 - BÃƒÆ’Ã‚Â©ni AbbÃƒÆ’Ã‚Â¨s":["Beni-Abbes","Beni-Ikhlef","El Ouata","Igli","Kerzaz","Ksabi","Tamtert","Timoudi"],"53 - In Salah":["Ain Salah","Foggaret Ezzoua","Inghar"],"55 - Touggourt":["Blidet Amor","El Alia","El-Hadjira","Megarine","Nezla","Sidi Slimane","Taibet","Tebesbest","Temacine","Touggourt","Zaouia El Abidia"],"56 - Djanet":["Bordj El Haouass","Djanet"],"57 - El M'Ghair":["Djamaa","El-M'ghaier","M'rara","Oum Touyour","Sidi Amrane","Sidi Khelil","Still","Tenedla"],"58 - El Menia":["El Meniaa","Hassi Fehal","Hassi Gara"]};
 const WILAYA_COMMUNES=Object.fromEntries(Object.entries(WILAYA_DATA).map(([key,value])=>[key.slice(0,2),value]));
-let product=null,variant=null,selectedOptions={},delivery='home',shipping={home_delivery:0,stop_desk:0},desks=null,selectedDesk='',checkoutTracked=false,draftCaptureBound=false;
+let product=null,variant=null,selectedOptions={},delivery='home',shipping={home_delivery:0,stop_desk:0},desks=null,selectedDesk='',checkoutTracked=false,draftCaptureBound=false,relatedItems=[];
 
 function slugFromPath(){const parts=location.pathname.split('/').filter(Boolean);return parts[1]&&parts[1]!=='product.html'?decodeURIComponent(parts[1]):new URLSearchParams(location.search).get('slug');}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -962,6 +1015,84 @@ function updateStickyUpsell(){
   else if(isSet()){el.textContent='اطلب أكثر، وفّر أكثر';if(cta)cta.textContent='اطلب الآن';}
   else if(cta)cta.textContent='اطلب الآن';
 }
+function relatedImages(p){
+  return Array.isArray(p.images)?p.images:(p.images?[p.images]:[]);
+}
+function relatedVariants(p){
+  const raw=p.variants;let list=[];
+  if(Array.isArray(raw))list=raw;
+  else if(raw&&typeof raw==='object')list=Object.entries(raw).map(([name,val])=>typeof val==='object'?{name,...val}:{name,price:val});
+  if(!list.length)list=[{name:'Standard',label:'Standard',price:p.price,image:relatedImages(p)[0]||''}];
+  return list.map(v=>({name:v.name||v.label||v.value||'Standard',label:v.label||v.name||v.value||'Standard',price:Number(v.price||p.price||0),image:v.image||relatedImages(p)[0]||'',options:v.options||null}));
+}
+function relatedMinPrice(p){
+  const prices=relatedVariants(p).map(v=>Number(v.price||0)).filter(v=>v>0);
+  return prices.length?Math.min(...prices):Number(p.price||0);
+}
+function relatedQuickVariants(p){
+  const vars=relatedVariants(p);
+  return vars.length?vars.slice(0,6):[{label:'Standard',price:p.price,image:relatedImages(p)[0]||''}];
+}
+function relatedVariantLabel(v){return v.label||v.name||'Standard';}
+function productUrl(slug){return `/p/${encodeURIComponent(slug)}`;}
+function relatedCardHTML(p,index){
+  const img=relatedImages(p)[0]||'';
+  const sale=Number(p.original_price||0)>relatedMinPrice(p);
+  const isSplit=String(p.type||p.product_type||'').toLowerCase().includes('split');
+  const quickVars=relatedQuickVariants(p);
+  return`<article class="pcard${isSplit?' split-card':''}">
+    <a class="pthumb" href="${productUrl(p.slug)}" aria-label="${esc(p.name)}">
+      ${img?`<img src="${esc(img)}" alt="${esc(p.name)}" width="800" height="960" loading="lazy">`:''}
+      <div class="poverlay">
+        ${index<3?'<span class="pcard-badge">الأكثر مبيعاً</span>':''}
+        <span class="pcard-favorite" aria-hidden="true">👁</span>
+      </div>
+      <div class="pmeta"><span class="current">${money(relatedMinPrice(p))}</span>${sale?`<span class="old">${money(p.original_price)}</span>`:'<span>الدفع عند الاستلام</span>'}</div>
+    </a>
+    <div class="pbody">
+      <a class="pname" href="${productUrl(p.slug)}">${esc(p.name)}</a>
+      <div class="pquick">
+        <div class="quick-confirm" id="confirm-${esc(p.slug)}">تمت الإضافة للسلة</div>
+        <div class="variant-pop" id="variants-${esc(p.slug)}">
+          ${quickVars.map((v,i)=>`<button type="button" onclick="addRelatedVariant('${esc(p.slug)}',${i})">${esc(relatedVariantLabel(v))}<span>${money(Number(v.price||p.price||0))}</span></button>`).join('')}
+        </div>
+        <button class="pcta" type="button" onclick="toggleRelatedVariants('${esc(p.slug)}')"><svg class="cart-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.7"/><circle cx="18" cy="20" r="1.7"/><path d="M3 4h2.2l2.3 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 1.9-1.4L21 8H6.1"/></svg><span>أضف للسلة</span></button>
+      </div>
+    </div>
+  </article>`;
+}
+function closeRelatedVariants(exceptSlug){
+  document.querySelectorAll('.variant-pop.show').forEach(pop=>{
+    if(!exceptSlug||pop.id!==`variants-${exceptSlug}`)pop.classList.remove('show');
+  });
+}
+function toggleRelatedVariants(slug){
+  const pop=document.getElementById(`variants-${slug}`);
+  if(!pop)return;
+  const willOpen=!pop.classList.contains('show');
+  closeRelatedVariants(slug);
+  pop.classList.toggle('show',willOpen);
+}
+function addRelatedVariant(slug,index){
+  const product=relatedItems.find(p=>p.slug===slug);
+  if(!product||!window.ARCOCart)return;
+  const vars=relatedQuickVariants(product);
+  const fallback={label:'Standard',price:product.price,image:relatedImages(product)[0]||''};
+  const v=vars[index]||fallback;
+  if(product.collection){try{localStorage.setItem('arco_last_collection',product.collection);}catch(e){}}
+  window.ARCOCart.add({
+    product_slug:product.slug,
+    product:product.name,
+    variant:relatedVariantLabel(v),
+    selected_options:v.options||null,
+    price:Number(v.price||product.price||0),
+    image:v.image||relatedImages(product)[0]||''
+  });
+  updateStickyCartBadge();
+  closeRelatedVariants();
+  const confirm=document.getElementById(`confirm-${slug}`);
+  if(confirm){confirm.classList.add('show');setTimeout(()=>confirm.classList.remove('show'),1400);}
+}
 function loadRelated(){
   const col=product?.collection||'';
   const sl=product?.slug||'';
@@ -972,18 +1103,13 @@ function loadRelated(){
   fetch(`${SB_URL}/products?select=slug,name,images,variants,price&active=eq.true&collection=eq.${encodeURIComponent(col)}&limit=12`,{headers:H})
     .then(r=>r.json()).then(data=>{
       if(!Array.isArray(data)){section.style.display='none';return;}
-      const items=data.filter(p=>p.slug!==sl).slice(0,6);
+      const items=data.filter(p=>p.slug!==sl).slice(0,8);
       if(!items.length){section.style.display='none';return;}
-      rail.innerHTML=items.map(p=>{
-        const im=Array.isArray(p.images)?p.images:(p.images?[p.images]:[]);
-        const img=im[0]||'';
-        const vars=Array.isArray(p.variants)?p.variants:(p.variants&&typeof p.variants==='object'?Object.values(p.variants):[]);
-        const minP=vars.length?Math.min(...vars.map(v=>Number(v.price||0)).filter(v=>v>0)):Number(p.price||0);
-        return`<a class="rcard" href="/p/${encodeURIComponent(p.slug)}"><div class="rcard-img">${img?`<img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy">`:''}</div><div class="rcard-info"><div class="rcard-name">${esc(p.name)}</div><div class="rcard-price">${money(minP)}</div></div></a>`;
-      }).join('');
+      relatedItems=items;
+      rail.innerHTML=items.map(relatedCardHTML).join('');
     }).catch(()=>{section.style.display='none';});
 }
-function updateStickyCartBadge(){const badge=document.getElementById('sticky-cart-badge');if(!badge)return;const count=window.ARCOCart?.count?.()||0;badge.textContent=count;badge.classList.toggle('zero',count===0);}
+function updateStickyCartBadge(){const count=window.ARCOCart?.count?.()||0;const badge=document.getElementById('sticky-cart-badge');if(badge){badge.textContent=count;badge.classList.toggle('zero',count===0);}const collectionBadge=document.getElementById('collectionCartCount');if(collectionBadge)collectionBadge.textContent=count;}
 function addCurrentToCart(){
   if(!product||!window.ARCOCart)return;
   const v=findSelectedVariant()||variant||variants()[0];
@@ -1018,20 +1144,32 @@ function missing(){document.getElementById('app').innerHTML='<div class="missing
 function render(){
   if(isKidsProduct()){renderKidsPage();return;}
   const imgs=images();document.title=product.name+' - ARCO';
-  document.getElementById('app').innerHTML=`
-    <header class="topbar"><a class="brand" href="/"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/ACRO%20logo%20shopiy-03.png" alt="ARCO"></a><a class="back" href="/">كل تصاميمنا</a></header>
-    ${statHeroHTML()}
+  const app=document.getElementById('app');
+  app.classList.add('product-page');
+  app.innerHTML=`
+    <header class="topbar">
+      <div class="topbar-inner">
+        <button class="collection-cart-trigger" type="button" onclick="window.ARCOCart?.open()" aria-label="فتح السلة">
+          <span aria-hidden="true">🛒</span><b id="collectionCartCount">0</b>
+        </button>
+        <a class="brand" href="/" aria-label="ARCO">
+          <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/ACRO%20logo%20shopiy-03.png" alt="ARCO" width="130" height="40">
+        </a>
+        <a class="collection-whatsapp-trigger" href="https://wa.me/213550374607" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"/></svg>
+        </a>
+      </div>
+    </header>
     <section class="product-layout">
       <div class="gallery">
         <div class="main-img">${imgs[0]?`<img id="main-img" src="${esc(imgs[0])}" alt="${esc(product.name)}">`:''}</div>
         ${imgs.length>1?`<div class="thumbs">${imgs.map((img,i)=>`<button class="thumb ${i===0?'active':''}" onclick="setImage(this,'${esc(img)}')"><img src="${esc(img)}" alt=""></button>`).join('')}</div>`:''}
       </div>
       <div class="panel">
-        <div class="kicker">ARCO - COD Algeria</div>
         <h1>${esc(product.name)}</h1>
         <div class="desc">${esc(product.description_ar||product.description_fr||'لوحات قماشية مميزة للأطفال مع الدفع عند الاستلام فقط.')}</div>
         <div class="price-row">${product.original_price?`<span class="old">${money(product.original_price)}</span>`:''}<span class="price" id="base-price">${money(variant.price)}</span></div>
-        <div class="trust-strip"><span class="trust-chip">💳 دفع عند الاستلام</span><span class="trust-chip">👀 فحص قبل الدفع</span><span class="trust-chip">🚚 توصيل 58 ولاية</span></div>
+        <div class="product-footer-trust"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/product%20page%20footer.webp" alt="اطلب لوحتين وخذ الثالثة مجانا - الدفع عند الاستلام وفحص قبل الدفع وتوصيل للـ58 ولاية" loading="lazy"></div>
         <div class="block">
           <div class="label">النسخة <span class="hint">اختر النسخة</span></div>
           ${renderVariantControls()}
@@ -1055,7 +1193,7 @@ function render(){
     </section>
     <div class="shell" style="padding-top:0">
       <div class="related-section" id="related-section">
-        <div class="related-title">تصاميم قد تعجبك</div>
+        <div class="related-title">اضف لوحات أخرى واستفد من العرض</div>
         <div class="related-rail" id="related-rail"><div style="color:#555;font-size:13px;padding:10px">جاري التحميل...</div></div>
       </div>
       <div class="prod-testi">
