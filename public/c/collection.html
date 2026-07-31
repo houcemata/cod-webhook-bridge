@@ -431,7 +431,7 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 <script src="/meta-pixel.js" defer></script>
 <script src="/tiktok-pixel.js" defer></script>
 <script src="/attribution.js" defer></script>
-<script src="/cart.js" defer></script>
+<script src="/cart.js?v=20260731-cart-state-2" defer></script>
 </head>
 <body>
 
@@ -711,6 +711,8 @@ const COLLECTION_HERO_IMAGES={
   motivation:'motivation.webp',
   tv:'tv.webp'
 };
+const COLLECTION_ALIASES={gaming:'games',girls:'girl'};
+function canonicalCollectionSlug(slug){return COLLECTION_ALIASES[String(slug||'').trim()]||String(slug||'').trim();}
 
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const money=v=>Number(v||0).toLocaleString('fr-DZ')+' DZD';
@@ -732,7 +734,7 @@ function isSetProduct(p){const t=productType(p);return t==='set'||t.includes('se
 function isPosterProduct(p){const t=productType(p);return t==='poster'||(!isSetProduct(p)&&Number(minPrice(p))>0);}
 function heroUrlFor(slug){const file=COLLECTION_HERO_IMAGES[slug];return file?HERO_BASE+file:'';}
 
-let collectionSlug=new URLSearchParams(location.search).get('slug')||(location.pathname.split('/').filter(Boolean)[1]||'');
+let collectionSlug=canonicalCollectionSlug(new URLSearchParams(location.search).get('slug')||(location.pathname.split('/').filter(Boolean)[1]||''));
 let collection=null,allItems=[],activeSub='all',typeFilter='all',page=1,searchQuery='';
 
 function toggleCollectionMenu(){
@@ -768,10 +770,12 @@ function updateCollectionCart(){
 }
 setInterval(updateCollectionCart,500);
 function cartHasProduct(slug){
+  const wanted=String(slug||'').trim().toLowerCase();
+  if(!wanted)return false;
   if(window.ARCOCart?.has)return window.ARCOCart.has(slug);
   try{
     const cart=JSON.parse(localStorage.getItem('arco_cart_v1')||'[]');
-    return cart.some(item=>String(item.product_slug||'').trim()===String(slug||'').trim());
+    return cart.some(item=>String(item.product_slug||item.slug||'').trim().toLowerCase()===wanted);
   }catch(e){return false;}
 }
 function cartButtonText(inCart){return inCart?'مضاف للسلة':'أضف للسلة';}
@@ -792,6 +796,9 @@ function handleQuickCartClick(slug){
   toggleQuickVariants(slug);
 }
 window.addEventListener('arco:cartchange',()=>{updateCollectionCart();refreshCartAwareButtons();});
+window.addEventListener('pageshow',()=>{updateCollectionCart();refreshCartAwareButtons();});
+window.addEventListener('focus',()=>{updateCollectionCart();refreshCartAwareButtons();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateCollectionCart();refreshCartAwareButtons();}});
 
 function cardHTML(p){
   const img=pImages(p)[0];

@@ -88,7 +88,11 @@
       openAdded(item);
     },
     count() { return read().length; },
-    has(slug) { return read().some(item => String(item.product_slug || '').trim() === String(slug || '').trim()); },
+    has(slug) {
+      const wanted = String(slug || '').trim().toLowerCase();
+      if (!wanted) return false;
+      return read().some(item => String(item.product_slug || item.slug || '').trim().toLowerCase() === wanted);
+    },
     items() { return read(); },
     open: openDrawer,
   };

@@ -13,7 +13,7 @@
 <script src="/tiktok-pixel.js"></script>
 <script src="/attribution.js"></script>
 <script src="/draft-capture.js"></script>
-<script src="/cart.js"></script>
+<script src="/cart.js?v=20260731-cart-state-2"></script>
 <style>
 :root{--yellow:#F5C500;--black:#080808;--dark:#111;--line:rgba(255,255,255,.12);--muted:#aaa;--red:#e11d48;--green:#22c55e}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -1044,10 +1044,12 @@ function relatedQuickVariants(p){
 function relatedVariantLabel(v){return v.label||v.name||'Standard';}
 function productUrl(slug){return `/p/${encodeURIComponent(slug)}`;}
 function cartHasProduct(slug){
+  const wanted=String(slug||'').trim().toLowerCase();
+  if(!wanted)return false;
   if(window.ARCOCart?.has)return window.ARCOCart.has(slug);
   try{
     const cart=JSON.parse(localStorage.getItem('arco_cart_v1')||'[]');
-    return cart.some(item=>String(item.product_slug||'').trim()===String(slug||'').trim());
+    return cart.some(item=>String(item.product_slug||item.slug||'').trim().toLowerCase()===wanted);
   }catch(e){return false;}
 }
 function cartButtonText(inCart){return inCart?'مضاف للسلة':'أضف للسلة';}
@@ -1075,6 +1077,9 @@ function handleRelatedCartClick(slug){
   toggleRelatedVariants(slug);
 }
 window.addEventListener('arco:cartchange',()=>{updateStickyCartBadge();refreshCartAwareButtons();});
+window.addEventListener('pageshow',()=>{updateStickyCartBadge();refreshCartAwareButtons();});
+window.addEventListener('focus',()=>{updateStickyCartBadge();refreshCartAwareButtons();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){updateStickyCartBadge();refreshCartAwareButtons();}});
 function relatedCardHTML(p,index){
   const img=relatedImages(p)[0]||'';
   const sale=Number(p.original_price||0)>relatedMinPrice(p);
@@ -1155,7 +1160,8 @@ function loadDeferredImages(root){
   });
 }
 function loadRelated(){
-  const col=product?.collection||'';
+  const collectionAliases={gaming:'games',girls:'girl'};
+  const col=collectionAliases[String(product?.collection||'').trim()]||String(product?.collection||'').trim();
   const sl=product?.slug||'';
   const section=document.getElementById('related-section');
   const rail=document.getElementById('related-rail');
@@ -1163,8 +1169,8 @@ function loadRelated(){
   if(!col){section.style.display='none';return;}
   const enc=encodeURIComponent(col);
   Promise.all([
-    fetch(`${SB_URL}/products?select=slug,name,images,variants,price,original_price,type,product_type,sort_order,collection&active=eq.true&collection=eq.${enc}&limit=500`,{headers:H}).then(r=>r.json()),
-    fetch(`${SB_URL}/product_order_counts?select=slug,order_count&collection=eq.${enc}&limit=500`,{headers:H}).then(r=>r.json()).catch(()=>[])
+    fetch(`${SB_URL}/products?select=*&active=eq.true&collection=eq.${enc}&limit=500`,{headers:H}).then(r=>r.ok?r.json():[]),
+    fetch(`${SB_URL}/product_order_counts?select=slug,order_count&collection=eq.${enc}&limit=500`,{headers:H}).then(r=>r.ok?r.json():[]).catch(()=>[])
   ]).then(([data,counts])=>{
       if(!Array.isArray(data)){section.style.display='none';return;}
       const orderCounts={};
