@@ -47,7 +47,7 @@
     { min: 13000, off: 3000 },
     { min: 9500,  off: 2000 },
     { min: 6000,  off: 1000 },
-    { min: 3000,  off: 500  },
+    { min: 4000,  off: 500  },
   ];
   function thresholdDiscount(subtotal) {
     for (const t of THRESHOLDS) if (subtotal >= t.min) return t.off;
