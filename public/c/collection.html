@@ -424,6 +424,28 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
   .sec-title{font-size:1.3rem}.sec-sub{font-size:.62rem}
   .footer{padding-bottom:100px}
 }
+/* FINAL MOBILE COLLECTION POLISH */
+.collection-hero{display:block;width:100%;max-width:none;margin:0;border-radius:0;min-height:0;aspect-ratio:1870/850;background:#080808}
+.collection-hero>a{position:relative;display:block;width:100%;height:100%;overflow:hidden}
+.collection-hero img{display:block;width:100%;height:auto;aspect-ratio:1870/850;object-fit:cover;object-position:center;background:#080808}
+.collection-hero .collection-hero-cta{position:absolute;right:7%;bottom:9%;display:inline-flex;align-items:center;gap:12px;margin:0;padding:11px 20px;border-radius:9px;background:var(--y);color:#080808;font:800 .88rem/1 'Changa',sans-serif;box-shadow:0 8px 22px rgba(0,0,0,.32)}
+.collection-offer-image{padding:14px 0 8px}
+.collection-offer-image img{display:block;width:100%;height:auto;aspect-ratio:748/264;object-fit:cover;border:1px solid rgba(245,197,0,.28);border-radius:16px;background:#080808;box-shadow:0 12px 34px rgba(0,0,0,.3)}
+.col-icon-bar{position:relative;top:auto;padding:10px 0 8px;background:rgba(8,8,8,.94);border-bottom:1px solid var(--ln)}
+.col-icon-bar::before{display:none}
+.col-icon-scroll{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.col-icon-item{width:auto;padding:9px 16px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.035);color:#ddd;white-space:nowrap;font:700 .73rem/1 'Changa',sans-serif}
+.col-icon-item.active{border-color:var(--y);background:rgba(245,197,0,.1);color:var(--y)}
+.col-scroll-hint{position:absolute;left:10px;bottom:2px;color:var(--y);font:700 .6rem/1 'Changa',sans-serif;pointer-events:none}
+.col-scroll-hint.hidden{opacity:0}
+.toolbar{margin-top:10px}
+.col-search{display:none!important}
+@media(max-width:640px){
+  .collection-hero .collection-hero-cta{right:5%;bottom:7%;padding:9px 15px;font-size:.72rem}
+  .collection-offer-image{padding:10px 0 5px}
+  .collection-offer-image img{border-radius:12px}
+  .col-icon-item{padding:8px 14px;font-size:.68rem}
+}
 </style>
 <script src="/meta-pixel.js" defer></script>
 <script src="/tiktok-pixel.js" defer></script>
@@ -435,19 +457,6 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 <a class="skip-link" href="#products">تخطى إلى المنتجات</a>
 
 <div class="orbs" aria-hidden="true"><div class="orb orb-1"></div></div>
-
-<div class="announce" aria-label="إعلانات">
-  <div class="announce-track">
-    <span class="announce-item">🚚 توصيل لجميع الولايات الـ 58 <span class="announce-sep">✦</span></span>
-    <span class="announce-item">💳 الدفع عند الاستلام فقط <span class="announce-sep">✦</span></span>
-    <span class="announce-item">👀 حق الفحص قبل الدفع <span class="announce-sep">✦</span></span>
-    <span class="announce-item">🎁 اشترِ لوحتين والثالثة مجاناً <span class="announce-sep">✦</span></span>
-    <span class="announce-item">🚚 توصيل لجميع الولايات الـ 58 <span class="announce-sep">✦</span></span>
-    <span class="announce-item">💳 الدفع عند الاستلام فقط <span class="announce-sep">✦</span></span>
-    <span class="announce-item">👀 حق الفحص قبل الدفع <span class="announce-sep">✦</span></span>
-    <span class="announce-item">🎁 اشترِ لوحتين والثالثة مجاناً <span class="announce-sep">✦</span></span>
-  </div>
-</div>
 
 <header class="topbar">
   <div class="wrap topbar-inner">
@@ -474,36 +483,17 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 
 <section class="collection-hero wrap" id="collectionHero" aria-labelledby="hero-title">
   <a href="#products" aria-label="شاهد التصاميم">
-    <img id="collectionHeroImg" alt="" width="1829" height="1437" fetchpriority="high">
+    <img id="collectionHeroImg" alt="" width="1870" height="850" fetchpriority="high">
+    <span class="collection-hero-cta">شاهد التصاميم <span aria-hidden="true">←</span></span>
   </a>
 </section>
 
-<!-- OFFER HERO — above the collection selector -->
-<div class="stat-hero wrap collection-offer">
-  <div class="collection-offer-main">
-    <div class="collection-offer-copy">
-      <span class="offer-kicker">عرض لفترة محدودة</span>
-      <div class="collection-offer-headline">اطلب لوحتين<br><em>والثالثة مجاناً</em></div>
-      <div class="collection-offer-sub">أضف لوحة أخرى واستفد أكثر</div>
-    </div>
-    <div class="offer-steps" aria-label="طريقة العرض">
-      <div class="offer-step"><b>1</b><span>لوحة</span></div>
-      <div class="offer-step"><b>2</b><span>لوحتان</span></div>
-      <div class="offer-step offer-step-free"><b>مجانا</b><span>الثالثة</span></div>
-    </div>
-    <div class="collection-promos" aria-label="عروض الكمية">
-      <div class="collection-promo"><strong>العرض يتحسب تلقائياً في السلة</strong><span>بدون كود خصم</span></div>
-    </div>
-  </div>
-</div>
+<!-- Shared static promotion image; replace OFFER_IMAGE_URL when the final R2 asset is uploaded. -->
+<section class="collection-offer-image wrap" aria-label="عرض اللوحات">
+  <img id="collectionOfferImg" alt="اطلب لوحتين وخذ الثالثة مجاناً" width="748" height="264" loading="lazy">
+</section>
 
-<div class="wrap trust-strip-collection" aria-label="مزايا الطلب">
-  <span class="trust-chip-collection">💳 الدفع عند الاستلام</span>
-  <span class="trust-chip-collection">👀 افحص قبل الدفع</span>
-  <span class="trust-chip-collection">🚚 توصيل للـ58 ولاية</span>
-</div>
-
-<!-- COLLECTION ICON BAR -->
+<!-- SCROLLABLE TEXT-ONLY COLLECTION CHIPS -->
 <div class="col-icon-bar">
   <div class="wrap"><div class="col-icon-scroll" id="colIconScroll"><div class="state" style="min-height:0;padding:10px;font-size:.8rem">…</div></div></div>
   <span class="col-scroll-hint" id="colScrollHint" aria-hidden="true">اسحب للمزيد ←</span>
@@ -517,12 +507,6 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 
 <div class="wrap" id="products">
   <div class="toolbar">
-    <div class="col-search">
-      <div class="search-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="colSearchInput" type="search" placeholder="ابحث داخل هذه المجموعة..." aria-label="بحث">
-      </div>
-    </div>
     <div class="split-filter" id="splitFilter" role="group" aria-label="نوع اللوحة">
       <button class="active" onclick="setTypeFilter('all')" id="filterAll">الكل</button>
       <button onclick="setTypeFilter('set')" id="filterSingle">باقة ثلاثية (Set)</button>
@@ -697,6 +681,7 @@ const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6I
 const H={apikey:SK,Authorization:'Bearer '+SK};
 const PAGE_SIZE=16;
 const HERO_BASE='https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/heroes/collection/';
+const OFFER_IMAGE_URL='https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/offers/buy-2-get-1.webp';
 const COLLECTION_HERO_IMAGES={
   anime:'anime.webp',
   cars:'cars.webp',
@@ -744,6 +729,8 @@ function renderCollectionHero(){
   const title=document.getElementById('hero-title');
   if(image&&img){image.src=img;image.alt=collection?.name_ar?`لوحات ${collection.name_ar}`:'لوحات ARCO';}
   if(title&&collection?.name_ar)title.innerHTML=`لوحات ${esc(collection.name_ar)}<br><em>لذوقك المختلف</em>`;
+  const offer=document.getElementById('collectionOfferImg');
+  if(offer)offer.src=OFFER_IMAGE_URL;
 }
 function updateCollectionCart(){
   const count=Number(window.ARCOCart?.count?.()||0);
@@ -833,8 +820,6 @@ function filteredItems(){
   if(activeSub!=='all')list=list.filter(p=>(p.subcollection||'')===activeSub);
   if(typeFilter==='set')list=list.filter(isSetProduct);
   if(typeFilter==='poster')list=list.filter(isPosterProduct);
-  const q=(searchQuery||'').trim().toLowerCase();
-  if(q)list=list.filter(p=>(p.name||'').toLowerCase().includes(q));
   return list;
 }
 
@@ -886,8 +871,6 @@ async function load(){
     document.title='ARCO | '+(collection.name_ar||collectionSlug);
   }else{document.getElementById('col-title').textContent=collectionSlug;}
   activeSub='all';page=1;searchQuery='';typeFilter='all';
-  const searchInput=document.getElementById('colSearchInput');
-  if(searchInput)searchInput.value='';
   ['filterAll','filterSingle','filterSplit'].forEach(id=>document.getElementById(id).classList.remove('active'));
   document.getElementById('filterAll').classList.add('active');
   renderSubbar();
@@ -973,9 +956,6 @@ const FAQ=[
 ];
 document.getElementById('faqWrap').innerHTML=FAQ.map((f,i)=>`<div class="faq-item" data-i="${i}"><button class="faq-q" onclick="toggleFaq(${i})" aria-expanded="false"><span>${esc(f.q)}</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg></button><div class="faq-a"><div>${esc(f.a)}</div></div></div>`).join('');
 function toggleFaq(i){const el=document.querySelector(`.faq-item[data-i="${i}"]`);const o=el.classList.toggle('open');el.querySelector('.faq-q').setAttribute('aria-expanded',o);}
-
-let _st;
-document.getElementById('colSearchInput')?.addEventListener('input',e=>{clearTimeout(_st);_st=setTimeout(()=>{searchQuery=e.target.value;page=1;renderGrid();},180);});
 
 document.getElementById('yr').textContent=new Date().getFullYear();
 load();
