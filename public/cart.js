@@ -1,7 +1,7 @@
 /* ARCO cart.js - multi-product cart for POSTER and SET products.
    Posters: every 3 posters, cheapest is free.
    Threshold discount applies after poster freebies.
-   >= 3 000 DZD -> -500 DZD
+   >= 4 000 DZD -> -500 DZD
    >= 6 000 DZD -> -1 000 DZD
    >= 9 500 DZD -> -2 000 DZD
    >=13 000 DZD -> -3 000 DZD
@@ -14,7 +14,8 @@
   const KEY = 'arco_cart_v1';
 
   function read() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } }
-  function write(c) { localStorage.setItem(KEY, JSON.stringify(c)); renderBadge(); }
+  function notifyChange() { window.dispatchEvent(new CustomEvent('arco:cartchange', { detail: { count: read().length } })); }
+  function write(c) { localStorage.setItem(KEY, JSON.stringify(c)); renderBadge(); notifyChange(); }
   function money(v) { return Number(v || 0).toLocaleString('fr-DZ') + ' DZD'; }
   function esc(v) { return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
   
@@ -87,6 +88,8 @@
       openAdded(item);
     },
     count() { return read().length; },
+    has(slug) { return read().some(item => String(item.product_slug || '').trim() === String(slug || '').trim()); },
+    items() { return read(); },
     open: openDrawer,
   };
 
@@ -120,7 +123,7 @@
       .arco-ci .pr{font:800 .95rem/1 'Cairo',sans-serif;color:#F5C500;margin-top:5px}
       .arco-ci .pr.free{color:#22c55e}
       .arco-ci .rm{background:none;border:none;color:#e11d48;cursor:pointer;font-size:18px;align-self:flex-start}
-      .arco-promo{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#5ef0a0;border-radius:12px;padding:12px;text-align:center;font:700 .9rem/1.4 'Cairo',sans-serif;margin-bottom:10px}
+      .arco-promo{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#5ef0a0;border-radius:12px;padding:12px;text-align:center;font:900 .95rem/1.4 'Changa','Cairo',sans-serif;margin-bottom:10px}
       .arco-promo.near{background:rgba(245,197,0,.1);border-color:rgba(245,197,0,.3);color:#F5C500}
       .arco-promo.thresh{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.3);color:#93c5fd}
       .arco-empty{text-align:center;color:#888;padding:50px 20px}
@@ -198,7 +201,7 @@
       const posters = cart.filter(isPoster);
       const need = (3 - (posters.length % 3)) % 3;
       if (posters.length > 0 && need > 0) {
-        lines.push({ type: 'near', msg: `🔥 زيد ${need === 1 ? 'لوحة وحدة' : `${need} لوحات`} و اللوحة الثالثة بااااطل!` });
+        lines.push({ type: 'near', msg: `🔥 زيد لوحة و اللوحة الثالثة باااطل!` });
       }
     }
     // Threshold discount
@@ -413,7 +416,7 @@
       if (!r.ok || !result.ok) throw new Error(result.error || 'failed');
       if (window.ARCOMeta) window.ARCOMeta.trackPurchase({ content_name: 'Cart', value, currency: 'DZD', eventID: result.order_id, num_items: cart.length });
       if (window.ARCOTikTok) window.ARCOTikTok.trackPurchase({ content_name: 'Cart', value, currency: 'DZD', eventID: result.order_id });
-      localStorage.removeItem(KEY); renderBadge();
+      localStorage.removeItem(KEY); renderBadge(); notifyChange();
       closeDrawer();
       // Success screen — push to browse more
       const sx = document.getElementById('arco-success');

@@ -397,6 +397,7 @@ body{padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 .pmeta{min-height:24px}
 .pquick{position:relative;width:100%}
 .pcta{width:100%;border:0;cursor:pointer;font-family:'Changa',sans-serif;gap:7px}
+.pcta.in-cart{background:#1c2618!important;color:#7ee36d;border:1px solid rgba(126,227,109,.38)}
 .pcta .cart-ic{width:17px;height:17px;stroke:currentColor;stroke-width:2.4;fill:none;flex-shrink:0}
 .pcard .pbody{padding:0;background:#0d0d0d}
 .pcard .pmeta{position:absolute;right:10px;left:10px;bottom:10px;z-index:2;justify-content:center;gap:8px;min-height:0;padding:7px 10px;border-radius:9px;background:linear-gradient(180deg,rgba(8,8,8,.04),rgba(8,8,8,.78));backdrop-filter:blur(8px);color:rgba(255,255,255,.66);text-shadow:0 1px 6px rgba(0,0,0,.75)}
@@ -763,8 +764,34 @@ function updateCollectionCart(){
       if(totalEl)totalEl.textContent=money(total);
     }catch(e){}
   }
+  refreshCartAwareButtons();
 }
 setInterval(updateCollectionCart,500);
+function cartHasProduct(slug){
+  if(window.ARCOCart?.has)return window.ARCOCart.has(slug);
+  try{
+    const cart=JSON.parse(localStorage.getItem('arco_cart_v1')||'[]');
+    return cart.some(item=>String(item.product_slug||'').trim()===String(slug||'').trim());
+  }catch(e){return false;}
+}
+function cartButtonText(inCart){return inCart?'مضاف للسلة':'أضف للسلة';}
+function cartButtonClass(slug){return cartHasProduct(slug)?'pcta in-cart':'pcta';}
+function refreshCartAwareButtons(){
+  document.querySelectorAll('[data-cart-product]').forEach(btn=>{
+    const inCart=cartHasProduct(btn.dataset.cartProduct);
+    btn.classList.toggle('in-cart',inCart);
+    const label=btn.querySelector('span');
+    if(label)label.textContent=cartButtonText(inCart);
+  });
+}
+function handleQuickCartClick(slug){
+  if(cartHasProduct(slug)){
+    window.ARCOCart?.open?.();
+    return;
+  }
+  toggleQuickVariants(slug);
+}
+window.addEventListener('arco:cartchange',()=>{updateCollectionCart();refreshCartAwareButtons();});
 
 function cardHTML(p){
   const img=pImages(p)[0];
@@ -788,7 +815,7 @@ function cardHTML(p){
         <div class="variant-pop" id="variants-${esc(p.slug)}">
           ${quickVars.map((v,i)=>`<button type="button" onclick="addQuickVariant('${esc(p.slug)}',${i})">${esc(variantLabel(v))}<span>${money(variantPrice(p,v))}</span></button>`).join('')}
         </div>
-        <button class="pcta" type="button" onclick="toggleQuickVariants('${esc(p.slug)}')"><svg class="cart-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.7"/><circle cx="18" cy="20" r="1.7"/><path d="M3 4h2.2l2.3 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 1.9-1.4L21 8H6.1"/></svg><span>أضف للسلة</span></button>
+        <button class="${cartButtonClass(p.slug)}" type="button" data-cart-product="${esc(p.slug)}" onclick="handleQuickCartClick('${esc(p.slug)}')"><svg class="cart-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.7"/><circle cx="18" cy="20" r="1.7"/><path d="M3 4h2.2l2.3 11.2a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 1.9-1.4L21 8H6.1"/></svg><span>${cartButtonText(cartHasProduct(p.slug))}</span></button>
       </div>
     </div>
   </article>`;
@@ -824,6 +851,7 @@ function addQuickVariant(slug,index){
   });
   closeQuickVariants();
   updateCollectionCart();
+  refreshCartAwareButtons();
   const msg=document.getElementById(`confirm-${slug}`);
   if(msg){msg.classList.add('show');setTimeout(()=>msg.classList.remove('show'),1300);}
   const sticky=document.getElementById('collectionStickyCart');
