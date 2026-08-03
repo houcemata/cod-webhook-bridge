@@ -1977,10 +1977,10 @@ async function openEdit(){
           const item=document.getElementById('edit-modal').__editItems[i];
           item.product=name;
           if(product?.slug)item.product_slug=product.slug;
-          const image=productImage(product);
+          const image=productImage(product)||item.custom_upload?.url||item.image;
           if(image)item.image=image;
-          else delete item.image;
-        });
+          else if(!item.custom_upload?.url)delete item.image;
+        }, it.custom_upload?.url||it.image||'', currentName);
       });
     }
     window.__rerenderCartRows=renderAndInitPickers;
@@ -2041,10 +2041,10 @@ async function openEdit(){
           const item=document.getElementById('edit-modal').__editItems[i];
           item.product=name;
           if(product?.slug)item.product_slug=product.slug;
-          const image=productImage(product);
+          const image=productImage(product)||item.custom_upload?.url||item.image;
           if(image)item.image=image;
-          else delete item.image;
-        });
+          else if(!item.custom_upload?.url)delete item.image;
+        }, it.custom_upload?.url||it.image||'', it.product||'');
       });
     }
     window.__rerenderCartRows=renderNonCartRowsAndInit;
@@ -2387,7 +2387,7 @@ function openProductImagePreview(src,alt){
   img.src=src;img.alt=alt||'';
   overlay.hidden=false;
 }
-function makeProductPicker(containerId, initialValue, onChange){
+function makeProductPicker(containerId, initialValue, onChange, fallbackImage, fallbackAlt){
   const wrap = document.getElementById(containerId);
   if(!wrap) return;
   const pl = (window.__productList||[]);
@@ -2407,13 +2407,13 @@ function makeProductPicker(containerId, initialValue, onChange){
   function updateThumb(product){
     thumb.innerHTML='';
     thumb.onclick=null;
-    const src=productImage(product);
+    const src=productImage(product)||fallbackImage||'';
     if(!src)return;
     const img=document.createElement('img');
     img.src=src;img.alt='';img.loading='lazy';
     img.onerror=()=>{thumb.innerHTML='';};
     thumb.appendChild(img);
-    thumb.onclick=event=>{event.stopPropagation();openProductImagePreview(src,product?.name||'');};
+    thumb.onclick=event=>{event.stopPropagation();openProductImagePreview(src,product?.name||fallbackAlt||selected||'');};
   }
 
   function renderList(filter){
