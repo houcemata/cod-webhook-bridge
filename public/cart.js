@@ -97,20 +97,11 @@
     open: openDrawer,
   };
 
-  // ── FAB ──
   function ensureUI() {
-    if (document.getElementById('arco-cart-fab')) return;
-    const fab = document.createElement('button');
-    fab.id = 'arco-cart-fab';
-    fab.innerHTML = `🛒<span id="arco-cart-badge">0</span>`;
-    fab.onclick = openDrawer;
-    document.body.appendChild(fab);
+    if (document.getElementById('arco-drawer')) return;
 
     const style = document.createElement('style');
     style.textContent = `
-      #arco-cart-fab{position:fixed;bottom:20px;right:20px;z-index:60;width:58px;height:58px;border-radius:50%;border:none;background:#F5C500;color:#080808;font-size:24px;cursor:pointer;box-shadow:0 10px 30px rgba(245,197,0,.4);display:flex;align-items:center;justify-content:center}
-      #arco-cart-badge{position:absolute;top:-4px;right:-4px;background:#e11d48;color:#fff;font:700 12px/1 'Cairo',sans-serif;min-width:20px;height:20px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 5px}
-      #arco-cart-badge.zero{display:none}
       .arco-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:70;display:none;backdrop-filter:blur(4px)}
       .arco-ov.show{display:block}
       .arco-drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);background:#0d0d0d;border-left:1px solid rgba(255,255,255,.1);z-index:80;transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column;direction:rtl;font-family:'Cairo',sans-serif;color:#fff}
