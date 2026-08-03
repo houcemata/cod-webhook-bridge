@@ -12,6 +12,8 @@
     { "source": "/api/ship-orders-bulk", "destination": "/api/shipping?mode=bulk" },
     { "source": "/p/zikr-kids", "destination": "/p/product.html?slug=zikr-kids" },
     { "source": "/p/barber-shop", "destination": "/p/barber-shop.html" },
+    { "source": "/custom-design", "destination": "/custom-design.html" },
+    { "source": "/custom-print-orders", "destination": "/custom-print-orders.html" },
     { "source": "/p/:slug", "destination": "/p/product.html?slug=:slug" },
     { "source": "/c/:slug", "destination": "/c/collection.html?slug=:slug" },
     { "source": "/shipping", "destination": "/shipping.html" },

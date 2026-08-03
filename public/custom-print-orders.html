@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ARCO Custom Print Orders</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root{--bg:#f8fafc;--panel:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--slate:#334155;--green:#059669;--red:#dc2626;--shadow:0 10px 28px #0f172a0b}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 'Fira Sans',sans-serif}.hidden{display:none!important}.shell{max-width:1320px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:20px}.brand{display:flex;gap:12px;align-items:center}.mark{width:42px;height:42px;border-radius:12px;background:var(--slate);display:grid;place-items:center;color:#fff;font:600 16px 'Fira Code'}.eyebrow{color:var(--green);font:600 11px 'Fira Code';letter-spacing:.12em;text-transform:uppercase}.title{margin:3px 0 0;font-size:28px}.subtitle{margin:5px 0 0;color:var(--muted)}.btn{min-height:42px;border:1px solid var(--line);border-radius:10px;padding:9px 13px;background:#fff;color:var(--slate);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.btn.primary{background:var(--slate);color:#fff;border-color:var(--slate)}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.card img{width:100%;aspect-ratio:1/1;object-fit:contain;background:#eef2f7;display:block}.info{padding:14px}.order{font:600 12px 'Fira Code';color:var(--green);margin-bottom:5px}.name{font-weight:700;font-size:16px}.meta{color:var(--muted);font:12px 'Fira Code';margin-top:5px}.note{margin-top:10px;padding:10px;border-radius:10px;background:#f8fafc;border:1px solid var(--line);color:#334155}.actions{display:flex;gap:8px;margin-top:12px}.empty{padding:38px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px;background:#fff}.login{max-width:420px;margin:9vh auto}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.field input{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px;background:#fff;color:var(--ink)}.toast{position:fixed;right:22px;bottom:22px;background:var(--slate);color:#fff;border-radius:10px;padding:12px 15px}.toast.error{background:var(--red)}
+    @media(max-width:640px){.shell{padding:14px}.top{display:block}.top .btn{margin-top:12px}.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main id="login" class="login shell">
+    <div class="card" style="padding:28px"><div class="brand"><div class="mark">A</div><div><div class="eyebrow">ARCO OPERATIONS</div><h1 class="title">Custom Orders</h1></div></div><p class="subtitle" style="margin:16px 0 20px">Sign in with the existing ARCO account.</p><div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="username" /></div><div class="field" style="margin-top:10px"><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" /></div><button id="login-btn" class="btn primary" style="width:100%;margin-top:16px">Sign in</button></div>
+  </main>
+  <main id="app" class="shell hidden">
+    <header class="top"><div class="brand"><div class="mark">A</div><div><div class="eyebrow">ARCO OPERATIONS / MANUAL PRINT</div><h1 class="title">Custom designs</h1><p id="subtitle" class="subtitle">Loading custom panels...</p></div></div><a class="btn" href="/print-prep.html">Back to print prep</a></header>
+    <section id="content" class="grid"></section>
+  </main>
+  <div id="toast" class="toast hidden"></div>
+  <script>
+    const SB_PROJECT='https://mpkpehuatqsubohltssi.supabase.co';
+    const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
+    const sb=supabase.createClient(SB_PROJECT,SB_KEY);
+    const $=id=>document.getElementById(id);
+    const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    function toast(msg,error=false){const el=$('toast');el.textContent=msg;el.className='toast'+(error?' error':'');setTimeout(()=>el.className='toast hidden',3200)}
+    function sizeOf(v){const s=String(v||'').toLowerCase().replace(/×/g,'x');if(/30\s*x\s*40|\bm\b/.test(s))return'30x40 cm';if(/40\s*x\s*60|\bl\b/.test(s))return'40x60 cm';return String(v||'')}
+    function imageOf(item){return item?.custom_upload?.url||item?.image||''}
+    function noteOf(item){return item?.custom_note||item?.custom_upload?.note||''}
+    function customItems(order){const raw=Array.isArray(order.items)?order.items:[];return raw.map((item,index)=>({...item,index:index+1,order_key:String(order.order_id||order.id),customer:order.name||''})).filter(item=>item.custom_design===true||item.product_slug==='custom-design'||/^Custom\s+/i.test(order.product||''))}
+    async function ensureAccess(user){const {data,error}=await sb.from('user_roles').select('role').eq('user_id',user.id).in('role',['admin','operator']).maybeSingle();return !error&&!!data}
+    async function signIn(){const email=$('email').value.trim(),password=$('password').value;$('login-btn').disabled=true;const {data,error}=await sb.auth.signInWithPassword({email,password});if(error||!data.user||!(await ensureAccess(data.user))){toast(error?.message||'This account is not an operator account.',true);await sb.auth.signOut()}else showApp();$('login-btn').disabled=false}
+    async function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden');await loadBatch()}
+    async function loadBatch(){const batch=new URLSearchParams(location.search).get('batch');if(!batch){$('content').innerHTML='<div class="empty">No batch selected.</div>';return}const {data,error}=await sb.from('print_batches').select('id,created_at,order_snapshot').eq('id',batch).maybeSingle();if(error||!data){$('content').innerHTML='<div class="empty">Batch not found.</div>';return}const items=(Array.isArray(data.order_snapshot)?data.order_snapshot:[]).flatMap(customItems);$('subtitle').textContent=`Batch ${data.id.slice(0,8)} · ${items.length} custom panel${items.length===1?'':'s'}`;$('content').innerHTML=items.length?items.map(item=>{const image=imageOf(item);return `<article class="card"><img src="${esc(image)}" alt="${esc(item.order_key)} panel ${item.index}" /><div class="info"><div class="order">${esc(item.order_key)} · Panel ${item.custom_panel_index||item.index}</div><div class="name">${esc(item.customer||item.product||'Custom design')}</div><div class="meta">${esc(sizeOf(item.size||item.variant))}</div>${noteOf(item)?`<div class="note">${esc(noteOf(item))}</div>`:''}<div class="actions">${image?`<a class="btn primary" href="${esc(image)}" download>Download image</a><a class="btn" href="${esc(image)}" target="_blank" rel="noreferrer">Open</a>`:''}</div></div></article>`}).join(''):'<div class="empty">No custom designs in this batch.</div>'}
+    async function boot(){const {data:{session}}=await sb.auth.getSession();if(session&&await ensureAccess(session.user))showApp();else $('login').classList.remove('hidden');$('login-btn').onclick=signIn;$('password').addEventListener('keydown',e=>{if(e.key==='Enter')signIn()})}
+    boot();
+  </script>
+</body>
+</html>

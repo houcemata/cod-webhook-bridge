@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<title>تصميم مخصص - ARCO</title>
+<link rel="preconnect" href="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev" crossorigin>
+<link rel="preconnect" href="https://mpkpehuatqsubohltssi.supabase.co" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;900&family=Barlow+Condensed:wght@400;700;900&family=Changa:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="/meta-pixel.js"></script>
+<script src="/tiktok-pixel.js"></script>
+<script src="/attribution.js"></script>
+<script src="/cart.js?v=20260731-cart-state-2"></script>
+<style>
+:root{--yellow:#F5C500;--black:#080808;--dark:#111;--line:rgba(255,255,255,.12);--muted:#aaa;--red:#e11d48;--green:#22c55e}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--black);color:#fff;font-family:'Cairo',sans-serif;min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(245,197,0,.13),transparent 290px),radial-gradient(circle at 50% 0,rgba(245,197,0,.14),transparent 38%);z-index:-1}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.shell{width:min(1160px,100%);margin:0 auto;padding:0 18px 110px}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(8,8,8,.86);border-bottom:1px solid var(--line);backdrop-filter:blur(24px)}
+.topbar-inner{width:min(1240px,calc(100% - 32px));min-height:58px;margin:0 auto;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px}
+.brand{grid-column:2;justify-self:center}.brand img{height:40px;width:auto;display:block}
+.cart-trigger,.whatsapp-trigger{position:relative;width:42px;height:42px;border:0;background:none;display:grid;place-items:center}
+.cart-trigger{grid-column:1;justify-self:start;color:#fff;font-size:1.25rem;direction:ltr}.cart-trigger b{position:absolute;top:1px;right:0;min-width:18px;height:18px;padding:0 4px;border-radius:99px;background:var(--yellow);color:#080808;font:800 .64rem/18px 'Changa',sans-serif}
+.whatsapp-trigger{grid-column:3;justify-self:end;color:#25D366}.whatsapp-trigger svg{width:25px;height:25px;fill:currentColor}
+.hero{width:min(1240px,100%);margin:14px auto 0;border:1px solid rgba(245,197,0,.22);border-radius:14px;overflow:hidden;background:#000}
+.hero img{width:100%;height:auto;display:block;aspect-ratio:1829/1437;object-fit:cover}
+.panel{width:min(760px,calc(100% - 44px));margin:18px auto 0;text-align:right}
+h1{font-family:'Changa',sans-serif;color:var(--yellow);font-size:clamp(2rem,8vw,4rem);line-height:1.15;font-weight:800}
+.desc{color:#d7d7d7;line-height:1.9;margin:12px 0 16px;font-size:16px}
+.price-row{display:flex;align-items:center;gap:12px;justify-content:flex-start;direction:ltr;margin-bottom:16px}
+.price{font-family:'Bebas Neue',sans-serif;color:var(--yellow);font-size:46px;letter-spacing:1px}
+.block{border-top:1px solid var(--line);padding-top:18px;margin-top:18px}.label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:900;margin-bottom:10px}.hint{font-size:12px;color:var(--muted);font-weight:600}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.choice{border:1px solid var(--line);background:#111;color:#fff;border-radius:6px;padding:12px;text-align:right}.choice.active{border-color:var(--yellow);box-shadow:inset 0 0 0 1px rgba(245,197,0,.5)}.choice strong{display:block}.choice span{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+.upload-list{display:grid;gap:12px}.upload-card{border:1px solid var(--line);background:#101010;border-radius:10px;padding:12px;display:grid;gap:10px}.upload-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.upload-head strong{color:var(--yellow)}.upload-preview{min-height:130px;border:1px dashed rgba(255,255,255,.18);border-radius:8px;background:#0b0b0b;display:grid;place-items:center;overflow:hidden;color:#777;font-size:13px}.upload-preview img{width:100%;height:100%;max-height:240px;object-fit:cover;display:block}.upload-card input[type=file]{width:100%;background:#111;color:#ddd;border:1px solid var(--line);border-radius:6px;padding:10px}.form{display:grid;gap:10px}.field{display:grid;gap:6px}.field span{font-size:13px;color:#ddd;font-weight:700}.field input,.field select,.field textarea{width:100%;background:#111;color:#fff;border:1px solid var(--line);border-radius:5px;padding:12px;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--yellow)}.field textarea{resize:vertical;min-height:86px}
+.panel-size{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.panel-size button{border:1px solid var(--line);background:#111;color:#fff;border-radius:6px;padding:10px;font-weight:900}.panel-size button.active{border-color:var(--yellow);color:var(--yellow)}.add-panel{width:100%;border:1px solid rgba(245,197,0,.34);background:rgba(245,197,0,.08);color:var(--yellow);border-radius:8px;padding:13px;margin-top:12px;font-weight:900}
+.summary{display:grid;gap:8px;background:#101010;border:1px solid var(--line);border-radius:8px;padding:14px;margin-top:14px}.sum-row{display:flex;align-items:center;justify-content:space-between;gap:14px;color:#d2d2d2}.sum-row.discount{color:#72e38d}.sum-row.total{border-top:1px solid var(--line);padding-top:9px;color:#fff;font-weight:900}
+.upsell-banner{background:rgba(245,197,0,.07);border:1px solid rgba(245,197,0,.22);border-radius:10px;padding:12px 14px;margin-top:14px;text-align:center}.upsell-banner p{font-size:.88rem;color:#ddd;line-height:1.7}.upsell-banner strong{color:var(--yellow)}
+.order-btn{width:100%;border:0;background:var(--yellow);color:var(--black);font-weight:900;border-radius:6px;padding:15px;margin-top:14px;min-height:56px}.order-btn.loading{opacity:.7;pointer-events:none}
+.whatsapp-more{display:block;text-align:center;margin-top:10px;color:#25D366;text-decoration:none;font-weight:900}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#181818;color:#fff;border:1px solid var(--line);border-radius:999px;padding:10px 18px;z-index:30;opacity:0;pointer-events:none;transition:.2s;white-space:nowrap}.toast.show{opacity:1}.toast.err{border-color:rgba(225,29,72,.7)}
+.sticky{position:fixed;left:0;right:0;bottom:0;background:rgba(8,8,8,.9);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:20;direction:ltr}.sticky strong{color:var(--yellow);font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px}.sticky span{font-size:11px;color:rgba(245,197,0,.75);font-weight:700}.sticky button{flex:1;min-width:0;background:var(--yellow);color:var(--black);border:0;border-radius:5px;padding:11px 18px;font-weight:900;white-space:nowrap}
+.success{position:fixed;inset:0;background:rgba(8,8,8,.96);z-index:40;display:none;place-items:center;padding:22px;text-align:center}.success.show{display:grid}.success-box{max-width:460px}.success-icon{font-size:52px;margin-bottom:6px}.success h2{font-family:'Bebas Neue',sans-serif;color:var(--yellow);font-size:58px;letter-spacing:2px}.success p{line-height:1.8;color:#ddd;margin-top:10px}.success-browse-wrap{margin-top:18px;display:grid;gap:10px}.success-browse-btn{display:block;background:var(--yellow);color:var(--black);border:0;border-radius:8px;padding:13px 22px;font-weight:900;font-size:16px;text-decoration:none;text-align:center}.success-home-btn{display:block;background:rgba(255,255,255,.07);color:#fff;border:1px solid var(--line);border-radius:8px;padding:12px 22px;font-weight:700;text-decoration:none;text-align:center}
+@media(max-width:860px){body #arco-cart-fab{display:none!important}.shell{padding-left:0;padding-right:0}.hero{width:100%;margin-top:8px;border-radius:0;border-left:0;border-right:0}.panel{width:calc(100% - 44px)}.choices{gap:7px}.choice{padding:9px 8px}.choice strong{font-size:14px}.choice span{font-size:11px;margin-top:2px}.block{padding-top:13px;margin-top:13px}.form{gap:7px}.field input,.field select,.field textarea{padding:9px}.summary{padding:10px;gap:5px;margin-top:10px}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <button class="cart-trigger" type="button" onclick="window.ARCOCart?.open()" aria-label="فتح السلة"><span aria-hidden="true">🛒</span><b id="cart-count">0</b></button>
+    <a class="brand" href="/" aria-label="ARCO"><img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/ACRO%20logo%20shopiy-03.png" alt="ARCO" width="130" height="40"></a>
+    <a class="whatsapp-trigger" href="https://wa.me/213550374607" target="_blank" rel="noreferrer" aria-label="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2z"/></svg></a>
+  </div>
+</header>
+
+<main class="shell">
+  <section class="hero" aria-label="تصميم مخصص">
+    <img src="https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/Generated%20image%202%20(1).webp" alt="صمم لوحتك الخاصة بذوقك" width="1829" height="1437" fetchpriority="high" decoding="async">
+  </section>
+
+  <section class="panel">
+    <h1>صمّم لوحتك الخاصة</h1>
+    <p class="desc">ارفع الصور، اختر المقاس، واكتب ملاحظتك لكل لوحة. إذا احتجت أكثر من 3 لوحات، تواصل معنا مباشرة عبر واتساب.</p>
+    <div class="price-row"><span class="price" id="base-price">1,950 DZD</span></div>
+
+    <div class="block">
+      <div class="label">صور التصميم <span class="hint">ملاحظة منفصلة لكل صورة</span></div>
+      <div class="upload-list" id="upload-list"></div>
+      <button class="add-panel" type="button" onclick="addPanel()">أضف لوحة أخرى</button>
+    </div>
+
+    <div class="block" id="order">
+      <div class="label">معلوماتك <span class="hint">الدفع عند الاستلام فقط</span></div>
+      <div class="form">
+        <label class="field"><span>الاسم الكامل</span><input id="f-name" autocomplete="name"></label>
+        <label class="field"><span>رقم الهاتف</span><input id="f-phone" inputmode="tel" placeholder="05XXXXXXXX"></label>
+        <label class="field"><span>الولاية</span><select id="f-wilaya" onchange="onWilayaChange()"><option value="">اختر الولاية</option></select></label>
+        <div class="choices"><button class="choice active" type="button" onclick="selectDelivery(event,'home')"><strong>إلى المنزل</strong><span id="home-price">اختر الولاية</span></button><button class="choice" type="button" onclick="selectDelivery(event,'pickup')"><strong>إلى أقرب مكتب</strong><span id="desk-price">اختر الولاية</span></button></div>
+        <label class="field" id="commune-wrap"><span>البلدية</span><input id="f-commune" autocomplete="address-level2"></label>
+        <label class="field" id="desk-wrap" style="display:none"><span>نقطة الاستلام</span><select id="f-desk" onchange="selectedDesk=this.value"><option value="">اختر النقطة</option></select></label>
+      </div>
+      <div class="summary">
+        <div class="sum-row"><span>اللوحات</span><strong id="sum-product">1,950 DZD</strong></div>
+        <div class="sum-row discount" id="free-row" style="display:none"><span>الثالثة مجاناً</span><strong id="sum-free">0 DZD</strong></div>
+        <div class="sum-row"><span>التوصيل</span><strong id="sum-ship">0 DZD</strong></div>
+        <div class="sum-row total"><span>المجموع</span><strong id="sum-total">1,950 DZD</strong></div>
+      </div>
+      <div class="upsell-banner" id="upsell"><p><strong>أضف لوحة ثانية</strong> وبعدها الثالثة تكون مجاناً.</p></div>
+      <button type="button" class="order-btn" id="order-btn" onclick="submitOrder()">اطلب الآن</button>
+      <a class="whatsapp-more" href="https://wa.me/213550374607?text=السلام%20عليكم،%20أريد%20طلب%20أكثر%20من%203%20لوحات%20بتصميم%20مخصص" target="_blank" rel="noreferrer">تريد أكثر من 3 لوحات؟ تواصل معنا عبر واتساب</a>
+    </div>
+  </section>
+</main>
+
+<div class="sticky"><div style="display:flex;flex-direction:column;gap:2px"><strong id="sticky-total">1,950 DZD</strong><span id="sticky-upsell">أضف لوحة ثانية وبعدها الثالثة مجاناً</span></div><button type="button" onclick="scrollToOrder()">اطلب الآن</button></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="success" id="success">
+  <div class="success-box">
+    <div class="success-icon">✅</div>
+    <h2>تم استلام طلبك!</h2>
+    <p>شكراً <span id="success-name"></span>! سيتصل بك فريقنا قريباً لتأكيد التفاصيل.</p>
+    <p id="success-id" style="color:#888;font-size:13px;margin-top:6px"></p>
+    <div style="margin-top:18px;background:rgba(245,197,0,.08);border:1px solid rgba(245,197,0,.22);border-radius:12px;padding:14px">
+      <p style="color:#F5C500;font-weight:900;font-size:15px;margin-bottom:6px">🛒 تصفح واطلب المزيد</p>
+      <p style="color:#ccc;font-size:13px;line-height:1.7">طلبك وصل، وفريقنا سيتواصل معك بخصوص صور التصميم والملاحظات.</p>
+    </div>
+    <div class="success-browse-wrap">
+      <a class="success-browse-btn" href="/">تصفح باقي التصاميم</a>
+      <a class="success-home-btn" href="/">العودة للرئيسية</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB_URL='https://mpkpehuatqsubohltssi.supabase.co/rest/v1';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
+const H={apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'application/json'};
+const WILAYAS=[['01','Adrar'],['02','Chlef'],['03','Laghouat'],['04','Oum El Bouaghi'],['05','Batna'],['06','Bejaia'],['07','Biskra'],['08','Bechar'],['09','Blida'],['10','Bouira'],['11','Tamanrasset'],['12','Tebessa'],['13','Tlemcen'],['14','Tiaret'],['15','Tizi Ouzou'],['16','Algiers'],['17','Djelfa'],['18','Jijel'],['19','Setif'],['20','Saida'],['21','Skikda'],['22','Sidi Bel Abbes'],['23','Annaba'],['24','Guelma'],['25','Constantine'],['26','Medea'],['27','Mostaganem'],['28',"M'Sila"],['29','Mascara'],['30','Ouargla'],['31','Oran'],['32','El Bayadh'],['33','Illizi'],['34','Bordj Bou Arreridj'],['35','Boumerdes'],['36','El Tarf'],['37','Tindouf'],['38','Tissemsilt'],['39','El Oued'],['40','Khenchela'],['41','Souk Ahras'],['42','Tipaza'],['43','Mila'],['44','Ain Defla'],['45','Naama'],['46','Ain Temouchent'],['47','Ghardaia'],['48','Relizane'],['49','Timimoun'],['50','Bordj Badji Mokhtar'],['51','Ouled Djellal'],['52','Beni Abbes'],['53','In Salah'],['54','In Guezzam'],['55','Touggourt'],['56','Djanet'],['57',"El M'Ghair"],['58','El Menia']];
+const PRICES={'30x40':1950,'40x60':2450};
+const THRESHOLDS=[{min:13000,off:3000},{min:9500,off:2000},{min:6000,off:1000},{min:4000,off:500}];
+let panels=[{size:'30x40'}],delivery='home',shipping={home_delivery:0,stop_desk:0},desks=null,selectedDesk='',checkoutTracked=false;
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function money(v){return Number(v||0).toLocaleString('fr-DZ')+' DZD';}
+function panelPrice(panel){return PRICES[panel.size]||0}
+function subtotal(){return panels.reduce((sum,p)=>sum+panelPrice(p),0)}
+function freeDiscount(){const prices=panels.map(panelPrice).sort((a,b)=>a-b);return prices.slice(0,Math.floor(panels.length/3)).reduce((sum,price)=>sum+price,0)}
+function afterFree(){return Math.max(0,subtotal()-freeDiscount())}
+function thresholdDiscount(){const t=THRESHOLDS.find(t=>afterFree()>=t.min);return t?t.off:0}
+function productTotal(){return Math.max(0,afterFree()-thresholdDiscount())}
+function shippingCost(){return delivery==='home'?Number(shipping.home_delivery||0):Number(shipping.stop_desk||0)}
+function total(){return productTotal()+shippingCost()}
+function variantLabel(panel){return `${panel.size} cm`}
+function imageAlt(i){return `صورة التصميم ${i+1}`}
+function renderWilayas(){document.getElementById('f-wilaya').innerHTML='<option value="">اختر الولاية</option>'+WILAYAS.map(w=>`<option value="${w[0]}|${esc(w[1])}">${w[0]} - ${esc(w[1])}</option>`).join('')}
+function renderUploads(){
+  const list=document.getElementById('upload-list');
+  list.innerHTML=panels.map((panel,i)=>`<div class="upload-card">
+    <div class="upload-head"><strong>لوحة ${i+1}</strong><span>${money(panelPrice(panel))}</span></div>
+    <div class="panel-size"><button type="button" class="${panel.size==='30x40'?'active':''}" onclick="setPanelSize(${i},'30x40')">30x40 cm</button><button type="button" class="${panel.size==='40x60'?'active':''}" onclick="setPanelSize(${i},'40x60')">40x60 cm</button></div>
+    <div class="upload-preview" id="preview-${i}">${panel.preview?`<img src="${panel.preview}" alt="${imageAlt(i)}">`:`ارفع صورة اللوحة ${i+1}`}</div>
+    <input type="file" id="img-${i}" accept="image/*" onchange="previewImage(${i})">
+    <label class="field"><span>ملاحظة لهذه الصورة</span><textarea id="note-${i}" oninput="updatePanelNote(${i})" placeholder="مثال: اكتب الاسم باللون الذهبي، احذف الخلفية، خلي التصميم أسود...">${esc(panel.note||'')}</textarea></label>
+  </div>`).join('');
+}
+function previewImage(i){const file=document.getElementById(`img-${i}`)?.files?.[0],preview=document.getElementById(`preview-${i}`);if(!file||!preview)return;panels[i].file=file;const reader=new FileReader();reader.onload=()=>{panels[i].preview=reader.result;preview.innerHTML=`<img src="${reader.result}" alt="${imageAlt(i)}">`};reader.readAsDataURL(file);}
+function updatePanelNote(i){panels[i].note=document.getElementById(`note-${i}`)?.value||'';}
+function setPanelSize(index,size){panels[index].size=size;renderUploads();updateTotals();}
+function addPanel(){panels.push({size:panels[panels.length-1]?.size||'30x40'});renderUploads();updateTotals();document.getElementById(`img-${panels.length-1}`)?.scrollIntoView({behavior:'smooth',block:'center'});}
+function selectDelivery(ev,type){ev.preventDefault();delivery=type;selectedDesk='';ev.currentTarget.parentElement.querySelectorAll('.choice').forEach(b=>b.classList.remove('active'));ev.currentTarget.classList.add('active');document.getElementById('commune-wrap').style.display=type==='home'?'grid':'none';document.getElementById('desk-wrap').style.display=type==='pickup'?'grid':'none';if(type==='pickup')loadDesks();updateTotals();}
+async function onWilayaChange(){
+  const val=document.getElementById('f-wilaya').value;if(!val)return;selectedDesk='';
+  const id=val.split('|')[0];
+  const res=await fetch(`${SB_URL}/shipping_rates?wilaya_id=eq.${Number(id)}&select=home_delivery,stop_desk&limit=1`,{headers:H});
+  const data=await res.json();shipping=data[0]||{home_delivery:0,stop_desk:0};
+  document.getElementById('home-price').textContent=money(shipping.home_delivery);
+  document.getElementById('desk-price').textContent=money(shipping.stop_desk);
+  if(delivery==='pickup')loadDesks();updateTotals();
+}
+async function loadDesks(){
+  const sel=document.getElementById('f-desk');if(!sel)return;
+  if(!desks){try{const r=await fetch('/api/noest-desks');if(r.ok)desks=await r.json();}catch(e){}}
+  const id=(document.getElementById('f-wilaya').value||'').split('|')[0];
+  const entries=Object.entries(desks||{}).filter(([code])=>id&&new RegExp('^'+id+'[A-Z]').test(code));
+  sel.innerHTML='<option value="">اختر النقطة</option>'+entries.map(([code,d])=>`<option value="${code}">${esc(d.name||code)}</option>`).join('');
+}
+function updateTotals(){
+  document.getElementById('base-price').textContent=money(productTotal());
+  document.getElementById('sum-product').textContent=money(productTotal());
+  document.getElementById('sum-ship').textContent=money(shippingCost());
+  document.getElementById('sum-total').textContent=money(total());
+  document.getElementById('sticky-total').textContent=money(total());
+  const savings=freeDiscount()+thresholdDiscount();
+  const freeRow=document.getElementById('free-row');
+  freeRow.style.display=savings>0?'flex':'none';
+  document.getElementById('sum-free').textContent='-'+money(savings);
+  const mod=panels.length%3;
+  const nextTier=THRESHOLDS.slice().reverse().find(t=>afterFree()<t.min);
+  let msg='أضف لوحة أخرى ووفر أكثر';
+  if(mod===1)msg='أضف لوحة ثانية وبعدها الثالثة مجاناً';
+  else if(mod===2)msg='أضف اللوحة الثالثة الآن، ستكون مجاناً';
+  else if(nextTier)msg=`أضف ${money(nextTier.min-afterFree())} فقط وخذ خصم ${money(nextTier.off)}`;
+  else msg=`وفّرت ${money(savings)} في هذا الطلب`;
+  document.getElementById('upsell').innerHTML=`<p><strong>${msg}</strong></p>`;
+  document.getElementById('sticky-upsell').textContent=msg;
+  document.getElementById('cart-count').textContent=window.ARCOCart?.count?.()||0;
+}
+function scrollToOrder(){document.getElementById('order').scrollIntoView({behavior:'smooth',block:'center'});}
+function buildNotes(){
+  const lines=panels.map((panel,i)=>{
+    const file=panel.file;
+    const note=(panel.note||document.getElementById(`note-${i}`)?.value||'').trim();
+    return `لوحة ${i+1}: ${panel.size} cm | ${file?.name||'لم يتم رفع صورة'}${note?` | ملاحظة: ${note}`:''}`;
+  });
+  return ['طلب تصميم مخصص',`عدد اللوحات: ${panels.length}`,...lines].join('\n');
+}
+function compressImage(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onerror=()=>reject(new Error('تعذر قراءة الصورة'));
+    reader.onload=()=>{
+      const img=new Image();
+      img.onerror=()=>reject(new Error('تعذر تجهيز الصورة'));
+      img.onload=()=>{
+        const max=1600;
+        const scale=Math.min(1,max/Math.max(img.width,img.height));
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.max(1,Math.round(img.width*scale));
+        canvas.height=Math.max(1,Math.round(img.height*scale));
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        resolve(canvas.toDataURL('image/jpeg',.84).split(',')[1]);
+      };
+      img.src=reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+async function uploadCustomImages(){
+  const files=[];
+  for(let i=0;i<panels.length;i++){
+    const panel=panels[i];
+    const file=panel.file;
+    if(!file)throw new Error(`ارفع صورة اللوحة ${i+1}`);
+    files.push({name:file.name,type:'image/jpeg',panel_size:variantLabel(panel),note:(panel.note||'').trim(),data_base64:await compressImage(file)});
+  }
+  const r=await fetch('/api/custom-upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files})});
+  const result=await r.json().catch(()=>({}));
+  if(!r.ok||!result.ok)throw new Error(result.error||'فشل رفع الصور');
+  return result.files||[];
+}
+function trackCheckout(){
+  if(checkoutTracked)return;checkoutTracked=true;
+  const payload={content_name:'Custom Design',content_ids:['custom-design'],content_category:`${panels.length} custom panels`,value:total(),currency:'DZD'};
+  window.ARCOMeta?.trackInitiateCheckout?.(payload);window.ARCOTikTok?.trackInitiateCheckout?.(payload);
+}
+async function submitOrder(){
+  const name=document.getElementById('f-name').value.trim(),phone=document.getElementById('f-phone').value.replace(/\s/g,''),wilayaVal=document.getElementById('f-wilaya').value,commune=document.getElementById('f-commune').value.trim();
+  const btn=document.getElementById('order-btn');
+  if(!name)return toast('أدخل الاسم',true);
+  if(!/^0[567]\d{8}$/.test(phone))return toast('رقم الهاتف غير صحيح',true);
+  if(!wilayaVal)return toast('اختر الولاية',true);
+  if(!shippingCost())return toast('اختر ولاية متوفرة',true);
+  if(delivery==='home'&&!commune)return toast('أدخل البلدية',true);
+  if(delivery==='pickup'&&!selectedDesk)return toast('اختر نقطة الاستلام',true);
+  for(let i=0;i<panels.length;i++){updatePanelNote(i);if(!panels[i].file)return toast(`ارفع صورة اللوحة ${i+1}`,true);}
+  trackCheckout();
+  const [wilayaId,wilaya]=wilayaVal.split('|');
+  btn.classList.add('loading');btn.textContent='جاري رفع الصور...';
+  try{
+    const uploads=await uploadCustomImages();
+    btn.textContent='جاري تسجيل الطلب...';
+    const payload={name,phone,wilaya,wilaya_id:Number(wilayaId),commune:delivery==='home'?commune:'',delivery_type:delivery==='home'?'home':'pickup',station_code:delivery==='pickup'?selectedDesk:null,items:panels.map((panel,i)=>({product_slug:'custom-design',variant_label:variantLabel(panel),selected_options:{Size:`${panel.size} cm`},custom_design:true,custom_panel_index:i+1,custom_note:(panel.note||'').trim(),custom_upload:uploads[i]||null,image:uploads[i]?.url||''})),notes:buildNotes(),event_source_url:location.href,attribution:window.ARCOAttribution?.getPayload?.()};
+    const r=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const result=await r.json().catch(()=>({}));
+    if(!r.ok||!result.ok)throw new Error(result.error||'failed');
+    const purchase={content_name:'Custom Design',content_ids:['custom-design'],content_category:`${panels.length} custom panels`,value:total(),currency:'DZD',eventID:result.order_id};
+    window.ARCOMeta?.trackPurchase?.(purchase);window.ARCOTikTok?.trackPurchase?.(purchase);
+    document.getElementById('success-name').textContent=name;
+    document.getElementById('success-id').textContent='#'+result.order_id;
+    document.getElementById('success').classList.add('show');
+  }catch(e){btn.classList.remove('loading');btn.textContent='اطلب الآن';toast((e&&e.message&&e.message!=='failed')?e.message:'حدث خطأ. حاول مرة أخرى',true);}
+}
+let tt;function toast(msg,err=false){const el=document.getElementById('toast');el.textContent=msg;el.className='toast show'+(err?' err':'');clearTimeout(tt);tt=setTimeout(()=>el.className='toast',2600);}
+renderWilayas();renderUploads();updateTotals();
+window.addEventListener('arco:cartchange',updateTotals);
+</script>
+</body>
+</html>

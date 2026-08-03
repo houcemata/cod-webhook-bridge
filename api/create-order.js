@@ -92,6 +92,49 @@ function createOrderId() {
   return `${Date.now()}${Math.floor(100 + Math.random() * 900)}`;
 }
 
+const ORDER_VALUE_DISCOUNTS = [
+  { min: 13000, off: 3000 },
+  { min: 9500, off: 2000 },
+  { min: 6000, off: 1000 },
+  { min: 4000, off: 500 },
+];
+
+function orderValueDiscount(subtotal) {
+  for (const tier of ORDER_VALUE_DISCOUNTS) {
+    if (subtotal >= tier.min) return tier.off;
+  }
+  return 0;
+}
+
+async function nextCustomOrderLabel(supabase, fallbackOrderId) {
+  try {
+    const { data, error } = await supabase.rpc("next_custom_order_number");
+    if (error) throw error;
+    const number = Number(data);
+    if (Number.isFinite(number) && number > 0) return `Custom ${number}`;
+  } catch (error) {
+    console.error("[create-order] custom sequence unavailable:", error.message || error);
+  }
+  return `Custom ${fallbackOrderId}`;
+}
+
+function normalizeCustomUpload(upload) {
+  if (!upload || typeof upload !== "object" || Array.isArray(upload)) return null;
+  const key = normalizeText(upload.key);
+  const url = normalizeText(upload.url);
+  if (!key && !url) return null;
+  return {
+    index: Number(upload.index) || null,
+    key,
+    url,
+    name: normalizeText(upload.name),
+    type: normalizeText(upload.type),
+    bytes: Number(upload.bytes) || null,
+    panel_size: normalizeText(upload.panel_size),
+    note: normalizeText(upload.note),
+  };
+}
+
 function isSameOriginRequest(req) {
   const origin = req.headers.origin;
   const host = req.headers.host;
@@ -243,6 +286,11 @@ async function handleCartOrder(req, res, supabase, body) {
       variant: variant.label || variant.name,
       options: variant.options || null,
       price: Number(variant.price),
+      custom_design: it.custom_design === true || product.slug === "custom-design",
+      custom_panel_index: Number(it.custom_panel_index) || null,
+      custom_note: normalizeText(it.custom_note),
+      custom_upload: normalizeCustomUpload(it.custom_upload),
+      image: normalizeText(it.custom_upload?.url || it.image || variant.image),
     });
   }
 
@@ -260,6 +308,13 @@ async function handleCartOrder(req, res, supabase, body) {
     itemsTotal += linePrice;
     return { ...it, size: sizeCode(it.variant), is_free: isFree, line_price: linePrice };
   });
+  const thresholdDiscount = orderValueDiscount(itemsTotal);
+  itemsTotal = Math.max(0, itemsTotal - thresholdDiscount);
+  const discountedItemsForStore = itemsForStore.map((item, index) => (
+    index === 0 && thresholdDiscount > 0
+      ? { ...item, order_discount: thresholdDiscount }
+      : item
+  ));
 
   const { data: shippingRow } = await supabase
     .from("shipping_rates")
@@ -279,8 +334,11 @@ async function handleCartOrder(req, res, supabase, body) {
   const orderId = createOrderId();
 
   const composedNotes = notes || "";
-  const productSummary = `سلة ${itemsForStore.length} قطع`;
-  const variableSummary = itemsForStore.map((it) => it.variant).join(" + ").slice(0, 250);
+  const isCustomOrder = discountedItemsForStore.every((item) => item.custom_design || item.product_slug === "custom-design");
+  const productSummary = isCustomOrder
+    ? await nextCustomOrderLabel(supabase, orderId)
+    : `سلة ${discountedItemsForStore.length} قطع`;
+  const variableSummary = discountedItemsForStore.map((it) => it.variant).join(" + ").slice(0, 250);
 
   const finalOrderData = {
     name,
@@ -295,7 +353,7 @@ async function handleCartOrder(req, res, supabase, body) {
     shipping_cost: shippingCost,
     status: "pending",
     notes: composedNotes,
-    items: itemsForStore,
+    items: discountedItemsForStore,
     order_id: orderId,
     ip_address: clientIp || null,
     ...attribution,

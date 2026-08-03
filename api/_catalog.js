@@ -35,9 +35,35 @@ const ZIKR_KIDS_PRODUCT = {
   ],
 };
 
+const CUSTOM_DESIGN_PRODUCT = {
+  name: "Custom Design",
+  slug: "custom-design",
+  price: 1950,
+  active: true,
+  variants: [
+    {
+      name: "30x40 cm",
+      label: "30x40 cm",
+      price: 1950,
+      image: "https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/Generated%20image%202%20(1).webp",
+      options: { Size: "30x40 cm" },
+    },
+    {
+      name: "40x60 cm",
+      label: "40x60 cm",
+      price: 2450,
+      image: "https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/Generated%20image%202%20(1).webp",
+      options: { Size: "40x60 cm" },
+    },
+  ],
+};
+
 export function getCustomCatalogProduct(slug) {
   if (String(slug || "").toLowerCase() === ZIKR_KIDS_PRODUCT.slug) {
     return ZIKR_KIDS_PRODUCT;
+  }
+  if (String(slug || "").toLowerCase() === CUSTOM_DESIGN_PRODUCT.slug) {
+    return CUSTOM_DESIGN_PRODUCT;
   }
   return null;
 }

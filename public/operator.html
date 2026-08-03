@@ -1424,6 +1424,8 @@ function packagingSize(item){
   return raw;
 }
 function packagingImage(item,catalog){
+  if(item?.custom_upload?.url)return item.custom_upload.url;
+  if(item?.custom_upload?.key)return item.custom_upload.key;
   if(item?.image)return item.image;
   const slug=item?.product_slug||item?.slug||'';
   const name=item?.product||'';
