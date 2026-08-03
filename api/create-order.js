@@ -1,8 +1,13 @@
+import { randomUUID } from "node:crypto";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { sendAllAnalytics } from "./_analytics.js";
 import { getServiceClient } from "./_auth.js";
 import { getCustomCatalogProduct } from "./_catalog.js";
 import { buildAttribution } from "./_attribution.js";
 import { sendNewOrderPush } from "./_push.js";
+
+const MAX_CUSTOM_FILES = 12;
+const MAX_CUSTOM_IMAGE_BYTES = 4 * 1024 * 1024;
 
 function normalizeVariants(raw) {
   if (!raw) return [];
@@ -135,6 +140,83 @@ function normalizeCustomUpload(upload) {
   };
 }
 
+function env(name) {
+  const value = process.env[name];
+  if (!value) throw new Error(`${name} is not configured`);
+  return value;
+}
+
+function safeFileName(value, fallback) {
+  const clean = normalizeText(value)
+    .replace(/[^\w.\-]+/g, "-")
+    .replace(/-+/g, "-")
+    .slice(0, 80);
+  return clean || fallback;
+}
+
+function imageBufferFromBase64(data) {
+  const raw = normalizeText(data).replace(/^data:image\/[a-z0-9.+-]+;base64,/i, "");
+  const buffer = Buffer.from(raw, "base64");
+  if (!buffer.length || buffer.length > MAX_CUSTOM_IMAGE_BYTES) return null;
+  return buffer;
+}
+
+function publicUrlForKey(key) {
+  const base = normalizeText(process.env.R2_PUBLIC_BASE_URL).replace(/\/+$/, "");
+  return base ? `${base}/${key}` : "";
+}
+
+function r2Client() {
+  return new S3Client({
+    region: "auto",
+    endpoint: `https://${env("R2_ACCOUNT_ID")}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: env("R2_ACCESS_KEY_ID"),
+      secretAccessKey: env("R2_SECRET_ACCESS_KEY"),
+    },
+  });
+}
+
+async function uploadCustomImages(files) {
+  if (!Array.isArray(files) || !files.length) return [];
+  if (files.length > MAX_CUSTOM_FILES) throw new Error("Too many custom images");
+
+  const bucket = env("R2_BUCKET");
+  const group = `${Date.now()}-${randomUUID().slice(0, 8)}`;
+  const client = r2Client();
+  const uploaded = [];
+
+  for (let i = 0; i < files.length; i += 1) {
+    const file = files[i] || {};
+    const type = normalizeText(file.type) || "image/jpeg";
+    if (!type.startsWith("image/")) throw new Error(`Panel ${i + 1} is not an image`);
+    const body = imageBufferFromBase64(file.data_base64);
+    if (!body) throw new Error(`Panel ${i + 1} image is too large or invalid`);
+
+    const ext = type.includes("png") ? "png" : type.includes("webp") ? "webp" : "jpg";
+    const key = `orders/${group}/panel-${i + 1}-${safeFileName(file.name, "image")}.${ext}`;
+    await client.send(new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: body,
+      ContentType: type,
+    }));
+
+    uploaded.push({
+      index: i + 1,
+      key,
+      url: publicUrlForKey(key),
+      name: normalizeText(file.name),
+      type,
+      bytes: body.length,
+      panel_size: normalizeText(file.panel_size),
+      note: normalizeText(file.note),
+    });
+  }
+
+  return uploaded;
+}
+
 function isSameOriginRequest(req) {
   const origin = req.headers.origin;
   const host = req.headers.host;
@@ -261,9 +343,13 @@ async function handleCartOrder(req, res, supabase, body) {
   const blocked = await checkIpGate(req, res, supabase);
   if (blocked) return blocked;
 
+  const customFiles = Array.isArray(body.custom_files) ? body.custom_files : [];
+  const uploadedCustomFiles = customFiles.length ? await uploadCustomImages(customFiles) : [];
+
   // Resolve each cart item against the DB (never trust browser prices)
   const resolved = [];
-  for (const it of items) {
+  for (let itemIndex = 0; itemIndex < items.length; itemIndex += 1) {
+    const it = items[itemIndex];
     const slug = normalizeText(it.product_slug);
     if (!slug) continue;
     const { data: productRow } = await supabase
@@ -280,6 +366,7 @@ async function handleCartOrder(req, res, supabase, body) {
     if (!variant || !Number.isFinite(variant.price) || variant.price <= 0) {
       return res.status(400).json({ error: `Invalid variant for ${product.name}` });
     }
+    const customUpload = normalizeCustomUpload(it.custom_upload || uploadedCustomFiles[itemIndex]);
     resolved.push({
       product_slug: product.slug,
       product: product.name,
@@ -289,8 +376,8 @@ async function handleCartOrder(req, res, supabase, body) {
       custom_design: it.custom_design === true || product.slug === "custom-design",
       custom_panel_index: Number(it.custom_panel_index) || null,
       custom_note: normalizeText(it.custom_note),
-      custom_upload: normalizeCustomUpload(it.custom_upload),
-      image: normalizeText(it.custom_upload?.url || it.image || variant.image),
+      custom_upload: customUpload,
+      image: normalizeText(customUpload?.url || it.image || variant.image),
     });
   }
 

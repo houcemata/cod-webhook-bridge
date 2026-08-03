@@ -226,10 +226,7 @@ async function uploadCustomImages(){
     if(!file)throw new Error(`ارفع صورة اللوحة ${i+1}`);
     files.push({name:file.name,type:'image/jpeg',panel_size:variantLabel(panel),note:(panel.note||'').trim(),data_base64:await compressImage(file)});
   }
-  const r=await fetch('/api/custom-upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({files})});
-  const result=await r.json().catch(()=>({}));
-  if(!r.ok||!result.ok)throw new Error(result.error||'فشل رفع الصور');
-  return result.files||[];
+  return files;
 }
 function trackCheckout(){
   if(checkoutTracked)return;checkoutTracked=true;
@@ -250,9 +247,9 @@ async function submitOrder(){
   const [wilayaId,wilaya]=wilayaVal.split('|');
   btn.classList.add('loading');btn.textContent='جاري رفع الصور...';
   try{
-    const uploads=await uploadCustomImages();
+    const customFiles=await uploadCustomImages();
     btn.textContent='جاري تسجيل الطلب...';
-    const payload={name,phone,wilaya,wilaya_id:Number(wilayaId),commune:delivery==='home'?commune:'',delivery_type:delivery==='home'?'home':'pickup',station_code:delivery==='pickup'?selectedDesk:null,items:panels.map((panel,i)=>({product_slug:'custom-design',variant_label:variantLabel(panel),selected_options:{Size:`${panel.size} cm`},custom_design:true,custom_panel_index:i+1,custom_note:(panel.note||'').trim(),custom_upload:uploads[i]||null,image:uploads[i]?.url||''})),notes:buildNotes(),event_source_url:location.href,attribution:window.ARCOAttribution?.getPayload?.()};
+    const payload={name,phone,wilaya,wilaya_id:Number(wilayaId),commune:delivery==='home'?commune:'',delivery_type:delivery==='home'?'home':'pickup',station_code:delivery==='pickup'?selectedDesk:null,items:panels.map((panel,i)=>({product_slug:'custom-design',variant_label:variantLabel(panel),selected_options:{Size:`${panel.size} cm`},custom_design:true,custom_panel_index:i+1,custom_note:(panel.note||'').trim()})),custom_files:customFiles,notes:buildNotes(),event_source_url:location.href,attribution:window.ARCOAttribution?.getPayload?.()};
     const r=await fetch('/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const result=await r.json().catch(()=>({}));
     if(!r.ok||!result.ok)throw new Error(result.error||'failed');
