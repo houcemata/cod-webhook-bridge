@@ -513,13 +513,25 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Station code is required for pickup" });
     }
 
-    const { data: productRow, error: productError } = await supabase
-      .from("products")
-      .select("name, slug, price, active, variants")
-      .ilike("slug", productSlug)
-      .eq("active", true)
-      .limit(1)
-      .maybeSingle();
+    const isWeddingCustom = productSlug.toLowerCase() === "wedding-custom-design";
+    const { data: productRow, error: productError } = isWeddingCustom
+      ? {
+          data: {
+            name: "Wedding Custom Design",
+            slug: productSlug,
+            price: 3600,
+            active: true,
+            variants: [],
+          },
+          error: null,
+        }
+      : await supabase
+          .from("products")
+          .select("name, slug, price, active, variants")
+          .ilike("slug", productSlug)
+          .eq("active", true)
+          .limit(1)
+          .maybeSingle();
 
     const product = productRow || getCustomCatalogProduct(productSlug);
 
