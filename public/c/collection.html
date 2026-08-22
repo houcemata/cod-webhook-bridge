@@ -725,6 +725,7 @@ function variantImage(p,v){return v?.image||pImages(p)[0]||'';}
 function productType(p){return String(p.type||p.product_type||p.productType||'').trim().toLowerCase();}
 function isSetProduct(p){const t=productType(p);return t==='set'||t.includes('set')||t.includes('split')||t.includes('triptych');}
 function isPosterProduct(p){const t=productType(p);return t==='poster'||(!isSetProduct(p)&&Number(minPrice(p))>0);}
+function shuffleItems(items){for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}return items;}
 function heroUrlFor(slug){const file=COLLECTION_HERO_IMAGES[slug];return file?HERO_BASE+file:'';}
 
 let collectionSlug=canonicalCollectionSlug(new URLSearchParams(location.search).get('slug')||(location.pathname.split('/').filter(Boolean)[1]||''));
@@ -935,11 +936,11 @@ async function load(){
       const counts=await countRes.json();
       if(Array.isArray(counts))counts.forEach(r=>{orderCounts[r.slug]=Number(r.order_count)||0;});
     }catch(e){}
-    // Attach count and sort: most-ordered first, sort_order as tiebreaker
-    allItems=Array.isArray(products)?products.map(p=>({
+    // Attach order counts, then shuffle once per page load.
+    allItems=Array.isArray(products)?shuffleItems(products.map(p=>({
       ...p,
       _order_count:orderCounts[p.slug]||0
-    })).sort((a,b)=>b._order_count-a._order_count||(a.sort_order??999)-(b.sort_order??999)):[];
+    }))):[];
   }catch(e){allItems=[];}
   renderCollectionHero();
   renderGrid();
