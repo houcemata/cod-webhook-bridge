@@ -41,9 +41,9 @@ button,input{font:inherit}
 .metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{padding:14px;border-radius:15px;background:#ffffff05;border:1px solid var(--line)}.metric-label{font-size:11px;color:var(--muted);line-height:1.35}.metric-value{font:30px/1 'Bebas Neue',sans-serif;color:var(--yellow);margin-top:8px}.metric-note{font-size:10px;color:#66667b;margin-top:4px}
 .aov-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.aov-filter{background:#ffffff0a;color:#fff;border:1px solid var(--line);border-radius:9px;padding:7px 8px;font-size:11px;outline:0}.aov-filter:focus{border-color:#f5c50088}
 .tiktok-card{position:relative}.tiktok-entry{display:flex;gap:7px;margin-top:10px}.tiktok-entry input{min-width:0;flex:1;padding:8px 9px;border:1px solid var(--line);border-radius:9px;background:#ffffff08;color:#fff;outline:0;font-size:12px}.tiktok-entry input:focus{border-color:#f5c50088}.tiktok-entry button{padding:8px 10px;border:0;border-radius:9px;background:var(--yellow);color:#0a0a0a;font-size:11px;font-weight:900;cursor:pointer}.tiktok-entry button:disabled{opacity:.45;cursor:not-allowed}.tiktok-help{font-size:10px;color:#66667b;margin-top:6px;line-height:1.35}
-.status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.status{padding:13px 11px;border:1px solid var(--line);border-radius:15px;background:#ffffff05}.status b{display:block;font:28px/1 'Bebas Neue',sans-serif;margin-bottom:6px}.status span{font-size:10px;color:var(--muted)}.status.pending b{color:#fbbf24}.status.shipped b{color:var(--purple)}.status.shipping b{color:#c4b5fd}.status.delivered b{color:var(--green)}.status.cancelled b{color:var(--red)}.status.returned b{color:#fbbf24}.status.notdelivered b{color:#f87171}
+.status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.status{padding:13px 11px;border:1px solid var(--line);border-radius:15px;background:#ffffff05}.status b{display:block;font:28px/1 'Bebas Neue',sans-serif;margin-bottom:6px}.status span{font-size:10px;color:var(--muted)}.status.pending b{color:#fbbf24}.status.shipped b{color:var(--purple)}.status.delivered b{color:var(--green)}.status.cancelled b{color:var(--red)}.status.notdelivered b{color:#f87171}
 .spend-card{display:grid;grid-template-columns:1fr 1fr;gap:10px}.spend-main{grid-column:1/-1}.spend-main .card-value{font-size:44px}.meta-note{font-size:11px;color:var(--muted);margin-top:4px}.stamp{text-align:center;color:#5e5e71;font-size:10px;margin-top:20px}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);padding:11px 17px;border-radius:999px;background:#1b1b24;border:1px solid var(--line);box-shadow:0 10px 35px #0008;color:#fff;font-size:12px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}.toast.show{opacity:1}.toast.error{border-color:#e11d4888;color:#fecdd3}
-@media(min-width:600px){.content{padding:28px}.kpi-card{flex-basis:170px}.metric-grid{grid-template-columns:repeat(4,1fr)}.status-grid{grid-template-columns:repeat(7,1fr)}.spend-card{grid-template-columns:repeat(3,1fr)}.spend-main{grid-column:auto}.title{font-size:56px}}
+@media(min-width:600px){.content{padding:28px}.kpi-card{flex-basis:170px}.metric-grid{grid-template-columns:repeat(4,1fr)}.status-grid{grid-template-columns:repeat(4,1fr)}.spend-card{grid-template-columns:repeat(3,1fr)}.spend-main{grid-column:auto}.title{font-size:56px}}
 @media(max-width:480px){.app-tools{align-items:flex-start;flex-direction:column}.app-tools-actions{width:100%}.app-tools-actions .btn{flex:1}.period-inline{flex-wrap:wrap}.period-inline .section-title{flex:1 0 100%}.period-select{flex:1}.period-label{flex:1;text-align:left}.custom{flex:1 0 100%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
 /* Keep the AOV selector available without interrupting the KPI rail. */
@@ -104,15 +104,15 @@ button,input{font:inherit}
     </section>
     <h2 class="section-title">Current status breakdown</h2>
     <section class="status-grid">
-      <div class="status pending"><b id="pending">—</b><span>Pending</span></div><div class="status shipped"><b id="shipped">—</b><span>Shipped</span></div><div class="status shipping"><b id="shipping">—</b><span>Out for delivery</span></div><div class="status cancelled"><b id="cancelled">—</b><span>Canceled</span></div><div class="status returned"><b id="returned">—</b><span>Returned</span></div><div class="status notdelivered"><b id="not-delivered">—</b><span>Not delivered</span></div>
+      <div class="status pending"><b id="pending">—</b><span>Pending</span></div><div class="status shipped"><b id="shipped">—</b><span>Shipped</span></div><div class="status cancelled"><b id="cancelled">—</b><span>Canceled</span></div><div class="status notdelivered"><b id="not-delivered">—</b><span>Not delivered</span></div>
     </section>
 
     <h2 class="section-title">Rates</h2>
     <section class="metric-grid">
       <div class="metric"><div class="metric-label">Delivery rate</div><div class="metric-value" id="delivery-rate">—</div><div class="metric-note">Delivered / total orders</div></div>
       <div class="metric"><div class="metric-label">Confirmation rate</div><div class="metric-value" id="confirmation-rate">—</div><div class="metric-note">Confirmed flow / total</div></div>
-      <div class="metric"><div class="metric-label">Delivered out of shipped</div><div class="metric-value" id="shipped-rate">—</div><div class="metric-note">Delivered / shipped + returned + delivered</div></div>
-      <div class="metric"><div class="metric-label">Delivered rate settled</div><div class="metric-value" id="settled-rate">—</div><div class="metric-note">Delivered / delivered + returned</div></div>
+      <div class="metric"><div class="metric-label">Delivered out of shipped</div><div class="metric-value" id="shipped-rate">—</div><div class="metric-note">Delivered / shipped + not delivered + delivered</div></div>
+      <div class="metric"><div class="metric-label">Delivered rate settled</div><div class="metric-value" id="settled-rate">—</div><div class="metric-note">Delivered / delivered + not delivered</div></div>
     </section>
 
     <h2 class="section-title">Spend details</h2>
@@ -132,7 +132,7 @@ button,input{font:inherit}
 const SB_PROJECT='https://mpkpehuatqsubohltssi.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
 const SB_URL=SB_PROJECT+'/rest/v1';const sb=supabase.createClient(SB_PROJECT,SB_KEY);const USD_TO_DZD=255;
-const CONFIRMED=new Set(['confirmed','shipped','returned','delivered']);const TIKTOK_KEY='arco_tracker_tiktok_spend';
+const CONFIRMED=new Set(['confirmed','shipped','shipping','not_delivered','returned','delivered']);const TIKTOK_KEY='arco_tracker_tiktok_spend';
 let session=null,period=localStorage.getItem('arco_tracker_period')||'today',aovFilter=localStorage.getItem('arco_tracker_aov')||'all',timer=null,installPrompt=null;
 const $=id=>document.getElementById(id);
 function pad(n){return String(n).padStart(2,'0')}
@@ -227,9 +227,9 @@ async function runTracker(){
 }
 function render(orders,events,adSummary,tiktokSpend,r){
   const spend=Number(adSummary?.total||0),real=orders.filter(o=>o.from_draft!==true);const total=real.length;const confirmed=real.filter(o=>CONFIRMED.has(o.status)).length;const cohortDelivered=real.filter(o=>o.status==='delivered').length;const deliveredEvents=new Set(events.map(e=>e.order_id)).size;
-  const shipped=real.filter(o=>o.status==='shipped').length;const shipping=real.filter(o=>o.status==='shipping').length;const pending=real.filter(o=>o.status==='pending').length;const cancelled=real.filter(o=>o.status==='canceled').length;const returned=real.filter(o=>o.status==='returned').length;const notDelivered=real.filter(o=>o.status==='not_delivered').length;
-  set('total',fmt(total));set('confirmed',fmt(confirmed));set('cohort-delivered',fmt(cohortDelivered));set('period-delivered',fmt(deliveredEvents));set('pending',fmt(pending));set('shipped',fmt(shipped));set('shipping',fmt(shipping));set('cancelled',fmt(cancelled));set('returned',fmt(returned));set('not-delivered',fmt(notDelivered));
-  set('delivery-rate',pct(cohortDelivered,total));set('confirmation-rate',pct(confirmed,total));set('shipped-rate',pct(cohortDelivered,shipped+returned+cohortDelivered));set('settled-rate',pct(cohortDelivered,cohortDelivered+returned));
+  const shipped=real.filter(o=>o.status==='shipped'||o.status==='shipping').length;const pending=real.filter(o=>o.status==='pending').length;const cancelled=real.filter(o=>o.status==='canceled').length;const notDelivered=real.filter(o=>o.status==='not_delivered'||o.status==='returned').length;
+  set('total',fmt(total));set('confirmed',fmt(confirmed));set('cohort-delivered',fmt(cohortDelivered));set('period-delivered',fmt(deliveredEvents));set('pending',fmt(pending));set('shipped',fmt(shipped));set('cancelled',fmt(cancelled));set('not-delivered',fmt(notDelivered));
+  set('delivery-rate',pct(cohortDelivered,total));set('confirmation-rate',pct(confirmed,total));set('shipped-rate',pct(cohortDelivered,shipped+notDelivered+cohortDelivered));set('settled-rate',pct(cohortDelivered,cohortDelivered+notDelivered));
   const aovOrders=aovFilter==='confirmed'?real.filter(o=>CONFIRMED.has(o.status)):aovFilter==='delivered'?real.filter(o=>o.status==='delivered'):real;
   const productRevenue=aovOrders.reduce((sum,o)=>sum+Math.max(0,Number(o.prix_total||0)-Number(o.shipping_cost||0)),0);
   set('aov',aovOrders.length?dzd(productRevenue/aovOrders.length):'0 DZD');set('aov-note',`${fmt(aovOrders.length)} orders · shipping excluded`);
