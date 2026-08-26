@@ -977,7 +977,7 @@ async function loadOrders(){
   const pageSize = 1000;
   let all = [];
   let from = 0;
-  const params=new URLSearchParams({select:'id,order_id,name,phone,wilaya,commune,type_livraison,station_code,product,variable,items,prix_total,shipping_cost,status,from_draft,notes,call_count,created_at,confirmed_at,tracking_number,shipping_agency,attribution_source',order:'created_at.desc',limit:String(pageSize)});
+  const params=new URLSearchParams({select:'id,order_id,name,phone,wilaya,commune,type_livraison,station_code,product,variable,items,prix_total,shipping_cost,status,from_draft,notes,call_count,created_at,confirmed_at,tracking_number,shipping_agency,attribution_source',order:'created_at.desc'});
   const range=getOrderDateRange();
   if(range?.from)params.append('created_at',`gte.${range.from}`);
   if(range?.to)params.append('created_at',`lt.${range.to}`);
@@ -986,6 +986,7 @@ async function loadOrders(){
       headers: { Range: `${from}-${from + pageSize - 1}` }
     });
     const chunk = await r.json();
+    if(!r.ok)throw new Error(chunk?.message||chunk?.error||'Could not load orders');
     if(!Array.isArray(chunk) || chunk.length === 0) break;
     all = all.concat(chunk);
     if(chunk.length < pageSize) break;

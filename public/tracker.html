@@ -197,7 +197,7 @@ async function enableAlerts(){
 async function authHeaders(){const {data:{session:s}}=await sb.auth.getSession();session=s;return {apikey:SB_KEY,Authorization:`Bearer ${s?.access_token||SB_KEY}`,'Content-Type':'application/json'} }
 async function fetchRows(resource,query){
   const headers=await authHeaders();let all=[],start=0;const page=1000;
-  while(true){const res=await fetch(`${SB_URL}/${resource}?${query}&limit=${page}`,{headers:{...headers,Range:`${start}-${start+page-1}`}});const data=await res.json().catch(()=>[]);if(!res.ok)throw new Error(data?.message||data?.error||`Could not load ${resource}`);if(!Array.isArray(data)||!data.length)break;all=all.concat(data);if(data.length<page)break;start+=page}
+  while(true){const res=await fetch(`${SB_URL}/${resource}?${query}`,{headers:{...headers,Range:`${start}-${start+page-1}`}});const data=await res.json().catch(()=>[]);if(!res.ok)throw new Error(data?.message||data?.error||`Could not load ${resource}`);if(!Array.isArray(data)||!data.length)break;all=all.concat(data);if(data.length<page)break;start+=page}
   return all;
 }
 async function loadOrders(r){
