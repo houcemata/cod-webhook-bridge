@@ -39,7 +39,6 @@
     .empty{display:grid;place-items:center;text-align:center;min-height:260px;background:rgba(11,18,34,.75);border:1px dashed var(--line);border-radius:22px;padding:28px}.empty svg{width:46px;height:46px;color:var(--gold);margin-bottom:12px}.empty h2{font-size:18px}.empty p{color:var(--muted);font-size:13px;margin-top:7px;line-height:1.5}.loading{padding:38px;text-align:center;color:var(--muted)}
     .nav-row{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:8px;margin-top:12px}.nav-btn{min-height:50px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--text);font-weight:700;transition:transform .2s,background .2s}.nav-btn:active{transform:scale(.97)}.nav-btn.done{background:var(--green);border-color:var(--green);color:#03120a}.nav-btn svg{width:18px;height:18px;vertical-align:-4px;margin-right:5px}
     .toast{position:fixed;left:16px;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:50;background:#162238;border:1px solid var(--line);border-radius:14px;padding:13px 15px;text-align:center;font-size:13px;box-shadow:var(--shadow);transform:translateY(30px);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}.toast.show{opacity:1;transform:translateY(0)}.toast.error{border-color:rgba(239,68,68,.5);color:#fecaca}
-    /* Visual packing grid: two large design previews per row, with the size below each one. */
     .group{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:16px}
     .group+.group{padding-top:0}
     .group-title{grid-column:1/-1;margin-bottom:0;font-size:16px;letter-spacing:2px}
@@ -94,13 +93,77 @@
     function formatDate(value){if(!value)return'—';const d=new Date(value);return Number.isNaN(d.getTime())?'—':d.toLocaleString('fr-DZ',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
     function render(){renderOrder()}
     function move(delta){const list=currentQueue();const i=list.findIndex(x=>Number(x.id)===Number(activeId));const next=list[i+delta];if(next){activeId=next.id;render()}}
-     async function done(){const row=activeRow();if(!row||row.archived_at)return;$('done-btn').disabled=true;const queueBeforeArchive=currentQueue();const currentIndex=queueBeforeArchive.findIndex(x=>Number(x.id)===Number(row.id));const next=queueBeforeArchive[currentIndex+1]||null;const r=await sb.from('packaging_orders').update({archived_at:new Date().toISOString()}).eq('id',row.id);if(r.error){$('done-btn').disabled=false;showToast(r.error.message,true);return}row.archived_at=new Date().toISOString();activeId=next?.id||null;showToast('Order archived');render()}
+    async function done(){const row=activeRow();if(!row||row.archived_at)return;$('done-btn').disabled=true;const queueBeforeArchive=currentQueue();const currentIndex=queueBeforeArchive.findIndex(x=>Number(x.id)===Number(row.id));const next=queueBeforeArchive[currentIndex+1]||null;const r=await sb.from('packaging_orders').update({archived_at:new Date().toISOString()}).eq('id',row.id);if(r.error){$('done-btn').disabled=false;showToast(r.error.message,true);return}row.archived_at=new Date().toISOString();activeId=next?.id||null;showToast('Order archived');render()}
+
+    async function fetchAllPackagingOrders(){
+      const PAGE_SIZE=100;
+      let all=[];
+      let from=0;
+
+      while(true){
+        const {data,error}=await sb
+          .from('packaging_orders')
+          .select('*')
+          .order('confirmed_at',{ascending:true})
+          .order('id',{ascending:true})
+          .range(from,from+PAGE_SIZE-1);
+
+        if(error)throw error;
+
+        const page=data||[];
+        all.push(...page);
+
+        if(page.length<PAGE_SIZE)break;
+        from+=PAGE_SIZE;
+      }
+
+      return all;
+    }
+
+    async function fetchAllProducts(){
+      const PAGE_SIZE=100;
+      let all=[];
+      let from=0;
+
+      while(true){
+        const {data,error}=await sb
+          .from('products')
+          .select('name,slug,variants,images')
+          .eq('active',true)
+          .order('name',{ascending:true})
+          .range(from,from+PAGE_SIZE-1);
+
+        if(error)throw error;
+
+        const page=data||[];
+        all.push(...page);
+
+        if(page.length<PAGE_SIZE)break;
+        from+=PAGE_SIZE;
+      }
+
+      return all;
+    }
+
     async function load(){
       $('content').innerHTML='<div class="loading">Loading packaging queue…</div>';
-      const [orders,products]=await Promise.all([sb.from('packaging_orders').select('*').order('confirmed_at',{ascending:true}).order('id',{ascending:true}),sb.from('products').select('name,slug,variants,images').eq('active',true).order('name',{ascending:true})]);
-      if(orders.error){$('content').innerHTML=`<div class="empty"><h2>Database setup needed</h2><p>Run <b>supabase-packaging.sql</b> in your Supabase SQL editor, then refresh this page.</p></div>`;showToast(orders.error.message,true);return}
-      rows=orders.data||[];catalog=products.data||[];activeId=orderedVisible()[0]?.id||null;render();
+
+      try{
+        const [orders,products]=await Promise.all([
+          fetchAllPackagingOrders(),
+          fetchAllProducts()
+        ]);
+
+        rows=orders;
+        catalog=products;
+        activeId=orderedVisible()[0]?.id||null;
+        render();
+      }catch(error){
+        $('content').innerHTML=`<div class="empty"><h2>Database error</h2><p>${esc(error.message||'Could not load packaging queue.')}</p></div>`;
+        showToast(error.message||'Could not load packaging queue.',true);
+      }
     }
+
     function renderCatalogSuggestions(){const q=$('catalog-search').value.trim().toLowerCase(),box=$('catalog-suggestions');if(!q){box.classList.add('hidden');return}const matches=catalog.filter(p=>String(p.name||'').toLowerCase().includes(q)).slice(0,8);box.innerHTML=matches.length?matches.map(p=>`<button class="suggestion" type="button" data-slug="${esc(p.slug)}"><span>${esc(p.name)}</span><small>Catalog</small></button>`).join(''):'<div class="suggestion"><span>No matching products</span></div>';box.classList.remove('hidden');box.querySelectorAll('[data-slug]').forEach(b=>b.addEventListener('click',()=>showCatalogProduct(catalog.find(p=>p.slug===b.dataset.slug))))}
     function showCatalogProduct(product){if(!product)return;$('catalog-search').value=product.name;$('catalog-suggestions').classList.add('hidden');const variants=Array.isArray(product.variants)?product.variants:Object.values(product.variants||{});const image=variants[0]?.image||(Array.isArray(product.images)?product.images[0]:'')||LOGO;$('catalog-result').innerHTML=`<img src="${esc(image)}" alt="${esc(product.name)}" /><div><strong>${esc(product.name)}</strong><small>${variants.map(v=>esc(v.label||v.name||'Standard')).join(' · ')||'Catalog product'}</small></div>`;$('catalog-result').classList.remove('hidden')}
     async function ensureOperatorAccess(){const errEl=$('login-error');const{data:roleData,error}=await sb.from('user_roles').select('*').eq('user_id',currentUser.id).in('role',['operator','admin']).single();if(error||!roleData){await sb.auth.signOut();currentUser=null;currentRole=null;$('app').classList.add('hidden');$('login-screen').classList.remove('hidden');errEl.textContent='This account is not an operator account.';return false}currentRole=roleData;return true}
