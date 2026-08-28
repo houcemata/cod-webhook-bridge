@@ -56,7 +56,7 @@ export default async function handler(req, res) {
       if (orderId) results[orderId] = { error: "Missing order data" };
       continue;
     }
-    const prep = prepareNoestPayload({ order, orderId, stationCode, noestGuid });
+    const prep = await prepareNoestPayload({ order, orderId, stationCode, noestGuid, noestToken });
     if (!prep.ok) {
       results[orderId] = { error: prep.error };
       continue;

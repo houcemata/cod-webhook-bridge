@@ -1,4 +1,9 @@
 import { requireRole } from "./_auth.js";
+import {
+  normalizeLocationKey,
+  resolveCommuneForNoest,
+  resolveWilayaId,
+} from "../lib/noest-locations.js";
 
 const NOEST_BASE = "https://app.noest-dz.com/api/public";
 
@@ -47,6 +52,9 @@ const COMMUNE_ALIASES = {
 };
 
 function getWilayaId(wilayaName) {
+  const resolved = resolveWilayaId(wilayaName);
+  if (resolved) return resolved;
+
   if (!wilayaName) return null;
   const raw = String(wilayaName).trim();
   const rawLower = raw.toLowerCase();
@@ -122,13 +130,41 @@ function normalizeStationCode(stationCode) {
   return `${Number(match[1])}${match[2]}`;
 }
 
-function normalizeCommuneForNoest(wilayaId, commune) {
+async function resolveCommuneAndWilayaForNoest(wilayaId, commune, noestToken) {
   const raw = sanitizeNoestText(commune || "", "");
-  if (!raw) return "";
+  if (!raw) return { ok: true, wilayaId, commune: "" };
+
+  if (noestToken) {
+    try {
+      const resolved = await resolveCommuneForNoest({ token: noestToken, wilayaId, commune: raw });
+      if (resolved.ok) {
+        return {
+          ok: true,
+          wilayaId: Number(resolved.wilayaId || wilayaId),
+          commune: resolved.commune || "",
+          method: resolved.method,
+        };
+      }
+      console.warn("[noest-location] commune mismatch", {
+        wilayaId,
+        input: raw,
+        normalized: normalizeLocationKey(raw),
+        error: resolved.error,
+        suggestions: resolved.suggestions || [],
+      });
+      return {
+        ok: false,
+        error: resolved.error || `Invalid commune "${raw}" for Noest`,
+        suggestions: resolved.suggestions || [],
+      };
+    } catch (error) {
+      console.warn("[noest-location] could not load Noest commune reference", error.message || error);
+    }
+  }
 
   const key = normalizeWilayaKey(raw);
   const aliases = COMMUNE_ALIASES[Number(wilayaId)] || {};
-  return aliases[key] || raw;
+  return { ok: true, wilayaId, commune: aliases[key] || raw, method: aliases[key] ? "legacy_alias" : "raw" };
 }
 
 async function noestPost(endpoint, body, token) {
@@ -242,7 +278,7 @@ async function logHistory(orderRef, oldStatus, newStatus, changedBy) {
 
 // Build (and validate) a Noest payload for one order without sending it.
 // Returns { ok:true, payload, fallbackPayload, isStopDesk } or { ok:false, error }.
-export function prepareNoestPayload({ order, orderId, stationCode, noestGuid }) {
+export async function prepareNoestPayload({ order, orderId, stationCode, noestGuid, noestToken }) {
   const wilayaId = getWilayaId(order.wilaya);
   if (!wilayaId) {
     return { ok: false, error: `Unknown wilaya: "${order.wilaya}". Edit the order and fix the wilaya first.` };
@@ -255,9 +291,14 @@ export function prepareNoestPayload({ order, orderId, stationCode, noestGuid }) 
   const normalizedStationCode = normalizeStationCode(stationCode || order.station_code);
   const clientName = sanitizeNoestText(order.name, `Client ${orderId}`);
   const address = sanitizeNoestText(order.commune || order.wilaya, order.wilaya || "Algerie");
-  const commune = normalizeCommuneForNoest(wilayaId, order.commune || "");
-  const payload = buildNoestPayload({ noestGuid, orderId, order, wilayaId, phone, clientName, address, commune, isStopDesk, normalizedStationCode });
-  const fallbackPayload = buildNoestPayload({ noestGuid, orderId, order, wilayaId, phone, clientName, address, commune: "", isStopDesk, normalizedStationCode });
+  const location = await resolveCommuneAndWilayaForNoest(wilayaId, order.commune || "", noestToken);
+  if (!location.ok && !isStopDesk) {
+    const suggestions = location.suggestions?.length ? ` Suggestions: ${location.suggestions.join(", ")}` : "";
+    return { ok: false, error: `${location.error}.${suggestions}` };
+  }
+  const resolvedWilayaId = Number(location.wilayaId || wilayaId);
+  const payload = buildNoestPayload({ noestGuid, orderId, order, wilayaId: resolvedWilayaId, phone, clientName, address, commune: location.commune, isStopDesk, normalizedStationCode });
+  const fallbackPayload = buildNoestPayload({ noestGuid, orderId, order, wilayaId: resolvedWilayaId, phone, clientName, address, commune: "", isStopDesk, normalizedStationCode });
   return { ok: true, payload, fallbackPayload, isStopDesk };
 }
 
@@ -284,57 +325,17 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Noest credentials not configured" });
   }
 
-  const wilayaId = getWilayaId(order.wilaya);
-  if (!wilayaId) {
-    return res.status(400).json({
-      error: `Unknown wilaya: "${order.wilaya}". Please edit the order and fix the wilaya first.`,
-    });
-  }
+  const prepared = await prepareNoestPayload({ order, orderId, stationCode, noestGuid, noestToken });
+  if (!prepared.ok) return res.status(400).json({ error: prepared.error });
 
-  const phone = normalizePhone(order.phone);
-  if (phone.length < 8) {
-    return res.status(400).json({
-      error: `Invalid phone number: "${order.phone}". Please edit the order and use digits only.`,
-    });
-  }
-
-  const isStopDesk = order.type_livraison === "pickup";
-  const normalizedStationCode = normalizeStationCode(stationCode || order.station_code);
-  const clientName = sanitizeNoestText(order.name, `Client ${orderId}`);
-  const address = sanitizeNoestText(order.commune || order.wilaya, order.wilaya || "Algerie");
-  const commune = normalizeCommuneForNoest(wilayaId, order.commune || "");
-  const primaryPayload = buildNoestPayload({
-    noestGuid,
-    orderId,
-    order,
-    wilayaId,
-    phone,
-    clientName,
-    address,
-    commune,
-    isStopDesk,
-    normalizedStationCode,
-  });
+  const { payload: primaryPayload, fallbackPayload, isStopDesk } = prepared;
 
   let createRes = await noestPost("/create/order", primaryPayload, noestToken);
   let usedFallbackPayload = false;
-  let fallbackPayload = null;
 
   if (!createRes.ok || !createRes.data?.success) {
     const shouldRetryWithoutCommune = !isStopDesk && isCommuneValidationError(createRes.data);
     if (shouldRetryWithoutCommune) {
-      fallbackPayload = buildNoestPayload({
-        noestGuid,
-        orderId,
-        order,
-        wilayaId,
-        phone,
-        clientName,
-        address,
-        commune: "",
-        isStopDesk,
-        normalizedStationCode,
-      });
       createRes = await noestPost("/create/order", fallbackPayload, noestToken);
       usedFallbackPayload = true;
     }
