@@ -191,7 +191,7 @@ async function enableAlerts(){
     const configResponse=await fetch('/api/push-config');const config=await configResponse.json().catch(()=>({}));if(!configResponse.ok)throw new Error(config.error||'Push alerts are not configured yet');
     const registration=await navigator.serviceWorker.ready;let subscription=await registration.pushManager.getSubscription();
     if(!subscription)subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:base64ToBytes(config.publicKey)});
-    const headers=await authHeaders();const response=await fetch('/api/push-subscribe',{method:'POST',headers,body:JSON.stringify({subscription:subscription.toJSON()})});const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.error||'Could not save this device');
+    const headers=await authHeaders();const response=await fetch('/api/push-subscribe',{method:'POST',headers,body:JSON.stringify({subscription:subscription.toJSON(),app_context:'tracker'})});const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.error||'Could not save this device');
     setAppStatus('Alerts enabled — new orders will use the system sound.','good');button.textContent='Alerts on';toast('Alerts enabled for this device');
   }catch(error){setAppStatus(error.message||'Could not enable alerts','warn');toast(error.message||'Could not enable alerts',true)}finally{button.disabled=false}
 }
