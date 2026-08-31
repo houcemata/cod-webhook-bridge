@@ -49,7 +49,7 @@ button,input{font:inherit}
 /* Keep the AOV selector available without interrupting the KPI rail. */
 .aov-editor{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:10px;color:var(--muted);font-size:10px;height:auto;overflow:visible}.aov-editor::before{content:'AOV view';margin-right:auto}.aov-editor .aov-filter{min-height:36px}
 .legacy-acquisition{display:block!important}
-.app-tools{position:relative;padding-right:54px}.app-tools-dismiss{position:absolute;top:10px;right:10px}
+.app-tools{position:relative;padding-right:54px}.app-tools-dismiss{position:absolute;top:10px;right:10px}.pull-refresh{position:fixed;top:calc(58px + env(safe-area-inset-top));left:50%;z-index:25;transform:translate(-50%,-12px);padding:8px 13px;border:1px solid #f5c50055;border-radius:999px;background:#17150d;color:var(--yellow);font-size:11px;font-weight:800;opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease}.pull-refresh.show{opacity:1;transform:translate(-50%,0)}
 </style>
 </head>
 <body>
@@ -62,7 +62,8 @@ button,input{font:inherit}
   </div>
 </section>
 <main id="app">
-  <header class="topbar"><div class="brand-lockup"><img class="brand-mark" src="/arco-icon.png" alt=""><div class="brand">ARCO<small>OPS</small></div></div><div class="top-actions"><button class="btn btn-primary" id="run-btn"><span>Run tracker</span></button><button class="btn btn-secondary" id="admin-btn">Admin</button><button class="btn btn-secondary" id="logout-btn">Logout</button></div></header>
+  <header class="topbar"><div class="brand-lockup"><img class="brand-mark" src="/arco-icon.png" alt=""><div class="brand">ARCO<small>OPS</small></div></div><div class="top-actions"><button class="btn btn-primary" id="run-btn"><span>Run tracker</span></button><button class="btn btn-secondary" id="stock-btn">Stock</button><button class="btn btn-secondary" id="admin-btn">Admin</button><button class="btn btn-secondary" id="logout-btn">Logout</button></div></header>
+  <div class="pull-refresh" id="pull-refresh">Pull to refresh</div>
   <div class="content">
 
     <section class="period-inline">
@@ -238,6 +239,12 @@ function render(orders,events,adSummary,tiktokSpend,r){
 async function loadDashboard(){
   const r=getRange();if(!r){toast('Choose a valid date range',true);return}
   $('run-btn').disabled=true;try{const [orders,events,spend]=await Promise.all([loadOrders(r),loadDeliveryEvents(r),loadMetaSpend(r)]);render(orders,events,spend,tiktokForRange(r),r)}catch(e){toast(e.message||'Unable to load tracker',true)}finally{$('run-btn').disabled=false}}
+function setupPullRefresh(){
+  const indicator=$('pull-refresh');let startY=0,distance=0,pulling=false,refreshing=false;
+  window.addEventListener('touchstart',event=>{if(refreshing||window.scrollY>0||$('app').style.display==='none')return;startY=event.touches[0].clientY;distance=0;pulling=true},{passive:true});
+  window.addEventListener('touchmove',event=>{if(!pulling||window.scrollY>0)return;distance=event.touches[0].clientY-startY;if(distance>18){indicator.classList.add('show');indicator.textContent=distance>78?'Release to refresh':'Pull to refresh'}},{passive:true});
+  window.addEventListener('touchend',async()=>{if(!pulling)return;pulling=false;if(distance>78&&!refreshing){refreshing=true;indicator.classList.add('show');indicator.textContent='Refreshing...';try{await loadDashboard();toast('Tracker refreshed')}finally{refreshing=false;setTimeout(()=>indicator.classList.remove('show'),450)}}else indicator.classList.remove('show')});
+}
 async function login(){const email=$('email').value.trim(),password=$('password').value,btn=$('login-btn');if(!email||!password){$('login-error').textContent='Enter email and password';return}btn.disabled=true;try{const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;const {data:role}=await sb.from('user_roles').select('role').eq('user_id',data.user.id).eq('role','admin').maybeSingle();if(!role)throw new Error('Admin access required');session=data.session;$('login').classList.add('hidden');$('app').style.display='block';showPeriod();await loadDashboard()}catch(e){$('login-error').textContent=e.message||'Sign in failed'}finally{btn.disabled=false}}
 async function boot(){const {data:{session:s}}=await sb.auth.getSession();if(s){session=s;const {data:role}=await sb.from('user_roles').select('role').eq('user_id',s.user.id).eq('role','admin').maybeSingle();if(role){$('login').classList.add('hidden');$('app').style.display='block';showPeriod();await loadDashboard()}}}
 document.querySelectorAll('.kpi-card').forEach(card=>card.addEventListener('click',()=>{selectedKpi=card.dataset.kpi;localStorage.setItem('arco_tracker_kpi',selectedKpi);if(chartSnapshot)renderChart(chartSnapshot.orders,chartSnapshot.adSummary,chartSnapshot.r,chartSnapshot.stats);document.querySelectorAll('.kpi-card').forEach(item=>item.classList.toggle('active',item===card))}));document.querySelectorAll('.chart-mode').forEach(button=>button.addEventListener('click',()=>{chartMode=button.dataset.chartMode;document.querySelectorAll('.chart-mode').forEach(item=>item.classList.toggle('active',item===button));if(chartSnapshot)renderChart(chartSnapshot.orders,chartSnapshot.adSummary,chartSnapshot.r,chartSnapshot.stats)}));
@@ -246,6 +253,11 @@ $('aov-filter').value=aovFilter;$('aov-filter').addEventListener('change',e=>{ao
 $('tiktok-save').addEventListener('click',()=>{const r=getRange();if(!r||r.fromKey!==r.toKey){toast('Select one specific day before saving TikTok spend',true);return}const amount=Number($('tiktok-input').value);if(!Number.isFinite(amount)||amount<0){toast('Enter a valid TikTok spend in USD',true);return}const saved=readTikTok();saved[r.fromKey]=amount;localStorage.setItem(TIKTOK_KEY,JSON.stringify(saved));toast('TikTok spend saved');loadDashboard()});
  $('date-from').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('date-to').addEventListener('change',()=>{if(period==='custom')loadDashboard()});$('run-btn').addEventListener('click',runTracker);$('login-btn').addEventListener('click',login);$('password').addEventListener('keydown',e=>{if(e.key==='Enter')login()});$('admin-btn').addEventListener('click',()=>location.href='/admin.html');$('logout-btn').addEventListener('click',async()=>{await sb.auth.signOut();location.reload()});$('notify-btn').addEventListener('click',enableAlerts);$('install-btn').addEventListener('click',async()=>{if(installPrompt){installPrompt.prompt();const choice=await installPrompt.userChoice;installPrompt=null;if(choice.outcome==='accepted')hideInstall();return}setAppStatus(/iPad|iPhone|iPod/.test(navigator.userAgent)?'Use Safari Share → Add to Home Screen.':'This app is already installed or your browser controls installation.','warn')});setupPwa();boot();
 document.querySelectorAll('.period-tab').forEach(button=>button.classList.add('hidden'));$('period-select').value=period;$('period-select').addEventListener('change',event=>{period=event.target.value;localStorage.setItem('arco_tracker_period',period);showPeriod();if(period!=='custom')loadDashboard()});$('dismiss-app-tools').addEventListener('click',hideAppTools);$('logout-btn').addEventListener('click',()=>sessionStorage.removeItem('arco_tracker_app_tools_dismissed'),true);
+</script>
+<script>
+const stockButton=document.getElementById('stock-btn');
+if(stockButton)stockButton.addEventListener('click',()=>location.href='/stock');
+if(typeof setupPullRefresh==='function')setupPullRefresh();
 </script>
 </body>
 </html>

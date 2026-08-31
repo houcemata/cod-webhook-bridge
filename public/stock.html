@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="manifest" href="/manifest-stock.webmanifest">
+<title>ARCO Stock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#050505;--panel:#0b0b0c;--card:#111114;--line:#222226;--line2:#33333a;--text:#f7f7f8;--muted:#8c8d96;--muted2:#62636c;--red:#e11d48;--green:#22c55e;--amber:#f5c500;--blue:#38bdf8}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}.hidden{display:none!important}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}.login-card{width:min(390px,100%);background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px}.mark{width:44px;height:44px;border-radius:13px;background:var(--red);display:grid;place-items:center;font:900 24px/1 "Bebas Neue";color:#fff;margin:0 auto 12px}.login h1{text-align:center;font-size:25px}.login p{text-align:center;color:var(--muted);font-size:13px;margin:7px 0 18px}
+.field{display:grid;gap:6px;margin-top:10px}.field label{font-size:12px;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.field input,.field select,.field textarea{width:100%;background:#080809;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:12px;outline:none}.field textarea{resize:vertical;min-height:72px}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(225,29,72,.15)}
+.btn{min-height:40px;border:1px solid var(--line2);border-radius:11px;background:#141417;color:var(--text);padding:9px 13px;font-weight:850;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn:hover:not(:disabled){border-color:#44444d;background:#19191d}.btn:disabled{opacity:.45;cursor:not-allowed}.btn.primary{background:var(--red);border-color:var(--red);color:#fff}.btn.green{background:var(--green);border-color:var(--green);color:#041007}.btn.ghost{background:transparent}.btn.danger{color:#fb7185;border-color:rgba(225,29,72,.45);background:rgba(225,29,72,.08)}.btn.icon{width:40px;padding:0}.btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.error{min-height:18px;color:#fb7185;text-align:center;font-size:13px;margin-top:12px}.app{display:none;min-height:100vh}.topbar{position:sticky;top:0;z-index:20;background:rgba(5,5,5,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}.top-inner{max-width:1180px;margin:auto;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:10px;min-width:0}.brand .mark{margin:0;width:38px;height:38px;border-radius:11px;font-size:21px}.brand h1{font-size:19px;white-space:nowrap}.brand span{display:block;color:var(--muted);font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.08em}.actions{display:flex;gap:8px;align-items:center}
+.shell{max-width:1180px;margin:auto;padding:16px 14px 90px}.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:3px;margin-bottom:14px}.tab{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:10px 14px;white-space:nowrap;font-weight:850}.tab.active{color:#fff;border-color:rgba(225,29,72,.75);background:rgba(225,29,72,.14)}
+.section{display:none}.section.active{display:block}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}.kpi{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px}.kpi small{display:block;color:var(--muted);font-size:11px;font-weight:850;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px}.kpi strong{display:block;font:400 31px/1 "Bebas Neue";letter-spacing:.02em}.kpi .sub{color:var(--muted2);font-size:12px;margin-top:6px}
+.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px}.head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}.head h2{font-size:16px}.head p{color:var(--muted);font-size:12px;margin-top:4px}.list{display:grid;gap:8px}.row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px}.row.low{border-color:rgba(225,29,72,.55)}.row-title{font-weight:900;overflow:hidden;text-overflow:ellipsis}.row-meta{color:var(--muted);font-size:12px;margin-top:3px}.qty{font:400 29px/1 "Bebas Neue";letter-spacing:.02em;text-align:right}.qty.good{color:var(--green)}.qty.low{color:#fb7185}.qty.blue{color:var(--blue)}.qty.amber{color:var(--amber)}.row-actions{display:flex;gap:6px;margin-top:8px;justify-content:flex-end}.pill{display:inline-flex;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:850;border:1px solid var(--line2);color:var(--muted);margin-top:7px}.pill.low{color:#fb7185;border-color:rgba(225,29,72,.4);background:rgba(225,29,72,.09)}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}.empty{border:1px dashed var(--line2);border-radius:14px;padding:26px;text-align:center;color:var(--muted)}.notice{background:rgba(245,197,0,.08);border:1px solid rgba(245,197,0,.25);border-radius:14px;padding:12px;color:#ffe58a;font-size:13px}.muted{color:var(--muted)}.formula{display:grid;gap:8px;margin-top:10px}.formula div{background:#101013;border:1px solid var(--line);border-radius:12px;padding:10px;color:#d9d9df;font-size:12px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.history{display:grid;gap:8px;max-height:560px;overflow:auto}.history-row{background:#101013;border:1px solid var(--line);border-radius:12px;padding:11px}.history-row strong{display:block}.history-row span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.72);display:none;align-items:flex-end;justify-content:center;padding:14px}.modal.show{display:flex}.dialog{width:min(520px,100%);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--line2);border-radius:18px;padding:16px;box-shadow:0 24px 90px rgba(0,0,0,.55)}.dialog-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.dialog-head h3{font-size:17px}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:70;background:#18181b;border:1px solid var(--line2);color:#fff;border-radius:999px;padding:11px 15px;box-shadow:0 14px 40px rgba(0,0,0,.45);max-width:calc(100% - 28px);text-align:center}.toast.bad{background:#3b0a14;border-color:rgba(225,29,72,.45)}
+@media(max-width:900px){.kpis{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.brand span{display:none}}@media(max-width:560px){.top-inner{padding:10px}.shell{padding:12px 10px 84px}.kpis{gap:7px}.kpi{padding:11px}.kpi strong{font-size:26px}.row{grid-template-columns:1fr}.qty{text-align:left}.row-actions{justify-content:flex-start}.split{grid-template-columns:1fr}.actions .btn:not(.icon){display:none}.tab{padding:9px 12px}.card{padding:12px}}
+</style>
+</head>
+<body>
+<main id="login" class="login">
+  <div class="login-card">
+    <div class="mark">A</div>
+    <h1>ARCO Stock</h1>
+    <p>Sign in with your ARCO admin account.</p>
+    <div class="field"><label>Email</label><input id="email" type="email" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div>
+    <button id="login-btn" class="btn primary" style="width:100%;margin-top:14px">Sign in</button>
+    <div id="login-error" class="error"></div>
+  </div>
+</main>
+
+<main id="app" class="app">
+  <header class="topbar">
+    <div class="top-inner">
+      <div class="brand"><div class="mark">A</div><div><h1>ARCO Stock</h1><span id="user-chip">Workshop stock</span></div></div>
+      <div class="actions">
+        <button class="btn icon" id="push-btn" title="Enable push alerts" aria-label="Enable push alerts"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></button>
+        <button class="btn icon" id="refresh-btn" title="Refresh" aria-label="Refresh"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.8-4L3 10"/><path d="M3 4v6h6"/><path d="M4 13a8 8 0 0 0 14.8 4L21 14"/><path d="M21 20v-6h-6"/></svg></button>
+        <button class="btn ghost" id="logout-btn">Sign out</button>
+      </div>
+    </div>
+  </header>
+  <div class="shell">
+    <nav class="tabs">
+      <button class="tab active" data-section="overview">Overview</button>
+      <button class="tab" data-section="materials">Materials</button>
+      <button class="tab" data-section="production">Production</button>
+      <button class="tab" data-section="debts">Debts</button>
+      <button class="tab" data-section="settings">Settings</button>
+    </nav>
+
+    <section id="overview" class="section active">
+      <div class="kpis">
+        <div class="kpi"><small>Small ready panels</small><strong id="ready-m-panels">0</strong><div class="sub" id="ready-m-sets">0 sets equivalent</div></div>
+        <div class="kpi"><small>Large ready panels</small><strong id="ready-l-panels">0</strong><div class="sub" id="ready-l-sets">0 sets equivalent</div></div>
+        <div class="kpi"><small>Ready stock cost</small><strong id="ready-cost">0</strong><div class="sub">M 290, L 500 per panel</div></div>
+        <div class="kpi"><small>Ready selling value</small><strong id="ready-selling">0</strong><div class="sub">2900 / 3900 per 3 panels</div></div>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <div class="head"><div><h2>Workshop materials</h2><p>Autocollant in meters, MDF in panels, double-face tape in meters.</p></div></div>
+          <div id="material-overview" class="list"></div>
+        </div>
+        <div class="card">
+          <div class="head"><div><h2>Debt snapshot</h2><p>Unpaid autocollant, print, and employee work.</p></div></div>
+          <div id="debt-overview" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="materials" class="section">
+      <div class="grid">
+        <div class="card">
+          <div class="head"><div><h2>Material stock</h2><p>Update current meters and panel counts directly.</p></div></div>
+          <div id="materials-list" class="list"></div>
+        </div>
+        <div class="card">
+          <div class="head"><div><h2>Add purchase</h2><p>Use this when you buy rolls or MDF and pay later.</p></div></div>
+          <div class="field"><label>Material</label><select id="purchase-material"><option value="autocollant">Rouleau d'autocollant</option><option value="scotch_double_face">Scotch double face</option><option value="mdf_m">Panneaux MDF M</option><option value="mdf_l">Panneaux MDF L</option></select></div>
+          <div class="split">
+            <div class="field"><label>Quantity / length</label><input id="purchase-qty" type="number" min="0" step="0.01" value="50"></div>
+            <div class="field"><label>Unit</label><input id="purchase-unit" value="meters"></div>
+          </div>
+          <div class="toolbar" style="margin-top:8px"><button class="btn" onclick="setPurchaseLength(50)">50m roll</button><button class="btn" onclick="setPurchaseLength(100)">100m roll</button></div>
+          <div class="split">
+            <div class="field"><label>Amount owed</label><input id="purchase-owed" type="number" min="0" step="0.01" value="0"></div>
+            <div class="field"><label>Paid now</label><input id="purchase-paid" type="number" min="0" step="0.01" value="0"></div>
+          </div>
+          <div class="field"><label>Supplier / note</label><input id="purchase-note" placeholder="Optional"></div>
+          <button id="save-purchase-btn" class="btn primary" style="width:100%;margin-top:12px">Save purchase</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="production" class="section">
+      <div class="grid">
+        <div class="card">
+          <div class="head"><div><h2>Add production batch</h2><p>Deducts autocollant, MDF panels, and Scotch double face.</p></div></div>
+          <div class="split">
+            <div class="field"><label>Date</label><input id="prod-date" type="date"></div>
+            <div class="field"><label>Print length meters</label><input id="prod-length" type="number" min="0" step="0.01" value="0"></div>
+          </div>
+          <div class="split">
+            <div class="field"><label>M panels produced</label><input id="prod-m" type="number" min="0" value="0"></div>
+            <div class="field"><label>L panels produced</label><input id="prod-l" type="number" min="0" value="0"></div>
+          </div>
+          <div class="split">
+            <div class="field"><label>Shipping included</label><select id="shipping-included"><option value="no">No</option><option value="yes">Yes, add 200 DZD</option></select></div>
+            <div class="field"><label>Shipping extra goes to</label><select id="shipping-employee"><option value="employee_1">Employee 1</option><option value="employee_2">Employee 2</option></select></div>
+          </div>
+          <div class="field"><label>Notes</label><textarea id="prod-notes"></textarea></div>
+          <div id="batch-preview" class="formula"></div>
+          <button id="save-production-btn" class="btn green" style="width:100%;margin-top:12px">Save production batch</button>
+        </div>
+        <div class="card">
+          <div class="head"><div><h2>Production history</h2><p>Latest batches and debts created.</p></div></div>
+          <div id="production-list" class="history"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="debts" class="section">
+      <div class="grid">
+        <div class="card">
+          <div class="head"><div><h2>Debt totals</h2><p>Totals minus recorded payments.</p></div></div>
+          <div id="debt-list" class="list"></div>
+        </div>
+        <div class="card">
+          <div class="head"><div><h2>Record payment</h2><p>Subtract payments from debt totals.</p></div></div>
+          <div class="field"><label>Debt type</label><select id="pay-type"><option value="autocollant">Autocollant</option><option value="print">Print</option><option value="employee_1">Employee 1</option><option value="employee_2">Employee 2</option></select></div>
+          <div class="field"><label>Amount paid</label><input id="pay-amount" type="number" min="0" step="0.01" value="0"></div>
+          <div class="field"><label>Note</label><input id="pay-note" placeholder="Optional"></div>
+          <button id="save-payment-btn" class="btn primary" style="width:100%;margin-top:12px">Save payment</button>
+          <div class="head" style="margin-top:18px"><div><h2>Recent payments</h2></div></div>
+          <div id="payment-list" class="history"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="settings" class="section">
+      <div class="grid">
+        <div class="card">
+          <div class="head"><div><h2>Notification settings</h2><p>These alerts run without adding new Vercel functions.</p></div></div>
+          <div class="field"><label>Print debt alert limit</label><input id="print-limit" type="number" min="0" step="100" value="50000"></div>
+          <div class="field"><label>Material below threshold alerts</label><select id="material-alerts"><option value="true">Enabled</option><option value="false">Disabled</option></select></div>
+          <div class="field"><label>Production batch saved alerts</label><select id="production-alerts"><option value="true">Enabled</option><option value="false">Disabled</option></select></div>
+          <div class="field"><label>Print debt limit alerts</label><select id="print-alerts"><option value="true">Enabled</option><option value="false">Disabled</option></select></div>
+          <button id="save-settings-btn" class="btn primary" style="width:100%;margin-top:12px">Save settings</button>
+        </div>
+        <div class="card">
+          <div class="head"><div><h2>Material thresholds</h2><p>Edit each material threshold from the Materials tab.</p></div></div>
+          <div class="formula">
+            <div>Autocollant and Scotch thresholds are meters.</div>
+            <div>MDF M and MDF L thresholds are panel counts.</div>
+            <div>Alerts fire when the app is opened/refreshed or after production is saved.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="dialog">
+    <div class="dialog-head"><h3 id="modal-title">Adjust stock</h3><button class="btn icon ghost" id="modal-close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+const SB_PROJECT='https://mpkpehuatqsubohltssi.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wa3BlaHVhdHFzdWJvaGx0c3NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5OTc0NzUsImV4cCI6MjA5NTU3MzQ3NX0.v65rahP8E26xAnbcfOHJToKsja6q_A8v3Kxki8LAymk';
+const sb=supabase.createClient(SB_PROJECT,SB_KEY);
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+const money=v=>`${Math.round(Number(v||0)).toLocaleString()} DZD`;
+const SETTINGS={mPanelCost:290,lPanelCost:500,mSetPrice:2900,lSetPrice:3900,printMeterDebt:571.5,employeePerPanel:30,shippingExtra:200,scotchM:0.10,scotchL:0.20};
+const DEFAULT_ALERTS={id:true,print_debt_alert_limit:50000,material_alerts_enabled:true,production_alerts_enabled:true,print_debt_alerts_enabled:true};
+let currentUser=null, stockItems=[], readyStock=[], batches=[], purchases=[], payments=[], alertSettings={...DEFAULT_ALERTS}, toastTimer=null;
+
+function toast(msg,bad=false){const el=$('toast');el.textContent=msg;el.className='toast'+(bad?' bad':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.className='toast hidden',2800)}
+function today(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+function fmtDate(v){if(!v)return'';return new Date(v).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})}
+function num(v){return Number(v||0)}
+function sizeKey(v){const s=String(v||'').toLowerCase().replace(/×/g,'x');if(/30\s*x\s*40|\bm\b/.test(s))return'M';if(/40\s*x\s*60|\bl\b/.test(s))return'L';return''}
+function material(key){return stockItems.find(i=>materialKey(i)===key)}
+function materialKey(i){const n=String(i.name||'').toLowerCase(),s=String(i.size||'').toLowerCase();if(n.includes('autocollant'))return'autocollant';if(n.includes('scotch')||n.includes('double face'))return'scotch_double_face';if(n.includes('m board')||n.includes('mdf m')||s.includes('30x40'))return'mdf_m';if(n.includes('l board')||n.includes('mdf l')||s.includes('40x60'))return'mdf_l';return''}
+function materialLabel(key){return{autocollant:"Rouleau d'autocollant",scotch_double_face:'Scotch double face',mdf_m:'Panneaux MDF M',mdf_l:'Panneaux MDF L'}[key]||key}
+function materialUnit(key){return key==='mdf_m'||key==='mdf_l'?'pieces':'meters'}
+function readyPanelSummary(){
+  let m=0,l=0;
+  readyStock.forEach(r=>{const mult=String(r.product_type||'').toLowerCase()==='set'?3:1;const q=num(r.quantity)*mult;const size=sizeKey(r.size);if(size==='M')m+=q;if(size==='L')l+=q});
+  const cost=m*SETTINGS.mPanelCost+l*SETTINGS.lPanelCost;
+  const selling=(m/3)*SETTINGS.mSetPrice+(l/3)*SETTINGS.lSetPrice;
+  return{m,l,mSets:m/3,lSets:l/3,cost,selling};
+}
+function debtTotals(){
+  const paid=t=>payments.filter(p=>p.debt_type===t).reduce((s,p)=>s+num(p.amount),0);
+  const autocollant=purchases.filter(p=>p.material_key==='autocollant').reduce((s,p)=>s+num(p.amount_owed)-num(p.amount_paid),0)-paid('autocollant');
+  const print=batches.reduce((s,b)=>s+num(b.print_debt),0)-paid('print');
+  const employee1=batches.reduce((s,b)=>s+num(b.employee_1_debt),0)-paid('employee_1');
+  const employee2=batches.reduce((s,b)=>s+num(b.employee_2_debt),0)-paid('employee_2');
+  return{autocollant,print,employee1,employee2,total:autocollant+print+employee1+employee2};
+}
+function batchMath(){
+  const length=num($('prod-length')?.value),m=Math.max(0,parseInt($('prod-m')?.value)||0),l=Math.max(0,parseInt($('prod-l')?.value)||0),panels=m+l;
+  const scotch=m*SETTINGS.scotchM+l*SETTINGS.scotchL,printDebt=length*SETTINGS.printMeterDebt;
+  const shipping=$('shipping-included')?.value==='yes',shipTo=$('shipping-employee')?.value||'employee_1';
+  const base=panels*SETTINGS.employeePerPanel;
+  return{length,m,l,panels,autocollant:length,scotch,printDebt,employee1:base+(shipping&&shipTo==='employee_1'?SETTINGS.shippingExtra:0),employee2:base+(shipping&&shipTo==='employee_2'?SETTINGS.shippingExtra:0),shipping,shipTo};
+}
+
+async function ensureAdmin(user){const{data,error}=await sb.from('user_roles').select('role').eq('user_id',user.id).eq('role','admin').maybeSingle();return !error&&!!data}
+async function authHeaders(){const{data:{session}}=await sb.auth.getSession();return{'Content-Type':'application/json',Authorization:`Bearer ${session?.access_token||''}`}}
+async function signIn(){const btn=$('login-btn');btn.disabled=true;$('login-error').textContent='';const{data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error||!data.user||!(await ensureAdmin(data.user))){$('login-error').textContent=error?.message||'Admin access required';await sb.auth.signOut()}else{currentUser=data.user;showApp()}btn.disabled=false}
+async function boot(){const{data:{session}}=await sb.auth.getSession();if(session?.user&&await ensureAdmin(session.user)){currentUser=session.user;showApp()}else{$('login').classList.remove('hidden')}$('login-btn').onclick=signIn;$('password').addEventListener('keydown',e=>{if(e.key==='Enter')signIn()});$('logout-btn').onclick=()=>sb.auth.signOut().then(()=>location.reload());$('refresh-btn').onclick=loadAll;$('push-btn').onclick=enablePush;$('save-purchase-btn').onclick=savePurchase;$('save-production-btn').onclick=saveProduction;$('save-payment-btn').onclick=savePayment;$('save-settings-btn').onclick=saveSettings;$('modal-close').onclick=closeModal;$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});['prod-length','prod-m','prod-l','shipping-included','shipping-employee'].forEach(id=>$(id).addEventListener('input',renderBatchPreview));document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>showSection(b.dataset.section));$('prod-date').value=today()}
+function showApp(){$('login').style.display='none';$('app').style.display='block';$('user-chip').textContent=currentUser.email;loadAll()}
+function showSection(id){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.section===id));document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===id))}
+
+async function loadAll(){
+  const [stock,ready,batchRows,purchaseRows,paymentRows,settingsRow]=await Promise.all([
+    sb.from('stock_items').select('*').eq('stock_kind','production_material').order('id'),
+    sb.from('print_stock_items').select('*').gt('quantity',0).order('product_name').limit(1000),
+    sb.from('workshop_production_batches').select('*').order('production_date',{ascending:false}).order('id',{ascending:false}).limit(80),
+    sb.from('workshop_material_purchases').select('*').order('purchase_date',{ascending:false}).order('id',{ascending:false}).limit(120),
+    sb.from('workshop_debt_payments').select('*').order('payment_date',{ascending:false}).order('id',{ascending:false}).limit(120),
+    sb.from('workshop_stock_settings').select('*').eq('id',true).maybeSingle()
+  ]);
+  const err=[stock,ready,batchRows,purchaseRows,paymentRows,settingsRow].find(r=>r.error)?.error;if(err){toast(err.message,true);return}
+  stockItems=stock.data||[];readyStock=ready.data||[];batches=batchRows.data||[];purchases=purchaseRows.data||[];payments=paymentRows.data||[];
+  alertSettings={...DEFAULT_ALERTS,...(settingsRow.data||{})};
+  renderAll();
+  await checkPassiveAlerts();
+}
+function renderAll(){renderReady();renderMaterials();renderDebts();renderProduction();renderSettings();renderBatchPreview()}
+function renderReady(){
+  const r=readyPanelSummary();$('ready-m-panels').textContent=r.m.toLocaleString();$('ready-l-panels').textContent=r.l.toLocaleString();$('ready-m-sets').textContent=`${r.mSets.toFixed(1)} sets equivalent`;$('ready-l-sets').textContent=`${r.lSets.toFixed(1)} sets equivalent`;$('ready-cost').textContent=money(r.cost).replace(' DZD','');$('ready-selling').textContent=money(r.selling).replace(' DZD','');
+}
+function renderMaterials(){
+  const keys=['autocollant','mdf_m','mdf_l','scotch_double_face'];
+  const rows=keys.map(key=>{const i=material(key)||{};const qty=num(i.quantity);const low=qty<=num(i.low_stock_threshold);return `<div class="row ${low?'low':''}"><div><div class="row-title">${materialLabel(key)}</div><div class="row-meta">${materialUnit(key)} - threshold ${num(i.low_stock_threshold).toLocaleString()} - current DB name: ${esc(i.name||'missing')}</div>${low?'<span class="pill low">Low stock</span>':''}</div><div><div class="qty ${low?'low':'good'}">${qty.toLocaleString(undefined,{maximumFractionDigits:2})}</div><div class="row-actions"><button class="btn" onclick="openAdjust('${key}',1)">Add</button><button class="btn danger" onclick="openAdjust('${key}',-1)">Deduct</button><button class="btn ghost" onclick="openThreshold('${key}')">Threshold</button></div></div></div>`}).join('');
+  $('materials-list').innerHTML=rows;$('material-overview').innerHTML=rows;
+}
+function renderDebts(){
+  const d=debtTotals();
+  const rows=[['autocollant','Autocollant debt',d.autocollant],['print','Print debt',d.print],['employee_1','Employee 1 debt',d.employee1],['employee_2','Employee 2 debt',d.employee2]];
+  const html=rows.map(([k,label,value])=>`<div class="row"><div><div class="row-title">${label}</div><div class="row-meta">${k==='print'?'571.5 DZD per printed meter':k.includes('employee')?'30 DZD per panel, plus shipping extra when selected':'Unpaid roll purchases'}</div></div><div class="qty amber">${money(Math.max(0,value)).replace(' DZD','')}</div></div>`).join('')+`<div class="row"><div><div class="row-title">Total open debt</div><div class="row-meta">All tracked workshop debts</div></div><div class="qty low">${money(Math.max(0,d.total)).replace(' DZD','')}</div></div>`;
+  $('debt-list').innerHTML=html;$('debt-overview').innerHTML=html;
+  $('payment-list').innerHTML=payments.length?payments.slice(0,10).map(p=>`<div class="history-row"><strong>${materialLabel(p.debt_type)||p.debt_type} - ${money(p.amount)}</strong><span>${fmtDate(p.payment_date)}${p.notes?' - '+esc(p.notes):''}</span></div>`).join(''):'<div class="empty">No payments recorded yet.</div>';
+}
+function renderProduction(){
+  $('production-list').innerHTML=batches.length?batches.slice(0,20).map(b=>`<div class="history-row"><strong>${fmtDate(b.production_date)} - ${num(b.m_panels)+num(b.l_panels)} panels</strong><span>Print ${num(b.print_length_m)}m - M ${b.m_panels} - L ${b.l_panels} - scotch ${num(b.scotch_used_m).toFixed(2)}m</span><span>Print debt ${money(b.print_debt)} - Employee 1 ${money(b.employee_1_debt)} - Employee 2 ${money(b.employee_2_debt)}</span></div>`).join(''):'<div class="empty">No production batches yet.</div>';
+}
+function renderSettings(){
+  $('print-limit').value=num(alertSettings.print_debt_alert_limit);
+  $('material-alerts').value=String(alertSettings.material_alerts_enabled!==false);
+  $('production-alerts').value=String(alertSettings.production_alerts_enabled!==false);
+  $('print-alerts').value=String(alertSettings.print_debt_alerts_enabled!==false);
+}
+function renderBatchPreview(){
+  if(!$('batch-preview'))return;const b=batchMath();
+  $('batch-preview').innerHTML=`<div>Deduct autocollant: ${b.autocollant.toFixed(2)}m</div><div>Deduct Scotch double face: ${b.scotch.toFixed(2)}m (${b.m} M x 10cm + ${b.l} L x 20cm)</div><div>Deduct MDF: ${b.m} M panels and ${b.l} L panels</div><div>Print debt: ${money(b.printDebt)}. Employee 1: ${money(b.employee1)}. Employee 2: ${money(b.employee2)}.</div>`;
+}
+function openModal(title,html){$('modal-title').textContent=title;$('modal-body').innerHTML=html;$('modal').classList.add('show');$('modal').setAttribute('aria-hidden','false')}
+function closeModal(){$('modal').classList.remove('show');$('modal').setAttribute('aria-hidden','true');$('modal-body').innerHTML=''}
+function openAdjust(key,dir){const row=material(key);if(!row){toast('Material row missing in Supabase',true);return}openModal(`${dir>0?'Add':'Deduct'} ${materialLabel(key)}`,`<div class="notice">Current: ${num(row.quantity).toLocaleString()} ${materialUnit(key)}</div><div class="field"><label>Quantity</label><input id="adjust-qty" type="number" min="0" step="0.01" value="1"></div><button class="btn ${dir>0?'primary':'danger'}" style="width:100%;margin-top:14px" onclick="saveAdjust('${key}',${dir})">${dir>0?'Add':'Deduct'}</button>`)}
+function openThreshold(key){const row=material(key);if(!row){toast('Material row missing in Supabase',true);return}openModal(`${materialLabel(key)} threshold`,`<div class="notice">Alert when current stock is at or below this number. Unit: ${materialUnit(key)}.</div><div class="field"><label>Threshold</label><input id="threshold-value" type="number" min="0" step="0.01" value="${num(row.low_stock_threshold)}"></div><button class="btn primary" style="width:100%;margin-top:14px" onclick="saveThreshold('${key}')">Save threshold</button>`)}
+async function changeMaterial(key,delta){const row=material(key);if(!row)throw new Error(`${materialLabel(key)} row missing`);const next=num(row.quantity)+delta;if(next<0)throw new Error(`Not enough ${materialLabel(key)}`);const{error}=await sb.from('stock_items').update({quantity:next,unit:materialUnit(key),stock_kind:'production_material'}).eq('id',row.id);if(error)throw error;row.quantity=next}
+async function saveThreshold(key){const row=material(key);if(!row)return toast('Material row missing',true);const value=Math.max(0,num($('threshold-value').value));const{error}=await sb.from('stock_items').update({low_stock_threshold:value}).eq('id',row.id);if(error){toast(error.message,true);return}row.low_stock_threshold=value;closeModal();renderAll();toast('Threshold saved')}
+function checkMaterialDeductions(deductions){
+  deductions.forEach(([key,qty])=>{const row=material(key);if(!row)throw new Error(`${materialLabel(key)} row missing`);if(num(row.quantity)<qty)throw new Error(`Not enough ${materialLabel(key)}. Available ${num(row.quantity).toLocaleString()}, needed ${qty.toLocaleString()}`)});
+}
+async function saveAdjust(key,dir){try{const qty=Math.max(0,num($('adjust-qty').value));if(!qty)return toast('Enter quantity',true);await changeMaterial(key,qty*dir);closeModal();renderAll();toast('Stock updated');await sendStockPush('ARCO stock updated',`${materialLabel(key)} ${dir>0?'added':'deducted'} ${qty.toLocaleString()} ${materialUnit(key)}. Current stock ${num(material(key).quantity).toLocaleString()} ${materialUnit(key)}.`,'arco-stock-updated');await checkPassiveAlerts(true,true)}catch(e){toast(e.message,true)}}
+function setPurchaseLength(v){$('purchase-qty').value=v;$('purchase-unit').value='meters'}
+async function savePurchase(){
+  try{const key=$('purchase-material').value,qty=Math.max(0,num($('purchase-qty').value));if(!qty)return toast('Enter quantity',true);const payload={purchase_date:today(),material_key:key,quantity:qty,unit:$('purchase-unit').value.trim()||materialUnit(key),amount_owed:num($('purchase-owed').value),amount_paid:num($('purchase-paid').value),notes:$('purchase-note').value.trim(),created_by:currentUser.id};const{error}=await sb.from('workshop_material_purchases').insert(payload);if(error)throw error;await changeMaterial(key,qty);$('purchase-owed').value='0';$('purchase-paid').value='0';$('purchase-note').value='';await loadAll();toast('Purchase saved');await sendStockPush('ARCO material purchase saved',`${materialLabel(key)} +${qty.toLocaleString()} ${materialUnit(key)}. Owed ${money(payload.amount_owed)}.`,'arco-stock-purchase');await checkPassiveAlerts(true,true)}catch(e){toast(e.message,true)}
+}
+async function saveProduction(){
+  try{const b=batchMath();if(!b.length&&!b.panels)return toast('Enter production',true);const deductions=[['autocollant',b.autocollant],['mdf_m',b.m],['mdf_l',b.l],['scotch_double_face',b.scotch]].filter(x=>x[1]>0);checkMaterialDeductions(deductions);const payload={production_date:$('prod-date').value||today(),print_length_m:b.length,m_panels:b.m,l_panels:b.l,autocollant_used_m:b.autocollant,scotch_used_m:b.scotch,print_debt:b.printDebt,employee_1_debt:b.employee1,employee_2_debt:b.employee2,shipping_included:b.shipping,shipping_employee:b.shipTo,notes:$('prod-notes').value.trim(),created_by:currentUser.id};const{error}=await sb.from('workshop_production_batches').insert(payload);if(error)throw error;for(const [key,qty] of deductions)await changeMaterial(key,-qty);['prod-length','prod-m','prod-l'].forEach(id=>$(id).value='0');$('prod-notes').value='';await loadAll();toast('Production batch saved');await notifyProductionSaved(b);await checkPassiveAlerts(true,true)}catch(e){await loadAll();toast(e.message,true)}
+}
+async function savePayment(){const type=$('pay-type').value,amount=num($('pay-amount').value);if(amount<=0)return toast('Enter paid amount',true);const{error}=await sb.from('workshop_debt_payments').insert({payment_date:today(),debt_type:type,amount,notes:$('pay-note').value.trim(),created_by:currentUser.id});if(error){toast(error.message,true);return}$('pay-amount').value='0';$('pay-note').value='';await loadAll();toast('Payment saved')}
+async function saveSettings(){const payload={id:true,print_debt_alert_limit:Math.max(0,num($('print-limit').value)),material_alerts_enabled:$('material-alerts').value==='true',production_alerts_enabled:$('production-alerts').value==='true',print_debt_alerts_enabled:$('print-alerts').value==='true',updated_by:currentUser.id,updated_at:new Date().toISOString()};const{error}=await sb.from('workshop_stock_settings').upsert(payload,{onConflict:'id'});if(error){toast(error.message,true);return}alertSettings={...DEFAULT_ALERTS,...payload};toast('Settings saved');await checkPassiveAlerts(true)}
+
+function base64ToBytes(value){const padding='='.repeat((4-value.length%4)%4);const base64=(value+padding).replace(/-/g,'+').replace(/_/g,'/');const raw=atob(base64);return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)))}
+async function enablePush(){
+  try{if(!('Notification'in window)||!('serviceWorker'in navigator)||!('PushManager'in window))throw new Error('Push not supported on this browser');const permission=Notification.permission==='granted'?'granted':await Notification.requestPermission();if(permission!=='granted')throw new Error('Notification permission denied');const configResponse=await fetch('/api/push-config');const config=await configResponse.json().catch(()=>({}));if(!configResponse.ok)throw new Error(config.error||'Push is not configured yet');const registration=await navigator.serviceWorker.register('/push-sw.js');let subscription=await registration.pushManager.getSubscription();if(!subscription)subscription=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:base64ToBytes(config.publicKey)});const response=await fetch('/api/push-subscribe',{method:'POST',headers:await authHeaders(),body:JSON.stringify({subscription:subscription.toJSON()})});const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.error||'Could not save this device');localStorage.setItem('arco_stock_push_enabled','1');toast('Push alerts enabled')}catch(e){toast(e.message,true)}
+}
+async function notify(title,body,tag){
+  if(Notification.permission!=='granted'||!('serviceWorker'in navigator))return;
+  const registration=await navigator.serviceWorker.ready;
+  registration.showNotification(title,{body,icon:'/arco-icon.svg',badge:'/arco-badge.svg',tag,renotify:true,data:{url:'/stock.html'}});
+}
+async function sendStockPush(title,body,tag){
+  try{
+    const response=await fetch('/api/push?action=stock-alert',{method:'POST',headers:await authHeaders(),body:JSON.stringify({title,body,tag})});
+    const result=await response.json().catch(()=>({}));
+    if(!response.ok||result.skipped)throw new Error(result.error||'Stock push skipped');
+    return true;
+  }catch(error){
+    console.warn('[stock] server push failed:',error.message||error);
+    return false;
+  }
+}
+async function alertStock(title,body,tag,useServer=false){
+  const sent=useServer?await sendStockPush(title,body,tag):false;
+  if(!sent)await notify(title,body,tag);
+}
+async function notifyProductionSaved(b){
+  if(alertSettings.production_alerts_enabled===false)return;
+  await alertStock('Production batch saved',`${b.panels} panels - print ${b.length.toFixed(2)}m - print debt ${money(b.printDebt)}`,'arco-stock-production-saved',true);
+}
+async function checkPassiveAlerts(force=false,useServer=false){
+  if(alertSettings.material_alerts_enabled!==false){
+    const low=['autocollant','mdf_m','mdf_l','scotch_double_face'].filter(k=>{const i=material(k);return i&&num(i.quantity)<=num(i.low_stock_threshold)});
+    if(low.length){const key=`${today()}-${low.join(',')}`;if(force||localStorage.getItem('arco_stock_low_notified')!==key){localStorage.setItem('arco_stock_low_notified',key);await alertStock('ARCO material below threshold',low.map(k=>`${materialLabel(k)}: ${num(material(k).quantity).toLocaleString()} ${materialUnit(k)}`).join(', '),'arco-stock-low-material',useServer)}}
+  }
+  const d=debtTotals(),limit=num(alertSettings.print_debt_alert_limit);
+  if(alertSettings.print_debt_alerts_enabled!==false&&limit>0&&d.print>=limit){const key=`${today()}-${Math.floor(d.print)}-${limit}`;if(force||localStorage.getItem('arco_stock_print_debt_notified')!==key){localStorage.setItem('arco_stock_print_debt_notified',key);await alertStock('ARCO print debt limit passed',`Print debt is ${money(d.print)}. Limit is ${money(limit)}.`,'arco-stock-print-debt',useServer)}}
+}
+boot();
+</script>
+</body>
+</html>
