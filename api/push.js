@@ -5,6 +5,10 @@ function cleanText(value, fallback, maxLength = 160) {
   return String(value || fallback || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
 }
 
+function cleanAppContext(value) {
+  return ["tracker", "stock", "operator"].includes(value) ? value : "tracker";
+}
+
 export default async function handler(req, res) {
   const action = req.query?.action || new URL(req.url, `https://${req.headers.host || "arco-art.store"}`).searchParams.get("action");
   if (action === "config" && req.method === "GET") {
@@ -29,15 +33,15 @@ export default async function handler(req, res) {
         badge: "/arco-badge.svg",
         tag,
         url: "/stock.html",
-      });
+      }, ["stock"]);
       return res.status(200).json({ ok: true, ...result });
     }
 
     const subscription = req.body?.subscription;
     const endpoint = subscription?.endpoint;
     if (!endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) return res.status(400).json({ error: "Invalid push subscription" });
-    const row = { user_id: auth.user.id, endpoint, subscription, user_agent: req.headers["user-agent"] || "", updated_at: new Date().toISOString() };
-    const { error } = await getServiceClient().from("push_subscriptions").upsert(row, { onConflict: "endpoint" });
+    const row = { user_id: auth.user.id, endpoint, subscription, app_context: cleanAppContext(req.body?.app_context), user_agent: req.headers["user-agent"] || "", updated_at: new Date().toISOString() };
+    const { error } = await getServiceClient().from("push_subscriptions").upsert(row, { onConflict: "endpoint,app_context" });
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ ok: true });
   } catch (error) {

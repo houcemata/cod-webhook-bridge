@@ -18,16 +18,18 @@ export function getPushPublicKey() {
   return process.env.VAPID_PUBLIC_KEY || "";
 }
 
-export async function sendPushPayload(payload) {
+export async function sendPushPayload(payload, appContexts = []) {
   if (!configure()) {
     console.warn("[push] VAPID keys are not configured; skipping web push");
     return { sent: 0, skipped: true };
   }
 
   const supabase = getServiceClient();
-  const { data: subscriptions, error } = await supabase
+  let query = supabase
     .from("push_subscriptions")
     .select("id, subscription");
+  if (appContexts.length) query = query.in("app_context", appContexts);
+  const { data: subscriptions, error } = await query;
   if (error) {
     console.error("[push] subscription query failed:", error.message || error);
     return { sent: 0, skipped: true };
@@ -57,5 +59,5 @@ export async function sendNewOrderPush(order) {
     badge: "/arco-badge.svg",
     tag: `arco-order-${order.order_id}`,
     url: `/operator.html?order=${encodeURIComponent(order.order_id)}`,
-  });
+  }, ["tracker", "operator"]);
 }
