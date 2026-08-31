@@ -18,7 +18,7 @@ export function getPushPublicKey() {
   return process.env.VAPID_PUBLIC_KEY || "";
 }
 
-export async function sendNewOrderPush(order) {
+export async function sendPushPayload(payload) {
   if (!configure()) {
     console.warn("[push] VAPID keys are not configured; skipping web push");
     return { sent: 0, skipped: true };
@@ -33,18 +33,10 @@ export async function sendNewOrderPush(order) {
     return { sent: 0, skipped: true };
   }
 
-  const productPrice = Math.max(0, Number(order.prix_total || 0) - Number(order.shipping_cost || 0));
-  const payload = JSON.stringify({
-    title: "New Lead",
-    body: `${order.name || "Customer"} \u00b7 ${Math.round(productPrice)} DZD`,
-    icon: "/arco-icon.svg",
-    badge: "/arco-badge.svg",
-    tag: `arco-order-${order.order_id}`,
-    url: `/operator.html?order=${encodeURIComponent(order.order_id)}`,
-  });
+  const body = JSON.stringify(payload);
   const results = await Promise.all((subscriptions || []).map(async (row) => {
     try {
-      await webpush.sendNotification(row.subscription, payload, { TTL: 86400 });
+      await webpush.sendNotification(row.subscription, body, { TTL: 86400 });
       return true;
     } catch (pushError) {
       const status = pushError?.statusCode;
@@ -54,4 +46,16 @@ export async function sendNewOrderPush(order) {
     }
   }));
   return { sent: results.filter(Boolean).length, skipped: false };
+}
+
+export async function sendNewOrderPush(order) {
+  const productPrice = Math.max(0, Number(order.prix_total || 0) - Number(order.shipping_cost || 0));
+  return sendPushPayload({
+    title: "New Lead",
+    body: `${order.name || "Customer"} \u00b7 ${Math.round(productPrice)} DZD`,
+    icon: "/arco-icon.svg",
+    badge: "/arco-badge.svg",
+    tag: `arco-order-${order.order_id}`,
+    url: `/operator.html?order=${encodeURIComponent(order.order_id)}`,
+  });
 }
