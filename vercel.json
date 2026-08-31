@@ -10,6 +10,7 @@
     { "source": "/api/push-subscribe", "destination": "/api/push?action=subscribe" },
     { "source": "/api/ship-order", "destination": "/api/shipping?mode=single" },
     { "source": "/api/ship-orders-bulk", "destination": "/api/shipping?mode=bulk" },
+    { "source": "/stock", "destination": "/stock.html" },
     { "source": "/p/zikr-kids", "destination": "/p/product.html?slug=zikr-kids" },
     { "source": "/p/barber-shop", "destination": "/p/barber-shop.html" },
     { "source": "/custom-design", "destination": "/custom-design.html" },
@@ -54,6 +55,13 @@
     },
     {
       "source": "/operator.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" },
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    },
+    {
+      "source": "/stock.html",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate" },
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
