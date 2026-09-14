@@ -712,11 +712,12 @@ const money=v=>Number(v||0).toLocaleString('fr-DZ')+' DZD';
 function productUrl(s){return s==='liquid-football'?'/p/liquid-football.html':s==='barber-shop'?'/p/barber-shop.html':'/p/'+encodeURIComponent(s);}
 function pImages(p){const b=Array.isArray(p.images)?p.images:(p.images?[p.images]:[]);const v=Array.isArray(p.variants)?p.variants.map(x=>x.image).filter(Boolean):[];return[...new Set([...b,...v])];}
 function minPrice(p){const pr=Array.isArray(p.variants)?p.variants.map(v=>Number(v.price||0)).filter(v=>v>0):[];return pr.length?Math.min(...pr):Number(p.price||0);}
-function variantsOf(p){return Array.isArray(p.variants)?p.variants:(p.variants&&typeof p.variants==='object'?Object.values(p.variants):[]);}
+function variantsOf(p){const vars=Array.isArray(p.variants)?p.variants:(p.variants&&typeof p.variants==='object'?Object.values(p.variants):[]);const type=productType(p);if((type==='poster'||type==='set')&&!vars.some(v=>/60\s*[x×*]\s*80/i.test(variantLabel(v)))){const source=vars.find(v=>v.options&&Object.keys(v.options).some(k=>/size|taille/i.test(k)))||vars[0]||{};const options=source.options?Object.fromEntries(Object.entries(source.options).map(([k,val])=>[k,/size|taille/i.test(k)?'60x80 cm':val])):{Size:'60x80 cm'};vars.push({name:'60x80 cm',label:'60x80 cm',price:type==='set'?7800:3900,image:source.image||pImages(p)[0]||'',options});}return vars;}
+function hasSizeVariant(vars,size){return vars.some(v=>new RegExp(size.replace('x','\\s*[x×*]\\s*'),'i').test(variantLabel(v)));}
 function quickVariantsOf(p){
   const vars=variantsOf(p);
-  const wanted=vars.filter(v=>/30\s*x\s*40|30x40|40\s*x\s*60|40x60/i.test(variantLabel(v)));
-  const list=(wanted.length?wanted:vars).slice(0,2);
+  const wanted=vars.filter(v=>/30\s*x\s*40|30x40|40\s*x\s*60|40x60|60\s*x\s*80|60x80/i.test(variantLabel(v)));
+  const list=(wanted.length?wanted:vars).slice(0,3);
   return list.length?list:[{label:'30x40cm',price:p.price,image:pImages(p)[0]||''}];
 }
 function variantLabel(v){return String(v?.label||v?.name||v?.title||'Standard');}
