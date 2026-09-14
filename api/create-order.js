@@ -60,7 +60,12 @@ function sizeCode(label) {
     .replace(/\s+/g, "");
   if (norm.includes("30x40")) return "M";
   if (norm.includes("40x60")) return "L";
+  if (norm.includes("60x80")) return "XL";
   return label || "";
+}
+
+function isThresholdEligible(item) {
+  return !/60\s*[x×*]\s*80/i.test(String(item.variant || item.size || ""));
 }
 
 function resolveVariant(product, payload) {
@@ -89,7 +94,29 @@ function resolveVariant(product, payload) {
     if (match) return match;
   }
 
+  const requestedSize = Object.values(selectedOptions || {}).join(" ") + " " + variantLabel;
+  if (String(product.type || "").toLowerCase() === "poster" && /60\s*[x×*]\s*80/i.test(requestedSize)) {
+    const source = variants.find((variant) => variant.options && Object.keys(variant.options).some((key) => /size|taille/i.test(key))) || variants[0];
+    const options = source?.options
+      ? Object.fromEntries(Object.entries(source.options).map(([key, value]) => [key, /size|taille/i.test(key) ? "60x80 cm" : value]))
+      : { Size: "60x80 cm" };
+    return {
+      name: "60x80 cm",
+      label: "60x80 cm",
+      price: 3900,
+      image: source?.image || "",
+      options,
+    };
+  }
+
   if (variants.length === 1) return variants[0];
+  if (String(product.type || "").toLowerCase() === "set" && /60\\s*[x×*]\\s*80/i.test(requestedSize)) {
+    const source = variants.find((variant) => variant.options && Object.keys(variant.options).some((key) => /size|taille/i.test(key))) || variants[0];
+    const options = source?.options
+      ? Object.fromEntries(Object.entries(source.options).map(([key, value]) => [key, /size|taille/i.test(key) ? "60x80 cm" : value]))
+      : { Size: "60x80 cm" };
+    return { name: "60x80 cm", label: "60x80 cm", price: 7800, image: source?.image || "", options };
+  }
   return null;
 }
 
@@ -395,7 +422,11 @@ async function handleCartOrder(req, res, supabase, body) {
     itemsTotal += linePrice;
     return { ...it, size: sizeCode(it.variant), is_free: isFree, line_price: linePrice };
   });
-  const thresholdDiscount = orderValueDiscount(itemsTotal);
+  const thresholdBase = itemsForStore.reduce(
+    (sum, item) => sum + (isThresholdEligible(item) ? Number(item.line_price || 0) : 0),
+    0,
+  );
+  const thresholdDiscount = orderValueDiscount(thresholdBase);
   itemsTotal = Math.max(0, itemsTotal - thresholdDiscount);
   const discountedItemsForStore = itemsForStore.map((item, index) => (
     index === 0 && thresholdDiscount > 0

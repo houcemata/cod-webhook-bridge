@@ -55,6 +55,13 @@ const CUSTOM_DESIGN_PRODUCT = {
       image: "https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/Generated%20image%202%20(1).webp",
       options: { Size: "40x60 cm" },
     },
+    {
+      name: "60x80 cm",
+      label: "60x80 cm",
+      price: 4400,
+      image: "https://pub-afe21e63db9948a78cf5b43bfa17bcb8.r2.dev/Generated%20image%202%20(1).webp",
+      options: { Size: "60x80 cm" },
+    },
   ],
 };
 
