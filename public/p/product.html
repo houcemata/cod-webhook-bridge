@@ -669,7 +669,18 @@ function variants(){
   if(Array.isArray(raw))list=raw;
   else if(raw&&typeof raw==='object')list=Object.entries(raw).map(([name,val])=>typeof val==='object'?{name,...val}:{name,price:val});
   if(!list.length)list=[{name:'Standard',label:'Standard',price:product.price}];
-  return list.map(v=>({name:v.name||v.label||v.value||'Standard',label:v.label||v.name||v.value||'Standard',price:Number(v.price||product.price),stock:v.stock,image:v.image||'',options:v.options||null}));
+  const normalized=list.map(v=>({name:v.name||v.label||v.value||'Standard',label:v.label||v.name||v.value||'Standard',price:Number(v.price||product.price),stock:v.stock,image:v.image||'',options:v.options||null}));
+  if(String(product?.type||'').toLowerCase()==='poster'&&!normalized.some(v=>/60\s*[x×*]\s*80/i.test(v.label)){
+    const source=normalized.find(v=>v.options&&Object.keys(v.options).some(k=>/size|taille/i.test(k)));
+    const options=source?.options?Object.fromEntries(Object.entries(source.options).map(([key,value])=>[key,/size|taille/i.test(key)?'60x80 cm':value])):({Size:'60x80 cm'});
+    normalized.push({name:'60x80 cm',label:'60x80 cm',price:3900,image:source?.image||normalized[0]?.image||'',options});
+  }
+  if(String(product?.type||'').toLowerCase()==='set'&&!normalized.some(v=>v.label==='60x80 cm')){
+    const source=normalized.find(v=>v.options&&Object.keys(v.options).some(k=>/size|taille/i.test(k)));
+    const options=source?.options?Object.fromEntries(Object.entries(source.options).map(([key,value])=>[key,/size|taille/i.test(key)?'60x80 cm':value])):({Size:'60x80 cm'});
+    normalized.push({name:'60x80 cm',label:'60x80 cm',price:7800,image:source?.image||normalized[0]?.image||'',options});
+  }
+  return normalized;
 }
 function optionGroups(){
   const groups={};
@@ -1136,7 +1147,8 @@ function addRelatedVariant(slug,index){
     variant:relatedVariantLabel(v),
     selected_options:v.options||null,
     price:Number(v.price||product.price||0),
-    image:v.image||relatedImages(product)[0]||''
+    image:v.image||relatedImages(product)[0]||'',
+    product_type:product.type||product.product_type||''
   });
   updateStickyCartBadge();
   refreshCartAwareButtons();
@@ -1202,7 +1214,8 @@ function addCurrentToCart(){
     variant:(v&&(v.label||v.name))||'Standard',
     selected_options:selectedOptions||null,
     price:Number((v&&v.price)||product.price||0),
-    image:img
+    image:img,
+    product_type:product.type||product.product_type||''
   });
   updateStickyCartBadge();
   refreshCartAwareButtons();
