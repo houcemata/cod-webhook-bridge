@@ -27,6 +27,9 @@
     const price = Number(item?.price || 0);
     return type === "poster" || (type !== "set" && price > 0 && price < 2900);
   }
+  function isThresholdEligible(item) {
+    return !/60\s*[x×*]\s*80/i.test(String(item?.variant || item?.size || item?.selected_options?.Size || item?.selected_options?.Taille || ''));
+  }
   // ── Poster discount: cheapest of every 3 is free ──
   function computePosterDiscount(cart) {
     const posters = cart.filter(isPoster);
@@ -66,12 +69,17 @@
     const subtotal = cart.reduce((s, i) => s + Number(i.price || 0), 0);
     const { posterFreeDiscount, freeCartIdx, freeCount } = computePosterDiscount(cart);
     const afterPosters = Math.max(0, subtotal - posterFreeDiscount);
-    const thresh = thresholdDiscount(afterPosters);
+    const thresholdBase = cart.reduce((sum, item, index) => {
+      if (!isThresholdEligible(item)) return sum;
+      return sum + Number(item.price || 0) - (freeCartIdx.has(index) ? Number(item.price || 0) : 0);
+    }, 0);
+    const thresh = thresholdDiscount(thresholdBase);
     const totalDiscount = posterFreeDiscount + thresh;
     return {
       subtotal,
       posterFreeDiscount,
       thresholdDiscount: thresh,
+      thresholdBase,
       totalDiscount,
       total: Math.max(0, subtotal - totalDiscount),
       freeCartIdx,
@@ -203,9 +211,9 @@
     if (t.thresholdDiscount > 0) {
       lines.push({ type: 'thresh active', msg: `💥 خصم ${money(t.thresholdDiscount)} مطبّق على طلبك!` });
     } else {
-      const nx = nextThreshold(Math.max(0, t.subtotal - t.posterFreeDiscount));
+      const nx = nextThreshold(t.thresholdBase);
       if (nx) {
-        const missing = nx.min - Math.max(0, t.subtotal - t.posterFreeDiscount);
+        const missing = nx.min - t.thresholdBase;
         lines.push({ type: 'thresh', msg: `زيد بـ ${money(missing)} فقط وتوفر ${money(nx.off)} خصم!` });
       }
     }

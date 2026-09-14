@@ -1944,9 +1944,10 @@ async function openEdit(){
             <div id="${pickerId}"></div>
           </div>
           <select class="edit-select" style="width:62px;font-size:13px;padding:7px 6px"
-            onchange="(function(el){const m=document.getElementById('edit-modal').__editItems[${i}];m.size=el.value;m.variant=el.value==='M'?'30×40 cm':'40×60 cm'})(this)">
+            onchange="(function(el){const m=document.getElementById('edit-modal').__editItems[${i}];m.size=el.value;m.variant=el.value==='M'?'30×40 cm':el.value==='L'?'40×60 cm':'60×80 cm'})(this)">
             <option value="M"${sizeLabel(it)==='M'?' selected':''}>M</option>
             <option value="L"${sizeLabel(it)==='L'?' selected':''}>L</option>
+            <option value="XL"${sizeLabel(it)==='XL'?' selected':''}>XL</option>
           </select>
           <input type="number" class="edit-input" style="width:80px;font-size:13px;padding:7px 8px;text-align:right" min="0"
             value="${it.is_free?0:Number(it.line_price||it.price||0)}"
@@ -2309,10 +2310,11 @@ function waIcon(){return `<svg width="18" height="18" viewBox="0 0 24 24" fill="
 function esc(v){if(v==null)return '';return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function sourceBadge(source){const key=String(source||'unknown').toLowerCase();const label={meta:'META',tiktok:'TIKTOK',organic:'ORGANIC',direct:'DIRECT',operator:'OPERATOR',other:'OTHER',unknown:'UNKNOWN'}[key]||'UNKNOWN';return `<span class="source-badge source-${['meta','tiktok','organic','direct','operator','other'].includes(key)?key:'unknown'}">${label}</span>`;}
 function sizeLabel(it){
-  if(it&&it.size&&/^(M|L)$/i.test(it.size))return it.size.toUpperCase();
+  if(it&&it.size&&/^(M|L|XL)$/i.test(it.size))return it.size.toUpperCase();
   const norm=String((it&&(it.size||it.variant))||'').toLowerCase().replace(/سم|cm/g,'').replace(/[×*]/g,'x').replace(/\s+/g,'');
   if(norm.includes('30x40'))return 'M';
   if(norm.includes('40x60'))return 'L';
+  if(norm.includes('60x80'))return 'XL';
   return (it&&(it.size||it.variant))||'';
 }
 let _tt;
@@ -2335,11 +2337,12 @@ function exportConfirmedXLSX(){
       o.items.forEach(it => {
         const name = it.product || it.product_slug || it.slug || '';
         const sl   = sizeLabel(it);
-        const size = sl === 'M' ? '30x40 cm' : sl === 'L' ? '40x60 cm' : (it.size || it.variant || '');
+        const size = sl === 'M' ? '30x40 cm' : sl === 'L' ? '40x60 cm' : sl === 'XL' ? '60x80 cm' : (it.size || it.variant || '');
         rows.push([o.id, name, size]);
       });
     } else {
-      const size = o.variable && o.variable.includes('40x60') ? '40x60 cm'
+      const size = o.variable && o.variable.includes('60x80') ? '60x80 cm'
+                 : o.variable && o.variable.includes('40x60') ? '40x60 cm'
                  : o.variable && o.variable.includes('30x40') ? '30x40 cm'
                  : (o.variable || '');
       rows.push([o.id, o.product || '', size]);
