@@ -670,7 +670,7 @@ function variants(){
   else if(raw&&typeof raw==='object')list=Object.entries(raw).map(([name,val])=>typeof val==='object'?{name,...val}:{name,price:val});
   if(!list.length)list=[{name:'Standard',label:'Standard',price:product.price}];
   const normalized=list.map(v=>({name:v.name||v.label||v.value||'Standard',label:v.label||v.name||v.value||'Standard',price:Number(v.price||product.price),stock:v.stock,image:v.image||'',options:v.options||null}));
-  if(String(product?.type||'').toLowerCase()==='poster'&&!normalized.some(v=>/60\s*[x×*]\s*80/i.test(v.label)){
+  if(String(product?.type||'').toLowerCase()==='poster'&&!normalized.some(v=>String(v.label||'').toLowerCase().replace(/×/g,'x').includes('60x80'))){
     const source=normalized.find(v=>v.options&&Object.keys(v.options).some(k=>/size|taille/i.test(k)));
     const options=source?.options?Object.fromEntries(Object.entries(source.options).map(([key,value])=>[key,/size|taille/i.test(key)?'60x80 cm':value])):({Size:'60x80 cm'});
     normalized.push({name:'60x80 cm',label:'60x80 cm',price:3900,image:source?.image||normalized[0]?.image||'',options});
