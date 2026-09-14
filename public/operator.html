@@ -835,6 +835,7 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
     <div class="edit-field"><div class="edit-label">Phone</div><input class="edit-input" id="create-phone" type="tel" inputmode="tel" placeholder="05XXXXXXXX"/></div>
     <div class="edit-field"><div class="edit-label">Product</div><select class="edit-select" id="create-product" onchange="onCreateProductChange()"><option value="">Loading products…</option></select></div>
     <div class="edit-field"><div class="edit-label">Variant</div><select class="edit-select" id="create-variant"><option value="">Standard</option></select></div>
+    <div class="edit-field" id="create-custom-wrap" style="display:none"><div class="edit-label">Custom Design Image</div><input class="edit-input" id="create-custom-file" type="file" accept="*/*" onchange="operatorPickCrop({kind:'create',input:this,panelSize:document.getElementById('create-variant').value},this.files[0])"/><div id="create-custom-preview" style="color:#999;font-size:12px;margin-top:6px"></div></div>
     <div class="edit-field"><div class="edit-label">Delivery Type</div><select class="edit-select" id="create-type" onchange="onCreateTypeChange()"><option value="home">Home Delivery</option><option value="pickup">Stop Desk</option></select></div>
     <div class="edit-field"><div class="edit-label">Wilaya</div><select class="edit-select" id="create-wilaya" onchange="onCreateWilayaChange()"><option value="">Select Wilaya</option></select></div>
     <div class="edit-field" id="create-commune-wrap"><div class="edit-label">Commune</div><select class="edit-select" id="create-commune"><option value="">Select Commune</option></select></div>
@@ -846,6 +847,20 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
 </div>
 
 <div id="toast"></div>
+
+<div class="modal-overlay" id="operator-crop-modal">
+  <div class="edit-modal">
+    <div class="modal-title">Crop Custom Design <button class="modal-close" onclick="cancelOperatorCrop()">×</button></div>
+    <p style="color:#999;font-size:12px;line-height:1.6">Move and zoom the image inside the frame. The crop is fixed to the paper ratio 1:√2.</p>
+    <div style="width:min(100%,360px);aspect-ratio:1/1.41421356;margin:12px auto;background:#050505;border:1px solid #333;border-radius:10px;overflow:hidden;touch-action:none">
+      <canvas id="operator-crop-canvas" width="707" height="1000" style="display:block;width:100%;height:100%;cursor:grab" onpointerdown="beginOperatorCropDrag(event)" onpointermove="moveOperatorCropDrag(event)" onpointerup="endOperatorCropDrag()" onpointercancel="endOperatorCropDrag()"></canvas>
+    </div>
+    <label class="edit-label" for="operator-crop-zoom">Zoom <span id="operator-crop-zoom-value">100%</span></label>
+    <input id="operator-crop-zoom" type="range" min="1" max="3" step=".01" value="1" oninput="operatorCropZoom(event)" style="width:100%;accent-color:#e11d48">
+    <div id="operator-crop-status" style="min-height:20px;color:#e11d48;font-size:12px;margin-top:8px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><button class="btn-edit" onclick="cancelOperatorCrop()">Cancel</button><button class="edit-save-btn" style="margin-top:0" onclick="applyOperatorCrop()">Use Cropped Image</button></div>
+  </div>
+</div>
 
 <script>
 const SB_URL = 'https://mpkpehuatqsubohltssi.supabase.co/rest/v1';
@@ -1813,6 +1828,25 @@ function createSelectedProduct(){
   const slug=document.getElementById('create-product')?.value||'';
   return (window.__operatorProductList||[]).find(p=>p.slug===slug)||null;
 }
+function operatorCustomUploadControl(index,item,product){
+  const isCustom=product?.slug==='custom-design'||item?.product_slug==='custom-design'||item?.custom_design===true;
+  if(!isCustom)return '';
+  const attached=item?.custom_upload?.url?'Current cropped image attached. ':'';
+  return '<div style="margin:6px 0 2px"><div class="edit-label">Custom Design Image</div><input class="edit-input" type="file" accept="*/*" onchange="operatorPickCrop({kind:\'edit\',index:'+index+',input:this},this.files[0])"/><div style="color:#999;font-size:11px;margin-top:4px">'+attached+'Choose a new image to replace it.</div></div>';
+}
+let operatorCropState={target:null,file:null,image:null,cleanup:null,zoom:1,x:0,y:0,dragging:false,sx:0,sy:0,ox:0,oy:0};
+function operatorCropSource(file){return new Promise((resolve,reject)=>{if(window.createImageBitmap){createImageBitmap(file).then(bitmap=>resolve({image:bitmap,cleanup:()=>bitmap.close?.()})).catch(()=>operatorCropImageElement(file,resolve,reject));}else operatorCropImageElement(file,resolve,reject);});}
+function operatorCropImageElement(file,resolve,reject){const url=URL.createObjectURL(file),img=new Image();img.onload=()=>resolve({image:img,cleanup:()=>URL.revokeObjectURL(url)});img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('This image format cannot be opened by the browser'))};img.src=url;}
+async function operatorPickCrop(target,file){if(!file)return;try{const source=await operatorCropSource(file);operatorCropState={target,file,image:source.image,cleanup:source.cleanup,zoom:1,x:0,y:0,dragging:false,sx:0,sy:0,ox:0,oy:0};document.getElementById('operator-crop-zoom').value=1;document.getElementById('operator-crop-zoom-value').textContent='100%';document.getElementById('operator-crop-status').textContent='';document.getElementById('operator-crop-modal').classList.add('open');drawOperatorCrop();}catch(e){toast(e.message||'Could not open image',true);}}
+function drawOperatorCrop(){const c=document.getElementById('operator-crop-canvas'),im=operatorCropState.image;if(!c||!im)return;const ctx=c.getContext('2d'),W=707,H=1000,iw=im.naturalWidth||im.width,ih=im.naturalHeight||im.height,scale=Math.max(W/iw,H/ih)*operatorCropState.zoom,dw=iw*scale,dh=ih*scale,mx=Math.max(0,(dw-W)/2),my=Math.max(0,(dh-H)/2);operatorCropState.x=Math.max(-mx,Math.min(mx,operatorCropState.x));operatorCropState.y=Math.max(-my,Math.min(my,operatorCropState.y));ctx.fillStyle='#050505';ctx.fillRect(0,0,W,H);ctx.drawImage(im,(W-dw)/2+operatorCropState.x,(H-dh)/2+operatorCropState.y,dw,dh);}
+function beginOperatorCropDrag(e){if(!operatorCropState.image)return;e.preventDefault();operatorCropState.dragging=true;operatorCropState.sx=e.clientX;operatorCropState.sy=e.clientY;operatorCropState.ox=operatorCropState.x;operatorCropState.oy=operatorCropState.y;document.getElementById('operator-crop-canvas').setPointerCapture?.(e.pointerId);}
+function moveOperatorCropDrag(e){if(!operatorCropState.dragging)return;operatorCropState.x=operatorCropState.ox+e.clientX-operatorCropState.sx;operatorCropState.y=operatorCropState.oy+e.clientY-operatorCropState.sy;drawOperatorCrop();}
+function endOperatorCropDrag(){operatorCropState.dragging=false;}
+function operatorCropZoom(e){operatorCropState.zoom=Number(e.target.value)||1;document.getElementById('operator-crop-zoom-value').textContent=Math.round(operatorCropState.zoom*100)+'%';drawOperatorCrop();}
+async function operatorCropBase64(){const c=document.getElementById('operator-crop-canvas'),blob=await new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(new Error('Could not prepare image')),'image/jpeg',.92)),bytes=new Uint8Array(await blob.arrayBuffer());let binary='';for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(binary);}
+function closeOperatorCrop(){document.getElementById('operator-crop-modal')?.classList.remove('open');operatorCropState.cleanup?.();operatorCropState={target:null,file:null,image:null,cleanup:null,zoom:1,x:0,y:0,dragging:false,sx:0,sy:0,ox:0,oy:0};}
+function cancelOperatorCrop(){const t=operatorCropState.target;if(t?.input)t.input.value='';closeOperatorCrop();}
+async function applyOperatorCrop(){const t=operatorCropState.target;if(!t)return;try{const data=await operatorCropBase64(),file=operatorCropState.file,cropped={name:(file.name||'custom-design').replace(/\.[^.]+$/,'')+'.jpg',type:'image/jpeg',data_base64:data,panel_size:t.panelSize||'30x40 cm'};if(t.kind==='create'){window.__createCustomFile=cropped;document.getElementById('create-custom-preview').textContent='Cropped image ready';}else{const item=document.getElementById('edit-modal').__editItems[t.index];item.custom_file=cropped;item.custom_design=true;item.image='';window.__rerenderCartRows&&window.__rerenderCartRows();}closeOperatorCrop();toast('Cropped image ready');}catch(e){document.getElementById('operator-crop-status').textContent=e.message||'Could not prepare image';}}
 function createProductVariants(product){
   const raw=product?.variants;
   if(Array.isArray(raw))return raw;
@@ -1824,6 +1858,9 @@ function onCreateProductChange(){
   const sel=document.getElementById('create-variant');
   const variants=createProductVariants(product);
   if(sel)sel.innerHTML=variants.map(v=>{const label=v.label||v.name||'Standard';return `<option value="${esc(label)}">${esc(label)} — ${Number(v.price||product?.price||0).toLocaleString()} DZD</option>`;}).join('');
+  const custom=product?.slug==='custom-design';
+  document.getElementById('create-custom-wrap').style.display=custom?'block':'none';
+  if(!custom)window.__createCustomFile=null;
   updateCreateTotal();
 }
 function onCreateTypeChange(){
@@ -1873,6 +1910,10 @@ async function openCreateOrder(){
   document.getElementById('create-desk-wrap').style.display='none';
   populateCreateWilayas();
   document.getElementById('create-variant').innerHTML='<option value="">Select variant</option>';
+  document.getElementById('create-custom-wrap').style.display='none';
+  document.getElementById('create-custom-file').value='';
+  document.getElementById('create-custom-preview').textContent='';
+  window.__createCustomFile=null;
   window.__createShipping=null;
   document.getElementById('create-total-display').textContent='Total: Select product and wilaya';
   document.getElementById('create-order-modal').classList.add('open');
@@ -1888,11 +1929,12 @@ async function submitCreateOrder(){
   const commune=document.getElementById('create-commune').value;
   const desk=document.getElementById('create-desk').value;
   if(!name||!/^0[567]\d{8}$/.test(phone)||!product||!id||(type==='home'&&!commune)||(type==='pickup'&&!desk)){toast('Complete all order fields first',true);return;}
+  if(product.slug==='custom-design'&&!window.__createCustomFile){toast('Upload and crop the custom design image first',true);return;}
   btn.disabled=true;btn.textContent='Creating…';
   try{
     const {data:{session}}=await sb.auth.getSession();
     if(!session?.access_token)throw new Error('Your session expired. Please sign in again.');
-    const r=await fetch('/api/operator-create-order',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({name,phone,wilaya:wilayaName,wilaya_id:id,commune:type==='home'?commune:'',delivery_type:type,station_code:type==='pickup'?desk:null,product_slug:product.slug,variant_label:document.getElementById('create-variant').value,notes:document.getElementById('create-notes').value.trim()})});
+    const r=await fetch('/api/operator-create-order',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${session.access_token}`},body:JSON.stringify({name,phone,wilaya:wilayaName,wilaya_id:id,commune:type==='home'?commune:'',delivery_type:type,station_code:type==='pickup'?desk:null,product_slug:product.slug,variant_label:document.getElementById('create-variant').value,notes:document.getElementById('create-notes').value.trim(),custom_file:window.__createCustomFile||null})});
     const result=await r.json().catch(()=>({}));
     if(!r.ok||!result.ok)throw new Error(result.error||'Failed to create order');
     closeModal('create-order-modal');await loadOrders();toast(`Order #${result.order_id} created`);
@@ -1943,6 +1985,7 @@ async function openEdit(){
           <div class="prod-dropdown-wrap" style="flex:1">
             <div id="${pickerId}"></div>
           </div>
+          ${operatorCustomUploadControl(i,it,matched)}
           <select class="edit-select" style="width:62px;font-size:13px;padding:7px 6px"
             onchange="(function(el){const m=document.getElementById('edit-modal').__editItems[${i}];m.size=el.value;m.variant=el.value==='M'?'30×40 cm':el.value==='L'?'40×60 cm':'60×80 cm'})(this)">
             <option value="M"${sizeLabel(it)==='M'?' selected':''}>M</option>
@@ -1981,6 +2024,8 @@ async function openEdit(){
           const item=document.getElementById('edit-modal').__editItems[i];
           item.product=name;
           if(product?.slug)item.product_slug=product.slug;
+          item.custom_design=product?.slug==='custom-design';
+          window.__rerenderCartRows&&window.__rerenderCartRows();
           const image=productImage(product)||item.custom_upload?.url||item.image;
           if(image)item.image=image;
           else if(!item.custom_upload?.url)delete item.image;
@@ -2005,8 +2050,8 @@ async function openEdit(){
     }
     // Convert single-product order to items array so we can use same add/remove logic
     const initName=o.product||'';
-    const initSize=o.variable&&o.variable.includes('60')?'L':'M';
-    const editItemsNorm=[{product:initName,size:initSize,variant:initSize==='M'?'30×40 cm':'40×60 cm',is_free:false,line_price:Number(o.prix_total||0)-(o.shipping_cost||0),price:Number(o.prix_total||0)-(o.shipping_cost||0)}];
+    const initSize=o.variable&&o.variable.includes('60x80')?'XL':o.variable&&o.variable.includes('60')?'L':'M';
+    const editItemsNorm=[{product:initName,size:initSize,variant:initSize==='M'?'30×40 cm':initSize==='L'?'40×60 cm':'60×80 cm',is_free:false,line_price:Number(o.prix_total||0)-(o.shipping_cost||0),price:Number(o.prix_total||0)-(o.shipping_cost||0),custom_design:o.product_slug==='custom-design'||o.custom_design===true,custom_upload:o.custom_upload||null}];
     document.getElementById('edit-modal').__editItems=editItemsNorm;
 
     function renderNonCartRows(){
@@ -2016,8 +2061,9 @@ async function openEdit(){
       wrap.innerHTML=items.map((it,i)=>`
         <div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #1a1a1a">
           <div class="prod-dropdown-wrap" style="flex:1"><div id="prod-picker-nc-${i}"></div></div>
+          ${operatorCustomUploadControl(i,it,window.__productList.find(p=>p.name===it.product||p.slug===(it.product_slug||it.slug)))}
           <select class="edit-select" style="width:62px;font-size:13px;padding:7px 6px"
-            onchange="(function(el){const m=document.getElementById('edit-modal').__editItems[${i}];m.size=el.value;m.variant=el.value==='M'?'30×40 cm':'40×60 cm'})(this)">
+            onchange="(function(el){const m=document.getElementById('edit-modal').__editItems[${i}];m.size=el.value;m.variant=el.value==='M'?'30×40 cm':el.value==='L'?'40×60 cm':'60×80 cm'})(this)">
             <option value="M"${(it.size||'M')==='M'?' selected':''}>M</option>
             <option value="L"${(it.size||'M')==='L'?' selected':''}>L</option>
           </select>
@@ -2045,6 +2091,8 @@ async function openEdit(){
           const item=document.getElementById('edit-modal').__editItems[i];
           item.product=name;
           if(product?.slug)item.product_slug=product.slug;
+          item.custom_design=product?.slug==='custom-design';
+          window.__rerenderCartRows&&window.__rerenderCartRows();
           const image=productImage(product)||item.custom_upload?.url||item.image;
           if(image)item.image=image;
           else if(!item.custom_upload?.url)delete item.image;
@@ -2146,6 +2194,13 @@ function calcTotal(){
   document.getElementById('edit-total-display').textContent=`Total: ${(p+s).toLocaleString()} DZD`;
 }
 
+async function uploadOperatorEditFile(file,orderId,token){
+  const r=await fetch('/api/operator-upload-custom-image',{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({order_id:orderId,custom_file:file})});
+  const result=await r.json().catch(()=>({}));
+  if(!r.ok||!result.ok)throw new Error(result.error||'Custom image upload failed');
+  return result.upload;
+}
+
 async function saveEdit(){
   const o=currentOrder;
   const type=document.getElementById('edit-type').value;
@@ -2166,6 +2221,22 @@ async function saveEdit(){
   }
 
   const editedItems=document.getElementById('edit-modal').__editItems||[];
+  if(editedItems.some(it=>(it.product_slug==='custom-design'||it.custom_design===true)&&!it.custom_upload&&!it.custom_file)){
+    toast('Upload and crop the custom design image first',true);
+    return;
+  }
+  const customFiles=editedItems.filter(it=>it.custom_file);
+  if(customFiles.length){
+    const {data:{session}}=await sb.auth.getSession();
+    if(!session?.access_token){toast('Your session expired. Please sign in again.',true);return;}
+    try{
+      for(const item of customFiles){
+        item.custom_upload=await uploadOperatorEditFile(item.custom_file,o.id,session.access_token);
+        item.image=item.custom_upload.url;
+        delete item.custom_file;
+      }
+    }catch(error){toast(error.message||'Custom image upload failed',true);return;}
+  }
   const hasMultipleItems=editedItems.length>1;
   const first=editedItems[0]||{};
   const prodEl=document.getElementById('edit-product');
