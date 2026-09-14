@@ -2025,7 +2025,8 @@ async function openEdit(){
           item.product=name;
           if(product?.slug)item.product_slug=product.slug;
           item.custom_design=product?.slug==='custom-design';
-          window.__rerenderCartRows&&window.__rerenderCartRows();
+          if(item.custom_design&&!item.__customRenderDone){item.__customRenderDone=true;window.__rerenderCartRows&&window.__rerenderCartRows();}
+          if(!item.custom_design)item.__customRenderDone=false;
           const image=productImage(product)||item.custom_upload?.url||item.image;
           if(image)item.image=image;
           else if(!item.custom_upload?.url)delete item.image;
@@ -2092,7 +2093,8 @@ async function openEdit(){
           item.product=name;
           if(product?.slug)item.product_slug=product.slug;
           item.custom_design=product?.slug==='custom-design';
-          window.__rerenderCartRows&&window.__rerenderCartRows();
+          if(item.custom_design&&!item.__customRenderDone){item.__customRenderDone=true;window.__rerenderCartRows&&window.__rerenderCartRows();}
+          if(!item.custom_design)item.__customRenderDone=false;
           const image=productImage(product)||item.custom_upload?.url||item.image;
           if(image)item.image=image;
           else if(!item.custom_upload?.url)delete item.image;
