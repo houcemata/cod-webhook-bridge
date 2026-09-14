@@ -1828,6 +1828,12 @@ function createSelectedProduct(){
   const slug=document.getElementById('create-product')?.value||'';
   return (window.__operatorProductList||[]).find(p=>p.slug===slug)||null;
 }
+function ensureOperatorCustomDesignProduct(){
+  if(!Array.isArray(window.__productList))window.__productList=[];
+  if(!window.__productList.some(p=>p.slug==='custom-design')){
+    window.__productList.push({name:'Custom Design',slug:'custom-design',images:[]});
+  }
+}
 function operatorCustomUploadControl(index,item,product){
   const isCustom=product?.slug==='custom-design'||item?.product_slug==='custom-design'||item?.custom_design===true;
   if(!isCustom)return '';
@@ -1968,6 +1974,7 @@ async function openEdit(){
       }catch{}
       if(!window.__productList) window.__productList=[];
     }
+    ensureOperatorCustomDesignProduct();
 
     const editItems=o.items.map(it=>({...it}));
     document.getElementById('edit-modal').__editItems=editItems;
@@ -2049,6 +2056,7 @@ async function openEdit(){
       }catch{}
       if(!window.__productList) window.__productList=[];
     }
+    ensureOperatorCustomDesignProduct();
     // Convert single-product order to items array so we can use same add/remove logic
     const initName=o.product||'';
     const initSize=o.variable&&o.variable.includes('60x80')?'XL':o.variable&&o.variable.includes('60')?'L':'M';
