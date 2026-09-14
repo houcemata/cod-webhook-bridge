@@ -1,5 +1,6 @@
 import { getServiceClient, requireRole } from "./_auth.js";
 import { sendNewOrderPush } from "./_push.js";
+import { uploadOperatorCustomImage } from "./_operator-custom-upload.js";
 
 function clean(value) {
   return String(value ?? "").trim();
@@ -7,6 +8,14 @@ function clean(value) {
 
 function normalizePhone(value) {
   return clean(value).replace(/\s+/g, "");
+}
+
+function sizeCode(value) {
+  const raw=clean(value).toLowerCase().replace(/×/g,"x");
+  if(raw.includes("60x80")||raw.includes("xl"))return "XL";
+  if(raw.includes("40x60")||/(^|[\s-])l($|[\s-])/.test(raw))return "L";
+  if(raw.includes("30x40")||/(^|[\s-])m($|[\s-])/.test(raw))return "M";
+  return "";
 }
 
 function createOrderId() {
@@ -64,6 +73,12 @@ export default async function handler(req, res) {
     const variant = resolveVariant(product, body);
     const productPrice = Number(variant.price || product.price || 0);
     if (!Number.isFinite(productPrice) || productPrice <= 0) return res.status(400).json({ error: "Invalid product price" });
+    const isCustomDesign = product.slug === "custom-design";
+    let customUpload = null;
+    if (isCustomDesign) {
+      if (!body.custom_file) return res.status(400).json({ error: "A cropped custom image is required" });
+      customUpload = await uploadOperatorCustomImage(body.custom_file, `new-${Date.now()}`);
+    }
 
     const { data: shipping, error: shippingError } = await supabase
       .from("shipping_rates")
@@ -94,6 +109,10 @@ export default async function handler(req, res) {
       attribution_medium: "operator",
       attribution_captured_at: new Date().toISOString(),
     };
+    if (isCustomDesign) {
+      const customVariant = variant.label || variant.name || "Standard";
+      order.items = [{ product: product.name, product_slug: product.slug, variant: customVariant, selected_options: { Size: customVariant }, size: sizeCode(customVariant), line_price: productPrice, price: productPrice, custom_design: true, custom_panel_index: 1, custom_upload: customUpload, image: customUpload.url }];
+    }
 
     const { error: insertError } = await supabase.from("orders").insert(order);
     if (insertError) {
