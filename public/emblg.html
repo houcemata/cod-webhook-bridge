@@ -95,15 +95,15 @@
     function move(delta){const list=currentQueue();const i=list.findIndex(x=>Number(x.id)===Number(activeId));const next=list[i+delta];if(next){activeId=next.id;render()}}
     async function done(){const row=activeRow();if(!row||row.archived_at)return;$('done-btn').disabled=true;const queueBeforeArchive=currentQueue();const currentIndex=queueBeforeArchive.findIndex(x=>Number(x.id)===Number(row.id));const next=queueBeforeArchive[currentIndex+1]||null;const r=await sb.from('packaging_orders').update({archived_at:new Date().toISOString()}).eq('id',row.id);if(r.error){$('done-btn').disabled=false;showToast(r.error.message,true);return}row.archived_at=new Date().toISOString();activeId=next?.id||null;showToast('Order archived');render()}
 
-    async function fetchAllPackagingOrders(){
+    async function fetchAllPackagingOrders(includeArchived=false){
       const PAGE_SIZE=100;
       let all=[];
       let from=0;
 
       while(true){
-        const {data,error}=await sb
-          .from('packaging_orders')
-          .select('*')
+        let query=sb.from('packaging_orders').select('*');
+        if(!includeArchived)query=query.is('archived_at',null);
+        const {data,error}=await query
           .order('confirmed_at',{ascending:true})
           .order('id',{ascending:true})
           .range(from,from+PAGE_SIZE-1);
@@ -150,7 +150,7 @@
 
       try{
         const [orders,products]=await Promise.all([
-          fetchAllPackagingOrders(),
+          fetchAllPackagingOrders($('include-archived')?.checked===true),
           fetchAllProducts()
         ]);
 
@@ -171,7 +171,7 @@
     async function showApp(){$('login-screen').classList.add('hidden');$('app').classList.remove('hidden');await load()}
     async function start(nextUser){currentUser=nextUser;$('login-screen').classList.add('hidden');$('app').classList.remove('hidden');await load()}
     async function doLogout(){await sb.auth.signOut();currentUser=null;currentRole=null;$('app').classList.add('hidden');$('login-screen').classList.remove('hidden')}
-    $('login-btn').addEventListener('click',signIn);$('password').addEventListener('keydown',e=>{if(e.key==='Enter')signIn()});$('refresh-btn').addEventListener('click',load);$('logout-btn').addEventListener('click',doLogout);$('prev-btn').addEventListener('click',()=>move(-1));$('next-btn').addEventListener('click',()=>move(1));$('done-btn').addEventListener('click',done);$('customer-search').addEventListener('input',()=>{activeId=currentQueue()[0]?.id||null;renderCustomerSuggestions();render()});$('customer-search').addEventListener('focus',renderCustomerSuggestions);$('include-archived').addEventListener('change',()=>{activeId=currentQueue()[0]?.id||null;renderCustomerSuggestions();render()});$('catalog-toggle').addEventListener('click',()=>{$('catalog-tools').classList.toggle('hidden');$('catalog-search').focus()});$('catalog-search').addEventListener('input',renderCatalogSuggestions);
+    $('login-btn').addEventListener('click',signIn);$('password').addEventListener('keydown',e=>{if(e.key==='Enter')signIn()});$('refresh-btn').addEventListener('click',load);$('logout-btn').addEventListener('click',doLogout);$('prev-btn').addEventListener('click',()=>move(-1));$('next-btn').addEventListener('click',()=>move(1));$('done-btn').addEventListener('click',done);$('customer-search').addEventListener('input',()=>{activeId=currentQueue()[0]?.id||null;renderCustomerSuggestions();render()});$('customer-search').addEventListener('focus',renderCustomerSuggestions);$('include-archived').addEventListener('change',()=>load());$('catalog-toggle').addEventListener('click',()=>{$('catalog-tools').classList.toggle('hidden');$('catalog-search').focus()});$('catalog-search').addEventListener('input',renderCatalogSuggestions);
     window.addEventListener('DOMContentLoaded',async()=>{const{data:{session}}=await sb.auth.getSession();if(session){currentUser=session.user;if(await ensureOperatorAccess())await showApp()}});
     if('serviceWorker' in navigator)navigator.serviceWorker.register('/emblg-sw.js').catch(()=>{});
   </script>
