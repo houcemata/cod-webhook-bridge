@@ -90,5 +90,13 @@
       document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{if(tab.dataset.tab==='stock')setTimeout(()=>$('return-barcode').focus(),0)}));
     })();
   </script>
+  <script>
+    (()=>{
+      const input=$('return-barcode');
+      if(!input)return;
+      const decode=value=>{const raw=String(value??'');const map={'Q':'A','q':'a','&':'1','é':'2','"':'3',"'":'4','(':'5','-':'6','è':'7','_':'8','ç':'9','à':'0',')':'-'};return /[&é"'()\-è_çà)]/.test(raw)?[...raw].map(ch=>map[ch]??ch).join(''):raw};
+      input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopImmediatePropagation();input.value=decode(input.value);$('scan-return-btn').click()}},true);
+    })();
+  </script>
 </body>
 </html>

@@ -187,5 +187,33 @@
       $('order-barcode').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.currentTarget.value=decodeScannerValue(e.currentTarget.value);scan()}});
     })();
   </script>
+  <script>
+    (()=>{
+      const input=$('order-barcode');
+      if(!input)return;
+      const decode=value=>{const raw=String(value??'');const map={'Q':'A','q':'a','&':'1','é':'2','"':'3',"'":'4','(':'5','-':'6','è':'7','_':'8','ç':'9','à':'0',')':'-'};return /[&é"'()\-è_çà)]/.test(raw)?[...raw].map(ch=>map[ch]??ch).join(''):raw};
+      async function scanByTracking(){
+        const raw=decode(input.value.trim()).trim();
+        if(!raw)return;
+        const code=raw.replace(/\s+/g,'').toUpperCase();
+        try{
+          let row=rows.find(x=>String(x.source_order_key||'').replace(/\s+/g,'').toUpperCase()===code||String(x.source_order_id||'').replace(/\s+/g,'').toUpperCase()===code);
+          if(!row){
+            let orderQuery=await sb.from('orders').select('id,order_id,tracking_number').eq('tracking_number',raw).maybeSingle();
+            if(!orderQuery.data)orderQuery=await sb.from('orders').select('id,order_id,tracking_number').eq('order_id',raw).maybeSingle();
+            if(orderQuery.error)throw orderQuery.error;
+            if(orderQuery.data){
+              row=rows.find(x=>Number(x.source_order_id)===Number(orderQuery.data.id));
+              if(!row){const packagingQuery=await sb.from('packaging_orders').select('*').eq('source_order_id',orderQuery.data.id).order('id',{ascending:false}).limit(1).maybeSingle();if(packagingQuery.error)throw packagingQuery.error;row=packagingQuery.data;if(row)rows=[...rows.filter(x=>Number(x.id)!==Number(row.id)),row]}
+            }
+          }
+          if(!row){showToast('Packaging order not found',true);return}
+          if(row.archived_at)$('include-archived').checked=true;
+          activeId=row.id;$('customer-search').value=row.customer_name||'';input.value='';render();showToast('Packaging order opened');
+        }catch(error){showToast(error.message||'Could not find packaging order',true)}
+      }
+      input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopImmediatePropagation();scanByTracking()}},true);
+    })();
+  </script>
 </body>
 </html>
