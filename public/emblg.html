@@ -182,8 +182,9 @@
       const wrap=document.createElement('div');
       wrap.innerHTML='<label class="search-label" for="order-barcode">Scan packaging slip</label><div class="search-wrap"><input class="input" id="order-barcode" autocomplete="off" inputmode="none" placeholder="Scan the order barcode here" /></div><p style="font-size:12px;color:var(--muted);margin-top:7px;margin-bottom:14px">The matching order will open automatically. You can also search by customer below.</p>';
       panel.prepend(...Array.from(wrap.children));
+      function decodeScannerValue(value){const raw=String(value??'');if(!/[&é"'()\-è_çà)]/.test(raw))return raw;const map={'Q':'A','q':'a','&':'1','é':'2','"':'3',"'":'4','(':'5','-':'6','è':'7','_':'8','ç':'9','à':'0',')':'-'};return [...raw].map(ch=>map[ch]??ch).join('')}
       async function scan(){const input=$('order-barcode'),raw=input.value.trim();if(!raw)return;const code=String(raw).replace(/\s+/g,'').toUpperCase();let row=rows.find(x=>String(x.source_order_key||'').replace(/\s+/g,'').toUpperCase()===code||String(x.source_order_id||'').replace(/\s+/g,'').toUpperCase()===code);try{if(!row){let q=await sb.from('packaging_orders').select('*').eq('source_order_key',raw).maybeSingle();row=q.data;if(!row&&/^\d+$/.test(raw)){q=await sb.from('packaging_orders').select('*').eq('source_order_id',Number(raw)).order('id',{ascending:false}).limit(1).maybeSingle();row=q.data}if(!row){showToast('Packaging order not found',true);return}rows=[...rows.filter(x=>Number(x.id)!==Number(row.id)),row]}activeId=row.id;$('customer-search').value=row.customer_name||'';input.value='';render();showToast('Packaging order opened')}catch(error){showToast(error.message||'Could not find packaging order',true)}}
-      $('order-barcode').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();scan()}});
+      $('order-barcode').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.currentTarget.value=decodeScannerValue(e.currentTarget.value);scan()}});
     })();
   </script>
 </body>
