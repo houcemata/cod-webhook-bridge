@@ -80,7 +80,7 @@
     const $=id=>document.getElementById(id);
     const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
     function showToast(message,error=false){const el=$('toast');el.textContent=message;el.className='toast show'+(error?' error':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.className='toast',2800)}
-    function sizeOf(item){const raw=String(item?.size||item?.variant||'');if(/^M$/i.test(raw)||/30\s*[×x*]\s*40/i.test(raw))return'M';if(/^L$/i.test(raw)||/40\s*[×x*]\s*60/i.test(raw))return'L';return raw||'Other'}
+    function sizeOf(item){const raw=String(item?.size||item?.variant||'');if(/^M$/i.test(raw)||/30\s*[×x*]\s*40/i.test(raw))return'M';if(/^L$/i.test(raw)||/40\s*[×x*]\s*60/i.test(raw))return'L';if(/^XL$/i.test(raw)||/60\s*[×x*]\s*80/i.test(raw))return'XL';return raw||'Other'}
     function customImage(item){return item?.custom_upload?.url||item?.custom_upload?.key||item?.image||''}
     function customNote(item){return item?.custom_note||item?.custom_upload?.note||''}
     function expandedItems(order){const input=Array.isArray(order.items)?order.items:[];const list=input.length?input:[{product:order.product,variant:order.variable,size:sizeOf({variant:order.variable}),image:''}];return list.flatMap(item=>Array.from({length:Math.max(1,Number(item.quantity)||1)},()=>({...item,size:sizeOf(item),image:customImage(item),custom_note:customNote(item)})))}
@@ -89,21 +89,21 @@
     function currentQueue(){const query=$('customer-search').value.trim().toLowerCase();let list=orderedVisible();if(query)list=list.filter(x=>String(x.customer_name||'').toLowerCase().includes(query));return list}
     function activeRow(){return rows.find(x=>Number(x.id)===Number(activeId))||null}
     function renderCustomerSuggestions(){const q=$('customer-search').value.trim().toLowerCase();const box=$('customer-suggestions');if(!q){box.classList.add('hidden');return}const matches=orderedVisible().filter(x=>String(x.customer_name||'').toLowerCase().includes(q)).slice(0,8);box.innerHTML=matches.length?matches.map(x=>`<button class="suggestion" type="button" data-id="${esc(x.id)}"><span>${esc(x.customer_name)}</span><small>${x.archived_at?'Archived':'Active'}</small></button>`).join(''):'<div class="suggestion"><span>No matching customers</span></div>';box.classList.remove('hidden');box.querySelectorAll('[data-id]').forEach(b=>b.addEventListener('click',()=>{activeId=Number(b.dataset.id);$('customer-search').value=activeRow()?.customer_name||'';box.classList.add('hidden');render()}))}
-    function renderOrder(){const row=activeRow();const list=currentQueue();if(!row||!list.some(x=>Number(x.id)===Number(row.id))){activeId=list[0]?.id||null}const current=activeRow();$('queue-count').textContent=`${orderedVisible().filter(x=>!x.archived_at).length} active`;if(!current){$('content').innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m21 8-9-5-9 5 9 5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg><h2>No packaging orders</h2><p>Select confirmed orders in the operator app, then tap the ARCO Emblg package icon.</p></div>`;$('nav-row').classList.add('hidden');return}$('nav-row').classList.remove('hidden');const index=list.findIndex(x=>Number(x.id)===Number(current.id));const dup=sourceDuplicates(current);const groups={M:[],L:[],Other:[]};expandedItems(current).forEach(item=>{(groups[item.size]||groups.Other).push(item)});const groupHtml=['M','L','Other'].filter(k=>groups[k].length).map(k=>`<section class="group"><div class="group-title">${k==='Other'?'Other size':`Size ${k}`}</div>${groups[k].map(item=>`<div class="item"><img class="${item.image?'':'no-image'}" src="${esc(item.image||LOGO)}" alt="${esc(item.product||item.product_name||'Product image')}" loading="lazy" /><div class="item-info"><div class="item-name">${esc(item.product||item.product_name||item.product_slug||'Unnamed design')}</div><div class="item-meta">${esc(item.variant||item.size||k)}${customNote(item)?` · ${esc(customNote(item))}`:''}</div><span class="source-badge ${item.source==='returned'?'returned':'new'}">${item.source==='returned'?'Returned stock':'New production'}</span></div><span class="item-badge">${esc(k)}</span></div>`).join('')}</section>`).join('');$('content').innerHTML=`<article class="order-card"><div class="order-head"><div><h2>${esc(current.customer_name)}</h2><p>Order ${esc(current.source_order_key)} · Confirmed ${formatDate(current.confirmed_at||current.created_at)}</p></div><div class="position">${index+1}<span style="font:12px Inter;color:var(--muted)"> / ${list.length}</span></div></div>${dup.length>1?`<div class="duplicate">Duplicate transfer notice: this order was sent ${dup.length} times. Check the other snapshot before packing.</div>`:''}${groupHtml}</article>`;$('prev-btn').disabled=index<=0;$('next-btn').disabled=index>=list.length-1;$('done-btn').disabled=!!current.archived_at}
+    function renderOrder(){const row=activeRow();const list=currentQueue();if(!row||!list.some(x=>Number(x.id)===Number(row.id))){activeId=list[0]?.id||null}const current=activeRow();$('queue-count').textContent=`${orderedVisible().filter(x=>!x.archived_at).length} active`;if(!current){$('content').innerHTML=`<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m21 8-9-5-9 5 9 5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg><h2>No packaging orders</h2><p>Select confirmed orders in the operator app, then tap the ARCO Emblg package icon.</p></div>`;$('nav-row').classList.add('hidden');return}$('nav-row').classList.remove('hidden');const index=list.findIndex(x=>Number(x.id)===Number(current.id));const dup=sourceDuplicates(current);const groups={M:[],L:[],XL:[],Other:[]};expandedItems(current).forEach(item=>{(groups[item.size]||groups.Other).push(item)});const groupHtml=['M','L','XL','Other'].filter(k=>groups[k].length).map(k=>`<section class="group"><div class="group-title">${k==='Other'?'Other size':`Size ${k}`}</div>${groups[k].map(item=>`<div class="item"><img class="${item.image?'':'no-image'}" src="${esc(item.image||LOGO)}" alt="${esc(item.product||item.product_name||'Product image')}" loading="lazy" /><div class="item-info"><div class="item-name">${esc(item.product||item.product_name||item.product_slug||'Unnamed design')}</div><div class="item-meta">${esc(item.variant||item.size||k)}${customNote(item)?` · ${esc(customNote(item))}`:''}</div><span class="source-badge ${item.source==='returned'?'returned':'new'}">${item.source==='returned'?'Returned stock':'New production'}</span></div><span class="item-badge">${esc(k)}</span></div>`).join('')}</section>`).join('');$('content').innerHTML=`<article class="order-card"><div class="order-head"><div><h2>${esc(current.customer_name)}</h2><p>Order ${esc(current.source_order_key)} · Confirmed ${formatDate(current.confirmed_at||current.created_at)}</p></div><div class="position">${index+1}<span style="font:12px Inter;color:var(--muted)"> / ${list.length}</span></div></div>${dup.length>1?`<div class="duplicate">Duplicate transfer notice: this order was sent ${dup.length} times. Check the other snapshot before packing.</div>`:''}${groupHtml}</article>`;$('prev-btn').disabled=index<=0;$('next-btn').disabled=index>=list.length-1;$('done-btn').disabled=!!current.archived_at}
     function formatDate(value){if(!value)return'—';const d=new Date(value);return Number.isNaN(d.getTime())?'—':d.toLocaleString('fr-DZ',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
     function render(){renderOrder()}
     function move(delta){const list=currentQueue();const i=list.findIndex(x=>Number(x.id)===Number(activeId));const next=list[i+delta];if(next){activeId=next.id;render()}}
     async function done(){const row=activeRow();if(!row||row.archived_at)return;$('done-btn').disabled=true;const queueBeforeArchive=currentQueue();const currentIndex=queueBeforeArchive.findIndex(x=>Number(x.id)===Number(row.id));const next=queueBeforeArchive[currentIndex+1]||null;const r=await sb.from('packaging_orders').update({archived_at:new Date().toISOString()}).eq('id',row.id);if(r.error){$('done-btn').disabled=false;showToast(r.error.message,true);return}row.archived_at=new Date().toISOString();activeId=next?.id||null;showToast('Order archived');render()}
 
-    async function fetchAllPackagingOrders(){
+    async function fetchAllPackagingOrders(includeArchived=false){
       const PAGE_SIZE=100;
       let all=[];
       let from=0;
 
       while(true){
-        const {data,error}=await sb
-          .from('packaging_orders')
-          .select('*')
+        let query=sb.from('packaging_orders').select('*');
+        if(!includeArchived)query=query.is('archived_at',null);
+        const {data,error}=await query
           .order('confirmed_at',{ascending:true})
           .order('id',{ascending:true})
           .range(from,from+PAGE_SIZE-1);
@@ -150,7 +150,7 @@
 
       try{
         const [orders,products]=await Promise.all([
-          fetchAllPackagingOrders(),
+          fetchAllPackagingOrders($('include-archived')?.checked===true),
           fetchAllProducts()
         ]);
 
@@ -171,9 +171,49 @@
     async function showApp(){$('login-screen').classList.add('hidden');$('app').classList.remove('hidden');await load()}
     async function start(nextUser){currentUser=nextUser;$('login-screen').classList.add('hidden');$('app').classList.remove('hidden');await load()}
     async function doLogout(){await sb.auth.signOut();currentUser=null;currentRole=null;$('app').classList.add('hidden');$('login-screen').classList.remove('hidden')}
-    $('login-btn').addEventListener('click',signIn);$('password').addEventListener('keydown',e=>{if(e.key==='Enter')signIn()});$('refresh-btn').addEventListener('click',load);$('logout-btn').addEventListener('click',doLogout);$('prev-btn').addEventListener('click',()=>move(-1));$('next-btn').addEventListener('click',()=>move(1));$('done-btn').addEventListener('click',done);$('customer-search').addEventListener('input',()=>{activeId=currentQueue()[0]?.id||null;renderCustomerSuggestions();render()});$('customer-search').addEventListener('focus',renderCustomerSuggestions);$('include-archived').addEventListener('change',()=>{activeId=currentQueue()[0]?.id||null;renderCustomerSuggestions();render()});$('catalog-toggle').addEventListener('click',()=>{$('catalog-tools').classList.toggle('hidden');$('catalog-search').focus()});$('catalog-search').addEventListener('input',renderCatalogSuggestions);
+    $('login-btn').addEventListener('click',signIn);$('password').addEventListener('keydown',e=>{if(e.key==='Enter')signIn()});$('refresh-btn').addEventListener('click',load);$('logout-btn').addEventListener('click',doLogout);$('prev-btn').addEventListener('click',()=>move(-1));$('next-btn').addEventListener('click',()=>move(1));$('done-btn').addEventListener('click',done);$('customer-search').addEventListener('input',()=>{activeId=currentQueue()[0]?.id||null;renderCustomerSuggestions();render()});$('customer-search').addEventListener('focus',renderCustomerSuggestions);$('include-archived').addEventListener('change',()=>load());$('catalog-toggle').addEventListener('click',()=>{$('catalog-tools').classList.toggle('hidden');$('catalog-search').focus()});$('catalog-search').addEventListener('input',renderCatalogSuggestions);
     window.addEventListener('DOMContentLoaded',async()=>{const{data:{session}}=await sb.auth.getSession();if(session){currentUser=session.user;if(await ensureOperatorAccess())await showApp()}});
     if('serviceWorker' in navigator)navigator.serviceWorker.register('/emblg-sw.js').catch(()=>{});
+  </script>
+  <script>
+    (()=>{
+      const panel=document.querySelector('.search-panel');
+      if(!panel)return;
+      const wrap=document.createElement('div');
+      wrap.innerHTML='<label class="search-label" for="order-barcode">Scan packaging slip</label><div class="search-wrap"><input class="input" id="order-barcode" autocomplete="off" inputmode="none" placeholder="Scan the order barcode here" /></div><p style="font-size:12px;color:var(--muted);margin-top:7px;margin-bottom:14px">The matching order will open automatically. You can also search by customer below.</p>';
+      panel.prepend(...Array.from(wrap.children));
+      function decodeScannerValue(value){const raw=String(value??'');if(!/[&é"'()\-è_çà)]/.test(raw))return raw;const map={'Q':'A','q':'a','&':'1','é':'2','"':'3',"'":'4','(':'5','-':'6','è':'7','_':'8','ç':'9','à':'0',')':'-'};return [...raw].map(ch=>map[ch]??ch).join('')}
+      async function scan(){const input=$('order-barcode'),raw=input.value.trim();if(!raw)return;const code=String(raw).replace(/\s+/g,'').toUpperCase();let row=rows.find(x=>String(x.source_order_key||'').replace(/\s+/g,'').toUpperCase()===code||String(x.source_order_id||'').replace(/\s+/g,'').toUpperCase()===code);try{if(!row){let q=await sb.from('packaging_orders').select('*').eq('source_order_key',raw).maybeSingle();row=q.data;if(!row&&/^\d+$/.test(raw)){q=await sb.from('packaging_orders').select('*').eq('source_order_id',Number(raw)).order('id',{ascending:false}).limit(1).maybeSingle();row=q.data}if(!row){showToast('Packaging order not found',true);return}rows=[...rows.filter(x=>Number(x.id)!==Number(row.id)),row]}activeId=row.id;$('customer-search').value=row.customer_name||'';input.value='';render();showToast('Packaging order opened')}catch(error){showToast(error.message||'Could not find packaging order',true)}}
+      $('order-barcode').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.currentTarget.value=decodeScannerValue(e.currentTarget.value);scan()}});
+    })();
+  </script>
+  <script>
+    (()=>{
+      const input=$('order-barcode');
+      if(!input)return;
+      const decode=value=>{const raw=String(value??'');const map={'Q':'A','q':'a','&':'1','é':'2','"':'3',"'":'4','(':'5','-':'6','è':'7','_':'8','ç':'9','à':'0',')':'-'};return /[&é"'()\-è_çà)]/.test(raw)?[...raw].map(ch=>map[ch]??ch).join(''):raw};
+      async function scanByTracking(){
+        const raw=decode(input.value.trim()).trim();
+        if(!raw)return;
+        const code=raw.replace(/\s+/g,'').toUpperCase();
+        try{
+          let row=rows.find(x=>String(x.source_order_key||'').replace(/\s+/g,'').toUpperCase()===code||String(x.source_order_id||'').replace(/\s+/g,'').toUpperCase()===code);
+          if(!row){
+            let orderQuery=await sb.from('orders').select('id,order_id,tracking_number').eq('tracking_number',raw).maybeSingle();
+            if(!orderQuery.data)orderQuery=await sb.from('orders').select('id,order_id,tracking_number').eq('order_id',raw).maybeSingle();
+            if(orderQuery.error)throw orderQuery.error;
+            if(orderQuery.data){
+              row=rows.find(x=>Number(x.source_order_id)===Number(orderQuery.data.id));
+              if(!row){const packagingQuery=await sb.from('packaging_orders').select('*').eq('source_order_id',orderQuery.data.id).order('id',{ascending:false}).limit(1).maybeSingle();if(packagingQuery.error)throw packagingQuery.error;row=packagingQuery.data;if(row)rows=[...rows.filter(x=>Number(x.id)!==Number(row.id)),row]}
+            }
+          }
+          if(!row){showToast('Packaging order not found',true);return}
+          if(row.archived_at)$('include-archived').checked=true;
+          activeId=row.id;$('customer-search').value=row.customer_name||'';input.value='';render();showToast('Packaging order opened');
+        }catch(error){showToast(error.message||'Could not find packaging order',true)}
+      }
+      input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopImmediatePropagation();scanByTracking()}},true);
+    })();
   </script>
 </body>
 </html>
