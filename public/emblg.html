@@ -16,7 +16,7 @@
     :root{--bg:#020617;--surface:#0b1222;--surface-2:#111b2e;--line:#24324a;--text:#f8fafc;--muted:#9aa8bd;--gold:#f5c500;--green:#22c55e;--amber:#f59e0b;--red:#ef4444;--shadow:0 14px 34px rgba(0,0,0,.25)}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html{background:var(--bg)}
-    body{font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 80% -10%,rgba(245,197,0,.09),transparent 32rem),var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+    body{font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at 80% -10%,rgba(245,197,0,.09),transparent 32rem),var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;overflow-anchor:none}
     button,input{font:inherit}button{cursor:pointer}button:disabled{cursor:wait;opacity:.5}
     button:focus-visible,input:focus-visible{outline:3px solid rgba(245,197,0,.55);outline-offset:2px}
     .hidden{display:none!important}
@@ -201,6 +201,7 @@
       if(!input)return;
       const decode=value=>{const raw=String(value??'');const map={'Q':'A','q':'a','&':'1','é':'2','"':'3',"'":'4','(':'5','-':'6','è':'7','_':'8','ç':'9','à':'0',')':'-'};return /[&é"'()\-è_çà)]/.test(raw)?[...raw].map(ch=>map[ch]??ch).join(''):raw};
       async function scanByTracking(){
+        const savedScrollTop=window.scrollY,savedScrollLeft=window.scrollX;
         const raw=decode(input.value.trim()).trim();
         if(!raw)return;
         const code=raw.replace(/\s+/g,'').toUpperCase();
@@ -218,7 +219,7 @@
           if(!row){showToast('Packaging order not found',true);return}
           if(row.archived_at)$('include-archived').checked=true;
           if(row.archived_at)$('include-archived').checked=true;
-          slotRows[nextSlot]=row;nextSlot=(nextSlot+1)%2;activeId=row.id;$('customer-search').value='';input.value='';const savedScrollTop=window.scrollY,savedScrollLeft=window.scrollX;render();requestAnimationFrame(()=>window.scrollTo({top:savedScrollTop,left:savedScrollLeft,behavior:'auto'}));showToast('Packaging order opened');
+          slotRows[nextSlot]=row;nextSlot=(nextSlot+1)%2;activeId=row.id;$('customer-search').value='';input.value='';render();requestAnimationFrame(()=>{window.scrollTo({top:savedScrollTop,left:savedScrollLeft,behavior:'auto'});document.documentElement.scrollTop=savedScrollTop;document.body.scrollTop=savedScrollTop;setTimeout(()=>{window.scrollTo({top:savedScrollTop,left:savedScrollLeft,behavior:'auto'});},0)});showToast('Packaging order opened');
         }catch(error){showToast(error.message||'Could not find packaging order',true)}
       }
       input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopImmediatePropagation();scanByTracking()}},true);
