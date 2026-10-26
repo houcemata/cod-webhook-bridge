@@ -1510,7 +1510,7 @@ async function shipSingle(id){
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${session?.access_token||''}`},
       body:JSON.stringify(payload)
     });
-    const data=await r.json();
+    const data=await r.json().catch(()=>({}));
     if(!r.ok)throw new Error(data.error||'Failed');
     o.status='shipped';
     o.tracking_number=data.tracking_number;
@@ -1541,20 +1541,20 @@ async function bulkShip(){
   const{data:{session}}=await sb.auth.getSession();
   let ok=0,fail=0;
   try{
-    for(const id of ids){
-      const o=allOrders.find(x=>x.id===id);
-      if(!o)continue;
-      try{
-        const r=await fetch('/api/ship-order',{
-          method:'POST',
-          headers:{'Content-Type':'application/json','Authorization':`Bearer ${session?.access_token||''}`},
-          body:JSON.stringify({orderId:o.id,order:o,stationCode:o.station_code||null})
-        });
-        const data=await r.json();
-        if(r.ok){o.status='shipped';o.tracking_number=data.tracking_number;o.shipping_agency='noest';ok++;}
-        else fail++;
-      }catch{fail++;}
-      updateBulkProgress(ok+fail,ids.length,fail);
+    const orders=ids.map(id=>allOrders.find(x=>x.id===id)).filter(Boolean);
+    const r=await fetch('/api/ship-orders-bulk',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${session?.access_token||''}`},
+      body:JSON.stringify({orders:orders.map(o=>({orderId:o.id,order:o,stationCode:o.station_code||null}))})
+    });
+    const data=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(data.error||'Bulk shipping failed');
+    const results=data.results||{};
+    for(const o of orders){
+      const result=results[String(o.id)]||results[o.id];
+      if(result?.success){o.status='shipped';o.tracking_number=result.tracking_number;o.shipping_agency='noest';ok++;}
+      else fail++;
+      updateBulkProgress(ok+fail,orders.length,fail);
     }
     selectedIds.clear();
     await loadOrders();
