@@ -111,6 +111,12 @@ function orderValueDiscount(subtotal) {
   return 0;
 }
 
+function isPosterItem(item) {
+  const type = normalizeText(item?.product_type || item?.type).toLowerCase();
+  const price = Number(item?.price || 0);
+  return type === "poster" || (type !== "set" && price > 0 && price < 2900);
+}
+
 async function nextCustomOrderLabel(supabase, fallbackOrderId) {
   try {
     const { data, error } = await supabase.rpc("next_custom_order_number");
@@ -370,6 +376,7 @@ async function handleCartOrder(req, res, supabase, body) {
     resolved.push({
       product_slug: product.slug,
       product: product.name,
+      product_type: product.type || "",
       variant: variant.label || variant.name,
       options: variant.options || null,
       price: Number(variant.price),
@@ -383,9 +390,11 @@ async function handleCartOrder(req, res, supabase, body) {
 
   if (!resolved.length) return res.status(400).json({ error: "No valid items" });
 
-  // every-3rd-free: the CHEAPEST in each group of 3 becomes free
-  const sortedAsc = [...resolved].sort((a, b) => a.price - b.price);
-  const freeCount = Math.floor(resolved.length / 3);
+  // Every 3 eligible posters: the cheapest poster becomes free.
+  // Sets are not eligible for this promotion, even when mixed into the cart.
+  const posterItems = resolved.filter(isPosterItem);
+  const sortedAsc = [...posterItems].sort((a, b) => a.price - b.price);
+  const freeCount = Math.floor(posterItems.length / 3);
   const freeSet = new Set();
   for (let i = 0; i < freeCount; i++) freeSet.add(sortedAsc[i]);
   let itemsTotal = 0;

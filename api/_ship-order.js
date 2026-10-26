@@ -138,9 +138,17 @@ async function resolveCommuneAndWilayaForNoest(wilayaId, commune, noestToken) {
     try {
       const resolved = await resolveCommuneForNoest({ token: noestToken, wilayaId, commune: raw });
       if (resolved.ok) {
+        const resolvedWilayaId = Number(resolved.wilayaId || wilayaId);
+        if (resolvedWilayaId !== Number(wilayaId)) {
+          return {
+            ok: false,
+            error: `Commune "${raw}" belongs to wilaya ${resolvedWilayaId}, not wilaya ${wilayaId}`,
+            suggestions: [],
+          };
+        }
         return {
           ok: true,
-          wilayaId: Number(resolved.wilayaId || wilayaId),
+          wilayaId: resolvedWilayaId,
           commune: resolved.commune || "",
           method: resolved.method,
         };
@@ -302,7 +310,18 @@ export async function prepareNoestPayload({ order, orderId, stationCode, noestGu
   return { ok: true, payload, fallbackPayload, isStopDesk };
 }
 
-export { noestPost, formatNoestError, isCommuneValidationError, updateSupabase, logHistory };
+export {
+  getWilayaId,
+  normalizePhone,
+  sanitizeNoestText,
+  normalizeStationCode,
+  resolveCommuneAndWilayaForNoest,
+  noestPost,
+  formatNoestError,
+  isCommuneValidationError,
+  updateSupabase,
+  logHistory,
+};
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
