@@ -864,7 +864,7 @@ body{font-family:'Plus Jakarta Sans','Cairo',sans-serif}
     <div class="edit-field"><div class="edit-label">Product to send</div><input class="edit-input" id="exchange-product" placeholder="Product name" required/></div>
     <div class="edit-field"><div class="edit-label">Variant</div><input class="edit-input" id="exchange-variable" placeholder="Optional variant or size"/></div>
     <div class="edit-field"><div class="edit-label">Amount</div><input class="edit-input" id="exchange-amount" type="number" min="0" step="1" placeholder="0"/></div>
-    <button class="edit-save-btn" id="exchange-submit-btn" onclick="createExchange()">Create Échange and Ship</button>
+    <button class="edit-save-btn" id="exchange-submit-btn" onclick="createExchange()">Create Échange</button>
   </div>
 </div>
 
@@ -1747,12 +1747,12 @@ async function createExchange(){
     await loadOrders();
     currentOrder=allOrders.find(x=>x.id===o.id)||o;
     renderDetail(getDuplicatesForOrder(currentOrder));
-    toast(`Échange shipped! #${data.tracking_number}`);
+    toast(`Échange created as confirmed order #${data.exchange_order_id}`);
   }catch(error){
     toast(error.message||'Could not create exchange',true);
   }finally{
     button.disabled=false;
-    button.textContent='Create Échange and Ship';
+    button.textContent='Create Échange';
   }
 }
 
