@@ -241,7 +241,9 @@ function buildNoestPayload({ noestGuid, orderId, order, wilayaId, phone, clientN
     ...(commune ? { commune } : {}),
     montant: parseFloat(order.prix_total || 0),
     produit: sanitizeNoestText(buildProduitText(order), "Commande ARCO"),
-    type_id: 1,
+    // Échange orders are created locally as confirmed, then enter the same
+    // normal shipping flow. Keep their Noest type when that flow runs.
+    type_id: String(order.notes || "").startsWith("Échange for order #") ? 2 : 1,
     stop_desk: isStopDesk ? 1 : 0,
     can_open: 1,
     poids: 0.5,
