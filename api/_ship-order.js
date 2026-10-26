@@ -134,45 +134,44 @@ async function resolveCommuneAndWilayaForNoest(wilayaId, commune, noestToken) {
   const raw = sanitizeNoestText(commune || "", "");
   if (!raw) return { ok: true, wilayaId, commune: "" };
 
-  if (noestToken) {
-    try {
-      const resolved = await resolveCommuneForNoest({ token: noestToken, wilayaId, commune: raw });
-      if (resolved.ok) {
-        const resolvedWilayaId = Number(resolved.wilayaId || wilayaId);
-        if (resolvedWilayaId !== Number(wilayaId)) {
-          return {
-            ok: false,
-            error: `Commune "${raw}" belongs to wilaya ${resolvedWilayaId}, not wilaya ${wilayaId}`,
-            suggestions: [],
-          };
-        }
-        return {
-          ok: true,
-          wilayaId: resolvedWilayaId,
-          commune: resolved.commune || "",
-          method: resolved.method,
-        };
-      }
-      console.warn("[noest-location] commune mismatch", {
-        wilayaId,
-        input: raw,
-        normalized: normalizeLocationKey(raw),
-        error: resolved.error,
-        suggestions: resolved.suggestions || [],
-      });
-      return {
-        ok: false,
-        error: resolved.error || `Invalid commune "${raw}" for Noest`,
-        suggestions: resolved.suggestions || [],
-      };
-    } catch (error) {
-      console.warn("[noest-location] could not load Noest commune reference", error.message || error);
-    }
+  if (!noestToken) {
+    return { ok: false, error: "Noest location verification is unavailable; shipping was not sent." };
   }
 
-  const key = normalizeWilayaKey(raw);
-  const aliases = COMMUNE_ALIASES[Number(wilayaId)] || {};
-  return { ok: true, wilayaId, commune: aliases[key] || raw, method: aliases[key] ? "legacy_alias" : "raw" };
+  try {
+    const resolved = await resolveCommuneForNoest({ token: noestToken, wilayaId, commune: raw });
+    if (resolved.ok) {
+      const resolvedWilayaId = Number(resolved.wilayaId || wilayaId);
+      if (resolvedWilayaId !== Number(wilayaId)) {
+        return {
+          ok: false,
+          error: `Commune "${raw}" belongs to wilaya ${resolvedWilayaId}, not wilaya ${wilayaId}`,
+          suggestions: [],
+        };
+      }
+      return {
+        ok: true,
+        wilayaId: resolvedWilayaId,
+        commune: resolved.commune || "",
+        method: resolved.method,
+      };
+    }
+    console.warn("[noest-location] commune mismatch", {
+      wilayaId,
+      input: raw,
+      normalized: normalizeLocationKey(raw),
+      error: resolved.error,
+      suggestions: resolved.suggestions || [],
+    });
+    return {
+      ok: false,
+      error: resolved.error || `Invalid commune "${raw}" for Noest`,
+      suggestions: resolved.suggestions || [],
+    };
+  } catch (error) {
+    console.warn("[noest-location] could not load Noest commune reference", error.message || error);
+    return { ok: false, error: "Noest location verification failed; shipping was not sent." };
+  }
 }
 
 async function noestPost(endpoint, body, token) {
