@@ -176,16 +176,30 @@ async function resolveCommuneAndWilayaForNoest(wilayaId, commune, noestToken) {
 }
 
 async function noestPost(endpoint, body, token) {
-  const response = await fetch(`${NOEST_BASE}${endpoint}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  const data = await response.json();
-  return { ok: response.ok, status: response.status, data };
+  let last = null;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const response = await fetch(`${NOEST_BASE}${endpoint}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    const text = await response.text();
+    let data = null;
+    try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+    last = {
+      ok: response.ok,
+      status: response.status,
+      data,
+      retryAfterMs: Math.max(0, Number(response.headers.get("retry-after") || 0) * 1000),
+    };
+    if (response.status !== 429 || attempt === 2) return last;
+    const delay = last.retryAfterMs || [1500, 3500, 6000][attempt];
+    await new Promise((resolve) => setTimeout(resolve, Math.min(delay, 10000)));
+  }
+  return last;
 }
 
 function formatNoestError(data) {
